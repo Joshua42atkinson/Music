@@ -82,7 +82,7 @@ export default function ConnectionManager() {
               <ShieldCheck className="text-cf-gold" size={24} />
             </div>
             
-            <h2 className="text-2xl font-light text-cf-gold mb-2">Connect to Grimoire</h2>
+            <h2 className="text-2xl font-light text-cf-gold mb-2">Connect to Voix Vive</h2>
             <p className="text-sm text-cf-slate mb-8 font-serif italic">
               Your data is stored securely on your device. To sync with Bertrand or submit videos, enter the secure Server Code provided by your mentor.
             </p>

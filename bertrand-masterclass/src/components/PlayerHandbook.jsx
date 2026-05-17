@@ -23,7 +23,7 @@ const handbookData = {
     ]
   },
   tome2: {
-    title: "Tome 2: The Sacred Nook & The Grimoire",
+    title: "Tome 2: The Sacred Nook & Voix Vive",
     subtitle: "Attention Management and Environmental Scaffolding",
     icon: "🕯️",
     sections: [
@@ -33,8 +33,8 @@ const handbookData = {
         image: "/assets/slides/desk.png"
       },
       {
-        heading: "The Grimoire (Binder Control)",
-        content: "Every Bard needs a Grimoire. We call this 'Binder Control'. This physical binder is an external hard drive for your attention. By physically logging your minutes, your chord charts, and your habits, you offload the cognitive burden of remembering *what* to practice. You free up 100% of your mental RAM to focus entirely on *how* you play."
+        heading: "Voix Vive (Binder Control)",
+        content: "Every Bard needs Voix Vive. We call this 'Binder Control'. This physical binder is an external hard drive for your attention. By physically logging your minutes, your chord charts, and your habits, you offload the cognitive burden of remembering *what* to practice. You free up 100% of your mental RAM to focus entirely on *how* you play."
       }
     ]
   },

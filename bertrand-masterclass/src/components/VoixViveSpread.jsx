@@ -4,7 +4,7 @@ import chapters from '../data/chapterData';
 import BreathingGate from './BreathingGate';
 import { loadTraction, getChapterState, updateChapterTraction, recordBreathingSession } from '../data/tractionStore';
 
-const GrimoireSpread = ({ chapterId = 1, onBack }) => {
+const VoixViveSpread = ({ chapterId = 1, onBack }) => {
   const chapter = chapters.find(c => c.id === chapterId) || chapters[0];
   const [traction, setTraction] = useState(loadTraction());
   const chapterState = getChapterState(traction, chapterId);
@@ -67,32 +67,32 @@ const GrimoireSpread = ({ chapterId = 1, onBack }) => {
         />
       )}
 
-      <div className="grimoire-spread">
+      <div className="voix-vive-spread">
         <style>{`
-          .grimoire-spread {
+          .voix-vive-spread {
             display: flex; min-height: 100vh;
             background: #0a0a0f; color: #e0e0ff;
             font-family: 'Inter', sans-serif;
             position: relative;
           }
           @media (max-width: 899px) {
-            .grimoire-spread { flex-direction: column; }
-            .grimoire-page { width: 100% !important; min-height: auto !important; }
-            .grimoire-spine { display: none; }
-            .grimoire-mobile-tabs { display: flex !important; }
+            .voix-vive-spread { flex-direction: column; }
+            .voix-vive-page { width: 100% !important; min-height: auto !important; }
+            .voix-vive-spine { display: none; }
+            .voix-vive-mobile-tabs { display: flex !important; }
           }
-          .grimoire-page {
+          .voix-vive-page {
             flex: 1; padding: 3rem; overflow-y: auto;
             min-height: 100vh; position: relative;
           }
-          .grimoire-page.yin {
+          .voix-vive-page.yin {
             background: radial-gradient(ellipse at 30% 20%, rgba(123, 106, 170, 0.08) 0%, #0a0a0f 70%);
             border-right: 1px solid rgba(255,255,255,0.03);
           }
-          .grimoire-page.yang {
+          .voix-vive-page.yang {
             background: radial-gradient(ellipse at 70% 80%, rgba(201, 169, 110, 0.06) 0%, #0a0a0f 70%);
           }
-          .grimoire-spine {
+          .voix-vive-spine {
             width: 64px; background: #050508;
             border-left: 1px solid rgba(255,255,255,0.05);
             border-right: 1px solid rgba(255,255,255,0.05);
@@ -123,7 +123,7 @@ const GrimoireSpread = ({ chapterId = 1, onBack }) => {
             box-shadow: 0 0 12px rgba(201, 169, 110, 0.2);
           }
           .spine-fret:hover { transform: scale(1.15); }
-          .grimoire-mobile-tabs {
+          .voix-vive-mobile-tabs {
             display: none; position: sticky; top: 0;
             z-index: 100; background: #0a0a0f;
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -234,7 +234,7 @@ const GrimoireSpread = ({ chapterId = 1, onBack }) => {
         <button className="back-btn" onClick={onBack}>← Dashboard</button>
 
         {/* Mobile tabs */}
-        <div className="grimoire-mobile-tabs">
+        <div className="voix-vive-mobile-tabs">
           <button className={`mobile-tab ${activePage === 'yin' ? 'active' : ''}`} onClick={() => setActivePage('yin')}>
             ☯ Yin · Theory
           </button>
@@ -245,7 +245,7 @@ const GrimoireSpread = ({ chapterId = 1, onBack }) => {
 
         {/* ── YIN PAGE (Left) ── */}
         {(!isMobile || activePage === 'yin') && (
-          <motion.div className="grimoire-page yin"
+          <motion.div className="voix-vive-page yin"
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
             <div className="chapter-badge">
               <span className="ch-color" style={{ background: chapter.color }} />
@@ -290,7 +290,7 @@ const GrimoireSpread = ({ chapterId = 1, onBack }) => {
         )}
 
         {/* ── SPINE (Center Fretboard) ── */}
-        <div className="grimoire-spine">
+        <div className="voix-vive-spine">
           {spineNotes.map(note => (
             <div key={note.fret}
               className={`spine-fret ${note.isChapterFret ? 'chapter-fret' : note.isActive ? 'active' : 'dim'}`}
@@ -303,7 +303,7 @@ const GrimoireSpread = ({ chapterId = 1, onBack }) => {
 
         {/* ── YANG PAGE (Right) ── */}
         {(!isMobile || activePage === 'yang') && (
-          <motion.div className="grimoire-page yang"
+          <motion.div className="voix-vive-page yang"
             initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
             <div className="chapter-badge">
               <span className="ch-color" style={{ background: chapter.color }} />
@@ -349,4 +349,4 @@ const GrimoireSpread = ({ chapterId = 1, onBack }) => {
   );
 };
 
-export default GrimoireSpread;
+export default VoixViveSpread;

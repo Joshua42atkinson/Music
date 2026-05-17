@@ -30,7 +30,7 @@ export default function MentorshipHub() {
               Mentorship Hub
             </motion.h1>
             <p className="text-cf-slate mt-2 text-lg italic font-serif">
-              {role === 'student' ? "Your path to mastery, guided by The Bard." : "The Bard's Grimoire: Apprentice Overview"}
+            {role === 'student' ? "Your path to mastery, guided by The Bard." : "The Bard's Voix Vive: Apprentice Overview"}
             </p>
           </div>
           

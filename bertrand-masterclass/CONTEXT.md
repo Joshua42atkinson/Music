@@ -60,7 +60,7 @@ I. Music Theory (Grammar) | II. Ear Training | III. Technique (Kinesthesis) | IV
 
 **JOSHUA'S GREAT GAME** (do NOT import without discussion): Four Channels/Committee, Player/Persona/Architect, Physics of Being, Virtue Topology, N=1 Experiment, Coal/Steam/Traction model
 
-**BORDERLINE** (confirm Thursday): "The Bard's Grimoire" title, "Bard Level" terminology, Monomyth stage names, alchemical metaphors
+**BORDERLINE** (confirm Thursday): "The Bard's Voix Vive" title, "Bard Level" terminology, Monomyth stage names, alchemical metaphors
 
 ---
 
@@ -99,7 +99,7 @@ bertrand-masterclass/
 │   │   ├── SlideViewer.jsx      — ★★ CORE: Phone-native swipeable slide reader (glassmorphism)
 │   │   ├── ScaffoldingProvider.jsx — React context for traction-aware UI fade
 │   │   ├── FretboardExplorer.jsx — Full 14-fret fretboard with scales + Web Audio
-│   │   ├── GrimoireSpread.jsx   — Legacy desktop Yin/Yang book layout (superseded by SlideViewer)
+│   │   ├── VoixViveSpread.jsx   — Legacy desktop Yin/Yang book layout (superseded by SlideViewer)
 │   │   ├── BreathingGate.jsx    — Somatic breathing + body scan gate
 │   │   ├── PitchRoom.jsx        — Gamified ear training
 │   │   ├── DigitalBinder.jsx    — Practice log + habit tracker
