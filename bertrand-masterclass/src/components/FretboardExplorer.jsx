@@ -1,0 +1,423 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion } from 'framer-motion';
+
+// ═══════════════════════════════════════════════════════════
+// FULL 12-FRET FRETBOARD EXPLORER
+// Features: CAGED overlays, scale patterns, chapter-aware highlighting,
+// Web Audio synthesis, landscape recommendation
+// ═══════════════════════════════════════════════════════════
+
+const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+
+// Standard tuning: E2 A2 D3 G3 B3 E4
+const STRING_TUNING = [
+  { name: 'E', octave: 4, midiBase: 64 },  // High E
+  { name: 'B', octave: 3, midiBase: 59 },
+  { name: 'G', octave: 3, midiBase: 55 },
+  { name: 'D', octave: 3, midiBase: 50 },
+  { name: 'A', octave: 2, midiBase: 45 },
+  { name: 'E', octave: 2, midiBase: 40 },  // Low E
+];
+
+const TOTAL_FRETS = 14; // 0 (open) through 14
+
+function midiToFreq(midi) {
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+function midiToNoteName(midi) {
+  return NOTE_NAMES[midi % 12];
+}
+
+// CAGED shapes — which frets on which strings form each shape (relative to root)
+const CAGED_SHAPES = {
+  C: { label: 'C Shape', color: '#e74c3c', positions: [[0,0],[1,1],[0,2],[0,3],[1,4],[0,5]] },
+  A: { label: 'A Shape', color: '#f39c12', positions: [[0,0],[2,1],[2,2],[2,3],[0,4],[-1,5]] },
+  G: { label: 'G Shape', color: '#2ecc71', positions: [[3,0],[0,1],[0,2],[0,3],[2,4],[3,5]] },
+  E: { label: 'E Shape', color: '#3498db', positions: [[0,0],[0,1],[1,2],[2,3],[2,4],[0,5]] },
+  D: { label: 'D Shape', color: '#9b59b6', positions: [[-1,0],[3,1],[2,2],[0,3],[-1,4],[-1,5]] },
+};
+
+// Scale patterns (intervals from root)
+const SCALE_PATTERNS = {
+  major:            { label: 'Major', intervals: [0,2,4,5,7,9,11], color: '#3498db' },
+  minor:            { label: 'Natural Minor', intervals: [0,2,3,5,7,8,10], color: '#e74c3c' },
+  pentatonicMajor:  { label: 'Major Pentatonic', intervals: [0,2,4,7,9], color: '#2ecc71' },
+  pentatonicMinor:  { label: 'Minor Pentatonic', intervals: [0,3,5,7,10], color: '#f39c12' },
+  blues:            { label: 'Blues', intervals: [0,3,5,6,7,10], color: '#9b59b6' },
+  chromatic:        { label: 'Chromatic', intervals: [0,1,2,3,4,5,6,7,8,9,10,11], color: '#95a5a6' },
+};
+
+const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = false, presetRoot, presetScale }) => {
+  const [activeNote, setActiveNote] = useState(null);
+  const [activeScale, setActiveScale] = useState(presetScale || null);
+  const [rootNote, setRootNote] = useState(presetRoot ?? 0);
+  const [showNoteNames, setShowNoteNames] = useState(true);
+  const [showDots, setShowDots] = useState(true);
+  const effectiveFrets = maxFret || TOTAL_FRETS;
+  const audioCtxRef = useRef(null);
+
+  // Sync presets when they change (e.g. switching chapters)
+  useEffect(() => {
+    if (presetRoot != null) setRootNote(presetRoot);
+  }, [presetRoot]);
+  useEffect(() => {
+    if (presetScale !== undefined) setActiveScale(presetScale);
+  }, [presetScale]);
+
+  useEffect(() => {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) audioCtxRef.current = new AC();
+    return () => { if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close(); };
+  }, []);
+
+  const playNote = useCallback((freq) => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.45, now + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 1.5);
+  }, []);
+
+  const handleNoteClick = (midi, stringIdx, fret) => {
+    const freq = midiToFreq(midi);
+    const name = midiToNoteName(midi);
+    setActiveNote({ midi, name, freq, stringIdx, fret });
+    playNote(freq);
+    // Haptic feedback for phone
+    if (navigator.vibrate) navigator.vibrate(10);
+  };
+
+  // Build the full fretboard grid
+  const fretboardGrid = STRING_TUNING.map((str, stringIdx) => {
+    const notes = [];
+    for (let fret = 0; fret <= effectiveFrets; fret++) {
+      const midi = str.midiBase + fret;
+      const noteName = midiToNoteName(midi);
+      const noteClass = midi % 12;
+
+      // Is this note in the active scale?
+      let inScale = false;
+      if (activeScale && SCALE_PATTERNS[activeScale]) {
+        const intervals = SCALE_PATTERNS[activeScale].intervals;
+        const relativeToRoot = ((noteClass - rootNote) % 12 + 12) % 12;
+        inScale = intervals.includes(relativeToRoot);
+      }
+
+      // Is this the root?
+      const isRoot = noteClass === rootNote;
+
+      // Chapter-aware dimming
+      const inChapterRange = chapterFret == null || fret <= chapterFret;
+
+      notes.push({ midi, noteName, noteClass, fret, stringIdx, inScale, isRoot, inChapterRange });
+    }
+    return { string: str, notes };
+  });
+
+  // Fret marker dots (standard acoustic pattern)
+  const dotFrets = [3, 5, 7, 9, 12];
+  const doubleDotFrets = [12];
+
+  return (
+    <div className={`fretboard-explorer-v2 ${compact ? 'fb-compact' : ''}`}>
+      <style>{`
+        .fretboard-explorer-v2 {
+          background: rgba(10, 10, 15, 0.97);
+          border-radius: 16px; padding: 2rem;
+          border: 1px solid rgba(201, 169, 110, 0.1);
+          font-family: 'Inter', sans-serif; color: #e0e0ff;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          overflow-x: auto;
+        }
+        .fb-compact {
+          padding: 0.75rem 0.5rem;
+          border-radius: 8px;
+          border: none;
+          box-shadow: none;
+          background: transparent;
+        }
+        .fb-compact .fb-header { margin-bottom: 0.75rem; }
+        .fb-compact .fb-title { font-size: 1.1rem; }
+        .fb-compact .fb-note-cell { width: 44px; height: 44px; }
+        .fb-compact .fb-note-cell:first-child { width: 36px; }
+        .fb-compact .fb-note { width: 32px; height: 32px; font-size: 0.55rem; }
+        .fb-compact .fb-string-row { height: 44px; }
+        .fb-compact .fb-dot-cell { width: 44px; }
+        .fb-compact .fb-dot-cell:first-child { width: 36px; }
+        .fb-compact .fb-fret-num { width: 44px; }
+        .fb-compact .fb-fret-num:first-child { width: 36px; }
+        .fb-compact .fb-status { margin-top: 0.75rem; padding: 0.75rem; }
+        .fb-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+        .fb-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.8rem; color: #e8edf2; font-weight: 400;
+        }
+        .fb-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .fb-select, .fb-toggle {
+          background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+          color: #b0b8c8; padding: 0.4rem 0.8rem; border-radius: 6px;
+          font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+          cursor: pointer; transition: all 0.2s;
+        }
+        .fb-select:hover, .fb-toggle:hover { border-color: rgba(201,169,110,0.3); }
+        .fb-toggle.active { background: rgba(201,169,110,0.15); border-color: rgba(201,169,110,0.4); color: #c9a96e; }
+        .fb-select option { background: #0a0a0f; color: #b0b8c8; }
+        .fb-landscape-hint {
+          display: none; background: rgba(201,169,110,0.1);
+          border: 1px solid rgba(201,169,110,0.3); color: #c9a96e;
+          padding: 0.75rem 1rem; border-radius: 8px; text-align: center;
+          font-size: 0.85rem; margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) and (orientation: portrait) {
+          .fb-landscape-hint { display: block; }
+        }
+        .fb-neck {
+          position: relative; background: linear-gradient(180deg, #3d2b1a, #2c1e14, #3d2b1a);
+          border-radius: 6px; padding: 12px 0; overflow-x: auto;
+          border: 1px solid rgba(74, 51, 36, 0.6);
+          box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
+          min-width: fit-content;
+        }
+        .fb-fret-markers {
+          display: flex; position: absolute; bottom: -28px; left: 0; width: 100%;
+          pointer-events: none;
+        }
+        .fb-string-row {
+          display: flex; align-items: center; position: relative;
+          height: 38px; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .fb-string-row:last-child { border-bottom: none; }
+        .fb-string-label {
+          width: 28px; text-align: center; font-weight: 700;
+          font-size: 0.8rem; color: #a0a0b0; flex-shrink: 0;
+          font-family: 'JetBrains Mono', monospace;
+        }
+        .fb-string-line {
+          position: absolute; top: 50%; left: 28px; right: 0;
+          border-bottom: 2px solid; z-index: 0;
+        }
+        .fb-note-cell {
+          width: 52px; height: 38px; display: flex; align-items: center;
+          justify-content: center; position: relative; z-index: 1; flex-shrink: 0;
+          border-right: 2px solid rgba(212, 175, 55, 0.15);
+        }
+        .fb-note-cell:first-child {
+          width: 40px; border-right: 4px solid rgba(212, 175, 55, 0.6);
+        }
+        .fb-note {
+          width: 28px; height: 28px; border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.6rem; font-weight: 700; cursor: pointer;
+          transition: all 0.15s ease; position: relative;
+          font-family: 'JetBrains Mono', monospace;
+          border: 1.5px solid transparent;
+        }
+        .fb-note.in-scale {
+          background: rgba(201, 169, 110, 0.2);
+          border-color: rgba(201, 169, 110, 0.5);
+          color: #c9a96e;
+        }
+        .fb-note.root-note {
+          background: rgba(201, 169, 110, 0.5) !important;
+          border-color: #c9a96e !important;
+          color: #000 !important;
+          box-shadow: 0 0 10px rgba(201, 169, 110, 0.4);
+          font-weight: 900;
+        }
+        .fb-note.dim { opacity: 0.15; pointer-events: none; }
+        .fb-note.idle {
+          background: rgba(255,255,255,0.03);
+          border-color: rgba(255,255,255,0.06);
+          color: rgba(255,255,255,0.2);
+        }
+        .fb-note:hover:not(.dim) {
+          transform: scale(1.25);
+          background: rgba(201,169,110,0.3);
+          border-color: #c9a96e;
+          color: #fff;
+          box-shadow: 0 0 12px rgba(201,169,110,0.3);
+        }
+        .fb-note.playing {
+          background: #c9a96e !important; color: #000 !important;
+          border-color: #fff !important;
+          box-shadow: 0 0 20px rgba(201,169,110,0.6);
+          transform: scale(1.3);
+        }
+        .fb-dot-row {
+          display: flex; padding-left: 28px; margin-top: 8px;
+        }
+        .fb-dot-cell {
+          width: 52px; display: flex; justify-content: center; flex-shrink: 0;
+        }
+        .fb-dot-cell:first-child { width: 40px; }
+        .fb-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: rgba(201, 169, 110, 0.25);
+        }
+        .fb-dot.double { width: 6px; height: 6px; box-shadow: -8px 0 0 rgba(201,169,110,0.25); }
+        .fb-fret-num {
+          width: 52px; text-align: center; font-size: 0.55rem;
+          color: #5a6a80; font-family: 'JetBrains Mono', monospace;
+          flex-shrink: 0;
+        }
+        .fb-fret-num:first-child { width: 40px; }
+        .fb-status {
+          margin-top: 1.5rem; display: flex; justify-content: space-between;
+          align-items: center; flex-wrap: wrap; gap: 1rem;
+          padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;
+        }
+        .fb-playing-label {
+          font-size: 1.1rem; font-weight: 600;
+          color: ${activeNote ? '#c9a96e' : '#5a6a80'};
+          font-family: 'JetBrains Mono', monospace;
+        }
+        .fb-scale-legend {
+          display: flex; gap: 1rem; flex-wrap: wrap;
+        }
+        .fb-legend-item {
+          display: flex; align-items: center; gap: 0.4rem;
+          font-size: 0.7rem; color: #8090a8;
+        }
+        .fb-legend-dot {
+          width: 10px; height: 10px; border-radius: 50%;
+        }
+      `}</style>
+
+      {!compact && (
+        <div className="fb-header">
+          <h2 className="fb-title">The Vertiscape Map</h2>
+          <div className="fb-controls">
+            <select className="fb-select" value={rootNote} onChange={e => setRootNote(parseInt(e.target.value))}>
+              {NOTE_NAMES.map((n, i) => <option key={i} value={i}>{n}</option>)}
+            </select>
+            <select className="fb-select" value={activeScale || ''} onChange={e => setActiveScale(e.target.value || null)}>
+              <option value="">No Scale</option>
+              {Object.entries(SCALE_PATTERNS).map(([k, v]) => (
+                <option key={k} value={k}>{v.label}</option>
+              ))}
+            </select>
+            <button className={`fb-toggle ${showNoteNames ? 'active' : ''}`}
+              onClick={() => setShowNoteNames(!showNoteNames)}>
+              {showNoteNames ? 'Notes' : 'Notes'}
+            </button>
+          </div>
+        </div>
+      )}
+      {compact && (
+        <div className="fb-header" style={{ marginBottom: '0.5rem' }}>
+          <div className="fb-controls" style={{ width: '100%', justifyContent: 'space-between' }}>
+            <select className="fb-select" value={rootNote} onChange={e => setRootNote(parseInt(e.target.value))}>
+              {NOTE_NAMES.map((n, i) => <option key={i} value={i}>{n}</option>)}
+            </select>
+            <select className="fb-select" value={activeScale || ''} onChange={e => setActiveScale(e.target.value || null)}>
+              <option value="">No Scale</option>
+              {Object.entries(SCALE_PATTERNS).map(([k, v]) => (
+                <option key={k} value={k}>{v.label}</option>
+              ))}
+            </select>
+            <button className={`fb-toggle ${showNoteNames ? 'active' : ''}`}
+              onClick={() => setShowNoteNames(!showNoteNames)}>
+              {showNoteNames ? '♪' : '·'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="fb-landscape-hint">
+        📱 Rotate to landscape for the full fretboard experience
+      </div>
+
+      {/* THE NECK */}
+      <div className="fb-neck">
+        {fretboardGrid.map((row, sIdx) => {
+          // String thickness varies (thicker for bass strings)
+          const thickness = 1 + (sIdx * 0.4);
+          const brightness = Math.max(100, 200 - sIdx * 20);
+          return (
+            <div key={sIdx} className="fb-string-row">
+              <span className="fb-string-label">{row.string.name}</span>
+              <div className="fb-string-line" style={{
+                borderBottomWidth: `${thickness}px`,
+                borderColor: `rgba(${brightness}, ${brightness - 20}, ${brightness - 40}, 0.5)`
+              }} />
+              {row.notes.map(note => (
+                <div key={note.fret} className="fb-note-cell">
+                  <div
+                    className={`fb-note ${
+                      !note.inChapterRange ? 'dim' :
+                      activeNote?.midi === note.midi && activeNote?.stringIdx === sIdx ? 'playing' :
+                      note.isRoot && activeScale ? 'root-note' :
+                      note.inScale ? 'in-scale' :
+                      'idle'
+                    }`}
+                    onClick={() => handleNoteClick(note.midi, sIdx, note.fret)}
+                  >
+                    {showNoteNames ? note.noteName : ''}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+
+        {/* Fret dots */}
+        {showDots && (
+          <div className="fb-dot-row">
+            {Array.from({ length: effectiveFrets + 1 }, (_, f) => (
+              <div key={f} className="fb-dot-cell">
+                {dotFrets.includes(f) && (
+                  <div className={`fb-dot ${doubleDotFrets.includes(f) ? 'double' : ''}`} />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Fret numbers */}
+      <div style={{ display: 'flex', paddingLeft: 0, marginTop: 4 }}>
+        <div style={{ width: 28, flexShrink: 0 }} />
+        {Array.from({ length: effectiveFrets + 1 }, (_, f) => (
+          <div key={f} className="fb-fret-num">{f === 0 ? 'Open' : f}</div>
+        ))}
+      </div>
+
+      {/* Status bar */}
+      <div className="fb-status">
+        <span className="fb-playing-label">
+          {activeNote
+            ? `${activeNote.name} · Fret ${activeNote.fret} · ${activeNote.freq.toFixed(1)} Hz`
+            : 'Tap a note to begin'}
+        </span>
+        {activeScale && (
+          <div className="fb-scale-legend">
+            <div className="fb-legend-item">
+              <div className="fb-legend-dot" style={{ background: 'rgba(201,169,110,0.5)' }} />
+              Root
+            </div>
+            <div className="fb-legend-item">
+              <div className="fb-legend-dot" style={{ background: 'rgba(201,169,110,0.2)', border: '1px solid rgba(201,169,110,0.5)' }} />
+              Scale Tone
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default FretboardExplorer;
