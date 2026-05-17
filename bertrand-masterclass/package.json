@@ -12,13 +12,16 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@tailwindcss/typography": "^0.5.19",
+    "dexie": "^4.4.2",
+    "dexie-react-hooks": "^4.4.0",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.554.0",
     "pptxgenjs": "^4.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet-async": "^2.0.5",
-    "react-router-dom": "^7.9.6"
+    "react-router-dom": "^7.9.6",
+    "react-youtube": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

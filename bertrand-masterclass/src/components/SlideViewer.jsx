@@ -121,7 +121,7 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
         }
         .sv-image-zone img {
           width: 100%; height: 100%; object-fit: cover; opacity: 0.9;
-          transition: opacity 0.5s ease;
+          transition: opacity 1.5s ease-in-out;
         }
         .sv-image-gradient {
           position: absolute; inset: 0;
@@ -368,7 +368,7 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            transition={{ type: 'spring', stiffness: 60, damping: 20, mass: 1.2 }}
             drag={fretboardOpen ? false : "x"}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}

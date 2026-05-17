@@ -2,59 +2,598 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════
+   THE CONSCIOUS FRAMEWORK — Design System
+   A contemplative, unhurried aesthetic for sacred pedagogy
+   ═══════════════════════════════════════════════════════════ */
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  
-  /* Purdue Brand Colors reference */
-  --purdue-gold: #CFB991;
-  --purdue-black: #000000;
-  --slate-950: #020617;
+  /* Core Palette — Soft Twilight Blue */
+  --cf-void: #1a2332;
+  --cf-deep: #1e2838;
+  --cf-surface: #243040;
+  --cf-surface-raised: #2a3848;
+  --cf-border: #354560;
+  --cf-border-light: #455878;
+
+  /* Accent Colors */
+  --cf-gold: #c9a96e;
+  --cf-gold-dim: #8b7d5a;
+  --cf-gold-glow: rgba(201, 169, 110, 0.15);
+  --cf-sage: #7aaa88;
+  --cf-sage-dim: #5a8a68;
+  --cf-meditation: #7b6aaa;
+  --cf-meditation-dim: #5d4e88;
+  --cf-breath: #5a90a0;
+
+  /* Text */
+  --cf-ink: #d0d8e0;
+  --cf-ink-bright: #e8edf2;
+  --cf-whisper: #8090a8;
+  --cf-muted: #5a6a80;
+
+  /* Typography */
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-quote: 'EB Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
+/* ── Base ── */
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--slate-950);
-  color: rgba(255, 255, 255, 0.87);
+  background-color: var(--cf-void);
+  background-image: linear-gradient(180deg, var(--cf-void) 0%, #1c2636 50%, var(--cf-deep) 100%);
+  color: var(--cf-ink);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.75;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbar for Modals and Panels */
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--cf-ink-bright);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+h1 { font-size: 5rem; }
+h2 { font-size: 3.5rem; }
+h3 { font-size: 2.5rem; }
+h4 { font-size: 2rem; }
+
+@media (min-width: 768px) {
+  h1 { font-size: 7rem; }
+  h2 { font-size: 4.5rem; }
+  h3 { font-size: 3rem; }
+  h4 { font-size: 2.5rem; }
+}
+
+/* ── Scrollbar ── */
 @layer utilities {
   .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
   }
-
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5); /* Slate-900/50 */
-    border-radius: 4px;
+    background: var(--cf-deep);
   }
-
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(71, 85, 105, 0.5); /* Slate-600/50 */
-    border-radius: 4px;
-    transition: background 0.3s ease;
+    background: var(--cf-border);
+    border-radius: 3px;
   }
-
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(207, 185, 145, 0.6); /* Purdue Gold */
+    background: var(--cf-gold-dim);
   }
 }
 
-/* Typography Overrides */
-h1, h2, h3, h4, h5, h6 {
-  color: white;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+/* ── Animations ── */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.02); opacity: 1; }
 }
 
-/* Markdown/Prose Content Styles inside Reflections */
-.prose strong {
-  color: #CFB991;
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.prose p {
-  margin-bottom: 1em;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 168, 85, 0.3); }
+  50% { box-shadow: 0 0 20px 4px rgba(212, 168, 85, 0.15); }
+}
+
+@keyframes ink-wash {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes breath-guide {
+  0% { transform: scale(0.8); opacity: 0.3; }
+  40% { transform: scale(1.2); opacity: 0.8; }
+  60% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(0.8); opacity: 0.3; }
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 3s ease-in-out infinite;
+}
+
+.animate-ink-wash {
+  background-size: 400% 400%;
+  animation: ink-wash 15s ease infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-breath-guide {
+  animation: breath-guide 10s ease-in-out infinite;
+}
+
+/* ── Utility Classes ── */
+
+/* Golden divider */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--cf-gold-dim),
+    var(--cf-gold),
+    var(--cf-gold-dim),
+    transparent
+  );
+  border: none;
+  margin: 3rem 0;
+}
+
+/* Tao quote styling */
+.tao-quote {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--cf-sage);
+}
+
+/* Stage number badge */
+.stage-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cf-gold);
+  border: 1px solid var(--cf-gold-dim);
+  padding: 0.25rem 0.75rem;
+  border-radius: 2px;
+}
+
+/* Glass panel */
+.glass-panel {
+  background: rgba(20, 20, 32, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--cf-border);
+}
+
+/* Reading panel — optimal line length */
+.reading-panel {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Meditation overlay */
+.meditation-bg {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(91, 74, 138, 0.15) 0%,
+    rgba(10, 10, 15, 0.95) 70%
+  );
+}
+
+/* Ink wash gradient */
+.ink-wash-bg {
+  background: linear-gradient(
+    135deg,
+    var(--cf-void) 0%,
+    var(--cf-deep) 25%,
+    #0d0d18 50%,
+    var(--cf-deep) 75%,
+    var(--cf-void) 100%
+  );
+}
+
+/* Hero gradient */
+.hero-gradient {
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(212, 168, 85, 0.08) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    ellipse at 50% 100%,
+    rgba(91, 74, 138, 0.05) 0%,
+    transparent 50%
+  );
+}
+
+/* Video accent borders */
+.border-impact { border-color: #4a8a9e; }
+.border-authority { border-color: #9e7a4a; }
+.border-self { border-color: #7a4a9e; }
+
+.text-impact { color: #5a9aae; }
+.text-authority { color: #ae8a5a; }
+.text-self { color: #9a6abe; }
+
+.bg-impact { background-color: rgba(74, 138, 158, 0.1); }
+.bg-authority { background-color: rgba(158, 122, 74, 0.1); }
+.bg-self { background-color: rgba(122, 74, 158, 0.1); }
+
+/* Prose content */
+.prose-cf p {
+  margin-bottom: 2em;
+  line-height: 1.9;
+  font-size: 1.25rem;
+}
+
+.prose-cf strong {
+  color: var(--cf-gold);
+  font-weight: 600;
+}
+
+/* Selection */
+::selection {
+  background: rgba(212, 168, 85, 0.25);
+  color: var(--cf-ink-bright);
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--cf-gold);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAO QUOTE COMPONENT
+   ═══════════════════════════════════════════════════════════ */
+
+.tao-quote-section {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  position: relative;
+}
+
+.tao-quote-container {
+  max-width: 640px;
+  text-align: center;
+  position: relative;
+}
+
+.tao-chapter-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cf-gold-dim);
+  margin-bottom: 2rem;
+}
+
+.tao-glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cf-gold-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tao-quote-text {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 2;
+  color: var(--cf-sage);
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .tao-quote-text {
+    font-size: 1.75rem;
+  }
+}
+
+.tao-source {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--cf-muted);
+  margin-top: 2rem;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SET AND SETTING COMPONENT
+   ═══════════════════════════════════════════════════════════ */
+
+.set-and-setting-section {
+  padding: 2rem 0;
+}
+
+.set-and-setting-container {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.set-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--cf-border);
+}
+
+.set-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.set-image-fallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--cf-deep) 0%, var(--cf-surface) 50%, var(--cf-void) 100%);
+  z-index: -1;
+}
+
+.set-image-fallback.no-image {
+  z-index: 1;
+}
+
+.set-description-overlay {
+  margin-top: -3rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: rgba(26, 35, 50, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--cf-border);
+  border-radius: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  .set-description-overlay {
+    margin-left: 3rem;
+    margin-right: 3rem;
+    margin-top: -4rem;
+    padding: 2rem 2.5rem;
+  }
+}
+
+.set-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cf-gold-dim);
+  margin-bottom: 0.75rem;
+}
+
+.set-description {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--cf-whisper);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCENARIO READER COMPONENT
+   ═══════════════════════════════════════════════════════════ */
+
+.scenario-section {
+  padding: 3rem 1.5rem;
+}
+
+.scenario-container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.scenario-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cf-gold-dim);
+  margin-bottom: 0.75rem;
+}
+
+.scenario-title {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--cf-ink-bright);
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+}
+
+.scenario-content {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  line-height: 1.9;
+  color: var(--cf-ink);
+}
+
+.scenario-content p {
+  margin-bottom: 1.5em;
+}
+
+.scenario-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SOCRATIC MEDITATION COMPONENT
+   ═══════════════════════════════════════════════════════════ */
+
+.meditation-section {
+  position: relative;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+}
+
+.meditation-bg-layer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(123, 106, 170, 0.12) 0%,
+    rgba(26, 35, 50, 0.95) 70%
+  );
+  pointer-events: none;
+}
+
+.meditation-card {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.meditation-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cf-meditation-dim);
+  margin-bottom: 2rem;
+}
+
+.meditation-question {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.4rem;
+  line-height: 1.8;
+  color: var(--cf-ink-bright);
+  margin: 0 0 2.5rem;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .meditation-question {
+    font-size: 1.6rem;
+  }
+}
+
+.meditation-button {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cf-meditation);
+  background: rgba(123, 106, 170, 0.1);
+  border: 1px solid var(--cf-meditation-dim);
+  padding: 0.75rem 2rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.meditation-button:hover {
+  background: rgba(123, 106, 170, 0.2);
+  border-color: var(--cf-meditation);
+  transform: translateY(-1px);
+}
+
+/* Meditation complete state */
+.meditation-complete {
+  min-height: 30vh;
+}
+
+.meditation-done-container {
+  text-align: center;
+}
+
+.meditation-done-text {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--cf-whisper);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCENARIO READING TEXT (click-through mode)
+   ═══════════════════════════════════════════════════════════ */
+
+.scenario-reading-text p {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  line-height: 1.9;
+  color: var(--cf-ink);
+}
+
+@media (min-width: 768px) {
+  .scenario-reading-text p {
+    font-size: 1.25rem;
+  }
 }
