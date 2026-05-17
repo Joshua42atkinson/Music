@@ -13,9 +13,10 @@ import { TESTIMONIALS, FAQ } from '../data/testimonialData';
 const SERVICE_ICONS = {
   'private-lesson': '🎸',
   'voice-coaching': '🎤',
-  'async-review': '📹',
+  'quick-question': '💬',
+  'mini-critique': '🎬',
+  'full-review': '📹',
   'membership': '⭐',
-  'masterclass': '📖',
   'group-workshop': '👥',
   'gift-certificate': '🎁',
 };
