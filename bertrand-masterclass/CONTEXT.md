@@ -1,10 +1,11 @@
-# 🎸 BERTRAND MASTERCLASS — Master Context & Maturation Map
+# 🎸 VOIX VIVE — Master Context & Business Platform
 
-> **Purpose:** Load this entire file into a new AI session to instantly recover full project context.  
-> **Last Updated:** 2026-05-17 (Session 2)  
+> **Purpose:** Load this file into a new AI session to instantly recover full project context.  
+> **Last Updated:** 2026-05-17 (Session 4 — Revenue Pivot + Documentation Discipline)  
 > **Project Root:** `/home/joshua-atkinson/antigravity/daydream-website/bertrand-masterclass/`  
-> **Dev Server:** `npm run dev` → localhost:5174 (or next available port)  
-> **Git:** https://github.com/Joshua42atkinson/Music.git (code lives in daydream-website monorepo)
+> **Dev Server:** `npm run dev` → localhost:5178  
+> **Git:** https://github.com/joshua42atkinson/daydream-website.git  
+> **Deployment:** Vercel (TBD — needs production domain)
 
 ---
 
@@ -17,22 +18,62 @@
 - Author of *"The Great Game: A Player's Handbook to Consciousness"* (personal IP — see §3)
 - Portfolio: LDTAtkinson.com
 - Hardware: Desktop (AMD Strix Halo / 128GB RAM); currently on laptop
+- **Capabilities:** Can build anything in 2 months — VR/AR, Bevy ECS, Android, full-stack web
 
 ### The Client/SME — Bertrand Laurence
-- Master guitarist (Berklee, MassArt, Mirage Mime Theatre)
+- Master guitarist & vocalist (Berklee College of Music, MassArt, Mirage Mime Theatre)
 - Creator of the Somatic Mystic philosophy
 - Proprietary protocols: ©SHEARL, ©PLING!, ©FHEAL
-- YouTube: https://www.youtube.com/@BertrandLaurenceMusic/videos
+- **Location:** Houlton, Maine (relocated from Cambridge/Boston area)
+- **Family:** Has family in France he hasn't visited in years — **revenue generation is critical**
+- YouTube: @BertrandLaurenceMusic
 - Studio: https://bertrandguitarstudio.duetpartner.com/
+- Thumbtack: Top Pro award, multiple years
+- Passim School of Music: Group class instructor (Guit&Vocal, Fingerstyle)
 - **Thursday call scheduled** — Bertrand reviews the build
-
-### Academic Context
-- Purdue EDCI 57300 Practicum
-- AI Policy: Level 2 Partially Restricted — must declare AI usage
 
 ---
 
-## 2. BERTRAND'S PEDAGOGY (SME-OWNED CONTENT)
+## 2. BUSINESS STRATEGY
+
+### Revenue Model
+```
+The 12-chapter Living Textbook is 100% FREE.
+It is the culture-building marketing funnel that creates long-term students.
+
+Revenue comes from:
+  1. Live coaching (Zoom/in-studio)
+  2. Async video feedback
+  3. Community membership (Inner Circle)
+  4. Group workshops
+  5. Gift certificates
+  6. Tips / support
+
+FUTURE PREMIUM PRODUCT:
+  VR/AI Masterclass — Android app + VR mode
+  - Fine-tuned Gemma 4 model as "AI Bertrand"
+  - Bevy ECS architecture for immersive VR guitar classroom
+  - THIS is the paid Masterclass, not the free textbook
+```
+
+### Pricing (from Thumbtack/Duet Partner)
+```
+Private Lesson (Zoom):     $60/hr ($45 trial, $55 bulk, $50 10-pack)
+Guitar & Voice (©PLING!):  $60/hr ($55 bulk)
+Async Video Review:         $35/review ($30 5-pack, $25 10-pack)
+Inner Circle Membership:    $25/mo or $199/yr
+Group Workshop:             $35/person ($30 series)
+Gift Certificate:           $60-$275
+```
+
+### Payment Acceptance
+Stripe (cards, Apple Pay, Google Pay), Venmo, PayPal, Zelle, Cash App, Ko-fi, Wire/IBAN (for French/European students)
+
+> **ACTION REQUIRED:** Bertrand must create a Stripe account and generate Payment Link URLs. We paste them into `pricingData.js`.
+
+---
+
+## 3. BERTRAND'S PEDAGOGY (SME-OWNED CONTENT)
 
 ### The Core Axiom
 > *"You are an instrument playing an instrument. If I am playing the guitar, who is playing me?"*
@@ -50,147 +91,124 @@ I. Music Theory (Grammar) | II. Ear Training | III. Technique (Kinesthesis) | IV
 - **©FHEAL** — Hear / Feel → obey creative impulse without Left-Brain interference
 
 ### Key Teaching Concepts
-- Practice TOO SLOW (myelination), Kinesthetic Sleep, The Practice Nook, Binder Control, CAGED System, Vertiscales, Notes → Chords → Songs
+- Practice TOO SLOW (myelination), Kinesthetic Sleep, The Practice Nook
+- Binder Control, CAGED System, Vertiscales, Notes → Chords → Songs
+- "Applied theory" over traditional music theory
+- Body-centered: relaxation, effortlessness, flowing ergonomics
+- Student-choice: "Choose any songs and styles of their liking"
 
 ---
 
-## 3. IP BOUNDARY: THE GREAT GAME vs THE MASTERCLASS
+## 4. IP BOUNDARY: THE GREAT GAME vs THE MASTERCLASS
 
 **BERTRAND'S** (use freely): 5 Pillars, SHEARL/PLING!/FHEAL, Yin/Yang, kinesthesis, fascia, CAGED, Vertiscales, breath-work, body scan, Hero's Journey × Chromatic Scale
 
 **JOSHUA'S GREAT GAME** (do NOT import without discussion): Four Channels/Committee, Player/Persona/Architect, Physics of Being, Virtue Topology, N=1 Experiment, Coal/Steam/Traction model
 
-**BORDERLINE** (confirm Thursday): "The Bard's Voix Vive" title, "Bard Level" terminology, Monomyth stage names, alchemical metaphors
+**BORDERLINE** (confirmed titles): "Voix Vive" title, "Bard Level" terminology, Monomyth stage names
 
 ---
 
-## 4. TECH STACK
+## 5. TECH STACK
 
 ```
 Framework:    Vite + React 18 + React Router 7
 Styling:      Tailwind CSS 3 + vanilla CSS (~680 LOC with --bard-* aliases)
 Animation:    Framer Motion (swipe gestures, transitions)
 Icons:        Lucide React
-Audio:        Web Audio API
+Audio:        HTML5 Audio (Bertrand's "Houlton Skies" as primary ambient track)
 State:        localStorage via tractionStore.js + ScaffoldingProvider context
 Fonts:        Cormorant Garamond, Inter, EB Garamond, JetBrains Mono
-Total Source:  ~4,500 lines across 19 files
+Payments:     Stripe Payment Links (no backend required) + Venmo QR
+DB (Local):   Dexie.js / IndexedDB (offline progress + submission outbox)
+Media:        MediaRecorder API (practice video/audio capture)
+SEO:          JSON-LD LocalBusiness, Open Graph, Twitter Cards
+Total Source: ~8,250 lines across 24 files
 ```
 
 ---
 
-## 5. FILE MAP
+## 6. FILE MAP
 
 ```
 bertrand-masterclass/
-├── CONTEXT.md              — THIS FILE
+├── CONTEXT.md              — THIS FILE (master project context)
+├── ROADMAP.md              — Development roadmap with phases and timeline
+├── index.html              — SEO: JSON-LD, Open Graph, Twitter Cards
+│
 ├── src/
 │   ├── main.jsx            — React entry
-│   ├── App.jsx             — Router + ScaffoldingProvider wrapper
-│   ├── index.css           — Design system (~680 LOC, --cf-* + --bard-* tokens, .bard-* classes)
+│   ├── App.jsx             — Router + ScaffoldingProvider + WelcomeOnboarding
+│   ├── index.css           — Design system (~680 LOC, --cf-* + --bard-* tokens)
 │   │
 │   ├── data/
-│   │   ├── chapterData.js  — ★ 12-chapter curriculum (22 exercises, ~220 LOC)
-│   │   ├── slideGenerator.js — ★ Converts chapters → swipeable slide decks + SLIDE_IMAGES map
-│   │   ├── tractionStore.js — localStorage progress + scaffolding fade (180 LOC)
-│   │   └── videoData.js    — Video module index (41 LOC)
+│   │   ├── chapterData.js      — ★ 12-chapter curriculum (Hero's Journey × Chromatic)
+│   │   ├── slideGenerator.js   — Converts chapters → swipeable slide decks
+│   │   ├── tractionStore.js    — localStorage progress + scaffolding fade
+│   │   ├── localDatabase.js    — Dexie/IndexedDB schema (offline-first, submission outbox)
+│   │   ├── pricingData.js      — ★ Revenue streams, pricing, Stripe link stubs
+│   │   ├── testimonialData.js  — ★ 13 real student testimonials + 8 FAQ items
+│   │   └── videoData.js        — Video module index
 │   │
 │   ├── components/
-│   │   ├── SlideViewer.jsx      — ★★ CORE: Phone-native swipeable slide reader (glassmorphism)
+│   │   ├── SlideViewer.jsx         — ★★ CORE: Swipeable slide reader (the Living Textbook)
+│   │   ├── PracticeRecorder.jsx    — ★ Async video/audio recorder → IndexedDB outbox
+│   │   ├── WelcomeOnboarding.jsx   — ★ 3-slide first-run welcome flow
+│   │   ├── AmbientPlayer.jsx      — HTML5 Audio: "Houlton Skies" + volume/skip
+│   │   ├── DigitalBinder.jsx       — Practice log + submission history viewer
+│   │   ├── ConnectionManager.jsx   — Dormant (renders null until DaaS backend exists)
 │   │   ├── ScaffoldingProvider.jsx — React context for traction-aware UI fade
-│   │   ├── FretboardExplorer.jsx — Full 14-fret fretboard with scales + Web Audio
-│   │   ├── VoixViveSpread.jsx   — Legacy desktop Yin/Yang book layout (superseded by SlideViewer)
-│   │   ├── BreathingGate.jsx    — Somatic breathing + body scan gate
-│   │   ├── PitchRoom.jsx        — Gamified ear training
-│   │   ├── DigitalBinder.jsx    — Practice log + habit tracker
-│   │   ├── ModulePlayer.jsx     — Video embed shell
-│   │   ├── PlayerHandbook.jsx   — Legacy 5-Tome handbook (deprecated)
-│   │   └── About.jsx            — Bertrand bio + contact
+│   │   ├── FretboardExplorer.jsx   — 14-fret fretboard with scales + Web Audio
+│   │   ├── BreathingGate.jsx       — Somatic breathing gate
+│   │   ├── PitchRoom.jsx           — Gamified ear training
+│   │   ├── TheMentor.jsx           — Legacy (superseded by StudioPage, can be deleted)
+│   │   └── About.jsx               — Contact info
 │   │
 │   └── pages/
-│       └── OrientationHub.jsx   — ★ Mobile-first vertical chapter list + SlideViewer integration
+│       ├── OrientationHub.jsx     — ★ Mobile-first chapter list + 4-tab bottom nav
+│       ├── StudioPage.jsx         — ★ Business landing (6 services, testimonials, payments)
+│       └── MentorshipHub.jsx      — Legacy mentorship dashboard (placeholder)
 │
 └── public/assets/
-    ├── bertrand_profile.jpg
-    ├── slides/ch1/              — ★ Generated art: title.png, yin-tension.png, meditation.png
-    └── slides/                  — (ch2-12 art to be generated in next session)
+    ├── bertrand_profile.jpg       — Instructor photo
+    ├── houlton_skies.m4a          — ★ Bertrand's music (4.6MB, primary ambient)
+    ├── home_audio.m4a             — Secondary ambient track (26MB)
+    └── slides/ch1-ch12/           — AI-generated chapter artwork (ch1-8 populated, ch9-12 empty)
 ```
 
-★★ = Primary delivery component (this is what users interact with)
-
 ---
 
-## 6. CURRENT STATE — What's Built
+## 7. WHAT'S DONE vs WHAT'S LEFT
 
-### Mobile-First "Living Textbook" (THE CORE EXPERIENCE)
-- **OrientationHub:** Vertical chapter list grouped by Hero's Journey Acts (I–III)
-  - Each chapter = full-width card with icon badge, colored accent, fret/interval metadata
-  - Fixed bottom tool bar (Chapters / Fretboard / Binder / About)
-  - Tap any chapter → opens SlideViewer full-screen
-- **SlideViewer:** Phone-native swipeable slide deck (framer-motion drag gestures)
-  - Each chapter auto-generates ~12-15 slides from chapterData
-  - Slide types: title, yin-philosophy, yin-quote, yin-concept, yin-meditation, yang-instruction, yang-exercise, yang-fretboard, chapter-end
-  - Portrait: image top (38vh) / text bottom (glass panel)
-  - Landscape: image left (40%) / text right (60%)
-  - Glassmorphism: frosted glass topbar, text zone, and navigation
-  - Progress bar + dot navigation + prev/next arrows
-  - Per-slide image rendering (actual art when available, gradient fallback)
-  - Chapter 1 has 3 AI-generated background images (golden string, fascia meditation, breath ripple)
+### ✅ Complete
+- [x] 12-chapter Living Textbook (free, swipeable slides with artwork for ch1-8)
+- [x] StudioPage business landing (6 services, 13 testimonials, payment grid, FAQ, French section)
+- [x] PracticeRecorder (video/audio → IndexedDB outbox)
+- [x] AmbientPlayer (Bertrand's "Houlton Skies" via HTML5 Audio)
+- [x] WelcomeOnboarding (3-slide first-run intro)
+- [x] SEO (JSON-LD, Open Graph, Twitter Cards)
+- [x] OrientationHub bottom nav (Chapters, Fretboard, Binder, Studio)
+- [x] FretboardExplorer (14-fret with scales + Web Audio)
+- [x] Digital Binder (practice log, submissions, feedback)
 
-### All 12 Chapters Have Full Content
-- Unique philosophy (Yin), wisdom quote, meditation prompt per chapter
-- 2 detailed exercises each (Yang) with 5-step procedures
-- Chapter 12 = intentional Free Play (no exercises)
-- SHEARL and PLING! protocols integrated into chapters 4-7
+### 🟡 Needs Bertrand's Input
+- [ ] Stripe Payment Links — Bertrand creates Stripe account, we plug in URLs
+- [ ] Venmo QR image — need actual QR code screenshot
+- [ ] PayPal.me and Ko-fi URLs
+- [ ] Review StudioPage copy for accuracy
 
-### Supporting Systems
-- **FretboardExplorer:** 14-fret range, 6 scale patterns, root selector, MIDI math, chapter-aware dimming
-- **ScaffoldingProvider:** React context wrapping entire app
-- **TractionStore:** All 12 chapters unlocked by default (for Bertrand review)
-- **Design System:** Unified --bard-* CSS tokens + .bard-card/button/label/badge/quote classes
+### 🔴 Remaining Dev Work
+- [ ] ch9-12 artwork (35 images via AI generation)
+- [ ] PracticeRecorder → actual upload pipeline (Cloudflare R2 or DaaS tunnel)
+- [ ] Remove `react-youtube` unused dependency from package.json
+- [ ] Delete `TheMentor.jsx` (dead code, replaced by StudioPage)
+- [ ] MentorshipHub.jsx — either wire to real data or remove
 
----
-
-## 7. MATURATION MAP — Next Session Priorities
-
-### 🎨 PHASE A: Visual Art (Paused for Art Direction)
-- [x] Generate themed background images for Chapters 1-8.
-- [ ] Define strict "Art Direction / Brand Bible" before mass generating the remaining 60+ images.
-- [ ] Wire all remaining images into SLIDE_IMAGES map in slideGenerator.js.
-
-### 🎵 PHASE B: Background Music
-- [ ] Embed Bertrand's YouTube guitar performances as ambient audio.
-- [ ] Audio player component with play/pause, volume, track selector.
-- [ ] Auto-play soft guitar during Yin slides, silence during Yang exercises.
-
-### ✨ PHASE C: Glassmorphism Polish
-- [x] Apply glass treatment to SlideViewer panels.
-- [ ] Apply glass treatment to OrientationHub chapter cards.
-- [ ] Add subtle particle/glow effects to chapter headers.
-
-### 🎸 PHASE D: The Three Protocols (Software Interactivity)
-- [x] **©PLING! (Sing Then Find):** Built `PlingTrainer.jsx` using Web Audio API for real-time vocal pitch detection.
-- [ ] **©SHEARL (Call and Response):** Upgrade `FretboardExplorer.jsx` into an interactive game (App highlights fret -> App plays note -> App listens for student to play it on guitar).
-- [ ] **©FHEAL (Rhythm & Flow Tracker):** Build a module that uses microphone volume envelopes to measure continuous playing (Flow) vs stuttering, without Left-Brain interference.
-
-### 📱 PHASE E: Mobile UX Polish  
-- [ ] Test on 375px (iPhone SE) and 390px (iPhone 14) viewports.
-- [ ] Haptic feedback on slide swipe (navigator.vibrate).
-- [ ] PWA manifest for home screen install.
-
-### 🤖 PHASE F: AI & Advanced (Desktop ONLY)
-- [ ] Local LLM "Ask Bertrand" Socratic tutor.
-- [ ] Computer vision posture tracking.
-
-### 💼 PHASE G: Mentorship & Business Ecosystem (The Pivot)
-- [ ] **1-on-1 Mentoring Portal:** Create `MentorshipHub.jsx` for seamless Zoom/WebRTC video coaching integration.
-- [ ] **Homework App:** Upgrade `DigitalBinder.jsx` to a backend-ready application (Firebase/Supabase).
-- [ ] **Progress Tracking:** Allow Bertrand to assign chapters and students to submit audio/video practice recordings.
-
-### 📝 PHASE H: Content (Requires Bertrand — Thursday call)
-- [ ] Bertrand reviews all chapter content and app usability.
-- [ ] Confirm/replace terminology and titles.
-- [ ] Discuss backend database needs for the business pivot.
+### 🚀 Future: VR/AI Masterclass (the premium product)
+- [ ] Bevy ECS + Rust/WASM + OpenXR architecture document
+- [ ] Fine-tune Gemma 4 model on Bertrand's teaching data
+- [ ] Android app shell in Android Studio
+- [ ] VR classroom: avatar, fretboard overlay, pitch detection
 
 ---
 
@@ -199,21 +217,29 @@ bertrand-masterclass/
 ```
 INSTRUCTIONS FOR AI:
 
-1. You are building "The Bertrand Laurence Masterclass" — a mobile-first, swipeable
-   Living Textbook for guitar instruction based on Bertrand's Somatic Mystic philosophy.
+1. You are building "Voix Vive" — a BUSINESS PLATFORM for guitar instructor
+   Bertrand Laurence. The 12-chapter Living Textbook is FREE (marketing funnel).
+   Revenue comes from live coaching, async feedback, membership, and workshops.
 
 2. Project: Vite + React at /home/joshua-atkinson/antigravity/daydream-website/bertrand-masterclass/
 
-3. THE CORE EXPERIENCE is SlideViewer.jsx — a phone-native swipeable slide deck.
-   Each chapter auto-generates ~15 slides from chapterData.js via slideGenerator.js.
-   Slides have images (top/left) + text (bottom/right) with glassmorphism.
+3. THE CORE EXPERIENCE is the SlideViewer.jsx (free curriculum) +
+   StudioPage.jsx (business landing with pricing, testimonials, and CTAs).
 
-4. RESPECT THE IP BOUNDARY (§3): Don't import Great Game concepts without permission.
+4. PAYMENT: Use Stripe Payment Links (no backend needed). Bertrand also
+   accepts Venmo. Display both options prominently.
 
-5. NEXT PRIORITIES: Generate art for all 12 chapters, add background music,
-   polish glassmorphism, integrate fretboard as bottom sheet.
+5. RESPECT THE IP BOUNDARY (§4): Don't import Great Game concepts without permission.
 
-6. Run: cd bertrand-masterclass && npm run dev
+6. THE LIVING TEXTBOOK IS FREE. Do not gate chapters behind payment.
+   The FUTURE Masterclass is a separate VR/AI product (Bevy + Gemma 4).
 
-7. Desktop machine needed for: AI inference, WASM FFT, computer vision.
+7. Run: cd bertrand-masterclass && npm run dev
+
+8. Bertrand has family in France he hasn't visited in years.
+   This platform needs to fund that trip. Build accordingly.
 ```
+
+### Academic Context
+- Purdue EDCI 57300 Practicum
+- AI Policy: Level 2 Partially Restricted — must declare AI usage

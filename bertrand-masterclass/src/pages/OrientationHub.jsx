@@ -5,7 +5,8 @@ import { useScaffolding } from '../components/ScaffoldingProvider';
 import SlideViewer from '../components/SlideViewer';
 import FretboardExplorer from '../components/FretboardExplorer';
 import DigitalBinder from '../components/DigitalBinder';
-import TheMentor from '../components/TheMentor';
+import StudioPage from '../pages/StudioPage';
+import { useNavigate } from 'react-router-dom';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -602,15 +603,15 @@ const OrientationHub = () => {
           </motion.div>
         )}
 
-        {activeTab === 'mentor' && (
+        {activeTab === 'studio' && (
           <motion.div
-            key="mentor"
+            key="studio"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            <TheMentor />
+            <StudioPage />
           </motion.div>
         )}
       </AnimatePresence>
@@ -636,10 +637,10 @@ const OrientationHub = () => {
           📓 <span className="neck-tab-label">Binder</span>
         </button>
         <button
-          className={`neck-tab ${activeTab === 'mentor' ? 'active' : ''}`}
-          onClick={() => setActiveTab('mentor')}
+          className={`neck-tab ${activeTab === 'studio' ? 'active' : ''}`}
+          onClick={() => setActiveTab('studio')}
         >
-          🧙‍♂️ <span className="neck-tab-label">Mentor</span>
+          🏪 <span className="neck-tab-label">Studio</span>
         </button>
       </div>
     </div>

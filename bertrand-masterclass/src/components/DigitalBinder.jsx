@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, CheckCircle, UploadCloud, Play, Calendar, Music } from 'lucide-react';
+import { BookOpen, CheckCircle, UploadCloud, Play, Calendar, Music, Video, Clock, Send } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import PracticeRecorder from './PracticeRecorder';
 
 const DigitalBinder = () => {
   const [practiceTime, setPracticeTime] = useState(() => {
@@ -14,6 +16,11 @@ const DigitalBinder = () => {
       { id: 2, name: "Tuned Guitar", completed: false },
       { id: 3, name: "Reviewed CAGED Maps", completed: false }
     ];
+  });
+
+  const [showRecorder, setShowRecorder] = useState(false);
+  const [submissions, setSubmissions] = useState(() => {
+    return JSON.parse(localStorage.getItem('voixvive_submissions') || '[]');
   });
 
   useEffect(() => {
@@ -32,8 +39,30 @@ const DigitalBinder = () => {
     setHabits(habits.map(h => ({ ...h, completed: false })));
   };
 
+  const handleRecorderClose = () => {
+    setShowRecorder(false);
+    // Refresh submissions from localStorage
+    setSubmissions(JSON.parse(localStorage.getItem('voixvive_submissions') || '[]'));
+  };
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="min-h-screen bg-[#030306] text-white font-inter pb-32">
+      
+      {/* Practice Recorder Overlay */}
+      <AnimatePresence>
+        {showRecorder && (
+          <PracticeRecorder 
+            onClose={handleRecorderClose} 
+            exerciseName="PLING! Protocol — Minor 3rd" 
+          />
+        )}
+      </AnimatePresence>
       
       {/* Header */}
       <div className="pt-safe p-6 bg-cf-surface border-b border-cf-border">
@@ -81,13 +110,53 @@ const DigitalBinder = () => {
               </p>
               
               <div className="flex gap-2">
-                <button className="flex-1 py-3 rounded-xl bg-cf-sage text-cf-deep font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors">
-                  <UploadCloud size={18} /> Submit Audio
+                <button 
+                  onClick={() => setShowRecorder(true)}
+                  className="flex-1 py-3 rounded-xl bg-cf-sage text-cf-deep font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
+                >
+                  <Video size={18} /> Record & Submit
                 </button>
               </div>
             </div>
           </div>
         </div>
+
+        {/* My Submissions */}
+        {submissions.length > 0 && (
+          <div>
+            <h2 className="text-sm font-mono tracking-widest text-white/40 uppercase mb-4 px-2">My Submissions</h2>
+            <div className="space-y-2">
+              {submissions.slice(0, 5).map((sub) => (
+                <div key={sub.id} className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    sub.status === 'reviewed' ? 'bg-green-500/20' : 
+                    sub.status === 'sent' ? 'bg-blue-500/20' : 'bg-yellow-500/20'
+                  }`}>
+                    {sub.status === 'reviewed' ? <CheckCircle size={16} className="text-green-400" /> :
+                     sub.status === 'sent' ? <Send size={16} className="text-blue-400" /> :
+                     <Clock size={16} className="text-yellow-400" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-bold truncate">{sub.exerciseName}</h4>
+                    <p className="text-xs text-white/50">
+                      {sub.mediaType === 'video' ? '📹' : '🎙️'} {formatTime(sub.duration)} · {
+                        new Date(sub.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                      }
+                    </p>
+                  </div>
+                  <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded ${
+                    sub.status === 'reviewed' ? 'bg-green-500/20 text-green-400' :
+                    sub.status === 'sent' ? 'bg-blue-500/20 text-blue-400' :
+                    'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {sub.status === 'reviewed' ? 'Reviewed' :
+                     sub.status === 'sent' ? 'Sent' : 'Queued'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Daily Checklist */}
         <div>
@@ -146,3 +215,4 @@ const DigitalBinder = () => {
 };
 
 export default DigitalBinder;
+
