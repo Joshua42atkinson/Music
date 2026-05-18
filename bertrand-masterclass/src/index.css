@@ -9,10 +9,10 @@
 
 :root {
   /* Core Palette — Soft Twilight Blue */
-  --cf-void: #1a2332;
-  --cf-deep: #1e2838;
-  --cf-surface: #243040;
-  --cf-surface-raised: #2a3848;
+  --cf-void: #050508;
+  --cf-deep: #0a0a0f;
+  --cf-surface: #111118;
+  --cf-surface-raised: #18181f;
   --cf-border: #354560;
   --cf-border-light: #455878;
 
@@ -123,7 +123,7 @@ body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--cf-void);
-  background-image: linear-gradient(180deg, var(--cf-void) 0%, #1c2636 50%, var(--cf-deep) 100%);
+  background-image: none;
   color: var(--cf-ink);
   font-family: var(--font-body);
   font-size: 18px;

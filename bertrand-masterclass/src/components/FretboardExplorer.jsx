@@ -57,6 +57,22 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
   const [rootNote, setRootNote] = useState(presetRoot ?? 0);
   const [showNoteNames, setShowNoteNames] = useState(true);
   const [showDots, setShowDots] = useState(true);
+  // Orientation: 'auto' detects portrait/landscape; can be manually overridden
+  const [orientation, setOrientation] = useState('auto');
+  const isPortrait = typeof window !== 'undefined'
+    ? window.matchMedia('(orientation: portrait)').matches
+    : false;
+  const [portraitMedia, setPortraitMedia] = useState(isPortrait);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)');
+    const handler = (e) => setPortraitMedia(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  // vertical = true when portrait phone (or manually forced)
+  const isVertical = orientation === 'vertical' || (orientation === 'auto' && portraitMedia);
   const effectiveFrets = maxFret || TOTAL_FRETS;
   const audioCtxRef = useRef(null);
 
@@ -140,7 +156,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
   const doubleDotFrets = [12];
 
   return (
-    <div className={`fretboard-explorer-v2 ${compact ? 'fb-compact' : ''}`}>
+    <div className={`fretboard-explorer-v2 ${compact ? 'fb-compact' : ''} ${isVertical ? 'fb-vertical' : 'fb-horizontal'}`}>
       <style>{`
         .fretboard-explorer-v2 {
           background: rgba(10, 10, 15, 0.97);
@@ -192,9 +208,55 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
         @media (max-width: 768px) and (orientation: portrait) {
           .fb-landscape-hint { display: block; }
         }
+        /* ── VERTICAL MODE (portrait phone) ── */
+        /* Rotate the entire neck 90° so strings run left-right, frets run top-bottom */
+        .fb-vertical .fb-neck-wrap {
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-height: 70vh;
+        }
+        .fb-vertical .fb-neck {
+          /* Transpose: rotate the grid so it reads like a vertical guitar neck */
+          writing-mode: initial;
+          transform: rotate(90deg);
+          transform-origin: top left;
+          /* After rotation, the width becomes the height — set to viewport width */
+          width: calc(100vh - 120px);
+          position: absolute;
+          left: 0; top: 0;
+        }
+        .fb-vertical .fb-neck-outer {
+          position: relative;
+          /* Height = rotated width of the neck */
+          min-height: 200px;
+          overflow: hidden;
+          width: 100%;
+        }
+        /* Horizontal mode — default, no changes */
+        .fb-horizontal .fb-neck-outer {
+          overflow-x: auto;
+          overflow-y: hidden;
+        }
+        /* Orientation toggle button */
+        .fb-orient-btn {
+          background: rgba(201,169,110,0.08);
+          border: 1px solid rgba(201,169,110,0.2);
+          color: #c9a96e;
+          padding: 0.4rem 0.8rem;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          font-family: 'JetBrains Mono', monospace;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex; align-items: center; gap: 5px;
+        }
+        .fb-orient-btn:hover {
+          background: rgba(201,169,110,0.18);
+          border-color: rgba(201,169,110,0.4);
+        }
         .fb-neck {
           position: relative; background: linear-gradient(180deg, #3d2b1a, #2c1e14, #3d2b1a);
-          border-radius: 6px; padding: 12px 0; overflow-x: auto;
+          border-radius: 6px; padding: 12px 0;
           border: 1px solid rgba(74, 51, 36, 0.6);
           box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
           min-width: fit-content;
@@ -321,6 +383,17 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
               onClick={() => setShowNoteNames(!showNoteNames)}>
               {showNoteNames ? 'Notes' : 'Notes'}
             </button>
+            {/* Orientation toggle — only show when not compact */}
+            <button
+              className="fb-orient-btn"
+              onClick={() => {
+                if (orientation === 'auto') setOrientation(isVertical ? 'horizontal' : 'vertical');
+                else setOrientation('auto');
+              }}
+              title={isVertical ? 'Switch to horizontal' : 'Switch to vertical'}
+            >
+              {isVertical ? '↔ Horizontal' : '↕ Vertical'}
+            </button>
           </div>
         </div>
       )}
@@ -344,12 +417,10 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
         </div>
       )}
 
-      <div className="fb-landscape-hint">
-        📱 Rotate to landscape for the full fretboard experience
-      </div>
-
-      {/* THE NECK */}
-      <div className="fb-neck">
+      {/* THE NECK — wrapped for orientation control */}
+      <div className="fb-neck-outer">
+        <div className="fb-neck-wrap">
+          <div className="fb-neck">
         {fretboardGrid.map((row, sIdx) => {
           // String thickness varies (thicker for bass strings)
           const thickness = 1 + (sIdx * 0.4);
@@ -393,6 +464,8 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
             ))}
           </div>
         )}
+          </div>
+        </div>
       </div>
 
       {/* Fret numbers */}

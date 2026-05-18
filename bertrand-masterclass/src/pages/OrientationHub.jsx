@@ -36,9 +36,9 @@ const DOT_FRETS = [3, 5, 7, 9];
 const DOUBLE_DOT_FRETS = [12];
 
 const OrientationHub = () => {
-  const { bardLevel, practiceMinutes, streak } = useScaffolding();
   const navigate = useNavigate();
   const [activeFret, setActiveFret] = useState(null);
+  const { } = useScaffolding(); // context available for future use
 
   if (activeFret) {
     return (
@@ -423,25 +423,6 @@ const OrientationHub = () => {
         >
           "You are an instrument playing an instrument."
         </motion.p>
-        <motion.div
-          className="neck-stats"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <div className="neck-stat">
-            <span className="neck-stat-val">{bardLevel}</span>
-            <span className="neck-stat-lbl">Level</span>
-          </div>
-          <div className="neck-stat">
-            <span className="neck-stat-val">{practiceMinutes}</span>
-            <span className="neck-stat-lbl">Minutes</span>
-          </div>
-          <div className="neck-stat">
-            <span className="neck-stat-val">{streak}</span>
-            <span className="neck-stat-lbl">Streak</span>
-          </div>
-        </motion.div>
       </div>
 
       <div className="neck-board">
