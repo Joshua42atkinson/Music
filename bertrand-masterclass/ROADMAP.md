@@ -80,6 +80,48 @@ PREMIUM LAYER (Future)
 
 ---
 
+## Phase 1.5: Guitar Tools Suite 🛠️ (Week 1-2 — concurrent)
+
+**Goal:** Wire all orphaned interactive components into the Binder's new "Tools" tab. Students get a free, powerful practice toolkit that keeps them in the app.
+
+### Already Built (orphaned — need to wire into Binder)
+
+| Component | Lines | What It Does | Status |
+|-----------|-------|--------------|--------|
+| `FretboardExplorer.jsx` | 423 | 14-fret interactive neck, CAGED overlays, 6 scale patterns, Web Audio | ✅ In Fretboard tab |
+| `PlingTrainer.jsx` | 248 | Real-time pitch detection via mic — sing a note, see if you're in tune | ❌ Orphaned |
+| `PitchRoom.jsx` | ~200 | Interval ear training game — hear two notes, identify the interval | ❌ Orphaned |
+| `BreathingGate.jsx` | ~150 | Somatic breathing exercise + body scan (Bertrand's pre-practice ritual) | ❌ Orphaned |
+| `FretboardSheet.jsx` | 299 | Bottom-sheet fretboard overlay for in-slide practice | ❌ Orphaned |
+| `PlayerHandbook.jsx` | 209 | 5 Tomes reference content (old dashboard) | ❌ Orphaned |
+
+### New Tools to Build
+
+| Tool | Description | Difficulty |
+|------|-------------|------------|
+| **Metronome** | Tap tempo, adjustable BPM, accent patterns, visual pulse | Easy (Web Audio) |
+| **Chord Library** | Visual chord diagrams (open + barre), searchable, with audio | Medium |
+| **Practice Timer** | Pomodoro-style with "Practice TOO SLOW" reminders | Easy |
+| **CAGED Shape Toggle** | Add UI buttons to FretboardExplorer to show/hide CAGED overlays | Easy |
+| **Tuner** | Mic-based guitar tuner (extend PlingTrainer) | Medium |
+| **Chord Progression Player** | Common progressions (I-IV-V, I-V-vi-IV) with audio + fretboard | Medium |
+
+### Implementation Plan
+
+| Task | Priority |
+|------|----------|
+| Add "Tools" tab to DigitalBinder (alongside Assignments/Submissions) | P0 |
+| Wire PlingTrainer into Tools tab | P1 |
+| Wire PitchRoom into Tools tab | P1 |
+| Wire BreathingGate into Tools tab | P1 |
+| Build Metronome component | P1 |
+| Add CAGED shape toggle buttons to FretboardExplorer | P1 |
+| Build Chord Library with Bertrand's most-used chords | P2 |
+| Build Practice Timer with TOO SLOW philosophy | P2 |
+| Wire FretboardSheet into SlideViewer exercise slides | P2 |
+
+**Exit Criteria:** Binder has a "Tools" tab with 5+ interactive practice tools.
+
 ## Phase 2: Async Coaching Pipeline 📹 (Week 2 — May 25-31)
 
 **Goal:** Students can record, submit, and receive video feedback.
