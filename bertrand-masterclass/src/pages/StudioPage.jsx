@@ -708,6 +708,124 @@ export default function StudioPage() {
         </div>
       </section>
 
+      {/* ═══ FREE DOWNLOADS ═══ */}
+      <section className="studio-section" id="free-resources">
+        <h2 className="studio-section-title">Free Resources</h2>
+        <p className="studio-section-subtitle">Download Bertrand's teaching materials — yours to keep</p>
+
+        <style>{`
+          .downloads-group { margin-bottom: 24px; }
+          .downloads-group-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(201,169,110,0.5);
+            margin-bottom: 10px;
+          }
+          .download-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            text-decoration: none;
+            color: #d0c8b8;
+            transition: all 0.2s;
+          }
+          .download-item:hover {
+            background: rgba(201,169,110,0.07);
+            border-color: rgba(201,169,110,0.2);
+            color: #f0e6d2;
+          }
+          .download-icon { font-size: 1.2rem; flex-shrink: 0; }
+          .download-name { flex: 1; font-size: 0.85rem; font-family: 'EB Garamond', serif; }
+          .download-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            color: #7aaa88;
+            text-transform: uppercase;
+            background: rgba(122,170,136,0.1);
+            padding: 2px 7px;
+            border-radius: 4px;
+          }
+          .venmo-block {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px; border-radius: 12px;
+            background: rgba(201,169,110,0.05);
+            border: 1px solid rgba(201,169,110,0.15);
+            margin-top: 8px;
+          }
+          .venmo-qr { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(201,169,110,0.2); }
+          .venmo-text strong { display: block; color: #f0e6d2; font-size: 0.9rem; margin-bottom: 4px; }
+          .venmo-text span { color: #6a7a8a; font-size: 0.78rem; font-family: 'EB Garamond', serif; }
+        `}</style>
+
+        <div className="downloads-group">
+          <div className="downloads-group-label">🎵 Song Sheets</div>
+          {[
+            { name: 'Allegro — Classical Guitar Piece', file: 'allegro-classical-piece.pdf', type: 'PDF' },
+            { name: 'Auld Lang Syne — TAB', file: 'auld-lang-syne-tab.pdf', type: 'PDF' },
+            { name: 'Blue Christmas — Chord Melody', file: 'blue-christmas-chord-melody.pdf', type: 'PDF' },
+            { name: 'Blue Christmas — Simple TAB', file: 'blue-christmas-simple-tab.pdf', type: 'PDF' },
+            { name: 'Silent Night', file: 'silent-night.pdf', type: 'PDF' },
+          ].map(item => (
+            <a key={item.file} className="download-item" href={`/assets/downloads/${item.file}`} download target="_blank" rel="noopener noreferrer">
+              <span className="download-icon">📄</span>
+              <span className="download-name">{item.name}</span>
+              <span className="download-type">{item.type}</span>
+              <span style={{ color: '#5a6a7a' }}>↓</span>
+            </a>
+          ))}
+        </div>
+
+        <div className="downloads-group">
+          <div className="downloads-group-label">🗺️ Theory Maps</div>
+          {[
+            { name: 'E Vertiscales — Full Chart', file: 'e-vertiscales.pdf', type: 'PDF' },
+            { name: 'Modes in A', file: 'modes-in-a.pdf', type: 'PDF' },
+            { name: 'Modes Circle Cheat Sheet', file: 'modes-circle-cheat-sheet.pdf', type: 'PDF' },
+            { name: 'Blues in A — Maps', file: 'blues-in-a-maps.png', type: 'PNG' },
+          ].map(item => (
+            <a key={item.file} className="download-item" href={`/assets/downloads/${item.file}`} download target="_blank" rel="noopener noreferrer">
+              <span className="download-icon">🗺️</span>
+              <span className="download-name">{item.name}</span>
+              <span className="download-type">{item.type}</span>
+              <span style={{ color: '#5a6a7a' }}>↓</span>
+            </a>
+          ))}
+        </div>
+
+        <div className="downloads-group">
+          <div className="downloads-group-label">📊 Reference Charts</div>
+          {[
+            { name: 'CAGED System Introduction', file: 'caged-system-intro.png', type: 'PNG' },
+            { name: 'E Vertiscales — Visual Chart', file: 'e-vertiscales-chart.png', type: 'PNG' },
+            { name: 'Modes in E — Vertical', file: 'modes-in-e-vertical.png', type: 'PNG' },
+            { name: 'Harmony Grid Notes', file: 'harmony-grid-notes.jpg', type: 'JPG' },
+          ].map(item => (
+            <a key={item.file} className="download-item" href={`/assets/downloads/${item.file}`} download target="_blank" rel="noopener noreferrer">
+              <span className="download-icon">📊</span>
+              <span className="download-name">{item.name}</span>
+              <span className="download-type">{item.type}</span>
+              <span style={{ color: '#5a6a7a' }}>↓</span>
+            </a>
+          ))}
+        </div>
+
+        <div className="venmo-block">
+          <img src="/assets/downloads/venmo-qr.jpg" alt="Bertrand's Venmo QR" className="venmo-qr" />
+          <div className="venmo-text">
+            <strong>Pay via Venmo</strong>
+            <span>Scan or search @Bertrand-Laurence on Venmo</span>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ FRENCH SECTION ═══ */}
       <section className="studio-section">
         <div className="french-section">

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Circle } from 'lucide-react';
 import frets from '../data/chapterData';
 import { useScaffolding } from '../components/ScaffoldingProvider';
 import SlideViewer from '../components/SlideViewer';
@@ -385,27 +384,38 @@ const OrientationHub = () => {
           box-shadow: 0 0 20px rgba(0, 210, 211, 0.08);
         }
 
-        .back-to-palm {
+        .back-to-portal {
           position: absolute;
-          top: max(24px, env(safe-area-inset-top));
-          left: 24px;
+          top: max(16px, env(safe-area-inset-top));
+          left: 16px;
           z-index: 50;
-          color: rgba(201,169,110,0.6);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: rgba(201,169,110,0.7);
           cursor: pointer;
-          transition: all 0.3s;
-          background: none;
-          border: none;
+          background: rgba(201,169,110,0.06);
+          border: 1px solid rgba(201,169,110,0.15);
+          border-radius: 8px;
+          padding: 8px 12px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.65rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          transition: all 0.2s;
+          min-height: 36px;
         }
-        .back-to-palm:hover {
+        .back-to-portal:hover {
           color: #c9a96e;
-          transform: scale(1.1);
+          background: rgba(201,169,110,0.12);
+          border-color: rgba(201,169,110,0.35);
         }
       `}</style>
 
       {/* ═══════ THE NUT / HEADSTOCK ═══════ */}
       <div className="neck-nut">
-        <button className="back-to-palm" onClick={() => navigate('/')} aria-label="Return to center">
-          <Circle size={32} strokeWidth={1} />
+        <button className="back-to-portal" onClick={() => navigate('/')} aria-label="Return to portal">
+          ← Home
         </button>
         <motion.h1
           className="neck-logo"

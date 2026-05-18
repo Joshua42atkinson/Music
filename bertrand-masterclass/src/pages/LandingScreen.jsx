@@ -227,6 +227,26 @@ export default function LandingScreen() {
           transform: translateX(4px);
         }
 
+        /* ── LANDSCAPE PHONE: cards side-by-side ── */
+        @media (orientation: landscape) and (max-height: 600px) {
+          .landing-hub { padding: 8px 16px 24px; }
+          .wordmark-wrap { max-width: 260px; padding-top: max(6px, env(safe-area-inset-top)); margin-bottom: 4px; }
+          .trinity-label { margin-bottom: 8px; font-size: 0.5rem; }
+          .portals-grid { flex-direction: row; gap: 10px; max-width: 100%; }
+          .portal-card { flex: 1; min-width: 0; }
+          .portal-art { aspect-ratio: 4 / 3; }
+          .portal-info { padding: 10px 10px 8px; }
+          .portal-name { font-size: 1.05rem; }
+          .portal-tag, .portal-desc { display: none; }
+          .thumb-anchor { margin-top: 10px; }
+        }
+
+        /* ── DESKTOP: wider layout ── */
+        @media (min-width: 768px) {
+          .portals-grid { max-width: 600px; }
+          .wordmark-wrap { max-width: 560px; }
+        }
+
         /* ── THUMB ANCHOR ── */
         .thumb-anchor {
           display: flex;
