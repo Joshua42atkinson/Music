@@ -113,7 +113,7 @@ I. Music Theory (Grammar) | II. Ear Training | III. Technique (Kinesthesis) | IV
 
 ```
 Framework:    Vite + React 18 + React Router 7
-Styling:      Tailwind CSS 3 + vanilla CSS (~680 LOC with --bard-* aliases)
+Styling:      Tailwind CSS 3 + vanilla CSS (~660 LOC with --bard-* aliases)
 Animation:    Framer Motion (swipe gestures, transitions)
 Icons:        Lucide React
 Audio:        HTML5 Audio (Bertrand's "Houlton Skies" as primary ambient track)
@@ -123,7 +123,7 @@ Payments:     Stripe Payment Links (no backend required) + Venmo QR
 DB (Local):   Dexie.js / IndexedDB (offline progress + submission outbox)
 Media:        MediaRecorder API (practice video/audio capture)
 SEO:          JSON-LD LocalBusiness, Open Graph, Twitter Cards
-Total Source: ~8,250 lines across 24 files
+Source Code:  ~616 KB across 16 source files + 7 data files
 ```
 
 ---
@@ -134,12 +134,13 @@ Total Source: ~8,250 lines across 24 files
 bertrand-masterclass/
 ├── CONTEXT.md              — THIS FILE (master project context)
 ├── ROADMAP.md              — Development roadmap with phases and timeline
+├── Gamifying Guitar Learning with Open Source.md — Next phase planning doc
 ├── index.html              — SEO: JSON-LD, Open Graph, Twitter Cards
 │
 ├── src/
 │   ├── main.jsx            — React entry
 │   ├── App.jsx             — Router + ScaffoldingProvider + WelcomeOnboarding
-│   ├── index.css           — Design system (~680 LOC, --cf-* + --bard-* tokens)
+│   ├── index.css           — Design system (~660 LOC, --cf-* + --bard-* tokens)
 │   │
 │   ├── data/
 │   │   ├── chapterData.js      — ★ 12-chapter curriculum (Hero's Journey × Chromatic)
@@ -148,32 +149,33 @@ bertrand-masterclass/
 │   │   ├── localDatabase.js    — Dexie/IndexedDB schema (offline-first, submission outbox)
 │   │   ├── pricingData.js      — ★ Revenue streams, pricing, Stripe link stubs
 │   │   ├── testimonialData.js  — ★ 13 real student testimonials + 8 FAQ items
-│   │   └── videoData.js        — Video module index
+│   │   └── toolsData.jsx       — Tools catalog for Binder & SlideViewer
 │   │
 │   ├── components/
 │   │   ├── SlideViewer.jsx         — ★★ CORE: Swipeable slide reader (the Living Textbook)
 │   │   ├── PracticeRecorder.jsx    — ★ Async video/audio recorder → IndexedDB outbox
 │   │   ├── WelcomeOnboarding.jsx   — ★ 3-slide first-run welcome flow
 │   │   ├── AmbientPlayer.jsx      — HTML5 Audio: "Houlton Skies" + volume/skip
-│   │   ├── DigitalBinder.jsx       — Practice log + submission history viewer
-│   │   ├── ConnectionManager.jsx   — Dormant (renders null until DaaS backend exists)
+│   │   ├── DigitalBinder.jsx       — Practice log + Tools tab + submission history
 │   │   ├── ScaffoldingProvider.jsx — React context for traction-aware UI fade
 │   │   ├── FretboardExplorer.jsx   — 14-fret fretboard with scales + Web Audio
-│   │   ├── BreathingGate.jsx       — Somatic breathing gate
-│   │   ├── PitchRoom.jsx           — Gamified ear training
-│   │   ├── TheMentor.jsx           — Legacy (superseded by StudioPage, can be deleted)
-│   │   └── About.jsx               — Contact info
+│   │   ├── FretboardSheet.jsx      — Bottom-sheet fretboard overlay for in-slide practice
+│   │   ├── BreathingGate.jsx       — Somatic breathing gate (Bertrand's pre-practice ritual)
+│   │   ├── PitchRoom.jsx           — Gamified interval ear training
+│   │   ├── PlingTrainer.jsx        — Real-time pitch detection via mic (©PLING! protocol)
+│   │   ├── Metronome.jsx           — Tap tempo, adjustable BPM, visual pulse
+│   │   ├── PracticeTimer.jsx       — Pomodoro-style with "Practice TOO SLOW" reminders
+│   │   └── RhythmEngine.jsx        — Rhythm pattern engine
 │   │
 │   └── pages/
 │       ├── OrientationHub.jsx     — ★ Mobile-first chapter list + 4-tab bottom nav
-│       ├── StudioPage.jsx         — ★ Business landing (6 services, testimonials, payments)
-│       └── MentorshipHub.jsx      — Legacy mentorship dashboard (placeholder)
+│       └── StudioPage.jsx         — ★ Business landing (6 services, testimonials, payments)
 │
 └── public/assets/
     ├── bertrand_profile.jpg       — Instructor photo
     ├── houlton_skies.m4a          — ★ Bertrand's music (4.6MB, primary ambient)
     ├── home_audio.m4a             — Secondary ambient track (26MB)
-    └── slides/ch1-ch12/           — AI-generated chapter artwork (ch1-8 populated, ch9-12 empty)
+    └── slides/ch1-ch12/           — AI-generated chapter artwork (ch1-8 populated, ch9-12 need generation)
 ```
 
 ---
@@ -189,7 +191,9 @@ bertrand-masterclass/
 - [x] SEO (JSON-LD, Open Graph, Twitter Cards)
 - [x] OrientationHub bottom nav (Chapters, Fretboard, Binder, Studio)
 - [x] FretboardExplorer (14-fret with scales + Web Audio)
-- [x] Digital Binder (practice log, submissions, feedback)
+- [x] Digital Binder (practice log, tools tab, submissions)
+- [x] Guitar Tools: Metronome, PracticeTimer, PlingTrainer, PitchRoom, BreathingGate, RhythmEngine
+- [x] Workspace cleanup (removed dead code, legacy assets, unused deps — May 17 2026)
 
 ### 🟡 Needs Bertrand's Input
 - [ ] Stripe Payment Links — Bertrand creates Stripe account, we plug in URLs
@@ -199,10 +203,10 @@ bertrand-masterclass/
 
 ### 🔴 Remaining Dev Work
 - [ ] ch9-12 artwork (35 images via AI generation)
+- [ ] ch8 artwork completion (missing: exercise-0, exercise-1, fretboard, meditation, quote, end)
 - [ ] PracticeRecorder → actual upload pipeline (Cloudflare R2 or DaaS tunnel)
-- [ ] Remove `react-youtube` unused dependency from package.json
-- [ ] Delete `TheMentor.jsx` (dead code, replaced by StudioPage)
-- [ ] MentorshipHub.jsx — either wire to real data or remove
+- [ ] Wire orphaned tools into Binder's Tools tab (PlingTrainer, PitchRoom, BreathingGate)
+- [ ] Production deployment (domain + Vercel)
 
 ### 🚀 Future: VR/AI Masterclass (the premium product)
 - [ ] Bevy ECS + Rust/WASM + OpenXR architecture document

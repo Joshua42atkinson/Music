@@ -4,6 +4,7 @@ import chapters from '../data/chapterData';
 import { generateSlides } from '../data/slideGenerator';
 import FretboardSheet from './FretboardSheet';
 import PlingTrainer from './PlingTrainer';
+import { TOOLS_CATALOG } from '../data/toolsData';
 
 // ═══════════════════════════════════════════════════════════
 // SLIDE VIEWER — Phone-native swipeable chapter reader
@@ -63,16 +64,41 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
   };
 
   return (
-    <div className="sv-container">
+    <div className="sv-wrapper">
+      <div className="sv-container">
       <style>{`
-        .sv-container {
+        .sv-wrapper {
           position: fixed; inset: 0; z-index: 100;
+          display: flex; align-items: center; justify-content: center;
+          pointer-events: none;
+        }
+        @media (min-width: 768px) {
+          .sv-wrapper {
+            background: rgba(3, 3, 6, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            pointer-events: auto;
+          }
+        }
+        .sv-container {
+          position: absolute; inset: 0;
           background: #030306;
           display: flex; flex-direction: column;
           font-family: 'Inter', sans-serif;
           color: #e0e0ff;
           overflow: hidden;
           touch-action: pan-y;
+          pointer-events: auto;
+        }
+        @media (min-width: 768px) {
+          .sv-container {
+            position: relative; inset: auto;
+            width: 100%; max-width: 440px;
+            height: 90vh; max-height: 900px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+          }
         }
         .sv-topbar {
           display: flex; align-items: center; justify-content: space-between;
@@ -437,6 +463,7 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
           />
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };
@@ -501,6 +528,24 @@ function SlideContent({ slide, onOpenFretboard, onNextChapter }) {
         </>
       );
 
+    case 'yang-theory':
+      return (
+        <>
+          <p className="sv-label" style={{ color: '#0abde3' }}>{slide.label}</p>
+          <h2 className="sv-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.2rem)' }}>{slide.title}</h2>
+          
+          <div className="mb-6 p-4 rounded-xl bg-[#0abde3]/10 border border-[#0abde3]/30">
+            <h3 className="font-bold text-[#0abde3] text-sm mb-2 font-mono uppercase tracking-wider">How Music Works</h3>
+            <p className="sv-body text-sm">{slide.musicGrammar}</p>
+          </div>
+          
+          <div className="mb-6 p-4 rounded-xl bg-cf-gold/10 border border-cf-gold/30">
+            <h3 className="font-bold text-cf-gold text-sm mb-2 font-mono uppercase tracking-wider">How Guitar Works</h3>
+            <p className="sv-body text-sm">{slide.guitarGrammar}</p>
+          </div>
+        </>
+      );
+
     case 'yang-exercise':
       return (
         <>
@@ -518,10 +563,35 @@ function SlideContent({ slide, onOpenFretboard, onNextChapter }) {
             ))}
           </div>
           
-          {/* Inject PLING Trainer for specific exercises */}
+          {/* Inject PLING Trainer for specific exercises (Legacy mapping) */}
           {(slide.id === '4-exercise-0' || slide.id === '7-exercise-0') && (
             <PlingTrainer />
           )}
+
+          {/* Mapped Chapter Tool */}
+          {(() => {
+            const activeTool = TOOLS_CATALOG.find(t => t.id === slide.chapterId);
+            if (!activeTool) return null;
+            return (
+              <div className="mt-4 mb-4 p-4 rounded-xl bg-cf-gold/10 border border-cf-gold/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-cf-gold">{activeTool.icon}</span>
+                  <h3 className="font-bold text-cf-gold text-sm">{activeTool.name}</h3>
+                </div>
+                <p className="text-xs text-white/70 mb-3">{activeTool.desc}</p>
+                <button 
+                  className={`w-full py-2 rounded text-xs font-bold transition-colors ${activeTool.status === 'available' ? 'bg-cf-gold text-[#030306] hover:bg-white' : 'bg-white/10 text-white/40 cursor-not-allowed'}`}
+                  onClick={() => {
+                    if (activeTool.status === 'available') {
+                      alert(`Opening ${activeTool.name}... (Routing to be connected)`);
+                    }
+                  }}
+                >
+                  {activeTool.status === 'available' ? 'Launch Tool' : 'Coming Soon'}
+                </button>
+              </div>
+            );
+          })()}
 
           {/* Inline fretboard access from exercises */}
           <button className="sv-fretboard-fab" onClick={onOpenFretboard}>

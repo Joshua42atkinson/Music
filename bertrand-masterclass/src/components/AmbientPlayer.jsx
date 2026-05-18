@@ -46,20 +46,36 @@ export default function AmbientPlayer() {
   useEffect(() => {
     const audio = new Audio(currentTrack.src);
     audio.volume = volume;
-    audio.loop = TRACKS.length === 1; // Loop if single track
-    audio.preload = 'metadata';
+    audio.loop = true; // Always loop the ambient track
+    audio.preload = 'auto';
     
-    audio.addEventListener('ended', handleTrackEnd);
-    audio.addEventListener('timeupdate', () => setCurrentTime(audio.currentTime));
+    // Skip the silent intro of Houlton Skies to fix the broken loop feel
+    if (currentTrack.id === 'houlton-skies') {
+      audio.currentTime = 3; 
+    }
+    
+    audio.addEventListener('timeupdate', () => {
+      setCurrentTime(audio.currentTime);
+      // Optional: If there is silence at the end, we could trigger a manual loop here.
+      // For now, native loop is true.
+      if (audio.duration && audio.currentTime >= audio.duration - 0.5 && currentTrack.id === 'houlton-skies') {
+         audio.currentTime = 3; // loop back past the intro silence
+      }
+    });
     audio.addEventListener('loadedmetadata', () => setDuration(audio.duration));
     audio.addEventListener('play', () => setIsPlaying(true));
     audio.addEventListener('pause', () => setIsPlaying(false));
     
     audioRef.current = audio;
 
+    // Attempt Autoplay
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => console.log('Autoplay blocked by browser. User must click play.'));
+    }
+
     return () => {
       audio.pause();
-      audio.removeEventListener('ended', handleTrackEnd);
       audio.src = '';
     };
   }, [currentTrackIndex]);

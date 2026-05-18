@@ -54,8 +54,7 @@ const OrientationHub = () => {
       <style>{`
         .neck-container {
           min-height: 100vh;
-          max-width: 480px;
-          margin: 0 auto;
+          width: 100%;
           font-family: 'Inter', sans-serif;
           position: relative;
           overflow-x: hidden;
@@ -479,11 +478,51 @@ const OrientationHub = () => {
         {activeTab === 'chapters' && (
           <motion.div
             key="chapters"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-[480px] mx-auto"
           >
+            {/* ═══════ THE NUT / HEADSTOCK ═══════ */}
+            <div className="neck-nut">
+              <motion.h1
+                className="neck-logo"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                Voix Vive
+              </motion.h1>
+              <motion.p
+                className="neck-tagline"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+              >
+                "You are an instrument playing an instrument."
+              </motion.p>
+              <motion.div
+                className="neck-stats"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+              >
+                <div className="neck-stat">
+                  <span className="neck-stat-val">{bardLevel}</span>
+                  <span className="neck-stat-lbl">Level</span>
+                </div>
+                <div className="neck-stat">
+                  <span className="neck-stat-val">{practiceMinutes}</span>
+                  <span className="neck-stat-lbl">Minutes</span>
+                </div>
+                <div className="neck-stat">
+                  <span className="neck-stat-val">{streak}</span>
+                  <span className="neck-stat-lbl">Streak</span>
+                </div>
+              </motion.div>
+            </div>
+
             <div className="neck-board">
               {/* 6 Strings */}
               <div className="neck-strings">

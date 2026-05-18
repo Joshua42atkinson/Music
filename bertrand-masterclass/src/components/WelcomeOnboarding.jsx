@@ -13,17 +13,17 @@ const slides = [
   {
     id: 0,
     icon: '🎸',
-    title: 'Welcome to Voix Vive',
-    subtitle: 'Bertrand Laurence\'s Living Guitar Textbook',
-    body: 'A body-centered approach to guitar mastery — where breathing comes before playing, and understanding comes before memorizing.',
+    title: 'Bienvenue to Voix Vive',
+    subtitle: 'My Living Guitar Textbook',
+    body: 'A body-centered approach to guitar mastery. Here, breathing comes before playing, and understanding comes before memorizing. You are an instrument playing an instrument.',
     accent: '#c9a96e',
   },
   {
     id: 1,
     icon: '🗺️',
-    title: 'Your Journey Has 12 Frets',
+    title: 'The Fretboard is a Map',
     subtitle: 'Each fret is a chapter. Each chapter has two sides.',
-    body: '☽ Yin — Philosophy, meditation, and ear training. Slow down. Listen.\n\n☀ Yang — Physical exercises, fretboard patterns, and technique. Pick up the guitar.',
+    body: '☽ Yin — Philosophy, meditation, and ear training. Slow down. Listen deeply.\n\n☀ Yang — Physical exercises, fretboard patterns, and technique. Pick up the guitar and move.',
     accent: '#7aaa88',
   },
   {
@@ -31,7 +31,7 @@ const slides = [
     icon: '🫁',
     title: 'Breathe First, Then Play',
     subtitle: 'Start with Chapter 1: The Root Note',
-    body: 'Every session begins with a body scan and breath override. Your body is the first instrument — tune it before the wooden one.\n\nSwipe through slides at your own pace. There are no wrong notes here.',
+    body: 'Every session begins with a body scan and a breath override. Tune your body before you tune the wood.\n\nSwipe through the slides at your own pace. Il n\'y a pas de mauvaises notes ici. (There are no wrong notes here.)',
     accent: '#7b6aaa',
   },
 ];

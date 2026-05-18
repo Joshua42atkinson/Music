@@ -336,18 +336,6 @@ h4 { font-size: 2rem; }
   );
 }
 
-/* Video accent borders */
-.border-impact { border-color: #4a8a9e; }
-.border-authority { border-color: #9e7a4a; }
-.border-self { border-color: #7a4a9e; }
-
-.text-impact { color: #5a9aae; }
-.text-authority { color: #ae8a5a; }
-.text-self { color: #9a6abe; }
-
-.bg-impact { background-color: rgba(74, 138, 158, 0.1); }
-.bg-authority { background-color: rgba(158, 122, 74, 0.1); }
-.bg-self { background-color: rgba(122, 74, 158, 0.1); }
 
 /* Prose content */
 .prose-cf p {

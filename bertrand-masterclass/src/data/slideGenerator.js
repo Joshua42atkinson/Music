@@ -229,6 +229,20 @@ export function generateSlides(chapter) {
     });
   }
 
+  // 5.5 Western Music & Guitar Theory Slide
+  if (chapter.westernTheory) {
+    slides.push({
+      ...base,
+      id: `${chapter.id}-western-theory`,
+      type: 'yang-theory', // Mapping to the existing style but new content
+      label: '⚙ HOW IT WORKS',
+      title: 'The Grammar of Sound',
+      musicGrammar: chapter.westernTheory.musicGrammar,
+      guitarGrammar: chapter.westernTheory.guitarGrammar,
+      image: SLIDE_IMAGES[`${chapter.id}-yang-intro`] || null // Reuse the yang-intro image for the theory slide
+    });
+  }
+
   // 6. Yang Instruction intro
   slides.push({
     ...base,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { Scale, Interval } from '@tonaljs/tonal';
 
 // ═══════════════════════════════════════════════════════════
 // FULL 12-FRET FRETBOARD EXPLORER
@@ -38,14 +39,16 @@ const CAGED_SHAPES = {
   D: { label: 'D Shape', color: '#9b59b6', positions: [[-1,0],[3,1],[2,2],[0,3],[-1,4],[-1,5]] },
 };
 
-// Scale patterns (intervals from root)
-const SCALE_PATTERNS = {
-  major:            { label: 'Major', intervals: [0,2,4,5,7,9,11], color: '#3498db' },
-  minor:            { label: 'Natural Minor', intervals: [0,2,3,5,7,8,10], color: '#e74c3c' },
-  pentatonicMajor:  { label: 'Major Pentatonic', intervals: [0,2,4,7,9], color: '#2ecc71' },
-  pentatonicMinor:  { label: 'Minor Pentatonic', intervals: [0,3,5,7,10], color: '#f39c12' },
-  blues:            { label: 'Blues', intervals: [0,3,5,6,7,10], color: '#9b59b6' },
-  chromatic:        { label: 'Chromatic', intervals: [0,1,2,3,4,5,6,7,8,9,10,11], color: '#95a5a6' },
+// Scale patterns powered by @tonaljs/tonal
+const TONAL_SCALES = {
+  major:            { label: 'Major', tonalName: 'major', color: '#3498db' },
+  minor:            { label: 'Natural Minor', tonalName: 'minor', color: '#e74c3c' },
+  pentatonicMajor:  { label: 'Major Pentatonic', tonalName: 'major pentatonic', color: '#2ecc71' },
+  pentatonicMinor:  { label: 'Minor Pentatonic', tonalName: 'minor pentatonic', color: '#f39c12' },
+  blues:            { label: 'Blues', tonalName: 'minor blues', color: '#9b59b6' },
+  dorian:           { label: 'Dorian', tonalName: 'dorian', color: '#1abc9c' },
+  mixolydian:       { label: 'Mixolydian', tonalName: 'mixolydian', color: '#e67e22' },
+  chromatic:        { label: 'Chromatic', tonalName: 'chromatic', color: '#95a5a6' },
 };
 
 const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = false, presetRoot, presetScale }) => {
@@ -111,10 +114,14 @@ const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = f
 
       // Is this note in the active scale?
       let inScale = false;
-      if (activeScale && SCALE_PATTERNS[activeScale]) {
-        const intervals = SCALE_PATTERNS[activeScale].intervals;
-        const relativeToRoot = ((noteClass - rootNote) % 12 + 12) % 12;
-        inScale = intervals.includes(relativeToRoot);
+      if (activeScale && TONAL_SCALES[activeScale]) {
+        const rootName = midiToNoteName(rootNote).replace('♯', '#');
+        const scaleData = Scale.get(`${rootName} ${TONAL_SCALES[activeScale].tonalName}`);
+        if (scaleData && scaleData.intervals) {
+          const scaleSemitones = scaleData.intervals.map(ivl => Interval.semitones(ivl));
+          const relativeToRoot = ((noteClass - rootNote) % 12 + 12) % 12;
+          inScale = scaleSemitones.includes(relativeToRoot);
+        }
       }
 
       // Is this the root?
@@ -306,7 +313,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = f
             </select>
             <select className="fb-select" value={activeScale || ''} onChange={e => setActiveScale(e.target.value || null)}>
               <option value="">No Scale</option>
-              {Object.entries(SCALE_PATTERNS).map(([k, v]) => (
+              {Object.entries(TONAL_SCALES).map(([k, v]) => (
                 <option key={k} value={k}>{v.label}</option>
               ))}
             </select>
@@ -325,7 +332,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = f
             </select>
             <select className="fb-select" value={activeScale || ''} onChange={e => setActiveScale(e.target.value || null)}>
               <option value="">No Scale</option>
-              {Object.entries(SCALE_PATTERNS).map(([k, v]) => (
+              {Object.entries(TONAL_SCALES).map(([k, v]) => (
                 <option key={k} value={k}>{v.label}</option>
               ))}
             </select>
