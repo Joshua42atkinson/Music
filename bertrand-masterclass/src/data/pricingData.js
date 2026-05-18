@@ -26,8 +26,8 @@ export const PAYMENT_METHODS = [
     description: 'Send to @BertrandLaurence',
     icon: '📱',
     primary: true,
+    // ⚠️ Verify exact Venmo handle with Bertrand — his QR (BLVenmo.jpg) is on his resources page
     handle: '@BertrandLaurence',
-    // QR code image path (Bertrand's Venmo QR is on his Duet Partner resources page)
     qrImage: '/assets/venmo_qr.png',
   },
   {
@@ -84,10 +84,11 @@ export const SERVICES = [
     delivery: 'Zoom (nationwide) or In-Studio (Houlton, ME)',
     color: '#c9a96e',
     pricing: [
-      { label: 'Single Lesson', price: 60, unit: 'session', stripeLink: null },
-      { label: 'Trial Lesson', price: 45, unit: 'first session', stripeLink: null, badge: 'First Time' },
-      { label: '5-Lesson Pack', price: 275, unit: '5 sessions', stripeLink: null, badge: 'Save $25', perUnit: 55 },
-      { label: '10-Lesson Pack', price: 500, unit: '10 sessions', stripeLink: null, badge: 'Best Value', perUnit: 50 },
+      // Prices verified: bertrandguitarstudio.duetpartner.com (May 2026)
+      // Walk-in: $65 | "Onward" 5-pack: $55×5=$275 | "Onward Forward" 10-pack: $50×10=$500
+      { label: 'Single Lesson', price: 65, unit: 'session', stripeLink: null },
+      { label: '5-Lesson Pack — "Onward"', price: 275, unit: '5 sessions', stripeLink: null, badge: 'Save $50', perUnit: 55 },
+      { label: '10-Lesson Pack — "Onward Forward"', price: 500, unit: '10 sessions', stripeLink: null, badge: 'Best Value', perUnit: 50 },
     ],
     features: [
       'Body-centered, somatic approach',
@@ -108,8 +109,8 @@ export const SERVICES = [
     delivery: 'Zoom or In-Studio',
     color: '#7aaa88',
     pricing: [
-      { label: 'Single Session', price: 60, unit: 'session', stripeLink: null },
-      { label: '5-Session Pack', price: 275, unit: '5 sessions', stripeLink: null, badge: 'Save $25', perUnit: 55 },
+      { label: 'Single Session', price: 65, unit: 'session', stripeLink: null },
+      { label: '5-Session Pack', price: 275, unit: '5 sessions', stripeLink: null, badge: 'Save $50', perUnit: 55 },
     ],
     features: [
       'Vocal pitch training with guitar as coach',
@@ -238,9 +239,9 @@ export const SERVICES = [
     delivery: 'PDF emailed to you or recipient',
     color: '#aa5a7a',
     pricing: [
-      { label: '1 Private Lesson', price: 60, unit: 'gift', stripeLink: null },
-      { label: '5 Lessons', price: 275, unit: 'gift', stripeLink: null, badge: 'Popular' },
-      { label: 'Annual Membership', price: 199, unit: 'gift', stripeLink: null },
+      { label: '1 Private Lesson', price: 65, unit: 'gift', stripeLink: null },
+      { label: '5-Lesson Pack', price: 275, unit: 'gift', stripeLink: null, badge: 'Popular' },
+      { label: '10-Lesson Pack', price: 500, unit: 'gift', stripeLink: null },
       { label: 'Custom Amount', price: null, unit: 'custom', stripeLink: null },
     ],
     features: [
@@ -253,13 +254,15 @@ export const SERVICES = [
 ];
 
 // ── Bertrand's Credentials (Social Proof) ──
+// All credentials verified from bertrandguitarstudio.duetpartner.com (May 2026)
+// ⚠️ Do NOT add credentials without verifying against the website or asking Bertrand directly.
 export const CREDENTIALS = [
-  { icon: '🎓', label: 'Berklee College of Music' },
-  { icon: '⭐', label: 'Thumbtack Top Pro (Multi-Year)' },
-  { icon: '🎵', label: 'Passim School of Music Instructor' },
-  { icon: '🇫🇷', label: 'Education Francophone' },
-  { icon: '🎬', label: 'Film Scorer (Harvard Film Archive)' },
-  { icon: '🎸', label: '40+ Years Professional Musician' },
+  { icon: '⭐', label: 'Thumbtack Top Pro — Multi-Year Award' },
+  { icon: '🎵', label: 'Instructor — Passim School of Music, Harvard Sq.' },
+  { icon: '🇫🇷', label: 'Bilingual — English & French (Éducation Francophone)' },
+  { icon: '🎬', label: 'Live Film Scorer — Harvard Film Archive / Carpenter Center' },
+  { icon: '📰', label: '"Boston French Blues guitar wizard" — Elijah Wald, Boston Globe' },
+  { icon: '🎸', label: '6-string, 12-string, Dobro Slide, Electric — Cambridge / Somerville MA' },
 ];
 
 // ── Quick Access: All accepted styles ──

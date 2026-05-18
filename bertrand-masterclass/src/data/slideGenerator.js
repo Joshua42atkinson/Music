@@ -4,14 +4,14 @@
 // ═══════════════════════════════════════════════════════════
 
 /**
- * Generates an array of slide objects from a chapter.
- * Each slide: { id, type, title, body, image, accent, chapter }
- * Types: 'title' | 'yin-philosophy' | 'yin-quote' | 'yin-concept' | 'yin-meditation' | 'yang-instruction' | 'yang-exercise' | 'yang-fretboard' | 'chapter-end'
+ * Generates an array of slide objects from a fret.
+ * Each slide: { id, type, title, body, image, accent, fret }
+ * Types: 'title' | 'yin-philosophy' | 'yin-quote' | 'yin-concept' | 'yin-meditation' | 'yang-instruction' | 'yang-exercise' | 'yang-fretboard' | 'fret-end'
  */
 /**
  * Per-slide image mapping.
  * Key: slideId, Value: path to image in /public/assets/slides/
- * Images are generated per chapter; chapters without images use gradient fallback.
+ * Images are generated per fret; frets without images use gradient fallback.
  */
 const SLIDE_IMAGES = {
   // ── Chapter 1: The Root Note (15 images) ──
@@ -153,147 +153,147 @@ const SLIDE_IMAGES = {
   '12-end':        '/assets/slides/ch12/end.png',
 };
 
-export function generateSlides(chapter) {
+export function generateSlides(fret) {
   const slides = [];
-  const accent = chapter.color;
-  const base = { accent, chapterId: chapter.id, chapterTitle: chapter.title };
+  const accent = fret.color;
+  const base = { accent, fretId: fret.id, fretTitle: fret.title };
 
   // 1. Title slide
   slides.push({
     ...base,
-    id: `${chapter.id}-title`,
+    id: `${fret.id}-title`,
     type: 'title',
-    label: `CHAPTER ${chapter.id} · FRET ${chapter.fret}`,
-    title: chapter.title,
-    subtitle: chapter.subtitle,
-    body: chapter.coreMessage,
-    meta: `${chapter.interval} · ${chapter.heroStage}`,
-    icon: chapter.icon,
-    image: SLIDE_IMAGES[`${chapter.id}-title`] || null
+    label: `FRET ${fret.fret} · ${fret.interval}`,
+    title: fret.title,
+    subtitle: fret.subtitle,
+    body: fret.coreMessage,
+    meta: `${fret.interval} · ${fret.heroStage}`,
+    icon: fret.icon,
+    image: SLIDE_IMAGES[`${fret.id}-title`] || null
   });
 
   // 2. Yin Philosophy slides — split into paragraphs
-  const yinParagraphs = chapter.yin.philosophy.split('\n\n');
+  const yinParagraphs = fret.yin.philosophy.split('\n\n');
   yinParagraphs.forEach((para, i) => {
     slides.push({
       ...base,
-      id: `${chapter.id}-yin-${i}`,
+      id: `${fret.id}-yin-${i}`,
       type: 'yin-philosophy',
-      label: `☽ YIN · ${chapter.act}`,
-      title: i === 0 ? chapter.yin.title : null,
+      label: `☽ YIN · ${fret.act}`,
+      title: i === 0 ? fret.yin.title : null,
       body: para,
-      image: SLIDE_IMAGES[`${chapter.id}-yin-${i}`] || null
+      image: SLIDE_IMAGES[`${fret.id}-yin-${i}`] || null
     });
   });
 
   // 3. Yin Quote slide
-  if (chapter.yin.quote) {
+  if (fret.yin.quote) {
     slides.push({
       ...base,
-      id: `${chapter.id}-quote`,
+      id: `${fret.id}-quote`,
       type: 'yin-quote',
       label: '☽ WISDOM',
       title: null,
-      quote: chapter.yin.quote.text,
-      author: chapter.yin.quote.author,
-      image: SLIDE_IMAGES[`${chapter.id}-quote`] || null
+      quote: fret.yin.quote.text,
+      author: fret.yin.quote.author,
+      image: SLIDE_IMAGES[`${fret.id}-quote`] || null
     });
   }
 
   // 4. Yin Concept slides (one per concept)
-  if (chapter.yin.concepts?.length) {
-    chapter.yin.concepts.forEach((concept, i) => {
+  if (fret.yin.concepts?.length) {
+    fret.yin.concepts.forEach((concept, i) => {
       slides.push({
         ...base,
-        id: `${chapter.id}-concept-${i}`,
+        id: `${fret.id}-concept-${i}`,
         type: 'yin-concept',
         label: '☽ KEY CONCEPT',
         title: concept.term,
         body: concept.definition,
-        image: SLIDE_IMAGES[`${chapter.id}-concept-${i}`] || null
+        image: SLIDE_IMAGES[`${fret.id}-concept-${i}`] || null
       });
     });
   }
 
   // 5. Yin Meditation slide
-  if (chapter.yin.meditation) {
+  if (fret.yin.meditation) {
     slides.push({
       ...base,
-      id: `${chapter.id}-meditation`,
+      id: `${fret.id}-meditation`,
       type: 'yin-meditation',
       label: '☽ MEDITATION',
       title: 'Pause & Reflect',
-      body: chapter.yin.meditation.prompt,
-      duration: chapter.yin.meditation.duration,
-      image: SLIDE_IMAGES[`${chapter.id}-meditation`] || null
+      body: fret.yin.meditation.prompt,
+      duration: fret.yin.meditation.duration,
+      image: SLIDE_IMAGES[`${fret.id}-meditation`] || null
     });
   }
 
   // 5.5 Western Music & Guitar Theory Slide
-  if (chapter.westernTheory) {
+  if (fret.westernTheory) {
     slides.push({
       ...base,
-      id: `${chapter.id}-western-theory`,
+      id: `${fret.id}-western-theory`,
       type: 'yang-theory', // Mapping to the existing style but new content
       label: '⚙ HOW IT WORKS',
       title: 'The Grammar of Sound',
-      musicGrammar: chapter.westernTheory.musicGrammar,
-      guitarGrammar: chapter.westernTheory.guitarGrammar,
-      image: SLIDE_IMAGES[`${chapter.id}-yang-intro`] || null // Reuse the yang-intro image for the theory slide
+      musicGrammar: fret.westernTheory.musicGrammar,
+      guitarGrammar: fret.westernTheory.guitarGrammar,
+      image: SLIDE_IMAGES[`${fret.id}-yang-intro`] || null // Reuse the yang-intro image for the theory slide
     });
   }
 
   // 6. Yang Instruction intro
   slides.push({
     ...base,
-    id: `${chapter.id}-yang-intro`,
+    id: `${fret.id}-yang-intro`,
     type: 'yang-instruction',
-    label: `☀ YANG · ${chapter.pillar}`,
-    title: chapter.yang.title,
-    body: chapter.yang.instruction,
-    image: SLIDE_IMAGES[`${chapter.id}-yang-intro`] || null
+    label: `☀ YANG · ${fret.pillar}`,
+    title: fret.yang.title,
+    body: fret.yang.instruction,
+    image: SLIDE_IMAGES[`${fret.id}-yang-intro`] || null
   });
 
   // 7. Yang Exercise slides (one per exercise)
-  if (chapter.yang.exercises?.length) {
-    chapter.yang.exercises.forEach((exercise, i) => {
+  if (fret.yang.exercises?.length) {
+    fret.yang.exercises.forEach((exercise, i) => {
       slides.push({
         ...base,
-        id: `${chapter.id}-exercise-${i}`,
+        id: `${fret.id}-exercise-${i}`,
         type: 'yang-exercise',
         label: `☀ EXERCISE ${i + 1}`,
         title: exercise.name,
         steps: exercise.steps,
-        image: SLIDE_IMAGES[`${chapter.id}-exercise-${i}`] || null
+        image: SLIDE_IMAGES[`${fret.id}-exercise-${i}`] || null
       });
     });
   }
 
   // 8. Fretboard focus slide
-  if (chapter.yang.fretboardFocus) {
-    const ff = chapter.yang.fretboardFocus;
+  if (fret.yang.fretboardFocus) {
+    const ff = fret.yang.fretboardFocus;
     slides.push({
       ...base,
-      id: `${chapter.id}-fretboard`,
+      id: `${fret.id}-fretboard`,
       type: 'yang-fretboard',
       label: '☀ FRETBOARD FOCUS',
       title: 'Your Practice Zone',
       body: `Frets ${ff.startFret}–${ff.endFret} · Pattern: ${ff.pattern}`,
       fretboardFocus: ff,
-      image: SLIDE_IMAGES[`${chapter.id}-fretboard`] || null
+      image: SLIDE_IMAGES[`${fret.id}-fretboard`] || null
     });
   }
 
   // 9. Chapter end slide
   slides.push({
     ...base,
-    id: `${chapter.id}-end`,
-    type: 'chapter-end',
-    label: `CHAPTER ${chapter.id} COMPLETE`,
-    title: chapter.title,
-    body: `You have completed "${chapter.title}." When you are ready, proceed to the next fret.`,
-    icon: chapter.icon,
-    image: SLIDE_IMAGES[`${chapter.id}-end`] || null
+    id: `${fret.id}-end`,
+    type: 'fret-end',
+    label: `FRET ${fret.id} COMPLETE`,
+    title: fret.title,
+    body: `You have completed "${fret.title}." When you are ready, proceed to the next fret.`,
+    icon: fret.icon,
+    image: SLIDE_IMAGES[`${fret.id}-end`] || null
   });
 
   return slides;

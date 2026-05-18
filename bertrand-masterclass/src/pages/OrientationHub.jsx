@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import chapters from '../data/chapterData';
+import { Circle } from 'lucide-react';
+import frets from '../data/chapterData';
 import { useScaffolding } from '../components/ScaffoldingProvider';
 import SlideViewer from '../components/SlideViewer';
 import FretboardExplorer from '../components/FretboardExplorer';
@@ -36,15 +37,15 @@ const DOUBLE_DOT_FRETS = [12];
 
 const OrientationHub = () => {
   const { bardLevel, practiceMinutes, streak } = useScaffolding();
-  const [activeChapter, setActiveChapter] = useState(null);
-  const [activeTab, setActiveTab] = useState('chapters');
+  const navigate = useNavigate();
+  const [activeFret, setActiveFret] = useState(null);
 
-  if (activeChapter) {
+  if (activeFret) {
     return (
       <SlideViewer
-        chapterId={activeChapter}
-        onBack={() => setActiveChapter(null)}
-        onChapterChange={(id) => { setActiveChapter(id); }}
+        fretId={activeFret}
+        onBack={() => setActiveFret(null)}
+        onFretChange={(id) => { setActiveFret(id); }}
       />
     );
   }
@@ -139,7 +140,7 @@ const OrientationHub = () => {
         }
         .neck-stat-lbl {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.45rem;
+          font-size: 0.65rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
           color: #8a7a5a;
@@ -384,58 +385,28 @@ const OrientationHub = () => {
           box-shadow: 0 0 20px rgba(0, 210, 211, 0.08);
         }
 
-        /* ═══════ BOTTOM TAB BAR ═══════ */
-        .neck-tabs {
-          position: fixed;
-          bottom: 0; left: 0; right: 0;
-          display: flex;
-          justify-content: center;
-          gap: 0;
-          padding: 6px 16px;
-          padding-bottom: max(6px, env(safe-area-inset-bottom));
-          background: rgba(10, 8, 6, 0.95);
-          backdrop-filter: blur(16px) saturate(1.4);
-          -webkit-backdrop-filter: blur(16px) saturate(1.4);
-          border-top: 1px solid rgba(120, 90, 50, 0.15);
+        .back-to-palm {
+          position: absolute;
+          top: max(24px, env(safe-area-inset-top));
+          left: 24px;
           z-index: 50;
-        }
-        .neck-tab {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 3px;
+          color: rgba(201,169,110,0.6);
+          cursor: pointer;
+          transition: all 0.3s;
           background: none;
           border: none;
-          color: #6a5a40;
-          padding: 8px 24px;
-          cursor: pointer;
-          font-size: 1.3rem;
-          transition: all 0.2s;
-          min-height: 44px;
-          position: relative;
         }
-        .neck-tab:hover { color: #c9a96e; }
-        .neck-tab.active { color: #c9a96e; }
-        .neck-tab.active::after {
-          content: '';
-          position: absolute;
-          bottom: 0; left: 50%;
-          transform: translateX(-50%);
-          width: 20px; height: 2px;
-          border-radius: 1px;
-          background: #c9a96e;
-          box-shadow: 0 0 6px rgba(201,169,110,0.4);
-        }
-        .neck-tab-label {
-          font-size: 0.5rem;
-          font-family: 'JetBrains Mono', monospace;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
+        .back-to-palm:hover {
+          color: #c9a96e;
+          transform: scale(1.1);
         }
       `}</style>
 
       {/* ═══════ THE NUT / HEADSTOCK ═══════ */}
       <div className="neck-nut">
+        <button className="back-to-palm" onClick={() => navigate('/')} aria-label="Return to center">
+          <Circle size={32} strokeWidth={1} />
+        </button>
         <motion.h1
           className="neck-logo"
           initial={{ opacity: 0, y: -10 }}
@@ -473,67 +444,17 @@ const OrientationHub = () => {
         </motion.div>
       </div>
 
-      {/* ═══════ TAB CONTENT ═══════ */}
-      <AnimatePresence mode="wait">
-        {activeTab === 'chapters' && (
-          <motion.div
-            key="chapters"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-[480px] mx-auto"
-          >
-            {/* ═══════ THE NUT / HEADSTOCK ═══════ */}
-            <div className="neck-nut">
-              <motion.h1
-                className="neck-logo"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                Voix Vive
-              </motion.h1>
-              <motion.p
-                className="neck-tagline"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-              >
-                "You are an instrument playing an instrument."
-              </motion.p>
-              <motion.div
-                className="neck-stats"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-              >
-                <div className="neck-stat">
-                  <span className="neck-stat-val">{bardLevel}</span>
-                  <span className="neck-stat-lbl">Level</span>
-                </div>
-                <div className="neck-stat">
-                  <span className="neck-stat-val">{practiceMinutes}</span>
-                  <span className="neck-stat-lbl">Minutes</span>
-                </div>
-                <div className="neck-stat">
-                  <span className="neck-stat-val">{streak}</span>
-                  <span className="neck-stat-lbl">Streak</span>
-                </div>
-              </motion.div>
-            </div>
+      <div className="neck-board">
+        {/* 6 Strings */}
+        <div className="neck-strings">
+          {[0,1,2,3,4,5].map(i => (
+            <div key={i} className="neck-string" />
+          ))}
+        </div>
 
-            <div className="neck-board">
-              {/* 6 Strings */}
-              <div className="neck-strings">
-                {[0,1,2,3,4,5].map(i => (
-                  <div key={i} className="neck-string" />
-                ))}
-              </div>
-
-              {/* Frets / Chapters */}
-              {chapters.map((ch, idx) => {
-                const prevAct = idx > 0 ? chapters[idx - 1].act : null;
+        {/* Frets / Chapters */}
+              {frets.map((ch, idx) => {
+                const prevAct = idx > 0 ? frets[idx - 1].act : null;
                 const showAct = ch.act !== prevAct;
                 const hasDot = DOT_FRETS.includes(ch.fret);
                 const hasDoubleDot = DOUBLE_DOT_FRETS.includes(ch.fret);
@@ -547,7 +468,7 @@ const OrientationHub = () => {
                     <div className={`neck-fret ${isOctave ? 'neck-fret-12' : ''}`}>
                       <motion.div
                         className="neck-fret-card"
-                        onClick={() => setActiveChapter(ch.id)}
+                        onClick={() => setActiveFret(ch.id)}
                         whileTap={{ scale: 0.97 }}
                         initial={{ opacity: 0, x: -15 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -613,74 +534,6 @@ const OrientationHub = () => {
                   </React.Fragment>
                 );
               })}
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'fretboard' && (
-          <motion.div
-            key="fretboard"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            style={{ padding: '24px 16px 120px' }}
-          >
-            <FretboardExplorer />
-          </motion.div>
-        )}
-
-        {activeTab === 'binder' && (
-          <motion.div
-            key="binder"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            <DigitalBinder />
-          </motion.div>
-        )}
-
-        {activeTab === 'studio' && (
-          <motion.div
-            key="studio"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            <StudioPage />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ═══════ BOTTOM TAB BAR ═══════ */}
-      <div className="neck-tabs">
-        <button
-          className={`neck-tab ${activeTab === 'chapters' ? 'active' : ''}`}
-          onClick={() => setActiveTab('chapters')}
-        >
-          📖 <span className="neck-tab-label">Chapters</span>
-        </button>
-        <button
-          className={`neck-tab ${activeTab === 'fretboard' ? 'active' : ''}`}
-          onClick={() => setActiveTab('fretboard')}
-        >
-          🎸 <span className="neck-tab-label">Fretboard</span>
-        </button>
-        <button
-          className={`neck-tab ${activeTab === 'binder' ? 'active' : ''}`}
-          onClick={() => setActiveTab('binder')}
-        >
-          📓 <span className="neck-tab-label">Binder</span>
-        </button>
-        <button
-          className={`neck-tab ${activeTab === 'studio' ? 'active' : ''}`}
-          onClick={() => setActiveTab('studio')}
-        >
-          🏪 <span className="neck-tab-label">Studio</span>
-        </button>
       </div>
     </div>
   );

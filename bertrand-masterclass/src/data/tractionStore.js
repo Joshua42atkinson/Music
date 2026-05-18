@@ -10,8 +10,8 @@ const DEFAULT_STATE = {
   bardLevel: 1,
   totalTraction: 0,
   practiceMinutes: 0,
-  chaptersUnlocked: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  chapters: {},
+  fretsUnlocked: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  frets: {},
   breathingSessions: 0,
   lastPracticeDate: null,
   streak: 0,
@@ -26,9 +26,9 @@ const DEFAULT_STATE = {
   }
 };
 
-function getDefaultChapterState(chapterId) {
+function getDefaultFretState(fretId) {
   return {
-    id: chapterId,
+    id: fretId,
     yinCompleted: false,
     yangCompleted: false,
     breathingGateCleared: false,
@@ -70,28 +70,28 @@ export function resetTraction() {
 
 // ── Chapter Progress ──
 
-export function getChapterState(state, chapterId) {
-  return state.chapters[chapterId] || getDefaultChapterState(chapterId);
+export function getFretState(state, fretId) {
+  return state.frets[fretId] || getDefaultFretState(fretId);
 }
 
-export function updateChapterTraction(state, chapterId, updates) {
-  const current = getChapterState(state, chapterId);
+export function updateFretTraction(state, fretId, updates) {
+  const current = getFretState(state, fretId);
   const updated = { ...current, ...updates, lastAccessed: new Date().toISOString() };
   
   const newState = {
     ...state,
-    chapters: { ...state.chapters, [chapterId]: updated }
+    frets: { ...state.frets, [fretId]: updated }
   };
   
   // Recalculate total traction and bard level
-  const allChapters = Object.values(newState.chapters);
-  const totalTraction = allChapters.reduce((sum, ch) => sum + (ch.traction || 0), 0);
+  const allFrets = Object.values(newState.frets);
+  const totalTraction = allFrets.reduce((sum, ch) => sum + (ch.traction || 0), 0);
   newState.totalTraction = totalTraction;
   newState.bardLevel = Math.max(1, Math.floor(totalTraction / 100) + 1);
   
   // Auto-unlock next chapter when traction >= 60
-  if (updated.traction >= 60 && !newState.chaptersUnlocked.includes(chapterId + 1) && chapterId < 12) {
-    newState.chaptersUnlocked = [...newState.chaptersUnlocked, chapterId + 1];
+  if (updated.traction >= 60 && !newState.fretsUnlocked.includes(fretId + 1) && fretId < 12) {
+    newState.fretsUnlocked = [...newState.fretsUnlocked, fretId + 1];
   }
   
   // Recalculate scaffolding
@@ -103,11 +103,11 @@ export function updateChapterTraction(state, chapterId, updates) {
 
 // ── Breathing Gate ──
 
-export function recordBreathingSession(state, chapterId) {
-  const chapterState = getChapterState(state, chapterId);
-  const newState = updateChapterTraction(state, chapterId, {
+export function recordBreathingSession(state, fretId) {
+  const fretState = getFretState(state, fretId);
+  const newState = updateFretTraction(state, fretId, {
     breathingGateCleared: true,
-    meditationSeconds: chapterState.meditationSeconds + 60
+    meditationSeconds: fretState.meditationSeconds + 60
   });
   newState.breathingSessions = (newState.breathingSessions || 0) + 1;
   saveTraction(newState);
@@ -148,7 +148,7 @@ export function updatePitchScore(state, points) {
 // As traction increases, visual aids automatically reduce
 
 function calculateScaffolding(state) {
-  const avgTraction = state.totalTraction / Math.max(Object.keys(state.chapters).length, 1);
+  const avgTraction = state.totalTraction / Math.max(Object.keys(state.frets).length, 1);
   const level = Math.max(0, 1 - (avgTraction / 100));
   
   return {
@@ -174,6 +174,6 @@ export function getScaffoldingLevel(state) {
   return state.settings?.scaffoldingLevel ?? 1.0;
 }
 
-export function isChapterUnlocked(state, chapterId) {
-  return state.chaptersUnlocked.includes(chapterId);
+export function isChapterUnlocked(state, fretId) {
+  return state.fretsUnlocked.includes(fretId);
 }

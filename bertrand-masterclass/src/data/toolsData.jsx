@@ -5,16 +5,16 @@ export const TOOLS_CATALOG = [
   { 
     id: 1, 
     name: 'Breathing Gate', 
-    desc: 'Somatic Baseline', 
-    telemetry: 'Physical readiness and deep breathing protocol',
+    desc: 'Somatic Scan', 
+    telemetry: 'Clearing physical and mental Distortion before playing',
     status: 'available', 
     icon: <Wind size={18} /> 
   },
   { 
     id: 2, 
     name: 'Practice Timer', 
-    desc: 'Tension Mitigation', 
-    telemetry: 'Pomodoro-style session tracking with "Too Slow" reminders',
+    desc: 'Tuning The Player', 
+    telemetry: 'Pomodoro-style session tracking to prevent Distortion accumulation',
     status: 'available', 
     icon: <Timer size={18} /> 
   },
@@ -44,17 +44,17 @@ export const TOOLS_CATALOG = [
   },
   { 
     id: 6, 
-    name: 'Vertiscape Map', 
+    name: 'The Grid Map', 
     desc: 'Spatial Chord Shifting', 
-    telemetry: 'Tracking spatial movement across CAGED chord shapes',
+    telemetry: 'Illuminating The Grid and exploring CAGED geometry',
     status: 'available', 
     icon: <BookOpen size={18} /> 
   },
   { 
     id: 7, 
     name: 'PLING! Trainer', 
-    desc: 'Vocal-Motor Integration', 
-    telemetry: 'Dual audio tracking to check vocal and guitar alignment',
+    desc: 'The Atomic Unit', 
+    telemetry: 'Aligning Posture, Location, Intention, Nail, and Glide',
     status: 'available', 
     icon: <Mic size={18} /> 
   },
@@ -77,8 +77,8 @@ export const TOOLS_CATALOG = [
   { 
     id: 10, 
     name: 'Async Assessor', 
-    desc: 'Async Mastery Assessment', 
-    telemetry: 'Audio/video capture of performance for evaluation',
+    desc: 'Mentor Feedback', 
+    telemetry: 'Capture The Song for asynchronous Bertrand Tuning',
     status: 'available', 
     icon: <Video size={18} /> 
   },
@@ -93,8 +93,8 @@ export const TOOLS_CATALOG = [
   { 
     id: 12, 
     name: 'Rhythm Engine', 
-    desc: 'Dynamic Creative Agency', 
-    telemetry: 'Free-form improvisation tracking over backing tracks',
+    desc: 'Channeling The Song', 
+    telemetry: 'Reaching Rubedo through free-form improvisation',
     status: 'available', 
     icon: <Play size={18} /> 
   }

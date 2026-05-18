@@ -1,19 +1,46 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loadTraction, saveTraction, getScaffoldingLevel } from '../data/tractionStore';
+import { saveProgress, getProgress } from '../data/localDatabase';
 
 // ═══════════════════════════════════════════════════════════
 // SCAFFOLDING PROVIDER
 // Global React context that manages traction state and
 // exposes scaffolding-aware helpers to all components.
 // As mastery increases, UI aids automatically fade.
+//
+// Persistence architecture:
+//   localStorage (tractionStore)  → fast sync read/write
+//   IndexedDB (localDatabase)     → durable backup, survives clears
 // ═══════════════════════════════════════════════════════════
 
 const ScaffoldingContext = createContext(null);
 
 export function ScaffoldingProvider({ children }) {
   const [traction, setTraction] = useState(loadTraction());
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Re-sync from localStorage periodically (in case another tab writes)
+  // ── On mount: hydrate from IndexedDB if localStorage is empty ──
+  // This restores progress after a browser data clear or private mode session.
+  useEffect(() => {
+    const localState = loadTraction();
+    const isEmptyState = !localState.lastPracticeDate && localState.bardLevel <= 1 && localState.practiceMinutes === 0;
+
+    if (isEmptyState) {
+      getProgress().then(idbState => {
+        if (idbState) {
+          // Restore from IndexedDB backup
+          saveTraction(idbState);
+          setTraction(idbState);
+          console.info('[VoixVive] Restored progress from IndexedDB backup.');
+        }
+        setIsHydrated(true);
+      });
+    } else {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  // ── Periodic re-sync from localStorage (multi-tab support) ──
   useEffect(() => {
     const interval = setInterval(() => {
       setTraction(loadTraction());
@@ -29,6 +56,8 @@ export function ScaffoldingProvider({ children }) {
     setTraction(prev => {
       const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
       saveTraction(next);
+      // Async durable backup to IndexedDB — non-blocking
+      saveProgress(next).catch(() => {});
       return next;
     });
   }, []);
@@ -40,6 +69,7 @@ export function ScaffoldingProvider({ children }) {
     traction,
     refreshTraction,
     updateTraction,
+    isHydrated,
 
     // Scaffolding levels (1.0 = full aids, 0.0 = no aids)
     scaffolding,
@@ -70,6 +100,7 @@ export function useScaffolding() {
       traction: loadTraction(),
       refreshTraction: () => {},
       updateTraction: () => {},
+      isHydrated: true,
       scaffolding: 1.0,
       showNoteLabels: true,
       showFretNumbers: true,

@@ -1,10 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import chapters from '../data/chapterData';
+import frets from '../data/chapterData';
 import { generateSlides } from '../data/slideGenerator';
 import FretboardSheet from './FretboardSheet';
 import PlingTrainer from './PlingTrainer';
 import { TOOLS_CATALOG } from '../data/toolsData';
+import { saveSlidePosition, getSlidePosition } from '../data/localDatabase';
 
 // ═══════════════════════════════════════════════════════════
 // SLIDE VIEWER — Phone-native swipeable chapter reader
@@ -23,10 +24,15 @@ const slideVariants = {
   exit: (dir) => ({ x: dir < 0 ? '100%' : '-100%', opacity: 0 })
 };
 
-const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
-  const chapter = chapters.find(c => c.id === chapterId) || chapters[0];
-  const slides = generateSlides(chapter);
-  const [currentIdx, setCurrentIdx] = useState(0);
+const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
+  const fret = frets.find(c => c.id === fretId) || frets[0];
+  const slides = generateSlides(fret);
+  // Initialize from the student's last saved position for this fret
+  const [currentIdx, setCurrentIdx] = useState(() => {
+    const saved = getSlidePosition(fretId);
+    // Clamp to valid range in case slide count changed
+    return Math.min(saved, slides.length - 1);
+  });
   const [direction, setDirection] = useState(0);
   const [fretboardOpen, setFretboardOpen] = useState(false);
   const slide = slides[currentIdx];
@@ -35,7 +41,9 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
     if (idx < 0 || idx >= slides.length) return;
     setDirection(dir);
     setCurrentIdx(idx);
-  }, [slides.length]);
+    // Persist position so student can resume where they left off
+    saveSlidePosition(fretId, idx);
+  }, [slides.length, fretId]);
 
   const handleNext = () => goTo(currentIdx + 1, 1);
   const handlePrev = () => goTo(currentIdx - 1, -1);
@@ -47,15 +55,15 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
     else if (info.offset.x > SWIPE_THRESHOLD || info.velocity.x > SWIPE_VELOCITY) handlePrev();
   };
 
-  const goNextChapter = () => {
-    const nextId = chapterId < 12 ? chapterId + 1 : 1;
+  const goNextFret = () => {
+    const nextId = fretId < 12 ? fretId + 1 : 1;
     setCurrentIdx(0);
-    if (onChapterChange) onChapterChange(nextId);
+    if (onFretChange) onFretChange(nextId);
   };
-  const goPrevChapter = () => {
-    const prevId = chapterId > 1 ? chapterId - 1 : 12;
+  const goPrevFret = () => {
+    const prevId = fretId > 1 ? fretId - 1 : 12;
     setCurrentIdx(0);
-    if (onChapterChange) onChapterChange(prevId);
+    if (onFretChange) onFretChange(prevId);
   };
 
   const openFretboard = () => {
@@ -370,7 +378,7 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
       {/* ── Top Bar ── */}
       <div className="sv-topbar">
         <button className="sv-back" onClick={onBack}>← Back</button>
-        <span className="sv-chapter-label">Ch.{chapter.id} · {chapter.title}</span>
+        <span className="sv-chapter-label">Ch.{fret.id} · {fret.title}</span>
         <span className="sv-page-num">{currentIdx + 1}/{slides.length}</span>
       </div>
 
@@ -419,7 +427,7 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
               <SlideContent
                 slide={slide}
                 onOpenFretboard={openFretboard}
-                onNextChapter={goNextChapter}
+                onNextFret={goNextFret}
               />
             </div>
           </motion.div>
@@ -446,7 +454,7 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
             ))}
           </div>
           <button className="sv-nav-btn"
-            onClick={currentIdx === slides.length - 1 ? goNextChapter : handleNext}>
+            onClick={currentIdx === slides.length - 1 ? goNextFret : handleNext}>
             ›
           </button>
         </div>
@@ -458,8 +466,8 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
           <FretboardSheet
             isOpen={fretboardOpen}
             onClose={() => setFretboardOpen(false)}
-            chapter={chapter}
-            fretboardFocus={slide.fretboardFocus || chapter.yang?.fretboardFocus}
+            fret={fret}
+            fretboardFocus={slide.fretboardFocus || fret.yang?.fretboardFocus}
           />
         )}
       </AnimatePresence>
@@ -470,7 +478,7 @@ const SlideViewer = ({ chapterId = 1, onBack, onChapterChange }) => {
 
 // ── Slide Content Renderer ──
 
-function SlideContent({ slide, onOpenFretboard, onNextChapter }) {
+function SlideContent({ slide, onOpenFretboard, onNextFret }) {
   switch (slide.type) {
     case 'title':
       return (
@@ -570,7 +578,7 @@ function SlideContent({ slide, onOpenFretboard, onNextChapter }) {
 
           {/* Mapped Chapter Tool */}
           {(() => {
-            const activeTool = TOOLS_CATALOG.find(t => t.id === slide.chapterId);
+            const activeTool = TOOLS_CATALOG.find(t => t.id === slide.fretId);
             if (!activeTool) return null;
             return (
               <div className="mt-4 mb-4 p-4 rounded-xl bg-cf-gold/10 border border-cf-gold/30">
@@ -619,15 +627,15 @@ function SlideContent({ slide, onOpenFretboard, onNextChapter }) {
         </>
       );
 
-    case 'chapter-end':
+    case 'fret-end':
       return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', textAlign: 'center' }}>
           <div className="sv-end-icon">{slide.icon}</div>
           <h2 className="sv-end-title">{slide.title}</h2>
           <p className="sv-end-body">{slide.body}</p>
-          {slide.chapterId < 12 && (
-            <button className="sv-next-btn" onClick={onNextChapter}>
-              Next Chapter →
+          {slide.fretId < 12 && (
+            <button className="sv-next-btn" onClick={onNextFret}>
+              Next Fret →
             </button>
           )}
         </div>

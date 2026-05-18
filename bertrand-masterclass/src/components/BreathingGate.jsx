@@ -17,7 +17,7 @@ const BODY_SCAN_ITEMS = [
 
 const GATE_DURATION = 60; // seconds before chapter unlocks
 
-const BreathingGate = ({ chapterTitle, onComplete, isCleared = false }) => {
+const BreathingGate = ({ fretTitle, onComplete, isCleared = false }) => {
   const [phase, setPhase] = useState('intro'); // intro | breathing | bodyscan | complete
   const [breathPhaseIdx, setBreathPhaseIdx] = useState(0);
   const [cycles, setCycles] = useState(0);
@@ -70,7 +70,7 @@ const BreathingGate = ({ chapterTitle, onComplete, isCleared = false }) => {
   const gateReady = elapsed >= GATE_DURATION && allChecked;
   const currentBreathPhase = PHASES[breathPhaseIdx];
 
-  const handleEnterChapter = () => {
+  const handleEnterFret = () => {
     setPhase('complete');
     if (onComplete) onComplete();
   };
@@ -161,7 +161,7 @@ const BreathingGate = ({ chapterTitle, onComplete, isCleared = false }) => {
               Before You Enter
             </h2>
             <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: '#8090a8', marginBottom: '1rem' }}>
-              <em>"{chapterTitle || 'The Root Note'}"</em> awaits. But the music cannot begin until the body is ready.
+              <em>"{fretTitle || 'The Root Note'}"</em> awaits. But the music cannot begin until the body is ready.
             </p>
             <p style={{ fontSize: '1rem', lineHeight: 1.8, color: '#5a6a80', marginBottom: '2rem' }}>
               You are an instrument playing an instrument. Let us first tune the biological one.
@@ -233,11 +233,11 @@ const BreathingGate = ({ chapterTitle, onComplete, isCleared = false }) => {
               {elapsed}s · {allChecked ? '✓ Body scan complete' : `${BODY_SCAN_ITEMS.length - checkedItems.size} remaining`}
             </div>
 
-            <button className="gate-btn" disabled={!gateReady} onClick={handleEnterChapter}>
-              {gateReady ? 'Enter the Chapter' : `Hold space... ${Math.max(0, GATE_DURATION - elapsed)}s`}
+            <button className="gate-btn" disabled={!gateReady} onClick={handleEnterFret}>
+              {gateReady ? 'Enter the Fret' : `Hold space... ${Math.max(0, GATE_DURATION - elapsed)}s`}
             </button>
 
-            <button className="gate-skip" onClick={handleEnterChapter}>
+            <button className="gate-skip" onClick={handleEnterFret}>
               Skip for now →
             </button>
           </motion.div>

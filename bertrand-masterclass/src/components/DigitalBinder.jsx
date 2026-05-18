@@ -75,8 +75,8 @@ const DigitalBinder = () => {
       </AnimatePresence>
       
       {/* Header */}
-      <div className="pt-safe p-6 bg-cf-surface border-b border-cf-border">
-        <div className="flex items-center gap-3 mb-2">
+      <div className="pt-safe p-6 bg-cf-surface border-b border-cf-border relative">
+        <div className="flex items-center gap-3 mb-2 mt-4">
           <BookOpen className="text-cf-gold" size={24} />
           <h1 className="text-2xl font-cormorant font-bold text-cf-ink-bright">Digital Binder</h1>
         </div>
@@ -226,28 +226,20 @@ const DigitalBinder = () => {
         {activeTab === 'tools' && (
           <div className="space-y-4">
             <p className="text-xs text-white/50 px-2 text-center">
-              The 12 tools correspond to the 12 frets and chapters of the Hero's Journey.
+              The 12 tools correspond to the 12 frets of the Hero's Journey.
             </p>
             <div className="grid grid-cols-2 gap-4 pt-4 px-2">
-              {TOOLS_CATALOG.map((tool) => (
+              {TOOLS_CATALOG.filter(tool => tool.status === 'available').map((tool) => (
                 <div 
                   key={tool.id} 
-                  className={`relative p-4 rounded-xl border flex flex-col items-center text-center gap-3 transition-all ${
-                    tool.status === 'available' 
-                      ? 'bg-gradient-to-br from-cf-surface to-black/40 border-cf-gold/30 hover:border-cf-gold/60 cursor-pointer shadow-[0_4px_20px_rgba(201,169,110,0.05)] hover:-translate-y-1' 
-                      : 'bg-black/20 border-white/5 opacity-50 cursor-not-allowed'
-                  }`}
-                  onClick={() => {
-                    if (tool.status === 'available') {
-                      setActiveToolId(tool.id);
-                    }
-                  }}
+                  className="relative p-4 rounded-xl border flex flex-col items-center text-center gap-3 transition-all bg-gradient-to-br from-cf-surface to-black/40 border-cf-gold/30 hover:border-cf-gold/60 cursor-pointer shadow-[0_4px_20px_rgba(201,169,110,0.05)] hover:-translate-y-1"
+                  onClick={() => setActiveToolId(tool.id)}
                 >
                   <div className="absolute top-2 left-2 text-[10px] font-mono text-cf-gold/50 bg-cf-gold/10 px-1.5 rounded">
                     FRET {tool.id}
                   </div>
                   
-                  <div className={`p-3 rounded-full mt-4 ${tool.status === 'available' ? 'bg-cf-gold/10 text-cf-gold' : 'bg-white/5 text-white/30'}`}>
+                  <div className="p-3 rounded-full mt-4 bg-cf-gold/10 text-cf-gold">
                     {tool.icon}
                   </div>
 
@@ -258,6 +250,9 @@ const DigitalBinder = () => {
                 </div>
               ))}
             </div>
+            <p className="text-[10px] text-white/20 text-center font-mono pt-2">
+              {TOOLS_CATALOG.filter(t => t.status !== 'available').length} more tools unlocking soon
+            </p>
           </div>
         )}
 

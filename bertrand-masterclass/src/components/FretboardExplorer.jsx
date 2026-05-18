@@ -51,7 +51,7 @@ const TONAL_SCALES = {
   chromatic:        { label: 'Chromatic', tonalName: 'chromatic', color: '#95a5a6' },
 };
 
-const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = false, presetRoot, presetScale }) => {
+const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = false, presetRoot, presetScale }) => {
   const [activeNote, setActiveNote] = useState(null);
   const [activeScale, setActiveScale] = useState(presetScale || null);
   const [rootNote, setRootNote] = useState(presetRoot ?? 0);
@@ -128,9 +128,9 @@ const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = f
       const isRoot = noteClass === rootNote;
 
       // Chapter-aware dimming
-      const inChapterRange = chapterFret == null || fret <= chapterFret;
+      const inFretRange = fretLimit == null || fret <= fretLimit;
 
-      notes.push({ midi, noteName, noteClass, fret, stringIdx, inScale, isRoot, inChapterRange });
+      notes.push({ midi, noteName, noteClass, fret, stringIdx, inScale, isRoot, inFretRange });
     }
     return { string: str, notes };
   });
@@ -306,7 +306,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = f
 
       {!compact && (
         <div className="fb-header">
-          <h2 className="fb-title">The Vertiscape Map</h2>
+          <h2 className="fb-title">The Grid</h2>
           <div className="fb-controls">
             <select className="fb-select" value={rootNote} onChange={e => setRootNote(parseInt(e.target.value))}>
               {NOTE_NAMES.map((n, i) => <option key={i} value={i}>{n}</option>)}
@@ -365,7 +365,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, chapterFret, compact = f
                 <div key={note.fret} className="fb-note-cell">
                   <div
                     className={`fb-note ${
-                      !note.inChapterRange ? 'dim' :
+                      !note.inFretRange ? 'dim' :
                       activeNote?.midi === note.midi && activeNote?.stringIdx === sIdx ? 'playing' :
                       note.isRoot && activeScale ? 'root-note' :
                       note.inScale ? 'in-scale' :

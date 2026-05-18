@@ -4,7 +4,7 @@
 // Each chapter = 1 semitone = 1 Hero's Journey stage
 // ═══════════════════════════════════════════════════════════
 
-const chapters = [
+const frets = [
   {
     id: 1, fret: 1, note: 'Root', interval: 'Unison',
     heroStage: 'Call to Adventure', title: 'The Root Note', subtitle: 'Booting the Hardware',
@@ -189,5 +189,5 @@ const chapters = [
   }
 ];
 
-export default chapters;
-export { chapters };
+export default frets;
+export { frets };

@@ -50,7 +50,7 @@ const PATTERN_TO_SCALE = {
 const FretboardSheet = ({
   isOpen,
   onClose,
-  chapter,
+  fret,
   fretboardFocus,
   standalone = false,
 }) => {
@@ -59,7 +59,7 @@ const FretboardSheet = ({
   const sheetRef = useRef(null);
 
   // Auto-derive presets from chapter data
-  const rootNote = chapter ? (NOTE_TO_INDEX[chapter.note] ?? 0) : 0;
+  const rootNote = fret ? (NOTE_TO_INDEX[fret.note] ?? 0) : 0;
   const scaleName = fretboardFocus?.pattern
     ? (PATTERN_TO_SCALE[fretboardFocus.pattern] ?? null)
     : null;
@@ -179,12 +179,12 @@ const FretboardSheet = ({
           padding: 12px 8px 24px;
           -webkit-overflow-scrolling: touch;
         }
-        .fbs-chapter-info {
+        .fbs-fret-info {
           display: flex; align-items: center; gap: 10px;
           padding: 8px 16px 12px;
           flex-shrink: 0;
         }
-        .fbs-chapter-label {
+        .fbs-fret-label {
           font-family: 'JetBrains Mono', monospace;
           font-size: 0.55rem; letter-spacing: 0.15em;
           text-transform: uppercase; color: #5a6a80;
@@ -263,10 +263,10 @@ const FretboardSheet = ({
         </div>
 
         {/* Chapter Context */}
-        {chapter && (
-          <div className="fbs-chapter-info">
-            <span className="fbs-chapter-label">
-              Ch.{chapter.id} · {chapter.title}
+        {fret && (
+          <div className="fbs-fret-info">
+            <span className="fbs-fret-label">
+              Ch.{fret.id} · {fret.title}
             </span>
             <div className="fbs-preset-badge">
               {fretboardFocus && (
@@ -285,7 +285,7 @@ const FretboardSheet = ({
         <div className="fbs-body">
           <FretboardExplorer
             maxFret={maxFret}
-            chapterFret={fretboardFocus?.endFret}
+            fretLimit={fretboardFocus?.endFret}
             compact={true}
             presetRoot={rootNote}
             presetScale={scaleName}

@@ -45,7 +45,7 @@ export default function StudioPage() {
   };
 
   return (
-    <div className="studio-page">
+    <div className="studio-page relative">
       <style>{`
         .studio-page {
           background: linear-gradient(180deg, #0d0d14 0%, #1a120b 30%, #0a0a14 100%);

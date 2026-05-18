@@ -150,7 +150,7 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
     try {
       // Persist the actual blob to IndexedDB outbox (survives refresh)
       await db.outbox.add({
-        chapterId: exerciseName,
+        fretId: exerciseName,
         blob: blobRef.current,
         status: 'queued',
         submissionId,
