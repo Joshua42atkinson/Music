@@ -1,5 +1,7 @@
 {
-    "outputDirectory": "client/dist",
+    "buildCommand": "cd bertrand-masterclass && npm install && npm run build",
+    "outputDirectory": "bertrand-masterclass/dist",
+    "installCommand": "echo 'deps handled in buildCommand'",
     "rewrites": [
         {
             "source": "/(.*)",
