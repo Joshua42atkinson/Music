@@ -101,20 +101,25 @@ CHAPTERS 9–12: SONGS   — Full fretboard fluency, improvisation, no visible m
 
 Each chapter's tool is chosen as a **psychological self-discovery metaphor** — the tool embodies the inner process the student undergoes at that monomyth stage.
 
-| # | Tone | Stage | Chapter Focus | Protocol | Tool |
-|---|------|-------|---------------|----------|------|
+> **Source of truth:** `src/data/toolsData.jsx` + `src/components/DigitalBinder.jsx`
+> The code IS the curriculum. This table must match the code, not the other way around.
+
+| # | Tone | Stage | Chapter Focus | Protocol | Tool (Code) |
+|---|------|-------|---------------|----------|-------------|
 | 1 | C — Root | Call to Adventure | The Root Note. Body Scan. Ventral Vagal state. *"Am I safe here?"* | ©SHEARL | Breathing Gate |
 | 2 | C# — m2 | Refusal of the Call | *"I don't have time."* Timer reframes time from enemy to ally. | ©SHEARL | Practice Timer |
 | 3 | D — M2 | Meeting the Mentor | The Ear Awakens. The mentor is the student's own capacity to hear. | ©PLING! | Pitch Room |
 | 4 | D# — m3 | Crossing the Threshold | Committing to the Beat. The metronome does not negotiate. First surrender. | ©SHEARL | Metronome |
 | 5 | E — M3 | Tests, Allies, Enemies | Brightness and the Warp. G/B anomaly. The map lies — learn it anyway. | ©SHEARL | Interval Visualizer |
-| 6 | F — P4 | Approach to the Inmost Cave | The Full Neck. CAGED System. The thing they most fear: the entire fretboard at once. | ©SHEARL | Fretboard Explorer |
+| 6 | F — P4 | Approach to the Inmost Cave | The Full Neck. CAGED System. The thing they most fear: the entire fretboard at once. | ©SHEARL | The Grid Map |
 | 7 | F# — Tritone | The Ordeal | The Devil in Music. Sing the tritone before playing it. The mic does not lie. | ©PLING! | PLING! Trainer |
 | 8 | G — P5 | The Reward | Precision as Gift. Sub-cent resolution reveals what was invisible. Vibrato becomes intentional. | ©FHEAL | Microtonal Tracker |
-| 9 | G# — m6 | The Road Back | Force Threshold. Half pressure. Economy replaces speed. **Vertiscale Phase 1.** | ©FHEAL | **Vertiscale Engine** ⭐ |
-| 10 | A — M6 | The Resurrection | Submitting to the Mirror. Practice visible to another person for the first time. | ©SHEARL + ©PLING! | Async Assessor |
+| 9 | G# — m6 | The Road Back | Force Threshold. The Playable Guitar shows the full interactive fretboard — explore intervals and scales by touch. | ©SHEARL | Playable Guitar |
+| 10 | A — M6 | The Resurrection | Submitting to the Mirror. Practice visible to another person for the first time. | ©FHEAL | Async Assessor |
 | 11 | A# — m7 | Return with the Elixir | Fluency. All 12 keys at once. Navigate keys like rooms — without thinking about the door. | ©FHEAL | Multi-Key Hub |
-| 12 | B — M7 | Master of Two Worlds | Rubedo. Free improvisation. No map. No rules. Mastery is silence of the inner critic. | ©FHEAL | Rhythm Engine (Freeplay) |
+| 12 | B — M7 | Master of Two Worlds | Rubedo. Free improvisation. No map. No rules. Mastery is silence of the inner critic. | ©FHEAL | Rhythm Engine |
+
+> **Note:** The **Vertiscale Engine ⭐** (the Game) is NOT a fret-specific tool. It is a standalone game mode accessible via 🎮 Game on the landing screen. It spans ALL frets — any root note, any scale — and represents the synthesis of all 12 tools into a single playable practice loop (SHEARL Flash → PLING! Orbs → FHEAL Impression).
 
 ### Digital Binder — Self-Discovery Tool Arc
 ```
@@ -128,14 +133,14 @@ PERCEPTION & LISTENING (Frets 3–4)
 
 SPATIAL AWARENESS (Frets 5–6)
   Fret 5:  Interval Visualizer  — "How do notes relate?"
-  Fret 6:  Fretboard Explorer   — "Can I face the whole neck?"
+  Fret 6:  The Grid Map         — "Can I face the whole neck?"
 
 INTEGRATION & PRECISION (Frets 7–8)
   Fret 7:  PLING! Trainer       — "Can I sing and play?"
   Fret 8:  Microtonal Tracker   — "How precise am I really?"
 
 MASTERY & FREEDOM (Frets 9–12)
-  Fret 9:  Vertiscale Engine    — ⭐ THE GAME
+  Fret 9:  Playable Guitar      — "Can I explore freely?"
   Fret 10: Async Assessor       — "Can I be seen?"
   Fret 11: Multi-Key Hub        — "Can I see the whole?"
   Fret 12: Rhythm Engine        — "Can I play free?"
@@ -143,7 +148,7 @@ MASTERY & FREEDOM (Frets 9–12)
 
 ---
 
-## IV. THE GAME ⭐ — Vertiscale Engine (Fret 9)
+## IV. THE GAME ⭐ — Vertiscale Engine (Standalone Mode)
 
 ### What Is a Vertiscale?
 
