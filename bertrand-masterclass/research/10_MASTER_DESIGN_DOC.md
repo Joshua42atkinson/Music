@@ -438,18 +438,20 @@ JOSHUA'S (THE GREAT GAME) → Do NOT import without explicit discussion:
 BORDERLINE → "Voix Vive" title, "Bard Level" terminology, Monomyth stage names
 ```
 
-**Revenue:** 50/50 split on subscriptions after hosting costs. Joshua owns platform code. Bertrand owns curriculum + trademarks.
+**Ownership:** 100% Bertrand Laurence Guitar Studio. Joshua Atkinson developed the platform as a gift. All platform code, curriculum content, and trademarks belong to Bertrand.
 
-### License Compatibility (Apache 2.0 Core)
+### License Status
+
+The platform license is **to be determined by Bertrand Laurence**. Until a specific license is chosen, the platform is All Rights Reserved.
+
+**Dependency compatibility** (relevant when/if Bertrand chooses an open-source license):
 
 | Library | License | Status |
 |---|---|---|
-| JS-Hero, fretboard-js, Glicol, pitchlite | MIT | ✅ Compile directly |
-| FretPath | Apache 2.0 | ✅ Compile in; document modifications |
-| GPLv3 polyphonic detectors | GPLv3 | ⚠️ Isolate as microservice |
+| JS-Hero, fretboard-js, Glicol, pitchlite | MIT | ✅ Compatible with any license |
+| FretPath | Apache 2.0 | ✅ Compatible with any license |
+| GPLv3 polyphonic detectors | GPLv3 | ⚠️ Isolate as microservice if proprietary |
 | Any GPLv2 library | GPLv2 | ❌ Reject entirely |
-
-**Why Apache 2.0:** Explicit patent grant + Defensive Patent Termination protects DSP algorithms. Trademark Limitations protect ©SHEARL, ©PLING!, ©FHEAL even with open-source code.
 
 ---
 
@@ -458,6 +460,9 @@ BORDERLINE → "Voix Vive" title, "Bard Level" terminology, Monomyth stage names
 > **Meeting date:** Thursday, May 22, 2026
 > **Attendees:** Joshua + Bertrand
 > **Goal:** Walkthrough of the finished platform, pricing confirmation, domain launch
+>
+> **📋 Live Runsheet:** See [`MEETING_PREP.md`](../MEETING_PREP.md) for the phone-readable walkthrough script.
+> The content below is the academic record; the runsheet above is the live operational document.
 
 ### What To Show Bertrand
 
@@ -485,8 +490,8 @@ BORDERLINE → "Voix Vive" title, "Bard Level" terminology, Monomyth stage names
 
 - **The 12-chapter structure** — Built, tested, populated with art. Changing chapter order = full rebuild.
 - **The 3 protocols** (©SHEARL, ©PLING!, ©FHEAL) — These are Bertrand's IP and the curriculum's backbone.
-- **50/50 revenue split** — Already documented and agreed.
-- **Apache 2.0 open source** — The platform code is open. Bertrand's curriculum content and trademarks are protected separately.
+- **Bertrand owns everything** — Platform code + curriculum + trademarks are 100% Bertrand's. Joshua built this as a gift.
+- **License TBD** — Bertrand will decide whether to open-source, keep proprietary, or use a hybrid license.
 
 ### What's Flexible (Can Change Thursday)
 
@@ -689,7 +694,7 @@ PEARL is applied here from six stakeholder perspectives. Each perspective reveal
 | PEARL | What It Means Here |
 |-------|-------------------|
 | **Performance** | Deliver a production-ready platform that satisfies both the academic practicum (Purdue EDCI 57300) and the real-world client (Bertrand) |
-| **Evidence** | Clean builds, passing browser tests, documented design decisions traceable to learning theory, 50/50 revenue split functioning |
+| **Evidence** | Clean builds, passing browser tests, documented design decisions traceable to learning theory, platform delivered as a gift to the client |
 | **Activity** | ADDIECRAPEYE lifecycle, AI-augmented development, conversation-driven iteration, this very document |
 | **Reflection** | The IP boundary (Great Game vs. Masterclass) forces disciplined separation of personal philosophy from client-owned content |
 | **Learning** | Every feature built for Bertrand is a case study for the practicum; every academic insight improves the platform; the creator and the creation grow together |
@@ -814,7 +819,78 @@ Fret 24 · B' — Full Expression   "Inner and outer unite — this is voix vive
 
 ---
 
-## XII. VOCABULARY-AS-MECHANISM — The Voix Vive Lexicon
+## XII. BILINGUAL / INTERNATIONALIZATION STRATEGY
+
+### Why i18n?
+
+Bertrand is already bilingual (French/English). His Duet Partner site lists "Éducation Francophone" as a service. The brand name itself — *Voix Vive* — is French. The Francophone market (Quebec, Louisiana, France, West Africa, Belgium/Switzerland) represents 180M+ potential students and is underserved by English-only guitar platforms.
+
+### Technical Approach: `react-i18next`
+
+The standard React internationalization library. All hardcoded strings move to `locales/en.json` and `locales/fr.json`, components use `{t('key')}` instead of inline text, and a language toggle (🇺🇸 / 🇫🇷) appears in the header.
+
+### Implementation Phases
+
+| Phase | Scope | Effort | Dependency |
+|-------|-------|--------|-----------|
+| **A: Infrastructure** | Install i18next, create locale files, add provider + toggle | 2-3 hours | None |
+| **B: French Translation** | Translate curriculum (12 chapters), pricing, UI chrome | 4-6 hours | Bertrand reviews brand terms |
+| **C: Spanish** (deferred) | Add `locales/es.json`, same structure | 4-6 hours | Native speaker review |
+
+### Brand Terms Requiring Bertrand Approval
+
+©PLING!, ©SHEARL, ©FHEAL, "You are an instrument playing an instrument", "Practice TOO SLOW", "The Living Voice", "Inner Circle" — these are Bertrand's coined terms. French equivalents must be approved by him before shipping.
+
+### Quick Win: Bilingual Landing Section
+
+Before full i18n, add a French welcome panel to the Landing page: *"Voix Vive — La Voix Vivante. Bertrand Laurence enseigne la guitare en français et en anglais."* Zero engineering effort, immediate signal to Francophone visitors.
+
+---
+
+## XIII. AI TROUBADOUR EVALUATION SYSTEM
+
+### Concept
+
+A premium AI-powered singing/playing evaluation system that analyzes student recordings and generates feedback in Bertrand's pedagogical voice. Positioned as a premium feature above the free textbook tier.
+
+### Technical Stack (Built on Existing Components)
+
+| Existing Component | Troubadour Use |
+|--------------------|---------------|
+| `PlingTrainer.jsx` | Core — real-time pitch detection via mic |
+| `MicrotonalTracker.jsx` | Core — cents-level pitch accuracy (−50¢ to +50¢) |
+| `audioEngine.js` | Infrastructure — centralized Web Audio singleton |
+| `PracticeRecorder.jsx` | Storage — saves performances for analysis |
+| `RhythmEngine.jsx` | Core — measures timing accuracy |
+
+### New Modules Required
+
+| Module | Purpose | Difficulty |
+|--------|---------|-----------|
+| `ToneAnalyzer.js` | MFCC extraction → vocal tone classification (warm/bright/nasal/breathy) | Medium |
+| `BreathDetector.js` | Amplitude envelope → shallow vs. deep breathing patterns | Easy |
+| `PhraseSegmenter.js` | Splits recording into phrases for per-phrase scoring | Medium |
+| `TroubadourScorecard.jsx` | Visual radar chart (Pitch/Rhythm/Tone/Breath/Expression) | Easy |
+| `BertrandFeedbackGenerator.js` | Fine-tuned LLM generating coaching notes in Bertrand's voice | Hard |
+
+### Anti-Dopamine Evaluation Design
+
+The Troubadour system rejects Yousician-style speed scoring. Instead of "87/100" it says "Your pitch was centered and warm." Instead of combo streaks, it says "Notice how your breathing deepened in the 2nd phrase." This aligns with Bertrand's somatic philosophy: compare only to yesterday, not to a leaderboard.
+
+### Pricing Tiers
+
+| Tier | Price | What Student Gets |
+|------|-------|-------------------|
+| **Free** | $0 | Basic pitch check (PlingTrainer — already built) |
+| **Troubadour Bronze** | $5/eval | Pitch + Rhythm scorecard with AI tips |
+| **Troubadour Silver** | $15/eval | Full scorecard + AI-generated Bertrand-style notes |
+| **Troubadour Gold** | $35/eval | Full scorecard + actual Bertrand video reaction |
+
+> The Gold tier is the highest-leverage offering: AI handles scoring/analysis, Bertrand spends only 5 minutes recording a personal reaction to the AI-prepared summary. 20-minute job → 5-minute job, same human touch.
+
+---
+
+## XIV. VOCABULARY-AS-MECHANISM — The Voix Vive Lexicon
 
 Per the VaaM principle: language is not description — it is *scaffolding*. Introducing terms too quickly spikes cognitive load. The following lexicon is introduced in strict fret order. A student at Fret 3 should not encounter Fret 9 vocabulary.
 

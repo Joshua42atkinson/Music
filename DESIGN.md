@@ -353,18 +353,23 @@ Fonts: Cormorant Garamond + Inter + JetBrains Mono
 
 ## VI. THE ECONOMY — Business Model
 
-### Revenue Tiers
+### Revenue Model — À la Carte (All prices TBD by Bertrand)
 
-| Tier | Price | Includes | Who |
-|---|---|---|---|
-| Free | $0 | All 12 chapters + Digital Binder | Everyone |
-| The Passive Path | $19/mo | Progress persistence + all tools | Self-directed learners |
-| **The Mentored Path** | **$89/mo** | + AsyncAssessor (2 submissions/mo) = $356/hr effective for Bertrand | Committed students |
-| The Live Path | $350/mo | + Zoom sessions + direct messaging | Serious / performing students |
+> **Philosophy:** The 12-chapter Living Textbook is 100% free. Revenue comes from services, not paywalls.
 
-### One-Time Products
-- **Downloadable Resource Pack:** $29 — Vertiscales, CAGED maps, chord grids (printable PDF)
-- **Gift Certificate:** $60–$275 — generates confirmation for Gift-Givers
+| Service | Price | Notes |
+|---------|-------|-------|
+| **Private Lesson** | $65 single / $55×5 / $50×10 | Zoom or in-studio. Verified against DuetPartner |
+| **Guitar & Voice (©PLING!)** | $65 single / $55×5 | Integrated singing + playing |
+| **Quick Question** | $5 / $4×5 | Text reply within 24hr |
+| **Mini Critique** | $15 / $12×5 | 3-min video → focused feedback |
+| **Full Video Review** | $35 / $30×5 / $25×10 | 15-min watch + reaction video |
+| **Inner Circle Membership** | $25/mo or $199/yr | Group Q&A, priority queue, downloads |
+| **Group Workshop** | $35 / $30×4 | Passim School format, 8-15 students |
+| **Gift Certificate** | $65–$500 (custom) | PDF, valid 12 months, any service |
+| **Downloadable Resource Pack** | $29 | Vertiscales, CAGED maps, chord grids (future) |
+
+> ⚠️ All Stripe links are currently `null`. Bertrand needs to create a Stripe account and generate Payment Links before online payment works. Venmo QR is the fallback.
 
 ### Francophone Strategy
 Bertrand's French fluency opens Montreal, Quebec, and Louisiana. StudioPage French section is live. Domain `voix-vive.com` + French SEO activates this market on launch.
@@ -386,18 +391,20 @@ JOSHUA'S (THE GREAT GAME) → Do NOT import without explicit discussion:
 BORDERLINE → "Voix Vive" title, "Bard Level" terminology, Monomyth stage names
 ```
 
-**Revenue:** 50/50 split on subscriptions after hosting costs. Joshua owns platform code. Bertrand owns curriculum + trademarks.
+**Ownership:** 100% Bertrand Laurence Guitar Studio. Joshua Atkinson developed the platform as a gift. All platform code, curriculum content, and trademarks belong to Bertrand.
 
-### License Compatibility (Apache 2.0 Core)
+### License Status
+
+The platform license is **to be determined by Bertrand Laurence**. Until a specific license is chosen, the platform is All Rights Reserved.
+
+**Dependency compatibility** (relevant when/if Bertrand chooses an open-source license):
 
 | Library | License | Status |
 |---|---|---|
-| JS-Hero, fretboard-js, Glicol, pitchlite | MIT | ✅ Compile directly |
-| FretPath | Apache 2.0 | ✅ Compile in; document modifications |
-| GPLv3 polyphonic detectors | GPLv3 | ⚠️ Isolate as microservice |
+| JS-Hero, fretboard-js, Glicol, pitchlite | MIT | ✅ Compatible with any license |
+| FretPath | Apache 2.0 | ✅ Compatible with any license |
+| GPLv3 polyphonic detectors | GPLv3 | ⚠️ Isolate as microservice if proprietary |
 | Any GPLv2 library | GPLv2 | ❌ Reject entirely |
-
-**Why Apache 2.0:** Explicit patent grant + Defensive Patent Termination protects DSP algorithms. Trademark Limitations protect ©SHEARL, ©PLING!, ©FHEAL even with open-source code.
 
 ---
 

@@ -1,10 +1,10 @@
 # 🗺️ VOIX VIVE — Development Roadmap
 
-> **Last Updated:** 2026-05-18  
-> **Timeline:** 8 weeks from today (target completion: July 12, 2026)  
-> **Milestone:** Thursday Review with Bertrand (Client Stakeholder)
-> **Status:** Rough Draft Mode — not going live until approved. Building functional prototypes so the client can "add flavor" rather than building from scratch.
-> **Goal:** Sustainable income for Bertrand Laurence via free-textbook marketing funnel + paid coaching/VR product
+> **Last Updated:** 2026-05-19 (Revised per Market Assessment — revenue-first sequencing)  
+> **Timeline:** 8 weeks core platform (target: July 12, 2026), moonshots funded by revenue  
+> **Milestone:** Thursday Review with Bertrand (Client Stakeholder, May 22)  
+> **Status:** Rough Draft Mode — not going live until approved. Building functional prototypes so the client can "add flavor" rather than building from scratch.  
+> **Goal:** Sustainable income for Bertrand Laurence via free-textbook marketing funnel + paid coaching + AI evaluation + premium curriculum
 
 ---
 
@@ -17,26 +17,31 @@ FREE LAYER (Marketing Funnel)
 │  → Builds culture, trust, and student pipeline  │
 │  → SEO brings organic traffic                   │
 │  → Students fall in love with Bertrand's method │
+│  → Bilingual: English + French (i18n)           │
 └─────────────────────┬───────────────────────────┘
                       │ converts to
                       ▼
-PAID LAYER (Revenue)
+PAID LAYER (Revenue — the priority)
 ┌─────────────────────────────────────────────────┐
 │  Live Zoom Lessons        $60/hr                │
 │  Async Video Coaching     $35/review            │
+│  Troubadour AI Eval       $5-$35/eval (NEW)     │
+│  Voice Octave (Frets 13-24) $49 unlock (NEW)    │
 │  Inner Circle Membership  $25/mo                │
 │  Group Workshops          $35/person            │
 │  Gift Certificates        $60-275               │
 │  Tips (Ko-fi/Venmo)       any amount            │
 └─────────────────────┬───────────────────────────┘
-                      │ evolves into
+                      │ revenue funds
                       ▼
-PREMIUM LAYER (Future)
+MOONSHOT LAYER (Built after income is proven)
 ┌─────────────────────────────────────────────────┐
-│  VR Guitar Classroom (Bevy ECS + OpenXR)        │
+│  Android App / PWA (mobile-first experience)    │
 │  AI Bertrand Coach (fine-tuned Gemma 4)         │
-│  Android App (immersive somatic experience)     │
-│  → THIS is the "Masterclass" product            │
+│  VR Guitar Classroom (Bevy ECS + OpenXR)        │
+│  Roblox Music World (social learning)           │
+│  → Funded by Paid Layer revenue, not built on   │
+│    speculation                                  │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -135,26 +140,91 @@ PREMIUM LAYER (Future)
 
 **Exit Criteria:** All 12 fret cards are interactive with real UIs. ✅ Achieved.
 
-## Phase 2: Async Coaching Pipeline 📹 (Week 2 — May 25-31)
+## Phase 2: Stripe + Async Coaching Pipeline 💰 (Week 2 — May 25-31)
 
-**Goal:** Students can record, submit, and receive video feedback.
+**Goal:** Earn the first dollar. Connect Stripe. Let students submit videos and receive feedback.
 
 | Task | Owner | Priority |
 |------|-------|----------|
+| Bertrand creates Stripe account + generates payment links | Bertrand | **P0** |
+| Wire Stripe links into `pricingData.js` | Joshua | **P0** |
+| DNS: voix-vive.com → Vercel | Joshua | **P0** |
 | PracticeRecorder → real upload (Cloudflare R2 Workers) | Joshua | P0 |
 | Bertrand feedback recording interface | Joshua | P1 |
-| Email/SMS notification when submission received | Joshua | P1 |
+| Email notification on submission (Resend) | Joshua | P1 |
 | Submission review dashboard (Bertrand-side) | Joshua | P1 |
 | In-slide "Record This" CTAs on exercise slides | Joshua | P2 |
-| Student receives feedback notification | Joshua | P2 |
 
-**Exit Criteria:** Bertrand receives a practice video, records 3-min feedback, student gets notified.
+**Revenue unlocked:** $5 Quick Questions + $15 Mini Critiques + $35 Full Reviews + $65 Live Lessons  
+**Exit Criteria:** One student pays. One async review is delivered.
 
 ---
 
-## Phase 3: Community + Workshop System 👥 (Week 3-4 — June 1-14)
+## Phase 3: French Internationalization 🇫🇷 (Week 3 — June 1-7)
 
-**Goal:** Inner Circle membership + scheduled group workshops.
+**Goal:** Double the addressable market. Bertrand already speaks French.
+
+| Task | Owner | Priority |
+|------|-------|----------|
+| Install `react-i18next` + provider | Joshua | P0 |
+| Extract all strings to `locales/en.json` | Joshua | P0 |
+| Create `locales/fr.json` (UI chrome + pricing) | Joshua | P1 |
+| Translate `chapterData.js` (12 chapters) | Joshua + Bertrand | P1 |
+| Language toggle (🇺🇸 / 🇫🇷) in header | Joshua | P1 |
+| Bertrand reviews French translations | Bertrand | P1 |
+
+**Decision Required:** Do branded terms (©PLING!, ©SHEARL, ©FHEAL) stay in English or get French equivalents? Bertrand must decide.
+
+**Revenue unlocked:** Francophone market (Quebec, Louisiana, France, Belgium, West Africa — 180M+ speakers)  
+**Exit Criteria:** A French-speaking student can navigate the entire platform in French.
+
+---
+
+## Phase 4: Troubadour AI Evaluation 🤖 (Week 4-5 — June 8-21)
+
+**Goal:** AI-powered singing/playing evaluation. First automated revenue stream.
+
+Builds on existing components: PlingTrainer (pitch), MicrotonalTracker (cents), RhythmEngine (timing), PracticeRecorder (capture), audioEngine (infrastructure).
+
+| Task | Owner | Priority |
+|------|-------|----------|
+| `ToneAnalyzer.js` — MFCC vocal tone classification | Joshua | P0 |
+| `BreathDetector.js` — amplitude envelope analysis | Joshua | P1 |
+| `PhraseSegmenter.js` — phrase boundary detection | Joshua | P1 |
+| `TroubadourScorecard.jsx` — radar chart UI | Joshua | P0 |
+| Bronze tier ($5/eval) — Pitch + Rhythm scorecard | Joshua | P0 |
+| Silver tier ($15/eval) — Full scorecard + AI coaching notes | Joshua | P1 |
+| Gold tier ($35/eval) — AI prep + Bertrand video reaction | Joshua | P1 |
+
+**Anti-Dopamine Design:** No speed scores, no leaderboards, no combo streaks. Feedback uses Bertrand's philosophy: "Your pitch was centered and warm" instead of "87/100".
+
+**Revenue unlocked:** $5–$35 per AI evaluation. Zero marginal cost for Bronze/Silver.  
+**Exit Criteria:** A student records 60 seconds, receives a Troubadour Scorecard with pitch/rhythm/tone/breath ratings.
+
+---
+
+## Phase 5: Voice Octave — Frets 13-24 🎤 (Week 6-7 — June 22 - July 5)
+
+**Goal:** Premium curriculum that completes the "Voix Vive" brand promise. Guitar octave = free funnel. Voice octave = paid product.
+
+| Task | Owner | Priority |
+|------|-------|----------|
+| Write Frets 13-24 content with Bertrand | Both | P0 |
+| Generate Voice Octave slide artwork (AI) | Joshua | P1 |
+| Wire `chapterData.js` expansion (add 12 frets) | Joshua | P0 |
+| Implement paywall gate at Fret 13 | Joshua | P0 |
+| Stripe checkout for Voice Octave access | Joshua | P0 |
+| French translations for Frets 13-24 | Joshua + Bertrand | P1 |
+
+**Pricing options:** $49 one-time, $9/mo sub, or free with Inner Circle annual ($199/yr)  
+**Revenue unlocked:** First premium content product  
+**Exit Criteria:** Fret 13 displays behind a paywall. One student purchases access.
+
+---
+
+## Phase 6: Community + Workshop System 👥 (Week 8 — July 6-12)
+
+**Goal:** Inner Circle membership + scheduled group workshops. Now enhanced by French i18n and Troubadour AI.
 
 | Task | Owner | Priority |
 |------|-------|----------|
@@ -169,65 +239,93 @@ PREMIUM LAYER (Future)
 
 ---
 
-## Phase 4: Android App Shell 📱 (Week 5-6 — June 15-28)
+## Phase 7+: Moonshots 🚀 (After Income Is Proven)
 
-**Goal:** Native Android app wrapping the web platform + AI coaching.
+These are real goals — but they're gated behind revenue. Build them when the web app is earning.
 
-| Task | Owner | Priority |
-|------|-------|----------|
-| Android Studio project with WebView shell | Joshua | P0 |
-| Fine-tune Gemma 4 on Bertrand's teaching data (transcripts, protocols) | Joshua | P0 |
-| AI chat interface: "Ask Bertrand" | Joshua | P0 |
-| Offline mode (PWA caching for textbook) | Joshua | P1 |
-| Push notifications for feedback/workshop reminders | Joshua | P1 |
-| Google Play Store listing | Joshua | P2 |
+### Android App / PWA (Month 3 — August)
+| Task | Effort |
+|------|--------|
+| PWA conversion (offline, installable, push notifications) | 8-12 hrs |
+| OR: Android WebView shell + Play Store listing | 6-8 hrs |
+| Gemma 4 fine-tune on Bertrand's teaching data | 10-15 hrs |
+| "Ask Bertrand" AI chat interface | 6-8 hrs |
 
-**Exit Criteria:** Playable Android app with AI Bertrand that gives guitar coaching advice.
+**Gate:** Revenue ≥ $2,500/mo for 2 consecutive months.
+
+### VR Guitar Classroom (Month 4+ — September)
+| Task | Effort |
+|------|--------|
+| Bevy ECS + Rust/WASM architecture for 3D classroom | 20-30 hrs |
+| Bertrand AI avatar with gesture animation | 15-20 hrs |
+| OpenXR integration (Meta Quest / PCVR) | 15-20 hrs |
+| Multi-student VR lobby (up to 8 students) | 10-15 hrs |
+
+**Gate:** Revenue ≥ $5,000/mo. At least 50 active students.
+
+### Roblox Music World (Month 5+ — October)
+| Task | Effort |
+|------|--------|
+| Roblox Studio project — social music learning environment | 15-20 hrs |
+| Guitar practice mini-games adapted from Vertiscale Engine | 10-15 hrs |
+| Social features: jam rooms, student concerts, challenges | 10-15 hrs |
+| Roblox marketplace listing | 5-8 hrs |
+
+**Gate:** Revenue ≥ $5,000/mo. Young student demographic proven.
+
+> The moonshots are not cut — they're sequenced after the web app starts earning. Every dollar from Phases 2-6 funds these.
 
 ---
 
-## Phase 5: VR Guitar Classroom 🥽 (Week 7-8 — June 29 - July 12)
+## Revenue Projections (Updated per Market Assessment)
 
-**Goal:** Immersive VR experience — the premium "Masterclass" product.
-
-| Task | Owner | Priority |
-|------|-------|----------|
-| Bevy ECS + Rust/WASM architecture for 3D classroom | Joshua | P0 |
-| Bertrand AI avatar with gesture animation | Joshua | P0 |
-| OpenXR integration (Meta Quest / PCVR) | Joshua | P1 |
-| Mixed reality fretboard overlay | Joshua | P1 |
-| Real-time pitch detection (Web Audio → visual feedback) | Joshua | P1 |
-| Multi-student VR lobby (up to 8 students) | Joshua | P2 |
-| Haptic breathing guide (controller vibration) | Joshua | P2 |
-
-**Exit Criteria:** 1 student completes a 15-minute VR guitar lesson with AI Bertrand.
-
----
-
-## Revenue Projections
-
-### Conservative (Month 1, with active marketing)
+### Phase 2 Launch (Month 1-2, with active marketing)
 | Stream | Volume | Monthly |
 |--------|--------|---------|
-| Live Lessons (Zoom) | 5 weekly students × $60 | $1,200 |
-| Async Reviews | 10/month × $35 | $350 |
+| Live Lessons (Zoom) | 8 weekly × $60 avg | $1,920 |
+| Quick Questions ($5) | 20/month | $100 |
+| Mini Critiques ($15) | 10/month | $150 |
+| Full Video Reviews ($35) | 5/month | $175 |
 | Inner Circle Members | 10 × $25 | $250 |
-| Workshops | 2/month × 10 students × $35 | $700 |
-| **Total** | | **$2,500/mo** |
+| **Total** | | **$2,595/mo** |
 
-### Growth (Month 3, with app + SEO traffic)
+### Phase 4 Mature (Month 3-6, with AI + French + Voice Octave)
 | Stream | Volume | Monthly |
 |--------|--------|---------|
-| Live Lessons | 10 weekly students × $60 | $2,400 |
-| Async Reviews | 30/month × $30 avg | $900 |
-| Inner Circle Members | 40 × $25 | $1,000 |
-| Workshops | 4/month × 12 students × $35 | $1,680 |
-| VR Masterclass | 5 purchases × $97 | $485 |
-| **Total** | | **$6,465/mo** |
+| Live Lessons (Zoom) | 12 weekly × $60 avg | $2,880 |
+| Async Coaching (all tiers) | 35/month | $625 |
+| Troubadour AI (Bronze/Silver) | 40/month × $10 avg | $400 |
+| Voice Octave Purchases | 5/month × $49 | $245 |
+| Inner Circle Members | 30 × $25 | $750 |
+| Workshops | 2/month × 10 × $35 | $700 |
+| **Total** | | **$5,600/mo** |
+
+### Phase 6 Compounding (Month 6-12)
+| Stream | Volume | Monthly |
+|--------|--------|---------|
+| Live Lessons | 15 weekly × $60 avg | $3,600 |
+| Async Coaching | 50/month avg | $1,000 |
+| Troubadour AI | 60/month × $10 avg | $600 |
+| Voice Octave + Voice bundles | 10/month | $490 |
+| Inner Circle Members | 50 × $25 | $1,250 |
+| Workshops | 4/month × 12 × $35 | $1,680 |
+| Gift Certificates | 5/month × $65 avg | $325 |
+| **Total** | | **$8,945/mo** |
+
+### Revenue Compounding
+```
+Each phase builds on the previous:
+  → French students can buy Troubadour evaluations
+  → Troubadour AI reduces Bertrand's per-review time (20 min → 5 min)
+  → Voice Octave justifies Inner Circle membership
+  → Inner Circle members attend workshops
+  → All revenue funds Android/VR/Roblox moonshots
+```
 
 ### France Trip Math
-At $2,500/mo, Bertrand saves $1,000/mo → France trip funded in **3 months**.  
-At $6,465/mo, Bertrand saves $3,000/mo → France trip funded in **6 weeks**.
+At $2,595/mo (Phase 2), Bertrand saves $800/mo → France trip in **4 months**.  
+At $5,600/mo (Phase 4), Bertrand saves $2,000/mo → France trip in **6 weeks**.  
+At $8,945/mo (Phase 6), Bertrand saves $4,000+/mo → France trip in **3 weeks**.
 
 ---
 
@@ -302,3 +400,8 @@ At $6,465/mo, Bertrand saves $3,000/mo → France trip funded in **6 weeks**.
 | 2026-05-19 | Flash + Imagine dual modes for Phase 1 | "The Opposite Principle" — speed trains prediction velocity, stillness trains prediction stability |
 | 2026-05-19 | Phase 3 reframed from Freeplay to Journal + Coaching | v1 implements metacognitive reflection. Freeplay deferred to v2. |
 | 2026-05-19 | Fret 9 (Vertiscale Engine) complete — all 12/12 tools live | Phase 1.6 exit criteria achieved |
+| 2026-05-19 | **Roadmap resequenced: revenue-first** | Market assessment revealed Android/VR were scheduled before income. Inserted French i18n, Troubadour AI, and Voice Octave as Phases 3-5. Android/VR/Roblox deferred to moonshots (funded by revenue). |
+| 2026-05-19 | French i18n added as Phase 3 | Bertrand is bilingual, brand is French. 180M+ Francophone market underserved. |
+| 2026-05-19 | Troubadour AI Evaluation System added as Phase 4 | Builds on 5 existing components. First automated revenue stream ($5-$35/eval, zero marginal cost for Bronze/Silver). |
+| 2026-05-19 | Voice Octave (Frets 13-24) added as Phase 5 | Completes brand promise ("Voix Vive" = voice, but only guitar was covered). Premium paywall product. |
+| 2026-05-19 | Roblox Music World added to moonshots | Social learning environment for younger demographic. Gated behind revenue proof. |

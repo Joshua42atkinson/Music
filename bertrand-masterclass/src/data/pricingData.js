@@ -18,7 +18,7 @@ export const PAYMENT_METHODS = [
     icon: '💳',
     primary: true,
     // Replace with actual Stripe Payment Link URLs after Bertrand creates Stripe account
-    baseUrl: null, // e.g., 'https://buy.stripe.com/...'
+    baseUrl: 'https://buy.stripe.com/mock_voix_vive', // e.g., 'https://buy.stripe.com/...'
   },
   {
     id: 'venmo',
@@ -86,9 +86,9 @@ export const SERVICES = [
     pricing: [
       // Prices verified: bertrandguitarstudio.duetpartner.com (May 2026)
       // Walk-in: $65 | "Onward" 5-pack: $55×5=$275 | "Onward Forward" 10-pack: $50×10=$500
-      { label: 'Single Lesson', price: 65, unit: 'session', stripeLink: null },
-      { label: '5-Lesson Pack — "Onward"', price: 275, unit: '5 sessions', stripeLink: null, badge: 'Save $50', perUnit: 55 },
-      { label: '10-Lesson Pack — "Onward Forward"', price: 500, unit: '10 sessions', stripeLink: null, badge: 'Best Value', perUnit: 50 },
+      { label: 'Single Lesson', price: 65, unit: 'session', stripeLink: 'https://buy.stripe.com/mock_private_lesson_65' },
+      { label: '5-Lesson Pack — "Onward"', price: 275, unit: '5 sessions', stripeLink: 'https://buy.stripe.com/mock_private_lesson_5pack_275', badge: 'Save $50', perUnit: 55 },
+      { label: '10-Lesson Pack — "Onward Forward"', price: 500, unit: '10 sessions', stripeLink: 'https://buy.stripe.com/mock_private_lesson_10pack_500', badge: 'Best Value', perUnit: 50 },
     ],
     features: [
       'Body-centered, somatic approach',
@@ -109,8 +109,8 @@ export const SERVICES = [
     delivery: 'Zoom or In-Studio',
     color: '#7aaa88',
     pricing: [
-      { label: 'Single Session', price: 65, unit: 'session', stripeLink: null },
-      { label: '5-Session Pack', price: 275, unit: '5 sessions', stripeLink: null, badge: 'Save $50', perUnit: 55 },
+      { label: 'Single Session', price: 65, unit: 'session', stripeLink: 'https://buy.stripe.com/mock_voice_coaching_65' },
+      { label: '5-Session Pack', price: 275, unit: '5 sessions', stripeLink: 'https://buy.stripe.com/mock_voice_coaching_5pack_275', badge: 'Save $50', perUnit: 55 },
     ],
     features: [
       'Vocal pitch training with guitar as coach',
@@ -130,8 +130,8 @@ export const SERVICES = [
     delivery: 'In-App Message',
     color: '#5a8aaa',
     pricing: [
-      { label: 'Single Question', price: 5, unit: 'question', stripeLink: null },
-      { label: '5-Question Pack', price: 20, unit: '5 questions', stripeLink: null, badge: 'Save $5', perUnit: 4 },
+      { label: 'Single Question', price: 5, unit: 'question', stripeLink: 'https://buy.stripe.com/mock_quick_question_5' },
+      { label: '5-Question Pack', price: 20, unit: '5 questions', stripeLink: 'https://buy.stripe.com/mock_quick_question_5pack_20', badge: 'Save $5', perUnit: 4 },
     ],
     features: [
       'Ask anything — technique, theory, gear, practice tips',
@@ -151,8 +151,8 @@ export const SERVICES = [
     delivery: 'In-App Submission → Video Response',
     color: '#6a7aaa',
     pricing: [
-      { label: 'Single Mini Critique', price: 15, unit: 'submission', stripeLink: null },
-      { label: '5-Pack', price: 60, unit: '5 critiques', stripeLink: null, badge: 'Save $15', perUnit: 12 },
+      { label: 'Single Mini Critique', price: 15, unit: 'submission', stripeLink: 'https://buy.stripe.com/mock_mini_critique_15' },
+      { label: '5-Pack', price: 60, unit: '5 critiques', stripeLink: 'https://buy.stripe.com/mock_mini_critique_5pack_60', badge: 'Save $15', perUnit: 12 },
     ],
     features: [
       'Submit up to 3 minutes of video',
@@ -172,9 +172,9 @@ export const SERVICES = [
     delivery: 'In-App Submission → Video Response',
     color: '#7b6aaa',
     pricing: [
-      { label: 'Single Full Review', price: 35, unit: 'submission', stripeLink: null },
-      { label: '5-Review Pack', price: 150, unit: '5 reviews', stripeLink: null, badge: 'Save $25', perUnit: 30 },
-      { label: '10-Review Pack', price: 250, unit: '10 reviews', stripeLink: null, badge: 'Best Value', perUnit: 25 },
+      { label: 'Single Full Review', price: 35, unit: 'submission', stripeLink: 'https://buy.stripe.com/mock_full_review_35' },
+      { label: '5-Review Pack', price: 150, unit: '5 reviews', stripeLink: 'https://buy.stripe.com/mock_full_review_5pack_150', badge: 'Save $25', perUnit: 30 },
+      { label: '10-Review Pack', price: 250, unit: '10 reviews', stripeLink: 'https://buy.stripe.com/mock_full_review_10pack_250', badge: 'Best Value', perUnit: 25 },
     ],
     features: [
       'Submit up to 15 minutes of practice footage',
@@ -195,8 +195,8 @@ export const SERVICES = [
     delivery: 'Zoom Group Q&A + Priority Access',
     color: '#d4a84b',
     pricing: [
-      { label: 'Monthly', price: 25, unit: 'month', stripeLink: null, recurring: true },
-      { label: 'Annual', price: 199, unit: 'year', stripeLink: null, recurring: true, badge: 'Save 34%', perUnit: 16.58 },
+      { label: 'Monthly', price: 25, unit: 'month', stripeLink: 'https://buy.stripe.com/mock_membership_monthly_25', recurring: true },
+      { label: 'Annual', price: 199, unit: 'year', stripeLink: 'https://buy.stripe.com/mock_membership_annual_199', recurring: true, badge: 'Save 34%', perUnit: 16.58 },
     ],
     features: [
       'Monthly live group Q&A with me (Zoom)',
@@ -218,8 +218,8 @@ export const SERVICES = [
     delivery: 'Zoom (scheduled)',
     color: '#5a8aaa',
     pricing: [
-      { label: 'Single Workshop', price: 35, unit: 'person', stripeLink: null },
-      { label: '4-Workshop Series', price: 120, unit: 'person/series', stripeLink: null, badge: 'Save $20', perUnit: 30 },
+      { label: 'Single Workshop', price: 35, unit: 'person', stripeLink: 'https://buy.stripe.com/mock_group_workshop_35' },
+      { label: '4-Workshop Series', price: 120, unit: 'person/series', stripeLink: 'https://buy.stripe.com/mock_group_workshop_series_120', badge: 'Save $20', perUnit: 30 },
     ],
     features: [
       'Small group (8-15 students max)',
@@ -239,10 +239,10 @@ export const SERVICES = [
     delivery: 'PDF emailed to you or recipient',
     color: '#aa5a7a',
     pricing: [
-      { label: '1 Private Lesson', price: 65, unit: 'gift', stripeLink: null },
-      { label: '5-Lesson Pack', price: 275, unit: 'gift', stripeLink: null, badge: 'Popular' },
-      { label: '10-Lesson Pack', price: 500, unit: 'gift', stripeLink: null },
-      { label: 'Custom Amount', price: null, unit: 'custom', stripeLink: null },
+      { label: '1 Private Lesson', price: 65, unit: 'gift', stripeLink: 'https://buy.stripe.com/mock_gift_certificate_65' },
+      { label: '5-Lesson Pack', price: 275, unit: 'gift', stripeLink: 'https://buy.stripe.com/mock_gift_certificate_5pack_275', badge: 'Popular' },
+      { label: '10-Lesson Pack', price: 500, unit: 'gift', stripeLink: 'https://buy.stripe.com/mock_gift_certificate_10pack_500' },
+      { label: 'Custom Amount', price: null, unit: 'custom', stripeLink: 'https://buy.stripe.com/mock_gift_certificate_custom' },
     ],
     features: [
       'Beautiful PDF certificate emailed instantly',

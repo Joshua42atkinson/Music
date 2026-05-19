@@ -31,7 +31,7 @@ const slides = [
     icon: '🫁',
     title: 'Start Simple',
     subtitle: 'Pick any room. Try anything.',
-    body: 'If you\'re brand new, go to The Guitar and play one round of FLASH — it takes about 5 minutes. Gold dots will appear on a guitar neck. Memorize them, then tap where they were. That\'s it!',
+    body: 'If you\'re brand new, go to The Guitar and play one round of FLASH — it takes about 5 minutes. Gold dots will appear on a guitar neck. Study them, then tap where they were. That\'s it!',
     accent: '#7b6aaa',
   },
 ];

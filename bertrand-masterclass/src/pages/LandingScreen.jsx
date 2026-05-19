@@ -342,6 +342,40 @@ export default function LandingScreen() {
         <Circle size={28} strokeWidth={1} />
         <span className="thumb-label">Voix Vive</span>
       </motion.div>
+
+      {/* ── Studio Doorway ── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        style={{ textAlign: 'center', marginTop: 24, marginBottom: 32 }}
+      >
+        <a
+          href="/studio"
+          style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: '1.05rem',
+            color: 'rgba(201,169,110,0.5)',
+            textDecoration: 'none',
+            letterSpacing: '0.04em',
+            transition: 'color 0.3s',
+          }}
+          onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.8)'}
+          onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.5)'}
+        >
+          Learn with Bertrand →
+        </a>
+        <p style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.65rem',
+          color: 'rgba(201,169,110,0.2)',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          marginTop: 6,
+        }}>
+          Private lessons · Async coaching · Inner Circle
+        </p>
+      </motion.div>
     </div>
   );
 }

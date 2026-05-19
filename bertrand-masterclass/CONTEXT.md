@@ -41,19 +41,21 @@
 The 12-chapter Living Textbook is 100% FREE.
 It is the culture-building marketing funnel that creates long-term students.
 
-Revenue comes from:
+Revenue comes from (REVENUE-FIRST SEQUENCING — Phase 2-6):
   1. Live coaching (Zoom/in-studio)
-  2. Async video feedback
-  3. Community membership (Inner Circle)
-  4. Group workshops
-  5. Gift certificates
-  6. Tips / support
+  2. Async video feedback (engagement ladder: $5→$15→$35)
+  3. Troubadour AI Evaluation ($5-$35/eval — NEW, automated)
+  4. Voice Octave premium curriculum (Frets 13-24, $49 unlock — NEW)
+  5. Community membership (Inner Circle)
+  6. Group workshops
+  7. Gift certificates
+  8. Tips / support
 
-FUTURE PREMIUM PRODUCT:
-  VR/AI Masterclass — Android app + VR mode
-  - Fine-tuned Gemma 4 model as "AI Bertrand"
-  - Bevy ECS architecture for immersive VR guitar classroom
-  - THIS is the paid Masterclass, not the free textbook
+MOONSHOTS (Gated behind proven revenue):
+  Android App / PWA — Gate: Revenue ≥ $2,500/mo
+  AI Bertrand Coach (fine-tuned Gemma 4) — Gate: Revenue ≥ $2,500/mo
+  VR Guitar Classroom (Bevy ECS + OpenXR) — Gate: Revenue ≥ $5,000/mo
+  Roblox Music World (social learning) — Gate: Revenue ≥ $5,000/mo
 ```
 
 ### Pricing (from Thumbtack/Duet Partner)
@@ -280,11 +282,13 @@ The project has a layered documentation system. **Read in this order depending o
 - [x] Digital Binder (practice log, tools tab, submissions)
 - [x] Workspace cleanup and rename (daydream-website → voix-vive)
 
-### 🟡 Needs Bertrand's Input
+### 🟡 Needs Bertrand's Input (Thursday May 22)
+> See `MEETING_PREP.md` for the full walkthrough runsheet.
 - [ ] Stripe Payment Links — Bertrand creates Stripe account, we plug in URLs
 - [ ] Venmo QR image — need actual QR code screenshot
-- [ ] Review StudioPage copy for accuracy
-- [ ] Thursday review call feedback
+- [ ] Review StudioPage copy and pricing for accuracy
+- [ ] License decision: open source, proprietary, or hybrid
+- [ ] Thursday review call feedback → feed into next ADDIECRAPEYE cycle
 
 ### 🔴 Next Game Workflows (Priority Order)
 
@@ -325,16 +329,22 @@ These are the next tasks for game development sessions. Each one should be a foc
 - Add imagination vividness self-rating after each round
 - Add body scan prompt rotation to Phase 3 journal
 
-### 🚀 Future: VR/AI Masterclass (the premium product)
-- [ ] Bevy ECS + Rust/WASM + OpenXR architecture document
+### 🚀 Future: Moonshots (Gated Behind Revenue)
+- [ ] French i18n — `react-i18next`, `locales/en.json` + `locales/fr.json` (Phase 3)
+- [ ] Troubadour AI — ToneAnalyzer, BreathDetector, PhraseSegmenter, Scorecard (Phase 4)
+- [ ] Voice Octave — Frets 13-24 premium curriculum with paywall (Phase 5)
+- [ ] Android App / PWA (Gate: Revenue ≥ $2,500/mo)
+- [ ] Bevy ECS + Rust/WASM + OpenXR VR classroom (Gate: Revenue ≥ $5,000/mo)
 - [ ] Fine-tune Gemma 4 model on Bertrand's teaching data
-- [ ] Android app shell in Android Studio
-- [ ] VR classroom: avatar, fretboard overlay, pitch detection
+- [ ] Roblox Music World — social music learning environment (Gate: Revenue ≥ $5,000/mo)
 
 ### 🎨 Remaining Non-Game Work
-- [ ] ch9-12 artwork (35 images via AI generation)
-- [ ] PracticeRecorder → actual upload pipeline (Cloudflare R2)
-- [ ] Production deployment (voix-vive.com domain + Vercel DNS)
+- [x] ch1-12 artwork — all 12 chapters have AI-generated slide art ✅
+- [ ] PracticeRecorder → actual upload pipeline (Cloudflare R2) — Phase 2
+- [ ] Production deployment (voix-vive.com domain + Vercel DNS) — Phase 2
+- [ ] French i18n — `react-i18next` infrastructure + translations — Phase 3
+- [ ] Troubadour AI Scorecard — radar chart + evaluation pipeline — Phase 4
+- [ ] Post-Thursday: update CONTEXT.md with Bertrand's feedback
 
 ---
 
@@ -374,6 +384,9 @@ INSTRUCTIONS FOR AI:
 
 10. Bertrand has family in France he hasn't visited in years.
     This platform needs to fund that trip. Build accordingly.
+
+11. REVENUE-FIRST SEQUENCING: Do not build Android/VR/Roblox until
+    the web app is earning income. See ROADMAP.md Phases 2-6 first.
 ```
 
 ### Academic Context

@@ -887,6 +887,51 @@ export default function StudioPage() {
           </button>
         </div>
       </section>
+
+      {/* ═══ LEGAL FOOTER ═══ */}
+      <footer style={{
+        maxWidth: 600,
+        margin: '0 auto',
+        padding: '40px 20px 24px',
+        textAlign: 'center',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '24px',
+          marginBottom: '16px',
+          flexWrap: 'wrap',
+        }}>
+          <a href="/privacy" style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.65rem',
+            color: '#5a6a7a',
+            textDecoration: 'none',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}>Privacy Policy</a>
+          <a href="/terms" style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.65rem',
+            color: '#5a6a7a',
+            textDecoration: 'none',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+          }}>Terms of Service</a>
+        </div>
+        <p style={{
+          fontFamily: "'EB Garamond', serif",
+          fontSize: '0.8rem',
+          color: '#3a4a5a',
+          fontStyle: 'italic',
+          margin: 0,
+        }}>
+          © 2026 Bertrand Laurence Guitar Studio. All rights reserved.
+          <br />
+          Platform developed by Joshua Atkinson.
+        </p>
+      </footer>
     </div>
   );
 }

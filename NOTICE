@@ -1,0 +1,28 @@
+Voix Vive — The Living Voice
+Copyright (c) 2026 Bertrand Laurence Guitar Studio
+
+Platform developed by Joshua Atkinson as a gift for Bertrand Laurence.
+
+Third-Party Dependencies:
+
+  React — Copyright (c) Meta Platforms, Inc. (MIT License)
+  Vite — Copyright (c) Evan You (MIT License)
+  Framer Motion — Copyright (c) Framer B.V. (MIT License)
+  Lucide Icons — Copyright (c) Lucide Contributors (ISC License)
+  Dexie.js — Copyright (c) David Fahlander (Apache 2.0 License)
+  @tonaljs/tonal — Copyright (c) danigb (MIT License)
+  React Router — Copyright (c) Remix Software, Inc. (MIT License)
+  React Helmet Async — Copyright (c) NYT (Apache 2.0 License)
+
+Fonts (Google Fonts — SIL Open Font License):
+  - Cormorant Garamond by Christian Thalmann
+  - Inter by Rasmus Andersson
+  - EB Garamond by Georg Duffner
+  - JetBrains Mono by JetBrains
+
+Pedagogical Frameworks Referenced:
+  - ADDIE Model (Branson, Rayner, Cox, Furman, & King, 1975)
+  - CRAP Principles — Robin Williams, "The Non-Designer's Design Book"
+  - Hero's Journey — Joseph Campbell, "The Hero with a Thousand Faces"
+  - Audiation Theory — Edwin Gordon
+  - Three Musics — Boethius, "De Institutione Musica" (c. 510 CE)

@@ -12,7 +12,7 @@ const GLOSSARY_ENTRIES = [
   { term: '©SHEARL', plain: 'See, Hear, Feel — the first step. Study the pattern before touching anything.' },
   { term: '©PLING!', plain: 'Sing then Play — hear the note in your head, sing it, then find it on the guitar.' },
   { term: '©FHEAL', plain: 'Feel and Express — stop thinking and let your fingers follow your instinct.' },
-  { term: 'Flash', plain: 'Quick memory game. A pattern appears and disappears — try to reproduce it from memory.' },
+  { term: 'Flash', plain: 'Quick recall game. A pattern appears and disappears — try to recreate it from your imagination.' },
   { term: 'Imagine', plain: 'Slow study mode. The pattern stays visible while you practice holding it steady in your mind.' },
   { term: 'Audiate', plain: 'Imagining a sound in your head before you make it out loud. Like reading silently, but with music.' },
   { term: 'Root Note', plain: 'The home base note. Everything else in a scale or chord is measured from here.' },

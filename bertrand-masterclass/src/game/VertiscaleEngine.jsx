@@ -19,7 +19,7 @@ import { logVertiscaleSession, getVertiscaleProgress } from './sessionLogger';
 // Assembles all 9 game engine pieces into a playable loop.
 //
 // Phase 1 (SHEARL Flash):
-//   REVEAL pattern → DARK → TAP from memory → RESULT diff → score
+//   REVEAL pattern → DARK → TAP from imagination → RESULT diff → score
 //
 // Phase 2 (PLING! Orbs):
 //   Descending orbs + pitch gate → sing → tap → score
@@ -340,12 +340,12 @@ function VertiscaleEngine({ onClose }) {
                        })() :
                        'Checking your placement accuracy...')
                     : (flashState === FLASH_STATES.REVEAL
-                        ? `Memorize the pattern! You have a few seconds before it disappears.`
+                        ? `Study the pattern! You have a few seconds before it disappears.`
                         : flashState === FLASH_STATES.DARK
                           ? 'The pattern just vanished — get ready to tap!'
                           : flashState === FLASH_STATES.TAP
-                            ? 'Tap where the notes were from memory!'
-                            : currentStage === 1 ? `Round ${round+1}: Focus on the bottom 2 strings. A pattern will flash — memorize it!` :
+                            ? 'Tap where the notes were — trust your imagination!'
+                            : currentStage === 1 ? `Round ${round+1}: Focus on the bottom 2 strings. A pattern will flash — absorb it!` :
                               currentStage === 2 ? `Round ${round+1}: Now including 3 strings. The pattern is growing!` :
                               currentStage === 3 ? `Round ${round+1}: 4 strings now — watch for the B string offset!` :
                               `Round ${round+1}: Full 6-string pattern — you've got this!`)}
@@ -362,7 +362,7 @@ function VertiscaleEngine({ onClose }) {
                   <p style={{ fontSize: '1rem', color: '#d0d8e0', marginBottom: 6 }}>
                     {gameMode === 'imagine'
                       ? '➀ Study the gold dots on the fretboard below — they show notes in the scale. ➁ Tap the same positions to lock them in. ➂ Hold your placement and breathe steadily until the timer completes.'
-                      : '➀ Gold dots will flash on the fretboard — memorize their positions! ➁ The pattern will disappear. ➂ Tap where the notes were from memory. ➃ Green = correct, Red = wrong, Orange = you missed it.'}
+                      : '➀ Gold dots will flash on the fretboard — study their positions! ➁ The pattern will disappear. ➂ Tap where the notes were — trust your imagination. ➃ Green = correct, Red = wrong, Orange = you missed it.'}
                   </p>
                 </div>
               )}
@@ -617,7 +617,7 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
         <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>Train your visual memory of where notes live on the guitar neck</p>
         <PhaseButton
           label="⚡ FLASH · Quick Recall"
-          desc="A pattern of notes flashes on the fretboard. Study it carefully — then it disappears! Tap from memory to recreate where the notes were."
+          desc="A pattern of notes flashes on the fretboard. Study it carefully — then it disappears! Tap from your imagination to recreate where the notes were."
           unlocked={phaseUnlock.phase1Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE1, 'flash')}
         />

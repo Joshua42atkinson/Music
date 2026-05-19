@@ -209,7 +209,7 @@ const frets = [
         { term: 'Dominant 7th', definition: 'A chord built from Root + Major 3rd + Perfect 5th + Minor 7th. It creates strong tension that pulls the ear back "home" to the root chord.' }
       ] },
     yang: { title: 'Performing Under Fire', instruction: 'Maintain your flow despite the chaos. Performance anxiety is the final dragon.', exercises: [
-        { name: 'The Distraction Protocol', steps: ['Play from memory', 'Turn on TV midway', 'Do not stop playing'] }
+        { name: 'The Distraction Protocol', steps: ['Play from your inner ear', 'Turn on TV midway', 'Do not stop playing'] }
       ], fretboardFocus: { startFret: 0, endFret: 11, strings: [1, 2, 3, 4, 5, 6], pattern: 'full-scale' } }
   },
   {

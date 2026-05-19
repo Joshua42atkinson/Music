@@ -179,23 +179,20 @@ BORDERLINE (confirmed titles, proceed with care):
 ```
 
 ### Revenue Agreement
-50/50 split on all subscription revenue after continuous hosting costs. Joshua retains the platform code. Bertrand retains all curriculum content and trademarks.
+100% of all revenue belongs to Bertrand Laurence Guitar Studio. Joshua Atkinson developed the platform as a gift. No revenue split exists.
 
-### License Topology (Apache 2.0 Core)
+### License Status
 
-The platform is published under Apache 2.0. This governs what dependencies can be included:
+The platform license is **to be determined by Bertrand Laurence**. Until a specific license is chosen, the platform is All Rights Reserved.
+
+**Dependency compatibility** (relevant when/if Bertrand chooses an open-source license):
 
 | Dependency | License | Integration |
 |---|---|---|
-| JS-Hero, fretboard-js, Glicol, pitchlite | MIT | ✅ Compile directly into codebase |
-| FretPath | Apache 2.0 | ✅ Compile in; document any modifications |
-| Polyphonic pitch detectors (GPLv3) | GPLv3 | ⚠️ Isolate as separate microservice — do NOT compile in |
+| JS-Hero, fretboard-js, Glicol, pitchlite | MIT | ✅ Compatible with any license |
+| FretPath | Apache 2.0 | ✅ Compatible with any license |
+| Polyphonic pitch detectors (GPLv3) | GPLv3 | ⚠️ Isolate as separate microservice if proprietary |
 | Any GPLv2 library | GPLv2 | ❌ Incompatible — reject entirely |
-
-**Why Apache 2.0 over MIT:**
-- Explicit patent grant protects the DSP algorithms
-- Defensive Patent Termination clause prevents corporate trolling
-- Trademark Limitations protect ©SHEARL, ©PLING!, ©FHEAL even with open-source code
 
 ---
 
