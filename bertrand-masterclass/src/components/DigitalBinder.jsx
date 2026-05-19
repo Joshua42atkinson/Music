@@ -158,7 +158,6 @@ const NeckNut = () => (
    MAIN COMPONENT
 ══════════════════════════════════════════ */
 const DigitalBinder = () => {
-  const [activeTab, setActiveTab] = useState('log');
   const [activeToolId, setActiveToolId] = useState(null);
 
   const [habits, setHabits] = useState(() => {
@@ -271,42 +270,21 @@ const DigitalBinder = () => {
     );
   };
 
-  const headerContent = (
-    <div className="flex gap-2 p-1 bg-black/40 rounded-lg max-w-[320px] mx-auto mt-4">
-      <button
-        onClick={() => { setActiveTab('log'); setActiveToolId(null); }}
-        className={`flex-1 py-2 text-sm font-bold rounded-md transition-colors ${
-          activeTab === 'log' ? 'bg-cf-gold text-[#030306]' : 'text-white/60 hover:text-white'
-        }`}
-      >
-        Practice Log
-      </button>
-      <button
-        onClick={() => { setActiveTab('tools'); setActiveToolId(null); }}
-        className={`flex-1 py-2 text-sm font-bold rounded-md transition-colors ${
-          activeTab === 'tools' ? 'bg-cf-gold text-[#030306]' : 'text-white/60 hover:text-white'
-        }`}
-      >
-        The 12 Tools
-      </button>
-    </div>
-  );
+
 
   return (
     <NeckMenu
-      items={activeTab === 'tools' ? mappedTools : []}
+      items={mappedTools}
       activeId={activeToolId}
       onItemClick={handleToolClick}
       renderContent={renderToolContent}
       headerTitle="Digital Binder"
       headerSubtitle="Track your practice and access tools."
-      headerContent={headerContent}
       showBackButton={true}
     >
       {/* ── PRACTICE LOG ── */}
-      {activeTab === 'log' && (
-        <div style={{ maxWidth: '640px', margin: '0 auto', width: '100%' }}>
-          <AnimatePresence>
+      <div style={{ maxWidth: '640px', margin: '0 auto', width: '100%', paddingTop: '40px' }}>
+        <AnimatePresence>
             {showRecorder && (
               <PracticeRecorder onClose={handleRecorderClose} exerciseName="PLING! Protocol — Minor 3rd" />
             )}
@@ -428,7 +406,6 @@ const DigitalBinder = () => {
 
             </div>
         </div>
-      )}
     </NeckMenu>
   );
 };
