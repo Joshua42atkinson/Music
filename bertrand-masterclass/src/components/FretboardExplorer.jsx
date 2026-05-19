@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Scale, Interval } from '@tonaljs/tonal';
 
 // ═══════════════════════════════════════════════════════════
@@ -368,7 +368,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
 
       {!compact && (
         <div className="fb-header">
-          <h2 className="fb-title">The Grid</h2>
+          <h2 className="fb-title">Playable Guitar</h2>
           <div className="fb-controls">
             <select className="fb-select" value={rootNote} onChange={e => setRootNote(parseInt(e.target.value))}>
               {NOTE_NAMES.map((n, i) => <option key={i} value={i}>{n}</option>)}

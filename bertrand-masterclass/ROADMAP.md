@@ -1,6 +1,6 @@
 # 🗺️ VOIX VIVE — Development Roadmap
 
-> **Last Updated:** 2026-05-17  
+> **Last Updated:** 2026-05-18  
 > **Timeline:** 8 weeks from today (target completion: July 12, 2026)  
 > **Goal:** Sustainable income for Bertrand Laurence via free-textbook marketing funnel + paid coaching/VR product
 
@@ -80,7 +80,7 @@ PREMIUM LAYER (Future)
 
 ---
 
-## Phase 1.5: Guitar Tools Suite 🛠️ (Week 1-2 — concurrent) ✅ (Complete)
+## Phase 1.5: Guitar Tools Suite 🛠️ ✅ (Complete — May 18 2026)
 
 **Goal:** Wire all orphaned interactive components into the Binder's new "Tools" tab. Students get a free, powerful practice toolkit that keeps them in the app.
 
@@ -93,7 +93,7 @@ PREMIUM LAYER (Future)
 | `PitchRoom.jsx` | ~200 | Interval ear training game — hear two notes, identify the interval | ✅ Wired in Binder |
 | `BreathingGate.jsx` | ~150 | Somatic breathing exercise + body scan (Bertrand's pre-practice ritual) | ✅ Wired in Binder |
 | `FretboardSheet.jsx` | 299 | Bottom-sheet fretboard overlay for in-slide practice | ✅ Wired in Slides |
-| `PlayerHandbook.jsx` | 209 | 5 Tomes reference content (old dashboard) | ❌ Orphaned |
+| `PlayerHandbook.jsx` | 209 | 5 Tomes reference content (old dashboard) | 🗑️ Removed (dead code) |
 
 ### New Tools to Build
 
@@ -120,7 +120,27 @@ PREMIUM LAYER (Future)
 | ✅ Build Practice Timer with TOO SLOW philosophy | P2 |
 | ✅ Wire FretboardSheet into SlideViewer exercise slides | P2 |
 
-**Exit Criteria:** Binder has a "Tools" tab with 5+ interactive practice tools. (✅ Achieved: 8 Tools Active)
+**Exit Criteria:** Binder has a "Tools" tab with 5+ interactive practice tools. (✅ Achieved: 8 Tools Active, 4 Planned)
+
+---
+
+## Phase 1.6: Complete The 12 Tools 🛠️ (11/12 Done — Fret 9 Remaining)
+
+**Goal:** Bring all 12 frets to life so the tools grid is fully interactive.
+
+| Fret | Tool | Protocol | Status |
+|------|------|----------|--------|
+| **5** | **Interval Visualizer** | ©SHEARL | ✅ Complete — tap-two-notes fretboard, interval name + semitone count |
+| **8** | **Microtonal Tracker** | ©FHEAL | ✅ Complete — real-time cents needle (−50¢ to +50¢) via mic |
+| **9** | **Vertiscale Engine** | ©SHEARL | 🔴 **NEXT** — full gamified scale memory game |
+| **11** | **Multi-Key Hub** | ©FHEAL | ✅ Complete — all-12-keys scale overlay extending FretboardExplorer |
+
+### Fret 9 — Vertiscale Engine Build Plan:
+- Phase 1: Show vertical scale pattern → hide → student taps from memory → score + streak
+- Phase 2: PLING! mic validation (sing the note before tapping)
+- Phase 3: FHEAL freeplay tracker (creative improv on scale)
+
+**Exit Criteria:** All 12 fret cards are interactive with real UIs. No "Coming Soon" cards remain.
 
 ## Phase 2: Async Coaching Pipeline 📹 (Week 2 — May 25-31)
 
@@ -228,3 +248,54 @@ At $6,465/mo, Bertrand saves $3,000/mo → France trip funded in **6 weeks**.
 | 2026-05-17 | Stripe Payment Links over Stripe API | Zero backend, Bertrand can manage himself |
 | 2026-05-17 | Dexie/IndexedDB for submission outbox | Local-first, survives refresh, syncs when online |
 | 2026-05-17 | Fine-tune Gemma 4 for AI Bertrand | On-device inference, no API costs, owns the model |
+
+---
+
+## Domain & Deployment
+
+### Current Deployment
+- **Platform:** Vercel (free tier)
+- **Local root:** `/home/joshua-atkinson/antigravity/voix-vive/`
+- **Build dir:** `bertrand-masterclass/` (configured in `vercel.json`)
+- **Current URL:** auto-assigned Vercel subdomain
+
+### Domain Options (Squarespace — researched 2026-05-18)
+
+| Domain | Price/yr | Notes |
+|--------|----------|-------|
+| **voix-vive.com** | **$14** | ✅ In cart — **recommended** |
+| voixvive.net | $14 | "Closed match" flag on Squarespace |
+| voixvive.org | $8 | Cheapest; .org implies nonprofit |
+| voievive.com | $14 | Misspelling risk |
+| musiquevive.com | $14 | Alternative brand angle |
+| voixvive.live | $10 | Good for live sessions / streaming |
+| voixvive.studio | $10 | Strong coaching/studio brand fit |
+| voixvive.store | $4 | Cheapest option |
+
+> **Recommendation:** Buy `voix-vive.com` ($14/yr). Optionally add `voixvive.studio` ($10/yr) as a redirect alias — easy to say, strong brand signal.
+
+### DNS → Vercel Setup
+1. Purchase domain on Squarespace
+2. In Vercel project → **Settings → Domains** → Add `voix-vive.com`
+3. Add these DNS records at Squarespace:
+   - `A` record → `76.76.21.21`
+   - `CNAME` record → `cname.vercel-dns.com`
+4. SSL auto-provisions via Let's Encrypt (~10 min)
+
+### Deployment Checklist
+- [ ] Purchase `voix-vive.com` on Squarespace
+- [ ] Add domain in Vercel project settings
+- [ ] Update DNS at Squarespace registrar
+- [ ] Confirm SSL and www → root redirect
+- [ ] Verify on mobile (iOS Safari + Android Chrome)
+
+### Key Decisions — 2026-05-18
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-05-18 | voix-vive.com as primary domain | Clean, brandable, $14/yr — already in cart |
+| 2026-05-18 | Metronome added to AmbientPlayer panel | Persistent click across all pages and tools |
+| 2026-05-18 | Frets 5, 8, 11 built and wired | 11/12 tools live — only Fret 9 (Vertiscale game) remains |
+| 2026-05-18 | DigitalBinder wrapped in max-width 640px | Matches StudioPage on desktop, no full-width stretch |
+| 2026-05-18 | Workspace renamed daydream-website → voix-vive | Align local folder with project brand |
+| 2026-05-18 | Root legacy files (Cargo, old README, old node_modules) deleted | Project is 100% in bertrand-masterclass/ — root was dead weight |

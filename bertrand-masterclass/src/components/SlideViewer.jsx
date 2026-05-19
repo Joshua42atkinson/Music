@@ -641,9 +641,146 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
         </div>
       );
 
+    case 'timeless-song':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+          {/* Label + ratio badge */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <p className="sv-label" style={{ color: '#c9a96e', margin: 0 }}>{slide.label}</p>
+            {slide.ratio && (
+              <span style={{
+                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
+                color: '#c9a96e', background: 'rgba(201,169,110,0.1)',
+                border: '1px solid rgba(201,169,110,0.25)',
+                padding: '3px 8px', borderRadius: 4, letterSpacing: '0.08em',
+              }}>
+                {slide.ratio}
+              </span>
+            )}
+          </div>
+
+          {/* Title */}
+          <h2 style={{
+            fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.6rem, 6vw, 2.4rem)',
+            fontWeight: 400, color: '#e8edf2', lineHeight: 1.15, margin: 0,
+          }}>
+            {slide.title}
+          </h2>
+
+          {/* POV body — split by \n\n into paragraphs */}
+          <div style={{ fontSize: '1rem', lineHeight: 1.9, color: '#b0b8c8' }}>
+            {(slide.body || '').split('\n\n').map((para, i) => (
+              <p key={i} style={{ marginBottom: '1em' }}>{para}</p>
+            ))}
+          </div>
+
+          {/* Historical subtext provenance */}
+          {slide.subtext && (
+            <p style={{
+              fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
+              color: '#5a6a80', letterSpacing: '0.12em', textTransform: 'uppercase',
+              borderLeft: '2px solid rgba(201,169,110,0.3)', paddingLeft: '0.75rem',
+            }}>
+              {slide.subtext}
+            </p>
+          )}
+
+          {/* Quote */}
+          {slide.quote && (
+            <div style={{
+              background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.15)',
+              borderRadius: 10, padding: '1rem 1.2rem',
+            }}>
+              <p style={{
+                fontFamily: 'EB Garamond, serif', fontSize: '1.05rem',
+                fontStyle: 'italic', color: '#c9a96e', lineHeight: 1.7, margin: 0,
+              }}>
+                "{slide.quote}"
+              </p>
+              {slide.author && (
+                <p style={{
+                  fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem',
+                  color: '#5a6a80', marginTop: '0.5rem', letterSpacing: '0.1em',
+                }}>
+                  — {slide.author}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* References panel — expandable */}
+          {slide.references?.length > 0 && (
+            <ReferencesPanel references={slide.references} accent={slide.accent} />
+          )}
+        </div>
+      );
+
     default:
       return <p className="sv-body">{slide.body}</p>;
   }
+}
+
+// ── References Panel — Expandable citations ──
+function ReferencesPanel({ references, accent }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginTop: '0.5rem' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 8, padding: '8px 14px',
+          color: '#5a6a80', cursor: 'pointer',
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: '0.65rem', letterSpacing: '0.1em',
+          display: 'flex', alignItems: 'center', gap: 8,
+          width: '100%', textAlign: 'left',
+          transition: 'all 0.2s',
+        }}
+      >
+        <span style={{ fontSize: '1rem' }}>📚</span>
+        <span style={{ flex: 1 }}>
+          {open ? 'HIDE' : 'VIEW'} REFERENCES ({references.length})
+        </span>
+        <span style={{ opacity: 0.5 }}>{open ? '▲' : '▼'}</span>
+      </button>
+      {open && (
+        <div style={{
+          marginTop: 8, padding: '12px 14px',
+          background: 'rgba(201,169,110,0.04)',
+          border: '1px solid rgba(201,169,110,0.12)',
+          borderRadius: 8,
+        }}>
+          {references.map((ref, i) => (
+            <div key={i} style={{
+              marginBottom: i < references.length - 1 ? 12 : 0,
+              paddingBottom: i < references.length - 1 ? 12 : 0,
+              borderBottom: i < references.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+            }}>
+              <p style={{
+                fontFamily: 'EB Garamond, serif', fontSize: '0.95rem',
+                fontStyle: 'italic', color: '#c9a96e', margin: 0,
+              }}>
+                {ref.title}
+              </p>
+              <p style={{
+                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
+                color: '#5a6a80', margin: '2px 0 4px', letterSpacing: '0.08em',
+              }}>
+                {ref.author} · {ref.date}
+              </p>
+              <p style={{
+                fontSize: '0.8rem', color: '#8090a8', lineHeight: 1.6, margin: 0,
+              }}>
+                {ref.context}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default SlideViewer;

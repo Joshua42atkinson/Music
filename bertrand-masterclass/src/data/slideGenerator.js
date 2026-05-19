@@ -2,6 +2,7 @@
 // SLIDE GENERATOR — Converts chapterData into swipeable slides
 // Each chapter becomes a deck of bite-sized phone-friendly slides
 // ═══════════════════════════════════════════════════════════
+import TIMELESS_SONG_SLIDES from './timelessSongSlides';
 
 /**
  * Generates an array of slide objects from a fret.
@@ -229,7 +230,15 @@ export function generateSlides(fret) {
     });
   }
 
-  // 5.5 Western Music & Guitar Theory Slide
+  // 5.5 — The Timeless Song slides (history + POV + art)
+  const timelessSlides = TIMELESS_SONG_SLIDES[fret.id];
+  if (timelessSlides?.length) {
+    timelessSlides.forEach(slide => {
+      slides.push({ ...base, ...slide, accent: fret.color });
+    });
+  }
+
+  // 5.6 Western Music & Guitar Theory Slide
   if (fret.westernTheory) {
     slides.push({
       ...base,

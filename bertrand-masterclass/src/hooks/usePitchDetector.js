@@ -1,0 +1,227 @@
+// ═══════════════════════════════════════════════════════════
+// usePitchDetector — Shared microphone + pitch detection hook
+//
+// Extracted from PlingTrainer's core logic and made reusable.
+// Uses a singleton AudioContext pattern to prevent duplicate
+// contexts when both PlingTrainer and VertiscaleEngine are
+// mounted in the same session.
+//
+// Provides:
+//   isListening, pitch (Hz), noteInfo {name, cents, octave},
+//   volume (0–100), breathState ('free' | 'held' | 'shallow'),
+//   startListening(), stopListening(), error
+// ═══════════════════════════════════════════════════════════
+
+import { useState, useRef, useCallback, useEffect } from 'react';
+
+// ── Shared singleton context (module-level) ──
+// If PlingTrainer already opened a mic session, VertiscaleEngine reuses it.
+let _sharedCtx = null;
+let _sharedAnalyser = null;
+let _sharedStream = null;
+let _refCount = 0;
+
+function acquireContext() {
+  if (_sharedCtx && _sharedCtx.state !== 'closed') {
+    _refCount++;
+    return { ctx: _sharedCtx, analyser: _sharedAnalyser };
+  }
+  return null;
+}
+
+// ── Pitch math helpers ──
+
+function noteFromPitch(frequency) {
+  const noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
+  return Math.round(noteNum) + 69;
+}
+
+function frequencyFromNoteNumber(note) {
+  return 440 * Math.pow(2, (note - 69) / 12);
+}
+
+function centsOffFromPitch(frequency, note) {
+  return Math.floor(1200 * Math.log(frequency / frequencyFromNoteNumber(note)) / Math.log(2));
+}
+
+// Autocorrelation pitch detection (same algorithm as PlingTrainer)
+function autoCorrelate(buf, sampleRate) {
+  let SIZE = buf.length;
+  let rms = 0;
+  for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < 0.002) return -1;
+
+  let r1 = 0, r2 = SIZE - 1;
+  const thres = 0.2;
+  for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+  for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+
+  buf = buf.slice(r1, r2);
+  SIZE = buf.length;
+
+  const c = new Array(SIZE).fill(0);
+  for (let i = 0; i < SIZE; i++)
+    for (let j = 0; j < SIZE - i; j++)
+      c[i] += buf[j] * buf[j + i];
+
+  let d = 0; while (c[d] > c[d + 1]) d++;
+  let maxval = -1, maxpos = -1;
+  for (let i = d; i < SIZE; i++) {
+    if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+  }
+
+  let T0 = maxpos;
+  const x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+  const a = (x1 + x3 - 2 * x2) / 2;
+  const b = (x3 - x1) / 2;
+  if (a) T0 = T0 - b / (2 * a);
+
+  return sampleRate / T0;
+}
+
+const NOTE_STRINGS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const BREATH_HELD_THRESHOLD = 0.008;  // amplitude; below this = held breath
+const BREATH_HELD_DURATION  = 1000;   // ms sustained below threshold = 'held'
+
+export default function usePitchDetector() {
+  const [isListening, setIsListening]   = useState(false);
+  const [pitch,       setPitch]         = useState(null);
+  const [noteInfo,    setNoteInfo]      = useState({ name: '--', cents: 0, octave: 0 });
+  const [volume,      setVolume]        = useState(0);
+  const [breathState, setBreathState]   = useState('free');
+  const [error,       setError]         = useState(null);
+
+  const ctxRef      = useRef(null);
+  const analyserRef = useRef(null);
+  const rafIdRef    = useRef(null);
+  const ownedCtx    = useRef(false); // true if we created the ctx (not borrowed)
+
+  // Breath hold tracking
+  const breathLowSince = useRef(null);
+
+  const tick = useCallback(() => {
+    const analyser = analyserRef.current;
+    const ctx      = ctxRef.current;
+    if (!analyser || !ctx || ctx.state === 'closed') return;
+
+    const buffer = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buffer);
+
+    // Volume (RMS)
+    let rmsSum = 0;
+    for (let i = 0; i < buffer.length; i++) rmsSum += buffer[i] * buffer[i];
+    const rms = Math.sqrt(rmsSum / buffer.length);
+    const vol = Math.min(100, rms * 1500);
+    setVolume(vol);
+
+    // ── Breath state detection ──
+    if (rms < BREATH_HELD_THRESHOLD) {
+      if (!breathLowSince.current) breathLowSince.current = performance.now();
+      const elapsed = performance.now() - breathLowSince.current;
+      if (elapsed >= BREATH_HELD_DURATION) setBreathState('held');
+      else if (elapsed >= 300)            setBreathState('shallow');
+    } else {
+      breathLowSince.current = null;
+      setBreathState('free');
+    }
+
+    // ── Pitch detection ──
+    const freq = autoCorrelate(buffer, ctx.sampleRate);
+    if (freq !== -1) {
+      const noteNum  = noteFromPitch(freq);
+      const noteName = NOTE_STRINGS[noteNum % 12];
+      const octave   = Math.floor(noteNum / 12) - 1;
+      const cents    = centsOffFromPitch(freq, noteNum);
+      setPitch(freq);
+      setNoteInfo({ name: noteName, cents, octave, midi: noteNum });
+    } else {
+      setPitch(null);
+    }
+
+    rafIdRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  const startListening = useCallback(async () => {
+    try {
+      // Try to reuse an existing shared context first
+      const existing = acquireContext();
+      if (existing) {
+        ctxRef.current      = existing.ctx;
+        analyserRef.current = existing.analyser;
+        ownedCtx.current    = false;
+      } else {
+        // Create a fresh context
+        const stream   = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const AC       = window.AudioContext || window.webkitAudioContext;
+        const ctx      = new AC();
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 2048;
+
+        const source = ctx.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        // Register as singleton
+        _sharedCtx     = ctx;
+        _sharedAnalyser = analyser;
+        _sharedStream  = stream;
+        _refCount      = 1;
+
+        ctxRef.current      = ctx;
+        analyserRef.current = analyser;
+        ownedCtx.current    = true;
+      }
+
+      setIsListening(true);
+      setError(null);
+      rafIdRef.current = requestAnimationFrame(tick);
+    } catch (err) {
+      console.error('[usePitchDetector] Mic access failed:', err);
+      setError('Please allow microphone access to use this feature.');
+    }
+  }, [tick]);
+
+  const stopListening = useCallback(() => {
+    cancelAnimationFrame(rafIdRef.current);
+    rafIdRef.current = null;
+
+    _refCount = Math.max(0, _refCount - 1);
+
+    if (ownedCtx.current && _refCount === 0) {
+      // We created it and no one else is using it — close
+      if (_sharedCtx && _sharedCtx.state !== 'closed') {
+        _sharedStream?.getTracks().forEach(t => t.stop());
+        _sharedCtx.close();
+      }
+      _sharedCtx = null;
+      _sharedAnalyser = null;
+      _sharedStream = null;
+    }
+
+    ctxRef.current      = null;
+    analyserRef.current = null;
+    ownedCtx.current    = false;
+
+    setIsListening(false);
+    setPitch(null);
+    setVolume(0);
+    setBreathState('free');
+    breathLowSince.current = null;
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => () => {
+    if (isListening) stopListening();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return {
+    isListening,
+    pitch,
+    noteInfo,
+    volume,
+    breathState,
+    error,
+    startListening,
+    stopListening,
+  };
+}
