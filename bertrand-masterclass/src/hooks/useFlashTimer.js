@@ -27,10 +27,11 @@ export const FLASH_STATES = {
   HOLD_RESULT: 'hold_result',
 };
 
-// Map consistencyScore [0,1] to flash duration ms [2000, 500]
+// Map consistencyScore [0,1] to flash duration ms [3500, 1000]
+// Novice-friendly: starts slow enough to actually study the pattern
 export function computeFlashDuration(consistencyScore) {
   const clamped = Math.max(0, Math.min(1, consistencyScore));
-  return Math.round(2000 - clamped * 1500); // 2000 → 500
+  return Math.round(3500 - clamped * 2500); // 3500 → 1000
 }
 
 // Map consistencyScore [0,1] to hold duration ms [3000, 8000]
@@ -45,7 +46,7 @@ const TAP_WINDOW_MS = 8000;
 // How long to show the result diff overlay before advancing
 const RESULT_DISPLAY_MS = 2500;
 // How long the REVEAL phase lasts in sustain mode (longer than flash — student studies)
-const SUSTAIN_REVEAL_MS = 3000;
+const SUSTAIN_REVEAL_MS = 5000;
 
 export default function useFlashTimer({
   consistencyScore = 0,

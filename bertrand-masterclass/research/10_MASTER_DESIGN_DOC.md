@@ -2,10 +2,11 @@
 ## Master Pedagogical Design Document
 ### *The TAO of Living Music*
 
-> **Version:** 2.0 — Assembled 2026-05-18  
-> **Author:** Joshua Atkinson (Platform Architect) | SME: Bertrand Laurence  
+> **Version:** 3.0 — PEARL Multi-Perspective + ADDIECRAPEYE Integration (2026-05-19)  
+> **Author:** Joshua Atkinson (Platform Architect & Instructional Designer) | SME: Bertrand Laurence  
+> **Design Framework:** ADDIECRAPEYE + PEARL (Trinity ID AI OS — The Conductor's Compass)  
 > **Source Batches:** `10_design_doc_01–04.md` in `/research/`  
-> **Status:** Living document — update when architectural decisions are made
+> **Status:** Living document — update when architectural or pedagogical decisions are made
 
 ---
 
@@ -499,6 +500,339 @@ BORDERLINE → "Voix Vive" title, "Bard Level" terminology, Monomyth stage names
 3. Does he want a "Welcome" video embedded on the landing page?
 4. Is there anything in the Timeless Song historical slides he'd want to change or add?
 5. Timeline: launch this weekend, or wait for Stripe setup first?
+6. **NEW:** Inner Voice / Outer Voice curriculum — should this be Frets 13–24, a parallel track, or embedded within existing frets?
+7. **NEW:** Voice cloning for slide narration — does he consent to AI voice generation from his YouTube audio?
+8. **NEW:** Carleton Project integration — which sub-categories (tone, timber, projection, articulation, linguistics, breath support) are ready for content?
+
+---
+
+## IX. THE SOVEREIGN FACTORY — ADDIECRAPEYE Lifecycle
+
+> *The PEARL goes in the CRAP.*
+> — Joshua Atkinson, Purdue EDCI 57300
+
+### What Is ADDIECRAPEYE?
+
+ADDIECRAPEYE is a 10-phase, 3-layer instructional systems engineering pipeline created by Joshua Atkinson. It takes raw subject matter and compiles it into localized, high-performance visual structures. The framework bridges instructional design theory (ADDIE) with visual systems architecture (CRAP — Robin Williams' canonical design principles) and real-time execution telemetry (EYE).
+
+```
+[ PHASE 1: CONCEPTUAL INTAKE & SYSTEMIC DESIGN ]
+   ├── A  — Analysis (Raw Asset & SME Data Parsing)
+   ├── D  — Design (Backward Mapping & Bloom's Taxonomy Contract)
+   ├── D  — Development (Artifact Compilation)
+   ├── I  — Implementation (Platform Stage Deployment)
+   └── E  — Evaluation (Continuous Alignment Metrics & QM Rubric)
+         │
+         ▼ The Engineering Bridge: Concept → Visual Output
+[ PHASE 2: VISUAL SYSTEMS ARCHITECTURE & COGNITIVE LAYOUT ]
+   ├── C  — Contrast (Visual Weight, Typographic Scale, & Optical Hierarchy)
+   ├── R  — Repetition (Consistent Semantic UI Tokens & Theme Continuity)
+   ├── A  — Alignment (Grid Topologies, Anchor Points, & Layout Constraints)
+   └── P  — Proximity (Cognitive Slicing, Spatial Grouping, & Layout Margins)
+         │
+         ▼ The Vibe Coding Feedback Loop
+[ PHASE 3: THE LIVE TELEMETRY RUNTIME LOOP ]
+   └── EYE — Execution, Yield, and Evaluation (Active Telemetry Engine)
+```
+
+**The PEARL** (Performance → Evidence → Activity → Reflection → Learning) is the multi-stakeholder perspective-checking methodology that lives inside the CRAP phases. Before making any visual design decision, PEARL asks: *does this serve the student? the mentor? the engineer? the gift-giver?* — ensuring no visual choice is arbitrary.
+
+### System Invariant
+> **No Design Without Structure.** Visual styling (C, R, A, P) is forbidden before structural constraints (A, D, D, I, E) are compiled and validated against the educational schema.
+
+---
+
+### Phase 1: ADDIE — Conceptual Intake & Systemic Design
+
+Applied to Voix Vive:
+
+| Phase | Instructional Action | Voix Vive Realization |
+|-------|---------------------|----------------------|
+| **A · Analysis** | Parse incoming SME assets using NLP/vision. Map background gaps and learner profiles | Datamined Bertrand's YouTube, DuetPartner, Thumbtack. Built learner profile: adults 30–65 with prior quit history and inner-critic dominance |
+| **D · Design** | Enforce strict backward design. Map terminal behaviors to Bloom's Taxonomy | 12-fret monomyth mapped to protocol gates (©SHEARL → ©PLING! → ©FHEAL). Each chapter has measurable exit criteria |
+| **D · Development** | Compile tested artifacts: code modules, content strings, media templates | SlideViewer, VertiscaleEngine, Troubadour adventure, 36 Timeless Song slides, 28 concept cards |
+| **I · Implementation** | Stage compiled files into the target platform environment | Vercel PWA, mobile-first, touch-optimized. Offline-first via Dexie/IndexedDB |
+| **E · Evaluation** | Audit the content architecture against quality rubric | Novice usability testing (Joshua as proxy learner). Curriculum audit against pedagogical intent. `npm run build` as structural validation |
+
+---
+
+### Phase 2: CRAP — Visual Systems Architecture
+
+> Based on Robin Williams' *The Non-Designer's Design Book* — the four canonical principles that transform amateur layouts into professional visual communication.
+
+The PEARL lives here. Each visual decision is checked against all stakeholder perspectives before implementation.
+
+#### C · Contrast — Visual Weight & Optical Hierarchy
+
+*If two things are not the same, make them very different.*
+
+| Voix Vive Application | PEARL Check |
+|----------------------|-------------|
+| Gold (#c9a96e) on dark backgrounds (#0a0d14) — maximum readability, zero eye strain | **Student:** Can a 55-year-old read this in a dimly lit room? **Engineer:** Does this pass WCAG AA contrast ratio? |
+| Title slides use `clamp(2rem, 8vw, 3.5rem)` — massive typographic scale. Body text at `clamp(1rem, 3vw, 1.15rem)` — comfortable reading | **Student:** Hierarchy is instant — I know what's the heading and what's the detail without thinking |
+| Game mode labels (⚡ FLASH, 🪁 IMAGINE, 🎵 AUDIATE) use distinct icons + colors per mode | **Mentor:** Bertrand can name-drop these modes in lessons and students will recognize them immediately |
+| Safety banner uses muted green + no-leaderboard messaging — visually distinct from game UI | **Student:** The safety message stands apart from the game. It registers as a separate, reassuring context |
+
+#### R · Repetition — Semantic UI Tokens & Theme Continuity
+
+*Repeat visual elements to bind disparate screens into a unified mental model.*
+
+| Voix Vive Application | PEARL Check |
+|----------------------|-------------|
+| `--bard-gold: #c9a96e` appears on every screen — NeckMenu, slide labels, game headers, fretboard dots | **Student:** Gold = Voix Vive. The brand becomes subconscious |
+| JetBrains Mono for all system labels. Cormorant Garamond for all contemplative body text | **Engineer:** Two font families, used consistently. No drift. No special cases |
+| Every portal card (Song, Guitar, Player) uses identical structure: icon circle → title → subtitle → chevron | **Gift-Giver:** The interface looks professional and cohesive — worthy of giving as a gift |
+| Phase banners (☽ YIN, ☀ YANG) repeat across all 12 chapters with identical styling | **Mentor:** Bertrand's Yin/Yang framework is visually branded into the platform |
+
+#### A · Alignment — Grid Topologies & Visual Anchors
+
+*Every element must have a deliberate visual connection to another element. No floating orphans.*
+
+| Voix Vive Application | PEARL Check |
+|----------------------|-------------|
+| NeckMenu frets left-align on a single vertical axis. Icon circles anchor the left edge; chevrons anchor the right | **Student:** The list scans instantly top-to-bottom. No visual searching |
+| Slide content centers on a single column, max-width 680px. No multi-column chaos on mobile | **Engineer:** One alignment axis = one responsive breakpoint to maintain |
+| Fretboard grid uses strict CSS Grid with equal cell widths. No percentage hacks | **Student:** The fretboard looks clean and geometric — it IS the pattern they're learning |
+| Game stats (Round, Stage, Score) align horizontally in a single row, evenly spaced | **Mentor:** Bertrand can point to any metric during a lesson and the student finds it instantly |
+
+#### P · Proximity — Spatial Grouping & Attention Slicing
+
+*Group related items close together. Separate unrelated blocks with negative space.*
+
+| Voix Vive Application | PEARL Check |
+|----------------------|-------------|
+| Safety banner + Difficulty selector + Mic button are grouped as a single "pre-game setup" cluster, separated from game modes by 24px+ margin | **Student:** Setup is one thing. Game choice is another. They don't bleed together |
+| Slide content: label → title → subtitle → body flows as a single visual unit with tight 8-12px gaps. Next slide is separated by a full swipe gesture | **Student:** Each slide feels like one idea, not a wall of text |
+| Fretboard dots are tight to their grid cells. Color legend floats 20px below the board with a dividing line | **Engineer:** Visual clutter IS technical debt. Clean proximity = fewer support questions |
+| Concept cards use tight internal padding but 16px gaps between cards — each concept is its own visual atom | **Community:** Vocabulary terms feel organized, not dumped. VaaM (§XII) is visually enforced |
+
+---
+
+### Phase 3: EYE — Execution, Yield, Evaluation
+
+The live telemetry runtime loop. After ADDIE builds and CRAP polishes, EYE verifies.
+
+| Sub-Phase | Action | Voix Vive Realization |
+|-----------|--------|----------------------|
+| **E · Execution** | Spin up the runtime environment. Verify visual outputs and interaction behavior | `npm run dev` → browser testing at mobile (375×812) and desktop viewports. Touch swipe, tap game, pitch gate — all manually verified |
+| **Y · Yield** | Document what this cycle produced beyond the original scope | Inner Voice / Outer Voice expansion (§XI). Voice cloning roadmap. Bilingual FR/EN proposal. PEARL convergence insight: "the absence of fear" |
+| **E · Evaluation** | Feed findings back into the next Analysis phase. Close the loop | Post-Thursday feedback from Bertrand → new Analysis intake → next ADDIECRAPEYE cycle begins |
+
+### The Recursive Nature
+
+ADDIECRAPEYE is not a waterfall — it is a factory that runs continuously. Each Yield (Y) produces new raw material that feeds the next Analysis (A). The platform never "finishes" — it matures. This is how a living textbook stays alive.
+
+```
+                    ┌──────────────────────────────────────┐
+                    │                                      │
+  A → D → D → I → E ═══► C → R → A → P ═══► E → Y → E ──┘
+  ▲                                                        │
+  └────────────────────────────────────────────────────────┘
+                      The Sovereign Loop
+```
+
+### Why This Matters for Voix Vive
+
+Standard ADDIE would stop at the first Evaluate. The product would *function* but it would look amateur, feel disconnected, and fail to communicate the depth of Bertrand's pedagogy visually. The CRAP bridge transforms structural content into visual communication that respects the student's cognitive load. The EYE loop ensures the visual system stays calibrated against real usage.
+
+For a platform built on the axiom *"You are an instrument playing an instrument"* — the visual system IS the instrument. If the layout is cluttered, the student's mind is cluttered. If the alignment is sloppy, the student's practice feels sloppy. **Visual clutter is pedagogical debt.**
+
+---
+
+## X. THE PEARL — Multi-Stakeholder Perspective Analysis
+
+> *Performance → Evidence → Activity → Reflection → Learning*
+
+PEARL is applied here from six stakeholder perspectives. Each perspective reveals a different facet of the same platform. The "pearl" — the wisdom — is what emerges when you see all six at once.
+
+### Perspective 1: 🎸 The Student (Adult Beginner)
+
+> *"I tried guitar before. I stopped because I felt stupid."*
+
+| PEARL | What It Means Here |
+|-------|-------------------|
+| **Performance** | The student can play a recognizable piece of music within 30 days of starting, without performance anxiety |
+| **Evidence** | Slide progress through 12 frets; vertiscale accuracy trending upward; journal entries showing reduced self-criticism |
+| **Activity** | The living textbook (free, self-paced), vertiscale game (no leaderboards), breathing gate (somatic safety), adventure mode (narrative play) |
+| **Reflection** | Phase 3 FHEAL journal prompts; rotating coaching cues in IMAGINE mode; "Which moment felt like music?" after freeplay |
+| **Learning** | Difficulty adapts to consistency (not speed); flash duration shrinks only when accuracy stabilizes; the platform *slows down* for struggling students rather than speeding up |
+
+**The Student's Pearl:** *The platform never tells them they're wrong. It tells them they're learning. The absence of punishment IS the pedagogy.*
+
+---
+
+### Perspective 2: 🎵 The Mentor (Bertrand Laurence)
+
+> *"I love the name Voix Vive BECAUSE it's all about expression, aliveness."*
+
+| PEARL | What It Means Here |
+|-------|-------------------|
+| **Performance** | Bertrand's teaching philosophy reaches 100+ students without requiring him to be present for every interaction |
+| **Evidence** | Async video reviews generating revenue; Inner Circle membership growth; student testimonials referencing his specific terminology (©SHEARL, ©PLING!, ©FHEAL) |
+| **Activity** | The platform IS his teaching made digital — students interact with his protocols, not generic guitar theory; his voice (future: AI narration) guides the slides |
+| **Reflection** | Thursday review calls; student submission inbox; async review queue that shows him exactly where students struggle |
+| **Learning** | The à la carte model scales with his effort; the free textbook builds trust; live coaching converts the trust into revenue; the platform does not replace him — it *amplifies* him |
+
+**The Mentor's Pearl:** *Bertrand's magic is not his technique — it's his safety. The platform must replicate the feeling of sitting in his practice nook in Houlton, Maine, where no one is watching and no one is judging. If the platform feels like a test, it has failed Bertrand's pedagogy.*
+
+---
+
+### Perspective 3: 🏗️ The Creator (Joshua Atkinson)
+
+> *"I can build anything in 2 months."*
+
+| PEARL | What It Means Here |
+|-------|-------------------|
+| **Performance** | Deliver a production-ready platform that satisfies both the academic practicum (Purdue EDCI 57300) and the real-world client (Bertrand) |
+| **Evidence** | Clean builds, passing browser tests, documented design decisions traceable to learning theory, 50/50 revenue split functioning |
+| **Activity** | ADDIECRAPEYE lifecycle, AI-augmented development, conversation-driven iteration, this very document |
+| **Reflection** | The IP boundary (Great Game vs. Masterclass) forces disciplined separation of personal philosophy from client-owned content |
+| **Learning** | Every feature built for Bertrand is a case study for the practicum; every academic insight improves the platform; the creator and the creation grow together |
+
+**The Creator's Pearl:** *The platform is not just a product — it's a thesis. The thesis is: "Constructivist learning science, applied with empathy and rigor, can turn a single music teacher's expertise into a scalable, revenue-generating, dignity-preserving digital ecosystem." If that thesis fails here, it fails everywhere.*
+
+---
+
+### Perspective 4: ⚙️ The Engineer (The Codebase)
+
+> *"No mocking. No pretending to work. Every output must compile."*
+
+| PEARL | What It Means Here |
+|-------|-------------------|
+| **Performance** | Zero runtime errors; sub-200ms interaction latency; offline-first PWA reliability; one AudioContext shared across all tools |
+| **Evidence** | `npm run build` passes; browser tests confirm all flows; no orphaned state; localStorage persistence verified |
+| **Activity** | Singleton `audioEngine.js`; flash timer using `performance.now()` (not `Date.now()`); pitch detection via AudioWorklet (not ScriptProcessor); pattern data from single source (`vertiscalePatterns.js`) |
+| **Reflection** | Design docs updated in the same session as code changes; CONTEXT.md as the system's own memory |
+| **Learning** | Architecture decisions propagate: the difficulty multiplier pattern (consistency score floor) can be reused for all future adaptive mechanics; the NeckMenu component serves Song, Guitar, and Player with zero duplication |
+
+**The Engineer's Pearl:** *Clean architecture IS pedagogy. If the code is tangled, the student's experience is tangled. A singleton audio engine means no mic conflicts. A single slide generator means no content drift. The engineer's discipline is the invisible foundation of the student's safety.*
+
+---
+
+### Perspective 5: 🎁 The Gift-Giver (Secondary User)
+
+> *"I want to give my partner something that says: I believe you can do this."*
+
+| PEARL | What It Means Here |
+|-------|-------------------|
+| **Performance** | The gift-giver can purchase a meaningful, personal gift in under 3 minutes — and the recipient feels seen, not overwhelmed |
+| **Evidence** | Gift certificate delivered (PDF/email); clear description of what the recipient receives; no subscription trap |
+| **Activity** | StudioPage gift section; $60–$275 range; redeemable for any service; printable certificate |
+| **Reflection** | The gift-giver sees: "Your loved one will receive access to Bertrand's 12-chapter curriculum (free) plus [N] private lessons with a master guitarist." — Not: "Here's a login to a web app." |
+| **Learning** | Future: personalized gift messages; "Gifted by [name]" shown on the recipient's dashboard; the relationship itself becomes part of the learning ecology |
+
+**The Gift-Giver's Pearl:** *The gift is not the platform. The gift is permission. Permission to try again, to be bad at something, to sound wrong in a safe space. The certificate's value is emotional, not transactional.*
+
+---
+
+### Perspective 6: 🌍 The Community (Future Inner Circle)
+
+> *"I want to learn alongside people who understand that this is more than technique."*
+
+| PEARL | What It Means Here |
+|-------|-------------------|
+| **Performance** | A self-sustaining community of 50+ adult learners sharing practice, asking questions, and supporting each other — without toxicity or competition |
+| **Evidence** | Monthly group Q&A attendance; peer encouragement in shared spaces; students referencing each other's progress with warmth |
+| **Activity** | Inner Circle membership ($25/mo or $199/yr); monthly group Q&A with Bertrand; downloadable Vertiscales; community practice rooms (future) |
+| **Reflection** | Bertrand's presence in the community is the anchor — but the community must be able to sustain itself between his appearances; the Phase 3 journal could be optionally shared |
+| **Learning** | Community norms emerge from the platform's values: no speed scoring, no leaderboards, mistakes are OK, your practice is private (unless you choose to share) |
+
+**The Community's Pearl:** *The community IS the curriculum's final chapter. Chapter 12 is "Master of Two Worlds" — the student returns to the community with the elixir of their own practice. A healthy Inner Circle is proof that Bertrand's pedagogy works at scale.*
+
+---
+
+### The Convergence: What All Six Perspectives Share
+
+When you lay all six PEARLs side by side, a single truth emerges:
+
+> **Every stakeholder's success depends on the same thing: the absence of fear.**
+
+- The student needs to be unafraid of wrong notes
+- The mentor needs to be unafraid of scaling his intimacy
+- The creator needs to be unafraid of merging academic rigor with real-world revenue
+- The engineer needs to be unafraid of simplicity (fewer abstractions = fewer bugs)
+- The gift-giver needs to be unafraid of giving something unconventional
+- The community needs to be unafraid of vulnerability
+
+This is why the platform's anti-dopamine, anti-leaderboard, anti-speed-scoring philosophy is not a design choice — it is the *load-bearing wall* of the entire architecture. Remove it, and every perspective collapses.
+
+---
+
+## XI. THE SECOND OCTAVE — Inner Voice / Outer Voice Expansion
+
+> *"I also integrate into the practice fun-de-Mentals of the physical voice... the Inner Voice (conscious, self-talk, journaling, dreams, song writing...) with the Outer Voice (tone, timber, projection, articulation, linguistics, breath support)"*
+> — Bertrand Laurence, May 19, 2026 (re: Carleton Alternative Education Project)
+
+### The Proposal: Frets 13–24
+
+The current 12 frets = **The Guitar Octave** (chromatic scale, Hero's Journey, instrument mastery).
+
+Frets 13–24 = **The Voice Octave** (same fret metaphor, same slide infrastructure, but the content shifts from guitar mastery to vocal-somatic mastery — the full meaning of "Voix Vive").
+
+```
+THE INNER VOICE (Frets 13–18)
+────────────────────────────────────────────────────────────────
+Fret 13 · C' — Self-Talk         "Notice the words you say to yourself while playing"
+Fret 14 · C#' — Journaling       "Write about your practice without judgment"
+Fret 15 · D' — Dreaming          "What does your inner musician sound like?"
+Fret 16 · D#' — Songwriting      "Turn your self-talk into lyrics"
+Fret 17 · E' — Consciousness     "Observe your thoughts while playing — don't follow them"
+Fret 18 · F' — Integration       "The inner voice guides the outer voice"
+
+THE OUTER VOICE (Frets 19–24)
+────────────────────────────────────────────────────────────────
+Fret 19 · F#' — Tone & Timber    "Shape the sound of your voice alongside the guitar"
+Fret 20 · G' — Projection        "Fill the room without force — breath is the engine"
+Fret 21 · G#' — Articulation     "Words and notes, crisp and clear"
+Fret 22 · A' — Linguistics       "Language shapes how you sing — English, French, music"
+Fret 23 · A#' — Breath Support   "The diaphragm as the second instrument"
+Fret 24 · B' — Full Expression   "Inner and outer unite — this is voix vive"
+```
+
+### Why This Matters
+
+1. **Brand completion:** "Voix Vive" means "The Living Voice" — but the current 12 frets are about guitar, not voice. Frets 13–24 complete the brand promise.
+2. **Carleton Project alignment:** Bertrand is already teaching this content at the alternative education school. It needs a home.
+3. **Revenue expansion:** The Voice Octave can be a premium product — the first 12 frets remain free (guitar funnel), the second 12 frets become the paid Masterclass.
+4. **Bilingual opportunity:** Fret 22 (Linguistics) naturally accommodates French/English bilingual content — directly serving the Francophone market.
+5. **Same infrastructure:** No new components needed. `chapterData.js` already supports adding frets. `slideGenerator.js` produces slides from the same structure. The NeckMenu renders them identically.
+
+### PEARL Analysis of the Voice Octave
+
+| PEARL | The Voice Octave |
+|-------|-----------------|
+| **Performance** | Student can sing a note, match pitch, and speak/perform lyrics with clear articulation — while playing guitar simultaneously |
+| **Evidence** | Mic-based pitch tracking (existing PlingTrainer); journal entries (existing Phase 3); recorded practice sessions |
+| **Activity** | ©PLING! protocol expanded: sing before you play → sing WHILE you play; voice projection exercises; breath support drills |
+| **Reflection** | "Which felt more alive — the guitar or your voice? Were they the same instrument?" |
+| **Learning** | The Voice Octave cannot exist without the Guitar Octave. Frets 1–12 prepare the body; Frets 13–24 liberate the voice. The dependency is pedagogically intentional |
+
+---
+
+## XII. VOCABULARY-AS-MECHANISM — The Voix Vive Lexicon
+
+Per the VaaM principle: language is not description — it is *scaffolding*. Introducing terms too quickly spikes cognitive load. The following lexicon is introduced in strict fret order. A student at Fret 3 should not encounter Fret 9 vocabulary.
+
+### Fret-Locked Vocabulary
+
+| Fret | Unlocked Terms | Plain-English Definition |
+|------|---------------|------------------------|
+| 1 | **Body Scan**, **Ventral Vagal** | Checking in with your body; the calm nervous system state |
+| 2 | **Semitone**, **Dissonance** | The smallest step on a guitar; two notes that clash on purpose |
+| 3 | **Pitch**, **Interval** | How high or low a sound is; the distance between two notes |
+| 4 | **©PLING!**, **Minor 3rd**, **Beat** | Sing before you play; the sad-sounding gap; the pulse of music |
+| 5 | **Major 3rd**, **Warp** | The happy-sounding gap; the B string's 1-fret shift that breaks the pattern |
+| 6 | **©SHEARL**, **CAGED**, **Perfect 4th** | See-hear-feel; 5 hand shapes that cover the whole neck; the 4th gap |
+| 7 | **Tritone**, **Audiation**, **Third Ear** | The "devil's interval"; hearing music in your mind before playing it; the inner listener |
+| 8 | **Perfect 5th**, **Power Chord**, **Resolution** | The strongest harmony; root + fifth (no 3rd); tension released into rest |
+| 9 | **Vertiscale**, **Myelination**, **©FHEAL** | Vertical scale shape; brain insulation for learned skills; feel-hear-act-listen |
+| 10 | **Minor 6th**, **Vulnerability** | The bittersweet gap; being seen while learning |
+| 11 | **Minor 7th**, **Multi-Key Fluency** | The bluesy gap; navigating all 12 keys without thinking |
+| 12 | **Major 7th**, **Octave**, **Flow State** | The dreamy gap; the same note one loop higher; effortless absorption |
+
+### Why This Matters
+
+Without fret-locking, a Chapter 1 student could encounter "audiation" or "myelination" and feel instantly overwhelmed — the same cognitive overload that made them quit guitar the first time. VaaM ensures that every new term arrives at the moment the student is *ready* to receive it, not before.
 
 ---
 
@@ -509,3 +843,10 @@ BORDERLINE → "Voix Vive" title, "Bard Level" terminology, Monomyth stage names
 3. `Gamifying Guitar Learning with Open Source.md` — Technical research (audio, XR, licensing)
 4. `09_master_architecture_doc.md` — Prior synthesis and corrections
 5. User-provided rough draft (Session 2026-05-18)
+6. **The Conductor's Compass** — Joshua Atkinson's isomorphic field guide to instructional design theory (Trinity ID AI OS)
+7. **ADDIECRAPEYE** — Atkinson's 10-phase sovereign factory loop: ADDIE (instructional intake) + CRAP (visual systems architecture via Robin Williams' design principles) + EYE (live telemetry)
+8. **PEARL** — Performance-Evidence-Activity-Reflection-Learning cycle (Atkinson, Purdue EDCI 57300)
+9. **VaaM** — Vocabulary-as-a-Mechanism principle for cognitive load management (Atkinson)
+10. Robin Williams, *The Non-Designer's Design Book* — Contrast, Repetition, Alignment, Proximity (the CRAP principles)
+11. Bertrand Laurence, private communication (May 19, 2026) — Inner Voice / Outer Voice curriculum expansion from Carleton Alternative Education Project
+

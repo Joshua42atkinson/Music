@@ -38,6 +38,14 @@
   --font-quote: 'EB Garamond', Georgia, serif;
   --font-mono: 'JetBrains Mono', monospace;
 
+  /* ── Minimum Font Standards (readability on all devices) ── */
+  --min-body: 1rem;        /* 16px — body, instructions, descriptions */
+  --min-label: 0.8rem;     /* 12.8px — uppercase mono labels */
+  --min-button: 0.9rem;    /* 14.4px — button text */
+  --min-meta: 0.85rem;     /* 13.6px — metadata, timestamps */
+  --min-game-note: 0.7rem; /* 11.2px — fretboard note labels (constrained) */
+  --min-stat: 1.1rem;      /* 17.6px — score numbers, stat values */
+
   /* Bard-specific aliases (pointing to --cf-* tokens) */
   --bard-void: var(--cf-void);
   --bard-surface: var(--cf-surface);
@@ -69,10 +77,10 @@
   background: rgba(201, 169, 110, 0.12);
   border: 1px solid rgba(201, 169, 110, 0.35);
   color: var(--cf-gold);
-  padding: 0.65rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: var(--min-button);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
@@ -89,7 +97,7 @@
 }
 .bard-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: var(--min-label);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--cf-muted);
@@ -103,7 +111,7 @@
   padding: 0.35rem 0.9rem;
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--min-meta);
   letter-spacing: 0.1em;
   color: var(--cf-muted);
 }
@@ -278,7 +286,7 @@ h4 { font-size: 2rem; }
 /* Stage number badge */
 .stage-badge {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--min-label);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--cf-gold);
@@ -382,7 +390,7 @@ h4 { font-size: 2rem; }
 
 .tao-chapter-label {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--min-label);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--cf-gold-dim);
@@ -422,7 +430,7 @@ h4 { font-size: 2rem; }
 
 .tao-source {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--min-meta);
   letter-spacing: 0.1em;
   color: var(--cf-muted);
   margin-top: 2rem;
@@ -494,7 +502,7 @@ h4 { font-size: 2rem; }
 
 .set-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: var(--min-label);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--cf-gold-dim);
@@ -524,7 +532,7 @@ h4 { font-size: 2rem; }
 
 .scenario-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: var(--min-label);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--cf-gold-dim);
@@ -589,7 +597,7 @@ h4 { font-size: 2rem; }
 
 .meditation-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: var(--min-label);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--cf-meditation-dim);
@@ -614,7 +622,7 @@ h4 { font-size: 2rem; }
 
 .meditation-button {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: var(--min-button);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--cf-meditation);

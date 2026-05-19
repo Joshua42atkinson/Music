@@ -154,7 +154,7 @@ const FretboardSheet = ({
         }
         .fbs-preset-tag {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.6rem; letter-spacing: 0.12em;
+          font-size: 0.8rem; letter-spacing: 0.12em;
           text-transform: uppercase;
           padding: 4px 10px; border-radius: 4px;
           background: rgba(201,169,110,0.1);
@@ -186,12 +186,12 @@ const FretboardSheet = ({
         }
         .fbs-fret-label {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.55rem; letter-spacing: 0.15em;
+          font-size: 0.85rem; letter-spacing: 0.15em;
           text-transform: uppercase; color: #5a6a80;
         }
         .fbs-fret-range {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.6rem; color: #c9a96e;
+          font-size: 0.8rem; color: #c9a96e;
           padding: 3px 8px;
           background: rgba(201,169,110,0.08);
           border-radius: 3px;

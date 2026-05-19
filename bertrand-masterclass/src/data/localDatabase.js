@@ -95,6 +95,19 @@ export function getSlidePosition(fretId) {
   }
 }
 
+/**
+ * Get chapter progress state for display in the NeckMenu.
+ * @param {number} fretId — chapter ID (1-12)
+ * @param {number} totalSlides — total slides in this chapter
+ * @returns {'not-started'|'in-progress'|'completed'}
+ */
+export function getChapterProgress(fretId, totalSlides) {
+  const pos = getSlidePosition(fretId);
+  if (pos === 0) return 'not-started';
+  if (pos >= totalSlides - 1) return 'completed';
+  return 'in-progress';
+}
+
 // ─────────────────────────────────────────────────────────────
 // SERVER DISCOVERY (DaaS tunnel URL)
 // ─────────────────────────────────────────────────────────────

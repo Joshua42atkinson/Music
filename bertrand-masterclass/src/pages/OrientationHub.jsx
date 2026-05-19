@@ -5,6 +5,8 @@ import NeckMenu from '../components/NeckMenu';
 import DigitalBinder from '../components/DigitalBinder';
 import StudioPage from '../pages/StudioPage';
 import { useNavigate } from 'react-router-dom';
+import { generateSlides } from '../data/slideGenerator';
+import { getChapterProgress } from '../data/localDatabase';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -29,6 +31,12 @@ const CHAPTER_ICONS = {
   12: { symbol: '∞', glyph: '𝄫' },    // Infinity
 };
 
+const PROGRESS_BADGES = {
+  'not-started': null,
+  'in-progress': { label: '◐', color: '#c9a96e', title: 'In progress' },
+  'completed':   { label: '●', color: '#2ed573', title: 'Completed' },
+};
+
 const DOT_FRETS = [3, 5, 7, 9];
 const DOUBLE_DOT_FRETS = [12];
 
@@ -46,10 +54,19 @@ const OrientationHub = () => {
     );
   }
 
-  const mappedFrets = frets.map(ch => ({
-    ...ch,
-    symbol: CHAPTER_ICONS[ch.id]?.symbol || ch.icon
-  }));
+  const mappedFrets = frets.map(ch => {
+    const totalSlides = generateSlides(ch).length;
+    const progress = getChapterProgress(ch.id, totalSlides);
+    const badge = PROGRESS_BADGES[progress];
+    return {
+      ...ch,
+      symbol: CHAPTER_ICONS[ch.id]?.symbol || ch.icon,
+      // Append progress indicator to subtitle
+      subtitle: badge
+        ? `${ch.subtitle}  ${badge.label}`
+        : ch.subtitle,
+    };
+  });
 
   return (
     <NeckMenu
@@ -57,7 +74,7 @@ const OrientationHub = () => {
       activeId={null} // We use SlideViewer instead of inline content
       onItemClick={(id) => setActiveFret(id)}
       headerTitle="Voix Vive"
-      headerSubtitle='"You are an instrument playing an instrument."'
+      headerSubtitle="Your 12-chapter journey through the guitar"
       showBackButton={true}
     />
   );

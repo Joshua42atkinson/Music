@@ -192,13 +192,13 @@ const MicrotonalTracker = () => {
     <div style={{ color: '#e8edf2', fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 11, color: '#7b6aaa', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>
+        <p style={{ fontSize: '0.8rem', color: '#7b6aaa', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>
           ©FHEAL · Feel Pitch Variance
         </p>
         <h2 style={{ fontSize: '1.6rem', fontFamily: 'Cormorant Garamond, serif', color: '#e8edf2', marginBottom: 4 }}>
           Microtonal Tracker
         </h2>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
           Sing or play a note. The tracker shows your cents deviation — perfect for vibrato, bends, and intonation work.
         </p>
       </div>
@@ -207,7 +207,7 @@ const MicrotonalTracker = () => {
         <div style={{
           background: 'rgba(231,76,60,0.1)', border: '1px solid rgba(231,76,60,0.3)',
           borderRadius: 8, padding: '12px 16px', marginBottom: 16,
-          fontSize: 13, color: '#e74c3c',
+          fontSize: '0.85rem', color: '#e74c3c',
         }}>
           {error}
         </div>
@@ -218,7 +218,7 @@ const MicrotonalTracker = () => {
         <button
           onClick={start}
           style={{
-            width: '100%', padding: '14px', borderRadius: 12, fontSize: 13,
+            width: '100%', padding: '14px', borderRadius: 12, fontSize: '0.85rem',
             fontFamily: 'JetBrains Mono, monospace', cursor: 'pointer', letterSpacing: '0.1em',
             textTransform: 'uppercase', border: '1px solid rgba(123,106,170,0.4)',
             background: 'rgba(123,106,170,0.1)', color: '#7b6aaa', marginBottom: 20,
@@ -231,7 +231,7 @@ const MicrotonalTracker = () => {
         <button
           onClick={stop}
           style={{
-            width: '100%', padding: '14px', borderRadius: 12, fontSize: 13,
+            width: '100%', padding: '14px', borderRadius: 12, fontSize: '0.85rem',
             fontFamily: 'JetBrains Mono, monospace', cursor: 'pointer', letterSpacing: '0.1em',
             textTransform: 'uppercase', border: '1px solid rgba(231,76,60,0.4)',
             background: 'rgba(231,76,60,0.1)', color: '#e74c3c', marginBottom: 20,
@@ -257,7 +257,7 @@ const MicrotonalTracker = () => {
             {detected ? detected.name : '—'}
           </span>
           {detected && (
-            <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', marginLeft: 4 }}>
+            <span style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.3)', marginLeft: 4 }}>
               {detected.octave}
             </span>
           )}
@@ -270,7 +270,7 @@ const MicrotonalTracker = () => {
 
         {/* Tuning status */}
         <div style={{
-          display: 'inline-block', padding: '4px 12px', borderRadius: 20, fontSize: 11,
+          display: 'inline-block', padding: '4px 12px', borderRadius: 20, fontSize: '0.8rem',
           fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em',
           background: `${tuningColor}15`, border: `1px solid ${tuningColor}40`, color: tuningColor,
         }}>
@@ -278,7 +278,7 @@ const MicrotonalTracker = () => {
         </div>
 
         {detected && (
-          <div style={{ marginTop: 8, fontSize: 10, color: 'rgba(255,255,255,0.25)', fontFamily: 'JetBrains Mono, monospace' }}>
+          <div style={{ marginTop: 8, fontSize: '0.75rem', color: 'rgba(255,255,255,0.25)', fontFamily: 'JetBrains Mono, monospace' }}>
             {detected.freq.toFixed(2)} Hz
           </div>
         )}
@@ -290,14 +290,14 @@ const MicrotonalTracker = () => {
           background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: 12, padding: '12px 16px',
         }}>
-          <p style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>
+          <p style={{ fontSize: '0.75rem', fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>
             Pitch History (vibrato trace)
           </p>
           <HistoryTrace history={history} />
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', fontFamily: 'JetBrains Mono, monospace' }}>−50¢</span>
-            <span style={{ fontSize: 9, color: 'rgba(122,170,136,0.6)', fontFamily: 'JetBrains Mono, monospace' }}>0¢ (in tune)</span>
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', fontFamily: 'JetBrains Mono, monospace' }}>+50¢</span>
+            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)', fontFamily: 'JetBrains Mono, monospace' }}>−50¢</span>
+            <span style={{ fontSize: '0.7rem', color: 'rgba(122,170,136,0.6)', fontFamily: 'JetBrains Mono, monospace' }}>0¢ (in tune)</span>
+            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)', fontFamily: 'JetBrains Mono, monospace' }}>+50¢</span>
           </div>
         </div>
       )}
@@ -313,9 +313,9 @@ const MicrotonalTracker = () => {
             padding: '8px 10px', borderRadius: 8, textAlign: 'center',
             background: `${r.color}10`, border: `1px solid ${r.color}30`,
           }}>
-            <div style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: r.color, fontWeight: 700 }}>{r.range}</div>
-            <div style={{ fontSize: 9, color: r.color, marginTop: 2 }}>{r.label}</div>
-            <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>{r.desc}</div>
+            <div style={{ fontSize: '0.75rem', fontFamily: 'JetBrains Mono, monospace', color: r.color, fontWeight: 700 }}>{r.range}</div>
+            <div style={{ fontSize: '0.7rem', color: r.color, marginTop: 2 }}>{r.label}</div>
+            <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>{r.desc}</div>
           </div>
         ))}
       </div>

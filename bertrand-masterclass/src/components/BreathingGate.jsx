@@ -97,7 +97,7 @@ const BreathingGate = ({ fretTitle, onComplete, isCleared = false }) => {
           width: 120px; height: 120px; border-radius: 50%;
           background: radial-gradient(circle, rgba(122, 170, 136, 0.4) 0%, rgba(122, 170, 136, 0.05) 100%);
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+          font-size: 0.9rem; letter-spacing: 0.15em; text-transform: uppercase;
           color: #7aaa88; font-weight: 600;
         }
         .breath-glow {
@@ -138,12 +138,12 @@ const BreathingGate = ({ fretTitle, onComplete, isCleared = false }) => {
         .gate-btn:hover { background: rgba(122, 170, 136, 0.25); transform: translateY(-2px); }
         .gate-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
         .gate-timer {
-          font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+          font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
           color: #5a6a80; letter-spacing: 0.1em; margin-top: 1rem;
         }
         .gate-skip {
           background: none; border: none; color: #5a6a80;
-          font-size: 0.75rem; cursor: pointer; margin-top: 1.5rem;
+          font-size: 0.9rem; cursor: pointer; margin-top: 1.5rem;
           text-decoration: underline; font-family: 'Inter', sans-serif;
         }
         .gate-skip:hover { color: #8090a8; }
@@ -154,7 +154,7 @@ const BreathingGate = ({ fretTitle, onComplete, isCleared = false }) => {
         {phase === 'intro' && (
           <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ textAlign: 'center', maxWidth: 560 }}>
-            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.2em', color: '#8b7d5a', textTransform: 'uppercase', marginBottom: '2rem' }}>
+            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', letterSpacing: '0.2em', color: '#8b7d5a', textTransform: 'uppercase', marginBottom: '2rem' }}>
               SOMATIC PREREQUISITE
             </p>
             <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.5rem', color: '#e8edf2', marginBottom: '1rem', fontWeight: 400 }}>
@@ -176,7 +176,7 @@ const BreathingGate = ({ fretTitle, onComplete, isCleared = false }) => {
         {phase === 'breathing' && (
           <motion.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ textAlign: 'center' }}>
-            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.2em', color: '#8b7d5a', textTransform: 'uppercase', marginBottom: '1rem' }}>
+            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', letterSpacing: '0.2em', color: '#8b7d5a', textTransform: 'uppercase', marginBottom: '1rem' }}>
               BREATH OVERRIDE · CYCLE {cycles + 1}
             </p>
 
@@ -209,7 +209,7 @@ const BreathingGate = ({ fretTitle, onComplete, isCleared = false }) => {
         {phase === 'bodyscan' && (
           <motion.div key="bodyscan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.2em', color: '#8b7d5a', textTransform: 'uppercase', marginBottom: '1rem' }}>
+            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', letterSpacing: '0.2em', color: '#8b7d5a', textTransform: 'uppercase', marginBottom: '1rem' }}>
               BODY SCAN · PRE-FLIGHT CHECK
             </p>
             <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.8rem', color: '#e8edf2', marginBottom: '2rem', fontWeight: 400 }}>

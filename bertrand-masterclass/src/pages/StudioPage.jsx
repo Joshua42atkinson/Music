@@ -833,10 +833,10 @@ export default function StudioPage() {
           <h2 className="studio-section-title" style={{ marginBottom: 12 }}>
             Éducation Francophone
           </h2>
-          <p style={{ color: '#8a9aaa', fontSize: '0.9rem', lineHeight: 1.7, fontFamily: "'EB Garamond', serif", fontStyle: 'italic', marginBottom: 16 }}>
+          <p style={{ color: '#8a9aaa', fontSize: '1rem', lineHeight: 1.7, fontFamily: "'EB Garamond', serif", fontStyle: 'italic', marginBottom: 16 }}>
             Bertrand enseigne en français ! Cours de guitare, coaching vocal, théorie musicale, et l'Atelier Chanson — tout est disponible dans votre langue maternelle.
           </p>
-          <p style={{ color: '#6a7a8a', fontSize: '0.8rem' }}>
+          <p style={{ color: '#6a7a8a', fontSize: '1rem' }}>
             Guitar, voice, theory, and the signature Atelier Chanson — all available in French.
           </p>
         </div>

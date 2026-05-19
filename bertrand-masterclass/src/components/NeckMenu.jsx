@@ -147,7 +147,7 @@ const NeckMenu = ({
         /* ═══════ ACT LABEL ═══════ */
         .neck-act {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.5rem;
+          font-size: 0.8rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
           color: #8a7a5a;
@@ -251,7 +251,7 @@ const NeckMenu = ({
         }
         .neck-fret-interval {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.5rem;
+          font-size: 0.8rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           margin-bottom: 3px;
@@ -266,7 +266,7 @@ const NeckMenu = ({
           text-shadow: 0 1px 4px rgba(0,0,0,0.3);
         }
         .neck-fret-sub {
-          font-size: 0.7rem;
+          font-size: 0.9rem;
           color: #8a7a60;
           white-space: nowrap;
           overflow: hidden;
@@ -339,7 +339,7 @@ const NeckMenu = ({
           border-radius: 8px;
           padding: 8px 12px;
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.65rem;
+          font-size: 0.85rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
           transition: all 0.2s;

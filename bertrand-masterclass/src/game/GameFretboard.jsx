@@ -17,9 +17,9 @@ import { STRING_TUNING, NOTE_NAMES } from '../data/vertiscalePatterns';
 //   HOLD_RESULT → diff overlay for sustain mode
 // ═══════════════════════════════════════════════════════════
 
-const CELL_W = 48;
-const CELL_H = 42;
-const NUT_W  = 32;
+const CELL_W = 56;   // wider for touch targets
+const CELL_H = 50;   // taller for readability
+const NUT_W  = 38;   // nut column width
 const INLAY_FRETS = [3, 5, 7];
 const DOUBLE_INLAY = [12];
 
@@ -100,12 +100,12 @@ function GameFretboard({
       pattern:      { background: isRoot ? 'rgba(201,169,110,0.7)' : 'rgba(201,169,110,0.25)', border: `1.5px solid rgba(201,169,110,${isRoot ? '1' : '0.6'})`, color: '#fff', boxShadow: `0 0 ${isRoot ? 18 : 10}px rgba(201,169,110,${isRoot ? 0.7 : 0.4})` },
       hit:          { background: 'rgba(46,213,115,0.35)',  border: '1.5px solid #2ed573', color: '#2ed573', boxShadow: '0 0 14px rgba(46,213,115,0.5)' },
       missed:       { background: 'rgba(255,171,0,0.2)',    border: '1.5px solid #ffab00', color: '#ffab00' },
-      phantom:      { background: 'rgba(255,71,87,0.2)',    border: '1.5px solid #ff4757', color: '#ff4757' },
+      phantom:      { background: 'rgba(255,71,87,0.2)',    border: '1.5px solid #ff4757', color: '#e74c3c' },
       // Sustain / Hold states
       'hold-idle':    { background: 'rgba(255,255,255,0.03)', border: '1.5px solid rgba(255,255,255,0.05)', color: 'transparent' },
       'hold-pattern': { background: isRoot ? 'rgba(201,169,110,0.5)' : 'rgba(201,169,110,0.15)', border: `1.5px solid rgba(201,169,110,${isRoot ? '0.8' : '0.4'})`, color: 'rgba(255,255,255,0.7)', boxShadow: `0 0 ${isRoot ? 14 : 8}px rgba(201,169,110,${isRoot ? 0.5 : 0.25})` },
       'hold-hit':     { background: 'rgba(46,213,115,0.3)',  border: '1.5px solid rgba(46,213,115,0.7)', color: '#2ed573', boxShadow: '0 0 16px rgba(46,213,115,0.4)' },
-      'hold-phantom': { background: 'rgba(255,71,87,0.15)', border: '1.5px solid rgba(255,71,87,0.4)', color: '#ff4757' },
+      'hold-phantom': { background: 'rgba(255,71,87,0.15)', border: '1.5px solid rgba(255,71,87,0.4)', color: '#e74c3c' },
     };
     return styles[state] || styles.idle;
   };
@@ -159,7 +159,7 @@ function GameFretboard({
         return (
           <div key={sIdx} style={{ display: 'flex', alignItems: 'center', height: CELL_H, position: 'relative', borderBottom: '1px solid rgba(255,255,255,0.025)' }}>
             {/* String label */}
-            <div style={{ width: NUT_W, textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#8090a8', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0, borderRight: '3px solid rgba(201,169,110,0.5)' }}>
+            <div style={{ width: NUT_W, textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#8090a8', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0, borderRight: '3px solid rgba(201,169,110,0.5)' }}>
               {str.name}
             </div>
 
@@ -216,9 +216,9 @@ function GameFretboard({
                     animate={breathAnim}
                     transition={breathTrans}
                     style={{
-                      width: 30, height: 30, borderRadius: '50%',
+                      width: 36, height: 36, borderRadius: '50%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '0.55rem', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: '0.7rem', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
                       zIndex: 1, position: 'relative', transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
                       ...ds,
                     }}
@@ -239,7 +239,7 @@ function GameFretboard({
           const hasDouble = DOUBLE_INLAY.includes(f);
           return (
             <div key={f} style={{ width: CELL_W, flexShrink: 0, textAlign: 'center', position: 'relative' }}>
-              <span style={{ fontSize: '0.5rem', color: '#3a4a5a', fontFamily: 'JetBrains Mono, monospace' }}>
+              <span style={{ fontSize: '0.7rem', color: '#5a6a80', fontFamily: 'JetBrains Mono, monospace' }}>
                 {f === 0 ? 'Open' : f}
               </span>
               {hasInlay && (
@@ -260,6 +260,21 @@ function GameFretboard({
           );
         })}
       </div>
+
+      {/* Color Legend — helps novices understand dot colors */}
+      {(flashState === FLASH_STATES.TAP || flashState === FLASH_STATES.RESULT || flashState === FLASH_STATES.HOLD_RESULT) && (
+        <div style={{
+          display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap',
+          padding: '8px 12px', marginTop: 6,
+          background: 'rgba(255,255,255,0.02)', borderRadius: 6,
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem', color: '#5a6a80',
+        }}>
+          <span><span style={{ color: '#c9a96e' }}>●</span> Note</span>
+          <span><span style={{ color: '#2ed573' }}>●</span> Correct</span>
+          <span><span style={{ color: '#e74c3c' }}>●</span> Wrong</span>
+          <span><span style={{ color: '#ffa502' }}>●</span> Missed</span>
+        </div>
+      )}
     </div>
   );
 }

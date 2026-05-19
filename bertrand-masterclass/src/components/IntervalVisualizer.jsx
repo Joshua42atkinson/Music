@@ -111,13 +111,13 @@ const IntervalVisualizer = () => {
     <div style={{ color: '#e8edf2', fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 11, color: '#5a90a0', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>
+        <p style={{ fontSize: '0.8rem', color: '#5a90a0', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>
           ©SHEARL · See Intervals
         </p>
         <h2 style={{ fontSize: '1.6rem', fontFamily: 'Cormorant Garamond, serif', color: '#e8edf2', marginBottom: 4 }}>
           Interval Visualizer
         </h2>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
           Tap any two notes on the fretboard — see and hear the interval between them.
         </p>
       </div>
@@ -131,10 +131,10 @@ const IntervalVisualizer = () => {
         transition: 'all 0.3s',
       }}>
         {tappedNotes.length === 0 && (
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>① Tap your first note…</span>
+          <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.35)' }}>① Tap your first note…</span>
         )}
         {tappedNotes.length === 1 && (
-          <span style={{ fontSize: 13, color: '#c9a96e' }}>
+          <span style={{ fontSize: '0.85rem', color: '#c9a96e' }}>
             First: <strong>{tappedNotes[0].noteName}</strong> (Fret {tappedNotes[0].fret}) — now tap a second note
           </span>
         )}
@@ -144,21 +144,21 @@ const IntervalVisualizer = () => {
               <span style={{ fontSize: 22, fontFamily: 'Cormorant Garamond, serif', color: intervalColor, fontWeight: 700 }}>
                 {playedInterval.label}
               </span>
-              <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: intervalColor, opacity: 0.7 }}>
+              <span style={{ fontSize: '0.8rem', fontFamily: 'JetBrains Mono, monospace', color: intervalColor, opacity: 0.7 }}>
                 {playedInterval.short} · {playedInterval.semitones} semitone{playedInterval.semitones !== 1 ? 's' : ''}
                 {playedInterval.octaveDiff > 0 ? ` + ${playedInterval.octaveDiff} oct` : ''}
               </span>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
               <span style={{
-                fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em',
+                fontSize: '0.7rem', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em',
                 textTransform: 'uppercase', padding: '3px 8px', borderRadius: 4,
                 background: `${intervalColor}20`, border: `1px solid ${intervalColor}50`, color: intervalColor,
               }}>
                 {tappedNotes[0].noteName} → {tappedNotes[1].noteName}
               </span>
               <span style={{
-                fontSize: 9, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em',
+                fontSize: '0.7rem', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.12em',
                 textTransform: 'uppercase', padding: '3px 8px', borderRadius: 4,
                 background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
                 color: intervalColor, opacity: 0.7,
@@ -172,7 +172,7 @@ const IntervalVisualizer = () => {
           <button
             onClick={reset}
             style={{
-              padding: '5px 10px', borderRadius: 6, fontSize: 10,
+              padding: '5px 10px', borderRadius: 6, fontSize: '0.75rem',
               fontFamily: 'JetBrains Mono, monospace', cursor: 'pointer',
               border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
               color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em', flexShrink: 0, marginLeft: 8,
@@ -195,7 +195,7 @@ const IntervalVisualizer = () => {
             const brightness = Math.max(100, 200 - sIdx * 20);
             return (
               <div key={sIdx} style={{ display: 'flex', alignItems: 'center', height: 36, position: 'relative' }}>
-                <div style={{ width: 22, textAlign: 'center', fontSize: 9, color: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
+                <div style={{ width: 22, textAlign: 'center', fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
                   {row.string.name}
                 </div>
                 {/* String line */}
@@ -218,7 +218,7 @@ const IntervalVisualizer = () => {
                         height: note.isFirst || note.isSecond ? 26 : 22,
                         borderRadius: '50%', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 8, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: '0.55rem', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
                         transition: 'all 0.15s',
                         background: note.isFirst
                           ? '#c9a96e'
@@ -252,7 +252,7 @@ const IntervalVisualizer = () => {
         <div style={{ display: 'flex', paddingLeft: 22, marginTop: 4 }}>
           {Array.from({ length: TOTAL_FRETS + 1 }, (_, f) => (
             <div key={f} style={{
-              width: f === 0 ? 18 : 36, textAlign: 'center', fontSize: 9,
+              width: f === 0 ? 18 : 36, textAlign: 'center', fontSize: '0.7rem',
               color: 'rgba(255,255,255,0.2)', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0,
             }}>
               {f === 0 ? 'O' : f}
@@ -263,7 +263,7 @@ const IntervalVisualizer = () => {
 
       {/* Interval reference table */}
       <div style={{ marginTop: 20 }}>
-        <p style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>
+        <p style={{ fontSize: '0.75rem', fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 10 }}>
           Interval Reference
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
@@ -293,10 +293,10 @@ const IntervalVisualizer = () => {
               }}>
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: col, flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: isActive ? col : 'rgba(255,255,255,0.5)', fontWeight: isActive ? 700 : 400 }}>
+                  <div style={{ fontSize: '0.7rem', fontFamily: 'JetBrains Mono, monospace', color: isActive ? col : 'rgba(255,255,255,0.5)', fontWeight: isActive ? 700 : 400 }}>
                     {row.short} · {row.st}st
                   </div>
-                  <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.25)' }}>{row.label}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)' }}>{row.label}</div>
                 </div>
               </div>
             );

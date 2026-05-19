@@ -331,7 +331,7 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
           border: none;
           cursor: pointer;
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.75rem;
+          font-size: 0.9rem;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.08em;
@@ -372,7 +372,7 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
           border: none;
           background: transparent;
           color: #6a7a8a;
-          font-size: 0.75rem;
+          font-size: 0.9rem;
           font-family: 'JetBrains Mono', monospace;
           cursor: pointer;
           display: flex;
@@ -491,7 +491,7 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
             ) : (
               <div className="pr-viewfinder-audio">
                 <Mic size={48} style={{ color: 'rgba(201,169,110,0.3)' }} />
-                <span style={{ color: '#5a6a7a', fontSize: '0.75rem' }}>Audio Mode</span>
+                <span style={{ color: '#5a6a7a', fontSize: '0.9rem' }}>Audio Mode</span>
               </div>
             )}
 
@@ -507,7 +507,7 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
               <div className="pr-btn-record-inner" />
             </button>
 
-            <span style={{ color: '#5a6a7a', fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+            <span style={{ color: '#5a6a7a', fontSize: '0.9rem', fontFamily: "'JetBrains Mono', monospace" }}>
               TAP TO RECORD
             </span>
           </>
@@ -523,7 +523,7 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
             ) : (
               <div className="pr-viewfinder-audio" style={{ borderColor: 'rgba(232,85,85,0.4)' }}>
                 <Mic size={48} style={{ color: '#e85555' }} />
-                <span style={{ color: '#e85555', fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                <span style={{ color: '#e85555', fontSize: '0.9rem', fontFamily: "'JetBrains Mono', monospace" }}>
                   ● RECORDING
                 </span>
               </div>
@@ -539,7 +539,7 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
               <div className="pr-btn-record-inner" />
             </button>
 
-            <span style={{ color: '#e85555', fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+            <span style={{ color: '#e85555', fontSize: '0.9rem', fontFamily: "'JetBrains Mono', monospace" }}>
               TAP TO STOP
             </span>
           </>

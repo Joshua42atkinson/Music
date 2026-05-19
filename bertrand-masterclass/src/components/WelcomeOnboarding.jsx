@@ -13,25 +13,25 @@ const slides = [
   {
     id: 0,
     icon: '🎸',
-    title: 'Bienvenue to Voix Vive',
-    subtitle: 'My Living Guitar Textbook',
-    body: 'You are The Player. The wood and wire is The Guitar. The invisible truth is The Song. Here, we Tune The Player to become a clear channel for The Song.',
+    title: 'Welcome to Your Practice Room',
+    subtitle: 'A safe, private space to learn guitar',
+    body: 'This app is your personal practice space. There are no tests you can fail, no timers pushing you, and no one watching you make mistakes. Explore at your own pace — there is no wrong way to start.',
     accent: '#c9a96e',
   },
   {
     id: 1,
     icon: '🗺️',
-    title: 'The Map and The Grid',
-    subtitle: 'Each fret has two sides: Yin (philosophy) and Yang (practice).',
-    body: '☽ Nigredo — Deconstructing bad habits. Slow down. Dissolve the Distortion.\n\n☀ Albedo — Illuminating The Grid. Pick up The Guitar and find the geometry.',
+    title: 'Three Rooms to Explore',
+    subtitle: 'Each room teaches a different part of music.',
+    body: '🎵 The Song — Read and learn the story behind the music.\n\n🎸 The Guitar — Play games that train your memory of the fretboard.\n\n🧘 The Player — Practice tools for breathing, pitch, and rhythm.',
     accent: '#7aaa88',
   },
   {
     id: 2,
     icon: '🫁',
-    title: 'Clear the Distortion',
-    subtitle: 'Start with Fret 1: The Root Note',
-    body: 'Every session begins with a somatic scan to clear physical and mental Distortion. Tune yourself before you tune the wood. There are no wrong notes, only unaligned intentions.',
+    title: 'Start Simple',
+    subtitle: 'Pick any room. Try anything.',
+    body: 'If you\'re brand new, go to The Guitar and play one round of FLASH — it takes about 5 minutes. Gold dots will appear on a guitar neck. Memorize them, then tap where they were. That\'s it!',
     accent: '#7b6aaa',
   },
 ];
@@ -122,7 +122,7 @@ export default function WelcomeOnboarding({ onComplete }) {
         }
         .welcome-body {
           font-family: 'Inter', sans-serif;
-          font-size: 0.95rem;
+          font-size: 1rem;
           line-height: 1.8;
           color: #b0b8c8;
           text-align: left;
@@ -156,7 +156,7 @@ export default function WelcomeOnboarding({ onComplete }) {
           padding: 14px 28px;
           border-radius: 12px;
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8rem;
+          font-size: 0.9rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
           cursor: pointer;

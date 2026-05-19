@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import frets from '../data/chapterData';
 import { generateSlides } from '../data/slideGenerator';
@@ -35,7 +35,21 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
   });
   const [direction, setDirection] = useState(0);
   const [fretboardOpen, setFretboardOpen] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
   const slide = slides[currentIdx];
+
+  // Show swipe hint only once, ever
+  useEffect(() => {
+    const seen = localStorage.getItem('voix_vive_swipe_hint_seen');
+    if (!seen) {
+      setShowSwipeHint(true);
+      const timer = setTimeout(() => {
+        setShowSwipeHint(false);
+        localStorage.setItem('voix_vive_swipe_hint_seen', '1');
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const goTo = useCallback((idx, dir) => {
     if (idx < 0 || idx >= slides.length) return;
@@ -51,6 +65,11 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
   const handleDragEnd = (e, info) => {
     // Don't process slide swipes if fretboard is open
     if (fretboardOpen) return;
+    // Dismiss swipe hint on first swipe
+    if (showSwipeHint) {
+      setShowSwipeHint(false);
+      localStorage.setItem('voix_vive_swipe_hint_seen', '1');
+    }
     if (info.offset.x < -SWIPE_THRESHOLD || info.velocity.x < -SWIPE_VELOCITY) handleNext();
     else if (info.offset.x > SWIPE_THRESHOLD || info.velocity.x > SWIPE_VELOCITY) handlePrev();
   };
@@ -130,14 +149,14 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
         .sv-back:active { transform: scale(0.95); }
         .sv-chapter-label {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.6rem; letter-spacing: 0.15em;
+          font-size: 0.85rem; letter-spacing: 0.15em;
           text-transform: uppercase; color: #5a6a80;
           max-width: 40%; text-align: center;
           overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .sv-page-num {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.65rem; color: #5a6a80;
+          font-size: 0.85rem; color: #5a6a80;
           padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 6px;
         }
         .sv-progress { height: 3px; background: rgba(255,255,255,0.03); flex-shrink: 0; }
@@ -179,7 +198,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
         }
         .sv-label {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.6rem; letter-spacing: 0.22em;
+          font-size: 0.85rem; letter-spacing: 0.22em;
           text-transform: uppercase; margin-bottom: 16px;
         }
         .sv-title {
@@ -194,7 +213,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
         }
         .sv-meta {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.7rem; color: #5a6a80;
+          font-size: 0.85rem; color: #5a6a80;
           letter-spacing: 0.1em; margin-bottom: 20px;
         }
         .sv-body {
@@ -213,7 +232,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
         }
         .sv-author {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.7rem; color: #5a6a80;
+          font-size: 0.85rem; color: #5a6a80;
           text-align: center; margin-top: 20px;
           letter-spacing: 0.1em;
         }
@@ -238,7 +257,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
         }
         .sv-duration {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.7rem; color: #7b6aaa;
+          font-size: 0.85rem; color: #7b6aaa;
           text-align: center; margin-top: 20px;
           letter-spacing: 0.15em;
         }
@@ -251,7 +270,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
         .sv-step-num {
           width: 28px; height: 28px; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+          font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
           font-family: 'JetBrains Mono', monospace;
           margin-top: 2px;
         }
@@ -277,7 +296,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           border: 1px solid rgba(201,169,110,0.35);
           color: #c9a96e; border-radius: 8px;
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8rem; letter-spacing: 0.12em;
+          font-size: 0.85rem; letter-spacing: 0.12em;
           text-transform: uppercase; cursor: pointer;
           transition: all 0.2s; min-height: 48px;
         }
@@ -293,7 +312,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           border-radius: 12px; cursor: pointer;
           transition: all 0.25s; color: #c9a96e;
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8rem; letter-spacing: 0.08em;
+          font-size: 0.85rem; letter-spacing: 0.08em;
           min-height: 48px;
         }
         .sv-fretboard-fab:hover {
@@ -431,6 +450,38 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
               />
             </div>
           </motion.div>
+        </AnimatePresence>
+
+        {/* Swipe hint — shown only once on first-ever chapter view */}
+        <AnimatePresence>
+          {showSwipeHint && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                position: 'absolute', bottom: 80, left: 0, right: 0,
+                display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 20,
+              }}
+            >
+              <div style={{
+                background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.3)',
+                borderRadius: 20, padding: '10px 24px',
+                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+                color: '#c9a96e', letterSpacing: '0.05em',
+                backdropFilter: 'blur(8px)',
+              }}>
+                <motion.span
+                  animate={{ x: [-4, 4, -4] }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+                  style={{ display: 'inline-block' }}
+                >
+                  ← Swipe to read →
+                </motion.span>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* ── Bottom Navigation ── */}
@@ -649,7 +700,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
             <p className="sv-label" style={{ color: '#c9a96e', margin: 0 }}>{slide.label}</p>
             {slide.ratio && (
               <span style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
+                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                 color: '#c9a96e', background: 'rgba(201,169,110,0.1)',
                 border: '1px solid rgba(201,169,110,0.25)',
                 padding: '3px 8px', borderRadius: 4, letterSpacing: '0.08em',
@@ -677,7 +728,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
           {/* Historical subtext provenance */}
           {slide.subtext && (
             <p style={{
-              fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
+              fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
               color: '#5a6a80', letterSpacing: '0.12em', textTransform: 'uppercase',
               borderLeft: '2px solid rgba(201,169,110,0.3)', paddingLeft: '0.75rem',
             }}>
@@ -699,7 +750,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
               </p>
               {slide.author && (
                 <p style={{
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem',
+                  fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                   color: '#5a6a80', marginTop: '0.5rem', letterSpacing: '0.1em',
                 }}>
                   — {slide.author}
@@ -733,7 +784,7 @@ function ReferencesPanel({ references, accent }) {
           borderRadius: 8, padding: '8px 14px',
           color: '#5a6a80', cursor: 'pointer',
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: '0.65rem', letterSpacing: '0.1em',
+          fontSize: '0.85rem', letterSpacing: '0.1em',
           display: 'flex', alignItems: 'center', gap: 8,
           width: '100%', textAlign: 'left',
           transition: 'all 0.2s',
@@ -765,7 +816,7 @@ function ReferencesPanel({ references, accent }) {
                 {ref.title}
               </p>
               <p style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
+                fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                 color: '#5a6a80', margin: '2px 0 4px', letterSpacing: '0.08em',
               }}>
                 {ref.author} · {ref.date}

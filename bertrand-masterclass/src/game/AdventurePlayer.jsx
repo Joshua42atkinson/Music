@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TROUBADOUR } from '../data/adventures/troubadour';
 import {
@@ -47,6 +47,8 @@ function AdventurePlayer({ onClose }) {
   const [activeChoice, setActiveChoice] = useState(null);
   const [showArt, setShowArt] = useState(true);
   const [artError, setArtError] = useState(false);
+  const [showSkipGate, setShowSkipGate] = useState(false);
+  const skipTimerRef = useRef(null);
 
   // Load adventure on mount
   useEffect(() => {
@@ -84,6 +86,8 @@ function AdventurePlayer({ onClose }) {
   // Gate timeout — auto-advance after 15s even if pitch not found
   useEffect(() => {
     if (phase !== 'gate') return;
+    // Show skip button after 8s
+    skipTimerRef.current = setTimeout(() => setShowSkipGate(true), 8000);
     const t = setTimeout(() => {
       if (gateState !== 'passed') {
         setGateState('failed');
@@ -92,12 +96,13 @@ function AdventurePlayer({ onClose }) {
         setTimeout(() => setPhase('choose'), 2000);
       }
     }, 15000);
-    return () => clearTimeout(t);
+    return () => { clearTimeout(t); clearTimeout(skipTimerRef.current); setShowSkipGate(false); };
   }, [phase, gateState, scene]);
 
   const handleStartGate = useCallback(() => {
     if (!isListening) startListening();
     setGateState('open');
+    setShowSkipGate(false);
     setPhase('gate');
     
     // Play the reference tone so the user knows what to sing
@@ -105,6 +110,14 @@ function AdventurePlayer({ onClose }) {
       playReferenceTone(scene.targetFreq);
     }
   }, [isListening, startListening, scene]);
+
+  const handleSkipGate = useCallback(() => {
+    setGateState('skipped');
+    setShowSkipGate(false);
+    setCoachingCue('No worries — you can always come back to practice this pitch later.');
+    setSession(prev => ({ ...prev, streak: 0 }));
+    setTimeout(() => setPhase('choose'), 1000);
+  }, []);
 
   const handleChoice = useCallback((choice) => {
     if (choice.mode === 'sing') {
@@ -144,6 +157,17 @@ function AdventurePlayer({ onClose }) {
       setGateState('waiting');
       setActiveChoice(null);
       setArtError(false);
+      setShowSkipGate(false);
+
+      // Save progress for resume
+      try {
+        localStorage.setItem('voix_vive_adventure_session', JSON.stringify({
+          adventureId: result.session.adventureId,
+          currentSceneId: result.nextScene?.id,
+          session: result.session,
+          timestamp: Date.now(),
+        }));
+      } catch (e) { /* non-critical */ }
 
       if (result.nextScene?.isEnding) {
         setPhase('ending');
@@ -168,7 +192,7 @@ function AdventurePlayer({ onClose }) {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 300,
       background: '#030306', display: 'flex', flexDirection: 'column',
-      fontFamily: 'Inter, sans-serif', color: '#e0e0ff', overflow: 'hidden',
+      fontFamily: 'Inter, sans-serif', color: '#e8edf2', overflow: 'hidden',
     }}>
       {/* Top Bar */}
       <div style={{
@@ -179,15 +203,15 @@ function AdventurePlayer({ onClose }) {
       }}>
         <button onClick={onClose} style={{
           background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-          color: '#a0aab8', borderRadius: 8, fontSize: '0.8rem', cursor: 'pointer',
+          color: '#8090a8', borderRadius: 8, fontSize: '1rem', cursor: 'pointer',
           padding: '8px 14px', fontFamily: 'JetBrains Mono, monospace',
         }}>← Exit</button>
         <span style={{
-          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
           letterSpacing: '0.15em', textTransform: 'uppercase', color: atmo.accent,
         }}>{ACT_LABELS[scene.act] || 'ADVENTURE'}</span>
         <span style={{
-          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: '#5a6a80',
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80',
         }}>🔥 {session.streak}</span>
       </div>
 
@@ -230,7 +254,7 @@ function AdventurePlayer({ onClose }) {
                   border: `1px solid ${atmo.accent}40`,
                 }}>
                   <span style={{
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                     letterSpacing: '0.12em', color: atmo.accent,
                   }}>{scene.intervalName} · {scene.pitchLabel}</span>
                 </div>
@@ -241,7 +265,7 @@ function AdventurePlayer({ onClose }) {
                 {/* Setting */}
                 <p style={{
                   fontFamily: 'EB Garamond, serif', fontSize: '1.05rem', lineHeight: 1.8,
-                  color: '#c0c8d4', marginTop: -20, position: 'relative', zIndex: 2,
+                  color: '#d0d8e0', marginTop: -20, position: 'relative', zIndex: 2,
                 }}>{scene.setting}</p>
 
                 {/* Mentor Line */}
@@ -250,7 +274,7 @@ function AdventurePlayer({ onClose }) {
                   background: `${atmo.accent}0a`, border: `1px solid ${atmo.accent}20`,
                 }}>
                   <p style={{
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: '0.5rem',
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: '1rem',
                     letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
                     marginBottom: 8,
                   }}>BERNARD DE VENTADORN</p>
@@ -264,7 +288,7 @@ function AdventurePlayer({ onClose }) {
                 {coachingCue && (
                   <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     style={{
-                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem',
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
                       color: '#5a6a80', fontStyle: 'italic', marginTop: 12, textAlign: 'center',
                     }}>— {coachingCue}</motion.p>
                 )}
@@ -278,7 +302,7 @@ function AdventurePlayer({ onClose }) {
                         padding: '12px 24px', borderRadius: 8, marginBottom: 12,
                         background: 'rgba(46,213,115,0.1)', border: '1px solid rgba(46,213,115,0.3)',
                         color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
-                        fontSize: '0.75rem',
+                        fontSize: '0.9rem',
                       }}>🎤 Enable Microphone</button>
                     )}
                     <button onClick={handleStartGate} style={{
@@ -286,7 +310,7 @@ function AdventurePlayer({ onClose }) {
                       padding: '16px 24px', borderRadius: 10,
                       background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
                       color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
-                      fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                      fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
                     }}>🎵 Find the {scene.targetNote}</button>
                   </motion.div>
                 )}
@@ -302,6 +326,20 @@ function AdventurePlayer({ onClose }) {
                       gateState={gateState}
                       tolerance={20}
                     />
+                    {showSkipGate && (
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ textAlign: 'center', marginTop: 16 }}>
+                        <button onClick={handleSkipGate} style={{
+                          padding: '10px 20px', borderRadius: 8,
+                          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#5a6a80', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+                          fontSize: '0.85rem',
+                        }}>Skip this pitch →</button>
+                        <p style={{ fontSize: '0.8rem', color: '#5a6a80', marginTop: 6, fontStyle: 'italic' }}>
+                          No penalty — the story continues
+                        </p>
+                      </motion.div>
+                    )}
                   </motion.div>
                 )}
 
@@ -310,7 +348,7 @@ function AdventurePlayer({ onClose }) {
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                     style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
                     <p style={{
-                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                       letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
                       textAlign: 'center', marginBottom: 4,
                     }}>YOUR RESPONSE</p>
@@ -322,11 +360,11 @@ function AdventurePlayer({ onClose }) {
                         cursor: 'pointer', transition: 'all 0.2s',
                       }}>
                         <p style={{
-                          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem',
+                          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                           letterSpacing: '0.1em', color: choice.mode === 'sing' ? atmo.accent : '#8090a8',
                           margin: '0 0 4px',
                         }}>{choice.label}</p>
-                        <p style={{ fontSize: '0.8rem', color: '#6a7a8a', margin: 0 }}>{choice.description}</p>
+                        <p style={{ fontSize: '1rem', color: '#8090a8', margin: 0 }}>{choice.description}</p>
                       </button>
                     ))}
                   </motion.div>
@@ -350,7 +388,7 @@ function AdventurePlayer({ onClose }) {
                     }}>Sing your response...</p>
                     {isListening && pitch && (
                       <p style={{
-                        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.7rem',
+                        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
                         color: '#2ed573',
                       }}>♪ {noteInfo?.name} ({Math.round(pitch)} Hz)</p>
                     )}
@@ -358,7 +396,7 @@ function AdventurePlayer({ onClose }) {
                       marginTop: 20, padding: '14px 28px', borderRadius: 8,
                       background: 'rgba(46,213,115,0.15)', border: '1px solid rgba(46,213,115,0.4)',
                       color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
-                      fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                      fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
                     }}>✓ Complete Response</button>
                   </motion.div>
                 )}
@@ -368,19 +406,19 @@ function AdventurePlayer({ onClose }) {
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                     style={{ marginTop: 24, textAlign: 'center' }}>
                     <p style={{
-                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                       letterSpacing: '0.2em', color: atmo.accent, textTransform: 'uppercase',
                       marginBottom: 16,
                     }}>{scene.endingType === 'commission' ? '★ THE COMMISSION' : 'THE PATRONAGE'}</p>
                     <p style={{
                       fontFamily: 'EB Garamond, serif', fontSize: '1.1rem', lineHeight: 1.7,
-                      color: '#c0c8d4',
+                      color: '#d0d8e0',
                     }}>{scene.setting}</p>
                     <button onClick={handleFinish} style={{
                       marginTop: 24, padding: '14px 28px', borderRadius: 8,
                       background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
                       color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
-                      fontSize: '0.8rem', letterSpacing: '0.1em',
+                      fontSize: '1rem', letterSpacing: '0.1em',
                     }}>View Journey Summary</button>
                   </motion.div>
                 )}
@@ -411,7 +449,7 @@ function SummaryView({ summary, session, onClose }) {
         gap: 20, padding: '40px 20px',
       }}>
       <p style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
         letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
       }}>ADVENTURE COMPLETE</p>
 
@@ -438,7 +476,7 @@ function SummaryView({ summary, session, onClose }) {
           color: '#c9a96e', lineHeight: 1.7, margin: 0,
         }}>"{summary.impression}"</p>
         <p style={{
-          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem',
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
           color: '#5a6a80', marginTop: 8, letterSpacing: '0.1em',
         }}>— BERNARD DE VENTADORN</p>
       </div>
@@ -447,7 +485,7 @@ function SummaryView({ summary, session, onClose }) {
         padding: '14px 28px', borderRadius: 8, marginTop: 8,
         background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.3)',
         color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
-        fontSize: '0.75rem',
+        fontSize: '0.9rem',
       }}>Return to Menu</button>
     </motion.div>
   );
@@ -460,7 +498,7 @@ function StatBox({ label, value }) {
       background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
     }}>
       <p style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.5rem',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '1rem',
         color: '#5a6a80', letterSpacing: '0.12em', marginBottom: 4,
       }}>{label}</p>
       <p style={{ fontSize: '1.1rem', color: '#e8edf2', fontWeight: 300, margin: 0 }}>{value}</p>

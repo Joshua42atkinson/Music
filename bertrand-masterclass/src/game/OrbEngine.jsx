@@ -208,7 +208,7 @@ function OrbEngine({
               }}
               onClick={() => handleOrbTap(orb)}
             >
-              <span style={{ fontSize: '0.6rem', fontWeight: 900, color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 900, color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>
                 {orb.note?.name ?? '?'}
               </span>
               {/* Gate indicator pulse when gate is open */}
@@ -252,7 +252,7 @@ function OrbEngine({
       </AnimatePresence>
 
       {/* Lane label */}
-      <div style={{ position: 'absolute', bottom: 4, right: 8, fontSize: '0.55rem', fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+      <div style={{ position: 'absolute', bottom: 4, right: 8, fontSize: '0.8rem', fontFamily: 'JetBrains Mono, monospace', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
         {preset.label}
       </div>
     </div>

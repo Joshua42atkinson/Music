@@ -168,7 +168,7 @@ export function generateSlides(fret) {
     title: fret.title,
     subtitle: fret.subtitle,
     body: fret.coreMessage,
-    meta: `${fret.interval} · ${fret.heroStage}`,
+    meta: `${fret.note} · ${fret.interval}`,
     icon: fret.icon,
     image: SLIDE_IMAGES[`${fret.id}-title`] || null
   });
@@ -278,8 +278,8 @@ export function generateSlides(fret) {
     });
   }
 
-  // 8. Fretboard focus slide
-  if (fret.yang.fretboardFocus) {
+  // 8. Fretboard focus slide (skip if no exercises — e.g. Chapter 12's free play)
+  if (fret.yang.fretboardFocus && fret.yang.exercises?.length > 0) {
     const ff = fret.yang.fretboardFocus;
     slides.push({
       ...base,

@@ -13,29 +13,29 @@ const PORTALS = [
   {
     id: 'song',
     name: 'The Song',
-    subtitle: '12-Fret Curriculum',
+    subtitle: 'Read & Learn',
     path: '/song',
     color: '#c9a96e',
     image: '/assets/portal_song.png',
-    description: 'The Monomyth Journey',
+    description: 'Discover the story behind the music',
   },
   {
     id: 'guitar',
     name: 'The Guitar',
-    subtitle: 'Fretboard Explorer',
+    subtitle: 'Play & Practice',
     path: '/guitar',
     color: '#7aaa88',
     image: '/assets/portal_guitar.png',
-    description: 'The Rosetta Stone',
+    description: 'Train your memory with fretboard games',
   },
   {
     id: 'player',
     name: 'The Player',
-    subtitle: 'Practice Tools',
+    subtitle: 'Breathe & Record',
     path: '/player',
     color: '#c07898',
     image: '/assets/portal_player.png',
-    description: 'Body Intelligence',
+    description: 'Take care of yourself as a musician',
   },
 ];
 
@@ -96,7 +96,7 @@ export default function LandingScreen() {
         /* ── TRINITY LABEL ── */
         .trinity-label {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.55rem;
+          font-size: 0.8rem;
           letter-spacing: 0.3em;
           text-transform: uppercase;
           color: rgba(201,169,110,0.45);
@@ -184,7 +184,7 @@ export default function LandingScreen() {
 
         .portal-tag {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.5rem;
+          font-size: 0.8rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
           color: var(--portal-color);
@@ -204,7 +204,7 @@ export default function LandingScreen() {
         }
 
         .portal-desc {
-          font-size: 0.7rem;
+          font-size: 0.9rem;
           color: rgba(255,255,255,0.4);
           margin-top: 2px;
           display: block;
@@ -262,7 +262,7 @@ export default function LandingScreen() {
 
         .thumb-label {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.45rem;
+          font-size: 0.8rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
           color: rgba(201,169,110,0.25);

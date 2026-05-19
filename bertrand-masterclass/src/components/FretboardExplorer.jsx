@@ -171,7 +171,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
         .fb-compact .fb-title { font-size: 1.1rem; }
         .fb-compact .fb-note-cell { width: 44px; height: 44px; }
         .fb-compact .fb-note-cell:first-child { width: 36px; }
-        .fb-compact .fb-note { width: 32px; height: 32px; font-size: 0.55rem; }
+        .fb-compact .fb-note { width: 32px; height: 32px; font-size: 0.85rem; }
         .fb-compact .fb-string-row { height: 44px; }
         .fb-compact .fb-dot-cell { width: 44px; }
         .fb-compact .fb-dot-cell:first-child { width: 36px; }
@@ -187,7 +187,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
         .fb-select, .fb-toggle {
           background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
           color: #b0b8c8; padding: 0.4rem 0.8rem; border-radius: 6px;
-          font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+          font-size: 0.9rem; font-family: 'JetBrains Mono', monospace;
           cursor: pointer; transition: all 0.2s;
         }
         .fb-select:hover, .fb-toggle:hover { border-color: rgba(201,169,110,0.3); }
@@ -238,7 +238,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
           color: #c9a96e;
           padding: 0.4rem 0.8rem;
           border-radius: 6px;
-          font-size: 0.7rem;
+          font-size: 0.85rem;
           font-family: 'JetBrains Mono', monospace;
           cursor: pointer;
           transition: all 0.2s;
@@ -284,7 +284,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
         .fb-note {
           width: 28px; height: 28px; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.6rem; font-weight: 700; cursor: pointer;
+          font-size: 0.8rem; font-weight: 700; cursor: pointer;
           transition: all 0.15s ease; position: relative;
           font-family: 'JetBrains Mono', monospace;
           border: 1.5px solid transparent;
@@ -333,7 +333,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
         }
         .fb-dot.double { width: 6px; height: 6px; box-shadow: -8px 0 0 rgba(201,169,110,0.25); }
         .fb-fret-num {
-          width: 52px; text-align: center; font-size: 0.55rem;
+          width: 52px; text-align: center; font-size: 0.85rem;
           color: #5a6a80; font-family: 'JetBrains Mono', monospace;
           flex-shrink: 0;
         }
@@ -353,7 +353,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
         }
         .fb-legend-item {
           display: flex; align-items: center; gap: 0.4rem;
-          font-size: 0.7rem; color: #8090a8;
+          font-size: 0.85rem; color: #8090a8;
         }
         .fb-legend-dot {
           width: 10px; height: 10px; border-radius: 50%;

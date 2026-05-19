@@ -10,6 +10,7 @@ import { computePhase1Score, computeSustainScore, computePhase2Score, checkStrea
 import { computeVertiscale, NOTE_NAMES, STRING_TUNING, midiToFreq } from '../data/vertiscalePatterns';
 import NeckMenu from '../components/NeckMenu';
 import AdventurePlayer from './AdventurePlayer';
+import Glossary from '../components/Glossary';
 
 // ── Inline progress helpers (localStorage, replaces sessionLogger until tractionStore is built) ──
 const VS_KEY = 'voixvive_vertiscale_progress';
@@ -57,6 +58,8 @@ function VertiscaleEngine({ onClose }) {
   const [engineState, setEngineState] = useState(ENGINE_STATES.MENU);
   const [rootNote, setRootNote]       = useState('E');
   const [gameMode, setGameMode]       = useState('flash'); // 'flash' | 'imagine'
+  const [difficulty, setDifficulty]   = useState('beginner'); // 'beginner' | 'standard' | 'challenge'
+  const [showTutorial, setShowTutorial] = useState(false);
   const [round, setRound]            = useState(0);
   const [roundScores, setRoundScores] = useState([]);
   const [playerTaps, setPlayerTaps]   = useState([]);
@@ -64,6 +67,7 @@ function VertiscaleEngine({ onClose }) {
   const [sessionLog, setSessionLog]   = useState([]);
   const [phaseUnlock, setPhaseUnlock] = useState({ phase1Unlocked: true, phase2Unlocked: true, phase3Unlocked: true });
   const [holdStartTime, setHoldStartTime] = useState(null);
+  const pendingLaunchRef = useRef(null);
 
   // ── Pitch detector ──
   const {
@@ -72,8 +76,8 @@ function VertiscaleEngine({ onClose }) {
   } = usePitchDetector();
 
   // ── Vertiscale pattern (with progressive difficulty) ──
-  const rootIndex = ROOT_NOTES.indexOf(rootNote);
-  const rawPattern = computeVertiscale({ rootIndex, tonalName: 'minor pentatonic', minFret: 0, maxFret: 7 });
+  const rootIndex = rootNote ? ROOT_NOTES.indexOf(rootNote) : 0;
+  const rawPattern = computeVertiscale({ rootIndex: Math.max(0, rootIndex), tonalName: 'minor pentatonic', minFret: 0, maxFret: 7 });
   
   // Calculate current stage (1 to 4) based on round (0 to 7)
   const currentStage = Math.floor(round / 2) + 1;
@@ -85,9 +89,11 @@ function VertiscaleEngine({ onClose }) {
     .filter(hit => hit && hit.stringIdx >= minStringIdx);
 
   // ── Flash timer (Phase 1) ──
+  // Difficulty multiplier: beginner = 0.0, standard = 0.4, challenge = 0.8
+  const difficultyMultiplier = difficulty === 'challenge' ? 0.8 : difficulty === 'standard' ? 0.4 : 0.0;
   const consistencyScore = roundScores.length > 0
-    ? roundScores.slice(-5).reduce((a, b) => a + b, 0) / Math.min(5, roundScores.length)
-    : 0;
+    ? Math.max(difficultyMultiplier, roundScores.slice(-5).reduce((a, b) => a + b, 0) / Math.min(5, roundScores.length))
+    : difficultyMultiplier;
 
   const {
     flashState, tapProgressPct, holdProgressPct, flashDurationMs, holdDurationMs,
@@ -124,8 +130,16 @@ function VertiscaleEngine({ onClose }) {
     });
   }, []);
 
-  // ── Start session ──
   const startPhase = useCallback((phase, mode) => {
+    // Show tutorial on first-ever game launch
+    const tutorialSeen = localStorage.getItem('voix_vive_game_tutorial_seen');
+    if (!tutorialSeen && (phase === ENGINE_STATES.PHASE1 || phase === ENGINE_STATES.PHASE2)) {
+      setShowTutorial(true);
+      localStorage.setItem('voix_vive_game_tutorial_seen', '1');
+      // Store pending launch params and return — tutorial dismiss will call startPhase again
+      pendingLaunchRef.current = { phase, mode };
+      return;
+    }
     if (mode) setGameMode(mode);
     setEngineState(phase);
     setRound(0);
@@ -203,7 +217,7 @@ function VertiscaleEngine({ onClose }) {
       ...(onClose ? { position: 'fixed', inset: 0, zIndex: 200 } : { position: 'relative', minHeight: 'calc(100vh - 64px)' }),
       background: '#030306',
       display: 'flex', flexDirection: 'column',
-      fontFamily: 'Inter, sans-serif', color: '#e0e0ff',
+      fontFamily: 'Inter, sans-serif', color: '#e8edf2',
       overflow: 'hidden',
       paddingLeft: 'env(safe-area-inset-left)',
       paddingRight: 'env(safe-area-inset-right)',
@@ -221,16 +235,16 @@ function VertiscaleEngine({ onClose }) {
             {onClose ? (
               <button onClick={onClose} style={{
                 background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-                color: '#a0aab8', borderRadius: 8, fontSize: '0.8rem',
-                cursor: 'pointer', padding: '8px 14px',
+                color: '#8090a8', borderRadius: 8, fontSize: '0.9rem',
+                cursor: 'pointer', padding: '10px 16px',
                 fontFamily: 'JetBrains Mono, monospace',
                 display: 'flex', alignItems: 'center', gap: 6,
               }}>← Exit</button>
             ) : (
               <button onClick={() => navigate('/')} style={{
                 background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-                color: '#a0aab8', borderRadius: 8, fontSize: '0.8rem',
-                cursor: 'pointer', padding: '8px 14px',
+                color: '#8090a8', borderRadius: 8, fontSize: '0.9rem',
+                cursor: 'pointer', padding: '10px 16px',
                 fontFamily: 'JetBrains Mono, monospace',
                 display: 'flex', alignItems: 'center', gap: 6,
               }}>← Home</button>
@@ -238,7 +252,7 @@ function VertiscaleEngine({ onClose }) {
 
             <span style={{
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '0.65rem', letterSpacing: '0.15em',
+              fontSize: '0.85rem', letterSpacing: '0.15em',
               textTransform: 'uppercase', color: '#c9a96e',
             }}>
               ⚡ VERTISCALE ENGINE
@@ -246,9 +260,11 @@ function VertiscaleEngine({ onClose }) {
 
             <span style={{
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '0.6rem', color: '#5a6a80',
+              fontSize: '0.85rem', color: '#5a6a80',
+              display: 'flex', alignItems: 'center', gap: 8,
             }}>
               {`R${round + 1}/8`}
+              <Glossary />
             </span>
           </div>
 
@@ -291,6 +307,8 @@ function VertiscaleEngine({ onClose }) {
               isListening={isListening}
               onStartMic={startListening}
               onClose={onClose}
+              difficulty={difficulty}
+              setDifficulty={setDifficulty}
             />
           )}
 
@@ -299,20 +317,52 @@ function VertiscaleEngine({ onClose }) {
               {/* Phase header */}
               <div style={{ textAlign: 'center', marginBottom: 16 }}>
                 <p style={{
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
-                  letterSpacing: '0.2em', color: '#c9a96e', textTransform: 'uppercase',
-                }}>{gameMode === 'imagine' ? '🫁 IMAGINE' : '⚡ FLASH'} · STAGE {currentStage}/4 · {rootNote} Vertiscale</p>
-                <p style={{ fontSize: '0.8rem', color: '#5a6a80', marginTop: 4 }}>
+                  fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+                  letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase',
+                }}>{gameMode === 'imagine' ? '🪁 IMAGINE' : '⚡ FLASH'} · STAGE {currentStage}/4 · {rootNote} Vertiscale</p>
+                <p style={{ fontSize: '1rem', color: '#8090a8', marginTop: 8, lineHeight: 1.6 }}>
                   {gameMode === 'imagine'
-                    ? (flashState === FLASH_STATES.REVEAL ? 'Study the pattern...' :
-                       flashState === FLASH_STATES.HOLD ? 'Hold your placement. Breathe.' :
-                       'Verifying your inner fretboard...')
-                    : (currentStage === 1 ? 'Starting with the bass strings...' :
-                       currentStage === 2 ? 'Adding the G string...' :
-                       currentStage === 3 ? 'Adding the B string offset...' :
-                       'Full 6-string pattern!')}
+                    ? (flashState === FLASH_STATES.REVEAL ? 'Study the gold dots below — they show where the notes are on the fretboard.' :
+                       flashState === FLASH_STATES.HOLD ? (() => {
+                         const holdCues = [
+                           'Hold your taps in place and breathe steadily.',
+                           'Trace the shape with your eyes — see the geometry.',
+                           'Close your eyes for a moment — can you still see the pattern?',
+                           'Feel where your fingers would go on a real fretboard.',
+                           'Breathe in through the nose, out through the mouth.',
+                           'Imagine hearing each note, from low string to high.',
+                         ];
+                         const idx = Math.floor((Date.now() / 4000) % holdCues.length);
+                         return holdCues[idx];
+                       })() :
+                       'Checking your placement accuracy...')
+                    : (flashState === FLASH_STATES.REVEAL
+                        ? `Memorize the pattern! You have a few seconds before it disappears.`
+                        : flashState === FLASH_STATES.DARK
+                          ? 'The pattern just vanished — get ready to tap!'
+                          : flashState === FLASH_STATES.TAP
+                            ? 'Tap where the notes were from memory!'
+                            : currentStage === 1 ? `Round ${round+1}: Focus on the bottom 2 strings. A pattern will flash — memorize it!` :
+                              currentStage === 2 ? `Round ${round+1}: Now including 3 strings. The pattern is growing!` :
+                              currentStage === 3 ? `Round ${round+1}: 4 strings now — watch for the B string offset!` :
+                              `Round ${round+1}: Full 6-string pattern — you've got this!`)}
                 </p>
               </div>
+
+              {/* First-round tutorial overlay */}
+              {round === 0 && flashState === FLASH_STATES.REVEAL && (
+                <div style={{
+                  background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)',
+                  borderRadius: 12, padding: '14px 18px', marginBottom: 14, lineHeight: 1.7,
+                }}>
+                  <p style={{ fontSize: '0.85rem', color: '#c9a96e', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>🎯 HOW TO PLAY</p>
+                  <p style={{ fontSize: '1rem', color: '#d0d8e0', marginBottom: 6 }}>
+                    {gameMode === 'imagine'
+                      ? '➀ Study the gold dots on the fretboard below — they show notes in the scale. ➁ Tap the same positions to lock them in. ➂ Hold your placement and breathe steadily until the timer completes.'
+                      : '➀ Gold dots will flash on the fretboard — memorize their positions! ➁ The pattern will disappear. ➂ Tap where the notes were from memory. ➃ Green = correct, Red = wrong, Orange = you missed it.'}
+                  </p>
+                </div>
+              )}
 
               {/* Timer bar — flash mode shows countdown, imagine mode shows hold progress */}
               {flashState === FLASH_STATES.TAP && (
@@ -354,12 +404,12 @@ function VertiscaleEngine({ onClose }) {
                   onClick={handleSubmit}
                   style={{
                     display: 'block', width: '100%', maxWidth: 300,
-                    margin: '16px auto 0', padding: '14px 24px',
+                    margin: '16px auto 0', padding: '16px 24px',
                     background: flashState === FLASH_STATES.HOLD ? 'rgba(46,213,115,0.1)' : 'rgba(46,213,115,0.15)',
                     border: '1px solid rgba(46,213,115,0.4)',
                     color: '#2ed573', borderRadius: 8,
                     fontFamily: 'JetBrains Mono, monospace',
-                    fontSize: '0.8rem', letterSpacing: '0.1em',
+                    fontSize: '0.9rem', letterSpacing: '0.1em',
                     textTransform: 'uppercase', cursor: 'pointer',
                   }}
                 >
@@ -370,10 +420,10 @@ function VertiscaleEngine({ onClose }) {
               {/* Score display — both modes */}
               {(flashState === FLASH_STATES.RESULT || flashState === FLASH_STATES.HOLD_RESULT) && roundScores.length > 0 && (
                 <div style={{ textAlign: 'center', marginTop: 16 }}>
-                  <p style={{ fontSize: '2rem', color: '#c9a96e', fontWeight: 300 }}>
+                  <p style={{ fontSize: '2.2rem', color: '#c9a96e', fontWeight: 300 }}>
                     {Math.round(roundScores[roundScores.length - 1] * 100)}%
                   </p>
-                  <p style={{ fontSize: '0.7rem', color: '#5a6a80' }}>Preparing next round...</p>
+                  <p style={{ fontSize: '0.9rem', color: '#5a6a80' }}>Preparing next round...</p>
                 </div>
               )}
 
@@ -432,7 +482,7 @@ function VertiscaleEngine({ onClose }) {
 // Sub-components
 // ═══════════════════════════════════════════════════════════
 
-function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isListening, onStartMic, onClose }) {
+function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isListening, onStartMic, onClose, difficulty, setDifficulty }) {
   const mappedRoots = ROOT_NOTES.map((note, idx) => ({
     id: note,
     fret: idx + 1,
@@ -443,57 +493,130 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
   }));
 
   const renderContent = (item) => (
-    <div style={{ padding: '24px 16px', color: '#e0e0ff' }}>
+    <div style={{ padding: '24px 16px', color: '#e8edf2' }}>
+      {/* What is a Vertiscale? — Expandable explainer for novices */}
+      <details style={{
+        marginBottom: 20, background: 'rgba(201,169,110,0.06)',
+        border: '1px solid rgba(201,169,110,0.15)', borderRadius: 12,
+        overflow: 'hidden',
+      }}>
+        <summary style={{
+          padding: '14px 18px', cursor: 'pointer', listStyle: 'none',
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+          letterSpacing: '0.1em', color: '#c9a96e', textTransform: 'uppercase',
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <span>❓</span> What is a Vertiscale? <span style={{ marginLeft: 'auto', opacity: 0.5 }}>▼</span>
+        </summary>
+        <div style={{ padding: '0 18px 16px', lineHeight: 1.8 }}>
+          <p style={{ fontSize: '1rem', color: '#d0d8e0', marginBottom: 10 }}>
+            A <strong style={{ color: '#c9a96e' }}>vertiscale</strong> is a vertical scale shape on the guitar neck. Instead of playing a scale horizontally (across frets left to right), you play it vertically (across strings on the same fret area).
+          </p>
+          <p style={{ fontSize: '1rem', color: '#d0d8e0', marginBottom: 10 }}>
+            This teaches you to <strong style={{ color: '#c9a96e' }}>see patterns in all directions</strong> — the foundation of fretboard mastery. Each exercise below trains a different aspect of this skill.
+          </p>
+          <p style={{ fontSize: '0.9rem', color: '#8090a8', fontStyle: 'italic' }}>
+            Don't worry if you're new — the game starts simple (just 2 strings) and gradually adds more.
+          </p>
+        </div>
+      </details>
+
+      {/* Safety reassurance — calms anxious adult learners */}
+      <div style={{
+        display: 'flex', flexWrap: 'wrap', gap: '6px 14px', justifyContent: 'center',
+        padding: '10px 16px', marginBottom: 16,
+        background: 'rgba(46,213,115,0.04)', borderRadius: 8,
+        border: '1px solid rgba(46,213,115,0.08)',
+      }}>
+        {['🛡️ No speed scoring', '🚫 No leaderboards', '✓ Mistakes are OK', '🔒 Your practice is private'].map(item => (
+          <span key={item} style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem',
+            color: '#5a8a68', letterSpacing: '0.03em',
+          }}>{item}</span>
+        ))}
+      </div>
+
+      {/* Difficulty selector */}
+      <div style={{
+        display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 20,
+        padding: '8px 12px', background: 'rgba(255,255,255,0.02)', borderRadius: 8,
+        border: '1px solid rgba(255,255,255,0.04)',
+      }}>
+        <p style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+          color: '#5a6a80', letterSpacing: '0.1em', textTransform: 'uppercase',
+          margin: '0 8px 0 0', display: 'flex', alignItems: 'center',
+        }}>SPEED:</p>
+        {[
+          { key: 'beginner', label: '🐢 Slow', desc: 'Pattern stays 3.5s' },
+          { key: 'standard', label: '🚶 Medium', desc: 'Pattern stays 2.5s' },
+          { key: 'challenge', label: '⚡ Fast', desc: 'Pattern stays 1.5s' },
+        ].map(d => (
+          <button key={d.key} onClick={() => setDifficulty(d.key)} title={d.desc} style={{
+            padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem',
+            background: difficulty === d.key ? 'rgba(201,169,110,0.15)' : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${difficulty === d.key ? 'rgba(201,169,110,0.4)' : 'rgba(255,255,255,0.06)'}`,
+            color: difficulty === d.key ? '#c9a96e' : '#5a6a80',
+            transition: 'all 0.2s',
+          }}>{d.label}</button>
+        ))}
+      </div>
+
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
         {!isListening ? (
           <button onClick={onStartMic} style={{
-            padding: '12px 24px', borderRadius: 8,
+            padding: '14px 24px', borderRadius: 8,
             background: 'rgba(46,213,115,0.1)', border: '1px solid rgba(46,213,115,0.3)',
             color: '#2ed573', cursor: 'pointer',
-            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
             letterSpacing: '0.05em'
           }}>🎤 Enable Microphone (optional)</button>
         ) : (
-          <p style={{ fontSize: '0.75rem', color: '#2ed573' }}>🎤 Mic active — breath tracking enabled</p>
+          <p style={{ fontSize: '0.9rem', color: '#2ed573' }}>🎤 Mic active — breath tracking enabled</p>
         )}
-        {micError && <p style={{ fontSize: '0.7rem', color: '#ff4757', marginTop: 8 }}>{micError}</p>}
+        {micError && <p style={{ fontSize: '0.9rem', color: '#e74c3c', marginTop: 8 }}>{micError}</p>}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 360, margin: '0 auto' }}>
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase', margin: '0 0 4px' }}>THE INNER FRETBOARD</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 400, margin: '0 auto' }}>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '0 0 2px' }}>THE INNER FRETBOARD</p>
+        <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>Train your visual memory of where notes live on the guitar neck</p>
         <PhaseButton
           label="⚡ FLASH · Quick Recall"
-          desc="See it → lose it → recreate from imagination"
+          desc="A pattern of notes flashes on the fretboard. Study it carefully — then it disappears! Tap from memory to recreate where the notes were."
           unlocked={phaseUnlock.phase1Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE1, 'flash')}
         />
         <PhaseButton
           label="🫁 IMAGINE · Sustained Hold"
-          desc="Study it → hold placement → breathe into it"
+          desc="The pattern stays visible while you place your taps. Focus on accuracy and steady breathing. The longer you hold, the deeper the learning."
           unlocked={phaseUnlock.phase1Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE1, 'imagine')}
         />
 
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase', margin: '12px 0 4px' }}>THE INNER EAR</p>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '16px 0 2px' }}>THE INNER EAR</p>
+        <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>Develop your ability to hear and match pitches</p>
         <PhaseButton
           label="🎵 AUDIATE · Pling! Orbs"
-          desc="Hear the note inside, sing it, verify on the fretboard"
+          desc="A note descends the screen. Try to hear it in your mind first, then sing it into the microphone. The app checks if you matched the pitch."
           unlocked={phaseUnlock.phase2Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE2)}
         />
 
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase', margin: '12px 0 4px' }}>THE INNER VOICE</p>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '16px 0 2px' }}>THE INNER VOICE</p>
+        <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>Reflect on what your practice sessions reveal</p>
         <PhaseButton
           label="📝 REFLECT · Session Journal"
-          desc="What did your hands remember that your mind forgot?"
+          desc="Review your session performance. See where you were accurate, where you struggled, and journal about what you noticed."
           unlocked={phaseUnlock.phase3Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE3)}
         />
 
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase', margin: '12px 0 4px' }}>THE LIVING STORY</p>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '16px 0 2px' }}>THE LIVING STORY</p>
+        <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>Learn through an immersive historical narrative</p>
         <PhaseButton
           label="🏰 ADVENTURE · The Troubadour"
-          desc="Eleanor's court, Poitiers, 1165 CE — a pitch-gated narrative"
+          desc="Play through a historical story as a medieval troubadour. At key moments, you must match a musical pitch to unlock the next chapter."
           unlocked={true}
           onClick={() => onStart(ENGINE_STATES.ADVENTURE)}
         />
@@ -522,7 +645,7 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
           <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 100 }}>
              <button onClick={onClose} style={{
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-              color: '#a0aab8', borderRadius: 8, fontSize: '0.8rem',
+              color: '#8090a8', borderRadius: 8, fontSize: '0.8rem',
               cursor: 'pointer', padding: '8px 14px',
               fontFamily: 'JetBrains Mono, monospace',
             }}>Close</button>
@@ -571,13 +694,13 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
       style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
         <p style={{
-          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
-          letterSpacing: '0.2em', color: '#c9a96e', textTransform: 'uppercase',
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+          letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase',
         }}>🎵 THE INNER EAR · {rootNote} Vertiscale</p>
-        <p style={{ fontSize: '0.8rem', color: '#5a6a80', marginTop: 4 }}>
-          Hear the note inside before you sing it. Audiate, then verify.
+        <p style={{ fontSize: '1rem', color: '#8090a8', marginTop: 8, lineHeight: 1.6 }}>
+          Notes will descend the screen. When a note crosses the gate line, sing or hum it into your microphone. Tap the orb when you're ready.
         </p>
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: '#5a6a80', marginTop: 8 }}>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80', marginTop: 8 }}>
           {orbScores.length}/{orbSequence.length} notes completed
         </p>
       </div>
@@ -636,11 +759,11 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
         <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
           {orbScores.map((s, i) => (
             <div key={i} style={{
-              width: 28, height: 28, borderRadius: '50%',
+              width: 34, height: 34, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: s.composite >= 0.7 ? 'rgba(46,213,115,0.2)' : s.composite > 0 ? 'rgba(201,169,110,0.15)' : 'rgba(255,71,87,0.15)',
               border: `1px solid ${s.composite >= 0.7 ? 'rgba(46,213,115,0.4)' : s.composite > 0 ? 'rgba(201,169,110,0.3)' : 'rgba(255,71,87,0.3)'}`,
-              fontSize: '0.5rem', fontFamily: 'JetBrains Mono', color: '#e0e0ff',
+              fontSize: '0.7rem', fontFamily: 'JetBrains Mono', color: '#e8edf2',
             }}>
               {Math.round(s.composite * 100)}
             </div>
@@ -649,9 +772,9 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
       )}
 
       <button onClick={onBack} style={{
-        marginTop: 12, padding: '10px 20px', borderRadius: 8, alignSelf: 'center',
+        marginTop: 12, padding: '12px 24px', borderRadius: 8, alignSelf: 'center',
         background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.3)',
-        color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+        color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
       }}>← Back to Menu</button>
     </motion.div>
   );
@@ -668,11 +791,11 @@ function PhaseButton({ label, desc, unlocked, progress, onClick }) {
       transition: 'all 0.2s', width: '100%',
     }}>
       <p style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem',
-        letterSpacing: '0.15em', color: unlocked ? '#c9a96e' : '#5a6a80',
-        margin: '0 0 4px',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+        letterSpacing: '0.1em', color: unlocked ? '#c9a96e' : '#5a6a80',
+        margin: '0 0 6px',
       }}>{unlocked ? '✦' : '🔒'} {label}</p>
-      <p style={{ fontSize: '0.8rem', color: '#8090a8', margin: 0 }}>{desc}</p>
+      <p style={{ fontSize: '1rem', color: '#8090a8', margin: 0, lineHeight: 1.6 }}>{desc}</p>
       {!unlocked && progress !== undefined && (
         <div style={{ marginTop: 8, height: 3, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
           <div style={{
@@ -702,7 +825,7 @@ function BreathIndicator({ breathState, volume }) {
         boxShadow: `0 0 8px ${colors[breathState]}`,
       }} />
       <span style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
         color: colors[breathState], letterSpacing: '0.08em',
       }}>{labels[breathState]}</span>
       <div style={{
@@ -745,7 +868,7 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
 
-      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase' }}>THE INNER VOICE</p>
+      <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase' }}>THE INNER VOICE</p>
 
       <h2 style={{
         fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem',
@@ -767,7 +890,7 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
             {Math.round(avgScore * 100)}
           </span>
           <span style={{
-            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.5rem',
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem',
             color: '#5a6a80', letterSpacing: '0.1em',
           }}>AVG SCORE</span>
         </div>
@@ -784,12 +907,12 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
       {/* Round history */}
       {roundScores.length > 0 && (
         <div style={{ width: '100%', maxWidth: 300 }}>
-          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem', color: '#5a6a80', letterSpacing: '0.15em', marginBottom: 8 }}>ROUND HISTORY</p>
+          <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80', letterSpacing: '0.1em', marginBottom: 8 }}>ROUND HISTORY</p>
           <div style={{ display: 'flex', gap: 4 }}>
             {roundScores.map((s, i) => (
-              <div key={i} style={{ flex: 1, height: 40, background: 'rgba(255,255,255,0.03)', borderRadius: 4, position: 'relative', overflow: 'hidden' }}>
+              <div key={i} style={{ flex: 1, height: 48, background: 'rgba(255,255,255,0.03)', borderRadius: 4, position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', bottom: 0, width: '100%', height: `${s * 100}%`, background: s >= 0.85 ? 'rgba(46,213,115,0.4)' : 'rgba(201,169,110,0.3)', borderRadius: '0 0 4px 4px' }} />
-                <span style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)', fontSize: '0.5rem', color: '#8090a8', fontFamily: 'JetBrains Mono' }}>{Math.round(s * 100)}</span>
+                <span style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)', fontSize: '0.7rem', color: '#8090a8', fontFamily: 'JetBrains Mono' }}>{Math.round(s * 100)}</span>
               </div>
             ))}
           </div>
@@ -805,14 +928,14 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
         <p style={{ fontFamily: 'EB Garamond, serif', fontSize: '1rem', fontStyle: 'italic', color: '#c9a96e', lineHeight: 1.7 }}>
           "{coaching.text}"
         </p>
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', color: '#5a6a80', marginTop: 8, letterSpacing: '0.1em' }}>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80', marginTop: 8, letterSpacing: '0.1em' }}>
           — BERTRAND · {coaching.focus.toUpperCase()}
         </p>
       </div>
 
       {/* Journal textarea */}
       <div style={{ width: '100%', maxWidth: 320 }}>
-        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.55rem', letterSpacing: '0.15em', color: '#5a6a80', marginBottom: 12, textAlign: 'center' }}>FHEAL REFLECTION</p>
+        <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.1em', color: '#c9a96e', marginBottom: 12, textAlign: 'center', textTransform: 'uppercase' }}>FHEAL REFLECTION</p>
         <div style={{ position: 'relative' }}>
           <textarea
             className="fheal-textarea"
@@ -845,15 +968,15 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
       {/* Action buttons */}
       <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 320, marginTop: 8 }}>
         <button onClick={() => { saveJournal(); onRestart(); }} style={{
-          flex: 1, padding: '14px', borderRadius: 8,
+          flex: 1, padding: '16px', borderRadius: 8,
           background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.3)',
-          color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+          color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
         }}>↻ Again</button>
         {onClose && (
           <button onClick={() => { saveJournal(); onClose(); }} style={{
-            flex: 1, padding: '14px', borderRadius: 8,
+            flex: 1, padding: '16px', borderRadius: 8,
             background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-            color: '#8090a8', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+            color: '#8090a8', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
           }}>Done</button>
         )}
       </div>
@@ -870,10 +993,10 @@ function StatCard({ label, value }) {
       textAlign: 'center',
     }}>
       <p style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.5rem',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem',
         color: '#5a6a80', letterSpacing: '0.12em', marginBottom: 4,
       }}>{label}</p>
-      <p style={{ fontSize: '1.1rem', color: '#e8edf2', fontWeight: 300 }}>{value}</p>
+      <p style={{ fontSize: '1.2rem', color: '#e8edf2', fontWeight: 300 }}>{value}</p>
     </div>
   );
 }

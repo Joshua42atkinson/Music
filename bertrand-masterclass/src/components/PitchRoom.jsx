@@ -127,13 +127,13 @@ const PitchRoom = () => {
     maxWidth: '800px',
     margin: '2rem auto',
     boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
-    border: '1px solid rgba(255,255,255,0.05)'
+    border: '1px solid rgba(255,255,255,0.05)',
   };
 
   const buttonStyle = {
     background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-    border: '1px solid rgba(0, 240, 255, 0.3)',
-    color: '#00f0ff',
+    border: '1px solid rgba(90, 144, 160, 0.3)',
+    color: '#5a90a0',
     padding: '1.2rem 3rem',
     fontSize: '1.2rem',
     borderRadius: '50px',
@@ -144,7 +144,7 @@ const PitchRoom = () => {
     fontWeight: '800',
     textTransform: 'uppercase',
     letterSpacing: '2px',
-    boxShadow: '0 8px 32px rgba(0, 240, 255, 0.1)'
+    boxShadow: '0 8px 32px rgba(90, 144, 160, 0.1)'
   };
 
   const optionStyle = {
@@ -169,7 +169,7 @@ const PitchRoom = () => {
 
       <div style={{ marginBottom: '3rem' }}>
         <button 
-          style={{...buttonStyle, transform: playing ? 'scale(0.95)' : 'scale(1)', borderColor: playing ? '#ff8a00' : 'rgba(0, 240, 255, 0.3)', color: playing ? '#ff8a00' : '#00f0ff'}}
+          style={{...buttonStyle, transform: playing ? 'scale(0.95)' : 'scale(1)', borderColor: playing ? '#c9a96e' : 'rgba(90, 144, 160, 0.3)', color: playing ? '#c9a96e' : '#5a90a0'}}
           onClick={handlePlay}
           disabled={playing}
         >
@@ -183,11 +183,11 @@ const PitchRoom = () => {
         transition: 'all 0.3s ease',
         transform: (!currentInterval || playing) ? 'translateY(10px)' : 'translateY(0)'
       }}>
-        <h3 style={{ marginBottom: '1.5rem', color: '#00f0ff', fontWeight: '400', letterSpacing: '1px' }}>What did you hear?</h3>
+        <h3 style={{ marginBottom: '1.5rem', color: '#5a90a0', fontWeight: '400', letterSpacing: '1px' }}>What did you hear?</h3>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           {options.map((opt, i) => (
             <button key={i} style={optionStyle} onClick={() => handleGuess(opt.name)}
-              onMouseEnter={(e) => Object.assign(e.target.style, { background: 'rgba(0,240,255,0.1)', borderColor: '#00f0ff' })}
+              onMouseEnter={(e) => Object.assign(e.target.style, { background: 'rgba(90,144,160,0.1)', borderColor: '#5a90a0' })}
               onMouseLeave={(e) => Object.assign(e.target.style, { background: 'rgba(0,0,0,0.4)', borderColor: 'rgba(255,255,255,0.1)' })}
             >
               {opt.name}
@@ -210,7 +210,7 @@ const PitchRoom = () => {
       </div>
 
       <div style={{ marginTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2rem' }}>
-        <p style={{ fontSize: '1.5rem', color: '#a0a0c0' }}>Score: <strong style={{ color: '#ff8a00', fontSize: '2rem' }}>{score}</strong></p>
+        <p style={{ fontSize: '1.5rem', color: '#a0a0c0' }}>Score: <strong style={{ color: '#c9a96e', fontSize: '2rem' }}>{score}</strong></p>
       </div>
     </div>
   );

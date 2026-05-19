@@ -50,7 +50,7 @@ function PitchGateUI({ targetNote, noteInfo, pitch, breathState = 'free', gateSt
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
         <div>
-          <div style={{ fontSize: '0.6rem', fontFamily: 'JetBrains Mono, monospace', color: colors.needle, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
+          <div style={{ fontSize: '0.85rem', fontFamily: 'JetBrains Mono, monospace', color: colors.needle, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
             Target Note
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: 900, color: colors.needle, fontFamily: 'Cormorant Garamond, serif', lineHeight: 1 }}>
@@ -60,7 +60,7 @@ function PitchGateUI({ targetNote, noteInfo, pitch, breathState = 'free', gateSt
 
         {/* Live detected note */}
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.6rem', fontFamily: 'JetBrains Mono, monospace', color: '#5a6a80', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
+          <div style={{ fontSize: '0.85rem', fontFamily: 'JetBrains Mono, monospace', color: '#5a6a80', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>
             Detecting
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: 900, fontFamily: 'Cormorant Garamond, serif', lineHeight: 1, color: inZone ? '#2ed573' : (pitch ? '#c9a96e' : '#3a4a5a') }}>
@@ -71,7 +71,7 @@ function PitchGateUI({ targetNote, noteInfo, pitch, breathState = 'free', gateSt
 
       {/* Pitch needle bar */}
       <div style={{ marginBottom: '0.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.55rem', fontFamily: 'JetBrains Mono, monospace', color: '#5a6a80', marginBottom: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontFamily: 'JetBrains Mono, monospace', color: '#5a6a80', marginBottom: 4 }}>
           <span>−50¢ Flat</span>
           <span style={{ color: colors.needle }}>In Tune</span>
           <span>+50¢ Sharp</span>
@@ -119,20 +119,20 @@ function PitchGateUI({ targetNote, noteInfo, pitch, breathState = 'free', gateSt
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            style={{ fontSize: '0.7rem', fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: colors.needle }}
+            style={{ fontSize: '0.9rem', fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: colors.needle }}
           >
             {colors.label}
           </motion.span>
         </AnimatePresence>
 
-        <span style={{ fontSize: '0.6rem', fontFamily: 'JetBrains Mono, monospace', color: breath.color }}>
+        <span style={{ fontSize: '0.85rem', fontFamily: 'JetBrains Mono, monospace', color: breath.color }}>
           {breath.label}
         </span>
       </div>
 
       {/* Cents deviation text */}
       {pitch && gateState === 'open' && (
-        <div style={{ textAlign: 'center', marginTop: '0.25rem', fontSize: '0.65rem', fontFamily: 'JetBrains Mono, monospace', color: inZone ? '#2ed573' : '#c9a96e' }}>
+        <div style={{ textAlign: 'center', marginTop: '0.25rem', fontSize: '0.85rem', fontFamily: 'JetBrains Mono, monospace', color: inZone ? '#2ed573' : '#c9a96e' }}>
           {centsRaw > 0 ? '+' : ''}{Math.round(centsRaw)}¢
           {inZone ? ' — within tolerance' : ` — need ±${tolerance}¢`}
         </div>

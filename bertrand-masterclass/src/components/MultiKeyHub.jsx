@@ -142,13 +142,13 @@ const MultiKeyHub = () => {
     <div style={{ color: '#e8edf2', fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <p style={{ fontSize: 12, color: '#7b6aaa', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>
+        <p style={{ fontSize: '0.8rem', color: '#7b6aaa', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>
           ©FHEAL · Multi-Key Fluency
         </p>
         <h2 style={{ fontSize: '1.6rem', fontFamily: 'Cormorant Garamond, serif', color: '#e8edf2', marginBottom: 4 }}>
           Multi-Key Hub
         </h2>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
           See any scale across all 12 keys at once. Tap a key to explore its full pattern.
         </p>
       </div>
@@ -160,7 +160,7 @@ const MultiKeyHub = () => {
             key={s.key}
             onClick={() => setScaleType(s.key)}
             style={{
-              padding: '5px 12px', borderRadius: 20, fontSize: 11,
+              padding: '5px 12px', borderRadius: 20, fontSize: '0.8rem',
               fontFamily: 'JetBrains Mono, monospace', cursor: 'pointer',
               border: `1px solid ${scaleType === s.key ? s.color : 'rgba(255,255,255,0.1)'}`,
               background: scaleType === s.key ? `${s.color}20` : 'transparent',
@@ -194,13 +194,13 @@ const MultiKeyHub = () => {
               {/* Key name + scale notes */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <span style={{
-                  fontSize: 16, fontFamily: 'Cormorant Garamond, serif',
+                  fontSize: '1rem', fontFamily: 'Cormorant Garamond, serif',
                   fontWeight: 700, color: isSelected ? color : '#e8edf2',
                 }}>
                   {note}
                 </span>
                 <span style={{
-                  fontSize: 9, fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: '0.7rem', fontFamily: 'JetBrains Mono, monospace',
                   color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em',
                 }}>
                   {scaleNotes.slice(0, 4).join(' ')}…
@@ -232,7 +232,7 @@ const MultiKeyHub = () => {
               borderRadius: 12, padding: 16,
             }}
           >
-            <p style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>
+            <p style={{ fontSize: '0.75rem', fontFamily: 'JetBrains Mono, monospace', color, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>
               {NOTE_NAMES[selectedKey]} {currentScale?.label}
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -242,7 +242,7 @@ const MultiKeyHub = () => {
                   background: i === 0 ? color : `${color}30`,
                   border: `1px solid ${color}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: '0.8rem', fontFamily: 'JetBrains Mono, monospace',
                   color: i === 0 ? '#000' : color, fontWeight: 700,
                   cursor: 'pointer',
                 }}
