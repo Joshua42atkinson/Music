@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAudioContext, resumeAudio } from '../audio/audioEngine';
 
 const intervals = [
   { name: 'Minor 2nd', semitones: 1 },
@@ -21,20 +22,7 @@ const PitchRoom = () => {
   const [feedback, setFeedback] = useState('');
   const [currentInterval, setCurrentInterval] = useState(null);
   const [options, setOptions] = useState([]);
-  
-  const audioCtxRef = useRef(null);
 
-  useEffect(() => {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) {
-      audioCtxRef.current = new AudioContext();
-    }
-    return () => {
-      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
-        audioCtxRef.current.close();
-      }
-    };
-  }, []);
 
   const generateInterval = () => {
     // Pick a random base frequency between 220Hz (A3) and 440Hz (A4)
@@ -64,14 +52,14 @@ const PitchRoom = () => {
   };
 
   const playSynthesizedInterval = (baseFreq, targetFreq) => {
-    if (!audioCtxRef.current) return;
-    if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
+    const ctx = resumeAudio();
+    if (!ctx) return;
 
     setPlaying(true);
 
     const playTone = (freq, startTime, duration) => {
-      const osc = audioCtxRef.current.createOscillator();
-      const gain = audioCtxRef.current.createGain();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
       
       osc.type = 'sine';
       osc.frequency.value = freq;
@@ -81,13 +69,13 @@ const PitchRoom = () => {
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 
       osc.connect(gain);
-      gain.connect(audioCtxRef.current.destination);
+      gain.connect(ctx.destination);
 
       osc.start(startTime);
       osc.stop(startTime + duration);
     };
 
-    const now = audioCtxRef.current.currentTime;
+    const now = ctx.currentTime;
     
     // Play notes sequentially (melodic interval)
     playTone(baseFreq, now, 1.0);

@@ -1,6 +1,7 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Scale, Interval } from '@tonaljs/tonal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { resumeAudio } from '../audio/audioEngine';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 
@@ -108,18 +109,10 @@ const MiniNeck = ({ rootIdx, scaleType, color, onPlay }) => {
 const MultiKeyHub = () => {
   const [scaleType, setScaleType] = useState('pentatonicMinor');
   const [selectedKey, setSelectedKey] = useState(null);
-  const audioCtxRef = useRef(null);
-
-  useEffect(() => {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (AC) audioCtxRef.current = new AC();
-    return () => { if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close(); };
-  }, []);
 
   const playNote = useCallback((freq) => {
-    const ctx = audioCtxRef.current;
+    const ctx = resumeAudio();
     if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const now = ctx.currentTime;

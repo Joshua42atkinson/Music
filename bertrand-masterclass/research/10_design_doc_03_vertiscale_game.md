@@ -1,5 +1,7 @@
 # VOIX VIVE — Design Document | Batch 03: The Vertiscale Engine
-*Fret 9 — The Game Mode | ©SHEARL → ©PLING! → ©FHEAL*
+*Fret 9 — The Imagination Engine | ©SHEARL → ©PLING! → ©FHEAL*
+
+> **Updated:** 2026-05-19 — Added Imagination Management Framework
 
 ---
 
@@ -15,55 +17,140 @@ The Vertiscale Engine takes this paper chart and makes it a living, three-phase 
 
 ---
 
+### The Imagination Management Framework
+
+**The game does not train fingers. It trains imagination. The fingers follow.**
+
+This is not a metaphor — it is the actual mechanism by which skilled musicians play. Three converging bodies of evidence ground this design:
+
+**1. Audiation (Edwin Gordon)**
+> *"Audiation is to music what thought is to language."*
+
+Audiation is the ability to hear and comprehend music when no sound is present — not passive playback, but active comprehension with understanding of tonality, meter, and function. This is what Bertrand independently calls the "Third Ear" and the PLING! protocol: *"Play what you sing, sing what you play."*
+
+**2. Predictive Processing (Neuroscience)**
+The brain does not passively receive sensory data. It continuously generates an internal model of reality and compares incoming signals against its predictions. Consciousness itself is a "controlled hallucination" (Anil Seth). In music:
+- A beginner **reacts** to each note (bottom-up)
+- An intermediate player **recognizes** patterns (matching)
+- An advanced player **predicts** what comes next (top-down generation)
+
+**3. Boethius's Three Musics (The Architecture)**
+
+| Level | Boethius | What It Is | Our System |
+|-------|----------|-----------|-------------|
+| **Musica Mundana** | Music of the Cosmos | Mathematical structure — ratios, overtones | **The Song** (Timeless Song slides, Pythagorean ratios) |
+| **Musica Humana** | Music of the Human | Internal harmony — the "tuning" of the self | **The Player** (Breath, somatic scans, FHEAL) |
+| **Musica Instrumentalis** | Music of Instruments | Audible sound — the lowest form | **The Guitar** (Fretboard patterns, scale shapes) |
+
+The game must graduate from training *musica instrumentalis* (fretboard placement) to training *musica humana* (internal rendering). The fretboard is the verification layer, not the learning target.
+
+**The Three Inners — Game Phase Mapping:**
+
+```
+Phase 1: THE INNER FRETBOARD
+  Train:  Visual-spatial imagination (can you see it with your eyes closed?)
+  Modes:  Flash (speed of rendering) + Imagine (stability of rendering)
+
+Phase 2: THE INNER EAR  
+  Train:  Auditory imagination (can you hear it before you sing it?)
+  Mode:   Audiation loop — imagine → sing → verify → place
+
+Phase 3: THE INNER VOICE
+  Train:  Metacognitive imagination (consciousness observing itself)
+  Mode:   Reflection — journal, coaching cues, somatic logging
+```
+
+**The Opposite Principle:**
+For every fast drill (Flash), there must be a slow counterpart (Imagine). Speed trains prediction velocity. Stillness trains prediction stability. Both are required for mastery.
+
+---
+
 ### The Three-Phase Architecture
 
 The game has three sequential unlockable phases. **They are not difficulty levels — they are developmental stages.** A student cannot reach Phase 3 by being fast. They reach it by demonstrating the biological markers of myelination: slow, accurate, breath-sustained repetition.
 
 ```
-PHASE 1: SHEARL — See It, Map It
+PHASE 1: THE INNER FRETBOARD (©SHEARL — See It, Map It)
   Protocol: ©SHEARL (Perception)
-  Mode:     Vertiscale Flash
-  Goal:     Spatial memory formation
-  Metric:   Accuracy of finger placement, NOT speed
+  Modes:    ⚡ Flash (quick recall) + 🫁 Imagine (sustained hold)
+  Goal:     Spatial imagination — render the fretboard internally
+  Metric:   Accuracy of internal model, NOT speed
+  
+  Flash:    See pattern → darkness → recreate from imagination
+  Imagine:  Study pattern → hold placement → breathe into it
 
-PHASE 2: PLING! — Sing It, Play It  
+PHASE 2: THE INNER EAR (©PLING! — Sing It, Play It)
   Protocol: ©PLING! (Embodiment)
-  Mode:     Note Drops with mic validation
-  Goal:     Vocal-motor integration under time pressure
-  Metric:   Pitch accuracy before placement (must sing → then tap)
+  Mode:     🎵 Audiate — descending orbs with mic validation
+  Goal:     Auditory imagination — hear inside before producing outside
+  Metric:   Pitch accuracy BEFORE placement (must imagine → sing → then tap)
+  
+  The critical gate: student must imagine the pitch before singing it.
+  The mic does not test the voice. It tests the imagination.
 
-PHASE 3: FHEAL — Feel It, Play Free
+PHASE 3: THE INNER VOICE (©FHEAL — Feel It, Reflect)
   Protocol: ©FHEAL (Expression)
-  Mode:     Freeplay over backing track
-  Goal:     Bypass analytical brain; express creative impulse
-  Metric:   Tracking only (no score) — pure session logging
+  Mode:     📝 Reflect — session journal + coaching cues
+  Goal:     Metacognitive imagination — consciousness observing itself
+  Metric:   Qualitative reflection only — no score displayed
+  
+  Dynamic coaching cues based on performance data.
+  Journal prompts target the imagination gap:
+    "What did your hands remember that your mind forgot?"
+    "Where was the gap between what you heard inside and what came out?"
 ```
 
 ---
 
-### Phase 1: Vertiscale Flash (©SHEARL)
+### Phase 1: The Inner Fretboard (©SHEARL)
 
-**Concept:** A vertical scale pattern illuminates on the virtual fretboard for a constrained window. The student studies it. The pattern vanishes. They must recreate it from spatial memory by tapping the correct fret positions.
+**Concept:** The fretboard is the verification layer, not the learning target. Phase 1 trains the student's ability to **render the fretboard pattern inside their imagination** — and then checks if the internal model matches external reality.
 
-**Game Loop:**
+Two modes serve opposite functions:
+
+#### ⚡ Flash Mode — Prediction Speed
+
+*"How quickly can you generate the internal model?"*
 
 ```
 1. REVEAL    — Scale pattern lights up on all 6 strings
                Display duration: 2.0s (beginner) → 0.5s (advanced)
-               Pattern includes: note names, finger numbers, string labels
+               Pattern includes: note names, root highlights
 
-2. DARKNESS  — Screen goes dark (or fretboard goes neutral)
+2. DARKNESS  — Fretboard goes neutral
                Student has 8 seconds to reproduce the pattern
 
-3. TAP       — Student taps fret positions (mobile touch or fretboard UI clicks)
-               Each tap: instant visual feedback (correct = glow, wrong = pulse-red-then-fade)
+3. TAP       — Student taps fret positions from imagination
+               Each tap: instant visual feedback (correct = glow, wrong = pulse-red)
 
-4. REVEAL    — Correct pattern re-illuminates, overlaid with student's taps
-               Diff view: missed notes in amber, correct in green
+4. RESULT    — Correct pattern re-illuminates, overlaid with student's taps
+               Diff view: missed = amber, correct = green, phantom = red
 
-5. SCORE     — Points awarded (see Scoring Philosophy below)
-               Next round begins with same or adjacent pattern
+5. SCORE     — Points awarded. Next round begins.
 ```
+
+#### 🫁 Imagine Mode — Prediction Stability
+
+*"How long can you hold the internal model stable?"*
+
+```
+1. REVEAL    — Scale pattern lights up (longer window: 3-5s)
+               Student studies the spatial relationships
+
+2. HOLD      — Pattern stays visible. Student taps placement.
+               Breathing pulse animation synchronizes with somatic state.
+               Timer counts UP — how long can you hold it?
+               Progress ring fills around correctly placed dots.
+
+3. RELEASE   — Student submits when ready (or timer completes)
+
+4. RESULT    — Diff overlay shows imagination accuracy
+               Scoring weights: placement (35%), hold duration (25%),
+               breath continuity (25%), consistency (15%)
+```
+
+**Why both modes matter:**
+Flash trains the *speed* of internal rendering — essential for real-time playing. Imagine trains the *stability* — essential for holding a musical phrase in mind long enough to voice it. Together they develop what Gordon calls "audiation readiness": the ability to generate, sustain, and manipulate a mental musical image.
 
 **Pattern Library:**
 The 12 scale patterns currently supported by FretboardExplorer become the Vertiscale Flash pattern library. Starter patterns:
@@ -80,34 +167,38 @@ The 12 scale patterns currently supported by FretboardExplorer become the Vertis
 
 ---
 
-### Phase 2: Note Drops with Mic Validation (©PLING!)
+### Phase 2: The Inner Ear (©PLING!)
 
-**Concept:** Glowing orbs descend onto the virtual fretboard in a continuous flow. Before the student can tap a note, they must **sing it** (mic validates pitch) — then tap the correct position. This implements the ©PLING! protocol in real-time: hear internally → vocalize → execute physically.
+**Concept:** The orb descent is not a rhythm game. It is an **audiation training loop**. The student must imagine the pitch inside their mind *before* producing it vocally. The mic gate does not test the voice — it tests the quality of the internal auditory image.
+
+This implements the ©PLING! protocol: imagine internally → vocalize → verify against reality → execute physically.
 
 **Game Loop:**
 
 ```
 1. ORB SPAWNS     — Note orb appears at top of fretboard column, begins descending
-                    Descent speed: slow (120 BPM equivalent) by default
-                    Each orb displays: note name, string number, optional finger hint
+                    Displays: note name, string number
+                    (Critically: NO reference pitch is played. The student must audiate.)
 
-2. MIC WINDOW     — When orb is 50% of the way down, mic detection activates
-                    Student must sing/hum the correct pitch within ±20 cents tolerance
-                    Visual indicator: pitch needle animates toward target zone
+2. AUDIATION      — Student sees the note name and IMAGINES the pitch
+                    This is the pedagogical core — the pause before singing
 
-3. GATE CHECK     — If pitch confirmed: orb turns green, tap window opens (2 bars)
-                    If pitch missed:    orb turns amber, tap window opens anyway (penalty)
-                    If orb reaches bottom without tap: miss registered
+3. MIC WINDOW     — At 50% descent: mic activates
+                    Student sings/hums what they imagined
+                    Pitch needle shows deviation from target
 
-4. TAP            — Student taps the correct fret position on the interactive neck
-                    Fretboard responds: string vibration animation + Web Audio note preview
+4. GATE CHECK     — Pitch confirmed: orb turns green → tap window opens
+                    Pitch missed:    orb turns amber → tap window opens (penalty)
+                    The gap between imagination and reality IS the learning signal
 
-5. FEEDBACK       — Accuracy composite: pitch accuracy + tap timing + breath state
-                    (Breath state: did the student hold their breath during mic window? — detect via amplitude dip)
+5. TAP            — Student taps the correct fret position
+                    Confirms spatial knowledge matches auditory knowledge
+
+6. FEEDBACK       — Composite: imagination accuracy × placement × breath
 ```
 
-**Why the mic gate matters:**
-Without the vocal gate, the student defaults to visual pattern matching — they see the orb coming and tap by spatial memory alone. The mic gate forces the pitch to live in their throat **before** it lives in their fingers. This is the neurological core of Bertrand's method.
+**Why the audiation pause matters:**
+Without it, the student defaults to two failure modes: (1) visual pattern matching (see orb, tap by reflex), or (2) vocal mimicry (hear reference, copy it). The pause forces the pitch to exist *in the imagination* before it exists in the throat. This is the neurological core of Bertrand's method and Gordon's audiation theory.
 
 **Difficulty Parameters (all adjustable, never called "difficulty"):**
 | Parameter | Beginner | Intermediate | Advanced |
@@ -121,38 +212,56 @@ Without the vocal gate, the student defaults to visual pattern matching — they
 
 ---
 
-### Phase 3: Freeplay Mode (©FHEAL)
+### Phase 3: The Inner Voice (©FHEAL)
 
-**Concept:** No rules. No orbs. No flash. A backing track plays (generated or from Bertrand's library). The student plays anything they want on the fretboard. The system **listens and records** without judging.
+**Concept:** The metacognitive layer. Phase 3 is where consciousness observes itself. After the action of Phases 1 and 2, the student reflects on the gap between their imagination and their execution.
 
-**What's tracked (invisibly, not displayed during play):**
-- Notes played vs. scale/mode of backing track (in-key vs. chromatic)
-- Note durations (are they rushing? sitting on notes?)
-- Gaps (rest is intentional — track silence)
-- Pitch bends and microtonal expression (MicrotonalTracker data piped in)
+**Current Implementation (v1 — Journal + Coaching):**
+- Dynamic Bertrand coaching cues generated from session performance data
+- Writable journal textarea persisted to localStorage
+- Rotating reflection prompts targeting the imagination gap:
+  - *"What did your hands remember that your mind forgot?"*
+  - *"Where was the gap between what you heard inside and what came out?"*
+  - *"What surprised you?"*
 
-**What's shown after the session:**
-- A simple session "impression" — not a score
-- Language like: "You spent most of this session in the upper register" or "You played 47 notes. 38 were in key. 9 were chromatic choices — that's interesting."
-- One question from "Bertrand" (the AI reflection prompt): *"Which moment felt the most like music to you?"*
+**Future Implementation (v2 — Freeplay + Invisible Tracking):**
+- No rules. No orbs. No flash. A backing track plays.
+- System listens and records without judging:
+  - Notes vs. backing track key (in-key vs. chromatic)
+  - Note durations and rests
+  - Pitch bends and microtonal expression
+- Session "impression" (not a score): *"You played 47 notes. 38 in key. Which moment felt the most like music to you?"*
 
 **Why no score in Phase 3:**
-©FHEAL is specifically engineered to deactivate the prefrontal cortex's analytical interference. A score during or after freeplay would immediately re-engage the inner critic. The reflection prompt replaces the score — it invites reflection without judgment.
+©FHEAL is specifically engineered to deactivate the prefrontal cortex's analytical interference. A score would immediately re-engage the inner critic. The reflection prompt replaces the score — it invites consciousness to observe itself without judgment. This is the Jungian "Active Imagination" applied to sound: the ego remains present while the unconscious expresses through the instrument.
 
 ---
 
-### Scoring Philosophy (Applies to Phases 1 & 2)
+### Scoring Philosophy (Phases 1 & 2)
 
-This is not Guitar Hero. Speed is never rewarded. The scoring engine measures **quality of attention**, not rate of execution.
+This is not Guitar Hero. Speed is never rewarded. The scoring engine measures **quality of the internal model**, not rate of execution.
 
-**Score Components:**
+**Flash Mode Score Components:**
 
 | Component | Weight | What It Measures |
 |---|---|---|
-| **Placement Accuracy** | 35% | Correct fret + correct string |
-| **Pitch Accuracy (Phase 2)** | 25% | Cents deviation from target during mic window |
-| **Breath Continuity** | 20% | No amplitude spikes or holds during execution (mic tracks this) |
-| **Consistency Ratio** | 20% | Variance across a 5-round window — lower variance = higher score |
+| **Placement Accuracy** | 35% | Did the internal fretboard image match reality? |
+| **Breath Continuity** | 25% | Was the student physiologically regulated during recall? |
+| **Consistency Ratio** | 25% | Variance across a 5-round window — stability of imagination |
+| **Timing** | 15% | Were the taps placed within the recall window? |
+
+**Imagine Mode Score Components:**
+
+| Component | Weight | What It Measures |
+|---|---|---|
+| **Placement Accuracy** | 35% | Did the internal image match the pattern? |
+| **Hold Duration** | 25% | How long could the student sustain the internal rendering? |
+| **Breath Continuity** | 25% | Was breath free and flowing during the hold? |
+| **Consistency** | 15% | Stability across rounds — myelination signal |
+
+**Phase 2 (Audiation) adds:**
+- Pitch accuracy (cents deviation between imagined pitch and sung pitch)
+- Audiation-to-motor time (gap between singing and tapping)
 
 **What is explicitly NOT scored:**
 - Speed of response (only used to unlock next pattern at minimum threshold)

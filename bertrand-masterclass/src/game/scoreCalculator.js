@@ -107,6 +107,32 @@ export function computePhase1Score({
 }
 
 // ─────────────────────────────────────────────────────────────
+// Sustain Mode Composite Score
+// holdRatio: fraction of target hold duration actually sustained (0–1)
+// ─────────────────────────────────────────────────────────────
+
+export function computeSustainScore({
+  correctPositions,
+  playerTaps,
+  holdRatio,
+  breathEvents,
+  recentRoundScores,
+}) {
+  const placement    = computePlacementAccuracy(correctPositions, playerTaps);
+  const breath       = computeBreathContinuity(breathEvents);
+  const consistency  = computeConsistencyRatio(recentRoundScores);
+  const hold         = Math.max(0, Math.min(1, holdRatio || 0));
+
+  // Sustain weights: placement 35%, hold duration 25%, breath 25%, consistency 15%
+  const composite = (placement * 0.35) + (hold * 0.25) + (breath * 0.25) + (consistency * 0.15);
+
+  return {
+    composite: Math.min(1, composite),
+    breakdown: { placement, hold, breath, consistency, pitch: null },
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
 // Phase 2 Composite Score
 // ─────────────────────────────────────────────────────────────
 

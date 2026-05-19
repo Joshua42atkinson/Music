@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scale, Interval } from '@tonaljs/tonal';
+import { getAudioContext, resumeAudio } from '../audio/audioEngine';
 
 // ═══════════════════════════════════════════════════════════
 // FULL 12-FRET FRETBOARD EXPLORER
@@ -74,7 +75,7 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
   // vertical = true when portrait phone (or manually forced)
   const isVertical = orientation === 'vertical' || (orientation === 'auto' && portraitMedia);
   const effectiveFrets = maxFret || TOTAL_FRETS;
-  const audioCtxRef = useRef(null);
+
 
   // Sync presets when they change (e.g. switching chapters)
   useEffect(() => {
@@ -84,16 +85,9 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
     if (presetScale !== undefined) setActiveScale(presetScale);
   }, [presetScale]);
 
-  useEffect(() => {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (AC) audioCtxRef.current = new AC();
-    return () => { if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close(); };
-  }, []);
-
   const playNote = useCallback((freq) => {
-    const ctx = audioCtxRef.current;
+    const ctx = resumeAudio();
     if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();

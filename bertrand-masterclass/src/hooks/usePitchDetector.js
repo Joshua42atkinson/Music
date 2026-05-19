@@ -13,18 +13,20 @@
 // ═══════════════════════════════════════════════════════════
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { getAudioContext, resumeAudio } from '../audio/audioEngine';
 
-// ── Shared singleton context (module-level) ──
-// If PlingTrainer already opened a mic session, VertiscaleEngine reuses it.
-let _sharedCtx = null;
+// ── Shared singleton mic stream (module-level) ──
+// We keep the stream and analyser shared to avoid multiple mic prompts.
+// The AudioContext itself is managed by audioEngine.js.
 let _sharedAnalyser = null;
 let _sharedStream = null;
 let _refCount = 0;
 
 function acquireContext() {
-  if (_sharedCtx && _sharedCtx.state !== 'closed') {
+  const ctx = getAudioContext();
+  if (_sharedAnalyser && ctx.state !== 'closed') {
     _refCount++;
-    return { ctx: _sharedCtx, analyser: _sharedAnalyser };
+    return { ctx, analyser: _sharedAnalyser };
   }
   return null;
 }
@@ -151,10 +153,9 @@ export default function usePitchDetector() {
         analyserRef.current = existing.analyser;
         ownedCtx.current    = false;
       } else {
-        // Create a fresh context
+        // Create a fresh stream and analyser
         const stream   = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const AC       = window.AudioContext || window.webkitAudioContext;
-        const ctx      = new AC();
+        const ctx      = resumeAudio();
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 2048;
 
@@ -162,7 +163,6 @@ export default function usePitchDetector() {
         source.connect(analyser);
 
         // Register as singleton
-        _sharedCtx     = ctx;
         _sharedAnalyser = analyser;
         _sharedStream  = stream;
         _refCount      = 1;
@@ -188,12 +188,8 @@ export default function usePitchDetector() {
     _refCount = Math.max(0, _refCount - 1);
 
     if (ownedCtx.current && _refCount === 0) {
-      // We created it and no one else is using it — close
-      if (_sharedCtx && _sharedCtx.state !== 'closed') {
-        _sharedStream?.getTracks().forEach(t => t.stop());
-        _sharedCtx.close();
-      }
-      _sharedCtx = null;
+      // We created it and no one else is using it — close the stream
+      _sharedStream?.getTracks().forEach(t => t.stop());
       _sharedAnalyser = null;
       _sharedStream = null;
     }
@@ -223,5 +219,6 @@ export default function usePitchDetector() {
     error,
     startListening,
     stopListening,
+    audioCtxRef: ctxRef,
   };
 }

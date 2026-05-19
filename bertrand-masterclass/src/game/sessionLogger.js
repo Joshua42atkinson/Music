@@ -4,9 +4,9 @@
 // Computes phase unlock eligibility after each session.
 // ═══════════════════════════════════════════════════════════
 
-import { loadTraction, saveTraction, updateFretTraction } from './tractionStore';
-import { db } from './localDatabase';
-import { computeConsistencyRatio, computePhaseUnlock, PHASE_CONSISTENCY_MINIMUM } from '../game/scoreCalculator';
+import { loadTraction, saveTraction, updateFretTraction } from '../data/tractionStore';
+import { db } from '../data/localDatabase';
+import { computeConsistencyRatio, computePhaseUnlock, PHASE_CONSISTENCY_MINIMUM } from './scoreCalculator';
 
 const FRET_ID = 9; // Vertiscale Engine lives at Fret 9
 

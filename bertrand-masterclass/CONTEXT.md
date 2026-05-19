@@ -1,9 +1,9 @@
 # 🎸 VOIX VIVE — Master Context & Business Platform
 
 > **Purpose:** Load this file into a new AI session to instantly recover full project context.  
-> **Last Updated:** 2026-05-18 (Session 7 — Workspace Rename + Tools Complete)  
+> **Last Updated:** 2026-05-19 (Session 8 — Imagination Engine Complete + Docs Updated)  
 > **Project Root:** `/home/joshua-atkinson/antigravity/voix-vive/bertrand-masterclass/`  
-> **Dev Server:** `npm run dev` → localhost:5178  
+> **Dev Server:** `npm run dev` → localhost:5173  
 > **Git Remote:** https://github.com/joshua42atkinson/Music.git  
 > **Deployment:** Vercel → `bertrand-masterclass/dist` (auto-deployed on push)
 
@@ -158,14 +158,38 @@ voix-vive/
     ├── Gamifying Guitar Learning with Open Source.md — Next phase planning doc
     ├── index.html          — SEO: JSON-LD, Open Graph, Twitter Cards
     │
+    ├── research/                           — ★ DESIGN DOCUMENTS (see §7b)
+    │   ├── 10_MASTER_DESIGN_DOC.md         — Single source of truth for the whole platform
+    │   ├── 10_design_doc_01_foundation.md  — Philosophy, student profile, Slow Web mandate
+    │   ├── 10_design_doc_02_curriculum.md  — Curriculum architecture, chapter map
+    │   ├── 10_design_doc_03_vertiscale_game.md — ★★ THE GAME DESIGN DOC (Imagination Engine)
+    │   ├── 10_design_doc_04_platform_and_business.md — Tech stack, revenue, deployment
+    │   └── 09_master_architecture_doc.md   — Prior synthesis (superseded by 10_ docs)
+    │
     ├── src/
     │   ├── main.jsx            — React entry
     │   ├── App.jsx             — Router + ScaffoldingProvider + WelcomeOnboarding
     │   ├── index.css           — Design system (~660 LOC, --cf-* + --bard-* tokens)
     │   │
+    │   ├── game/                            — ★★ THE IMAGINATION ENGINE (Fret 9)
+    │   │   ├── VertiscaleEngine.jsx         — Core state machine: menu, Phase 1/2/3, scoring
+    │   │   ├── GameFretboard.jsx            — Visual layer: 8 cell states, hold animations
+    │   │   ├── OrbEngine.jsx               — Phase 2: descending orbs (rAF + AudioContext timing)
+    │   │   ├── PitchGateUI.jsx             — Phase 2: pitch needle cents deviation display
+    │   │   ├── narrativeEngine.js           — Adventure state machine (Troubadour scenes)
+    │   │   ├── scoreCalculator.js           — Flash + Sustain scoring, consistency ratio
+    │   │   └── sessionLogger.js             — Persistence: tractionStore + Dexie
+    │   │
+    │   ├── hooks/
+    │   │   └── useFlashTimer.js             — Timer engine: REVEAL→DARK→TAP→RESULT + HOLD states
+    │   │
     │   ├── data/
     │   │   ├── chapterData.js      — ★ 12-chapter curriculum (Hero's Journey × Chromatic)
+    │   │   ├── vertiscalePatterns.js — Pattern library: 12 roots × pentatonic/major/minor
+    │   │   ├── harmonicData.js     — Pythagorean ratios + interval resonance cues
+    │   │   ├── adventures/troubadour.js — ★ Pitch-gated narrative: 12 scenes, 3 acts, branching
     │   │   ├── slideGenerator.js   — Converts chapters → swipeable slide decks
+    │   │   ├── timelessSongSlides.js — 36 historical slides (Pythagoras → Messiaen)
     │   │   ├── tractionStore.js    — localStorage progress + scaffolding fade
     │   │   ├── localDatabase.js    — Dexie/IndexedDB schema (offline-first, submission outbox)
     │   │   ├── pricingData.js      — ★ Revenue streams, pricing, Stripe link stubs
@@ -178,6 +202,7 @@ voix-vive/
     │   │   ├── WelcomeOnboarding.jsx   — ★ 3-slide first-run welcome flow
     │   │   ├── AmbientPlayer.jsx       — HTML5 Audio: ambient + Metronome (mutually exclusive)
     │   │   ├── DigitalBinder.jsx       — Practice log + Tools tab + submission history
+    │   │   ├── NeckMenu.jsx            — Root-note selection menu for game entry
     │   │   ├── ScaffoldingProvider.jsx — React context for traction-aware UI fade
     │   │   ├── FretboardExplorer.jsx   — 14-fret fretboard with scales + Web Audio
     │   │   ├── FretboardSheet.jsx      — Bottom-sheet fretboard overlay for in-slide practice
@@ -204,47 +229,112 @@ voix-vive/
 
 ---
 
+## 7b. SUPPORTING DOCUMENTS — Reference Guide
+
+The project has a layered documentation system. **Read in this order depending on your task:**
+
+| If you need... | Read this | Path |
+|---------------|-----------|------|
+| Full project context | **CONTEXT.md** (this file) | `./CONTEXT.md` |
+| Development timeline + key decisions | **ROADMAP.md** | `./ROADMAP.md` |
+| Platform philosophy, student profile, pedagogy | **Master Design Doc** | `./research/10_MASTER_DESIGN_DOC.md` |
+| **Game mechanics, imagination framework, scoring** | **★ Vertiscale Game Design Doc** | `./research/10_design_doc_03_vertiscale_game.md` |
+| Curriculum structure (Yin/Yang, chapter map) | **Curriculum Design Doc** | `./research/10_design_doc_02_curriculum.md` |
+| Tech stack, deployment, licensing | **Platform Design Doc** | `./research/10_design_doc_04_platform_and_business.md` |
+| Philosophy + slow web mandate | **Foundation Design Doc** | `./research/10_design_doc_01_foundation.md` |
+| Gamification research (audio, XR, licensing) | **Open Source Research** | `./Gamifying Guitar Learning with Open Source.md` |
+
+### How to Use These Docs
+
+**For game work:** Read `10_design_doc_03_vertiscale_game.md` FIRST. It contains:
+- The Imagination Management Framework (Gordon, Boethius, predictive processing)
+- The Three Inners mapping (Inner Fretboard / Inner Ear / Inner Voice)
+- Flash and Imagine mode game loops
+- Scoring philosophy (quality of internal model, not speed)
+- Phase 2 audiation loop and the critical "audiation pause"
+- Phase 3 journal/coaching cue design
+- Future: adventure system, XR transformation
+
+**For platform work:** Read `10_MASTER_DESIGN_DOC.md` for the full picture.
+
+**For pricing/business questions:** Read `ROADMAP.md` §Revenue + `10_design_doc_04_platform_and_business.md`.
+
+**Rule: Update docs when you change the game.** If a game mechanic changes, update the game design doc in the same session. This prevents scope creep and keeps imagination management as the governing lens.
+
+---
+
 ## 8. WHAT'S DONE vs WHAT'S LEFT
 
-### ✅ Complete
+### ✅ Complete (as of 2026-05-19)
 - [x] 12-chapter Living Textbook (free, swipeable slides with artwork for ch1-8)
 - [x] StudioPage business landing (6 services, 13 testimonials, payment grid, FAQ, French section)
-- [x] PracticeRecorder (video/audio → IndexedDB outbox)
-- [x] AmbientPlayer (Bertrand's "Houlton Skies" via HTML5 Audio)
-- [x] Metronome wired into AmbientPlayer panel (mutually exclusive with ambient, persistent across pages)
-- [x] WelcomeOnboarding (3-slide first-run intro)
-- [x] SEO (JSON-LD, Open Graph, Twitter Cards)
-- [x] OrientationHub bottom nav (Chapters, Fretboard, Binder, Studio)
-- [x] FretboardExplorer (14-fret with scales + Web Audio)
-- [x] Digital Binder (practice log, tools tab, submissions) — max-width 640px on desktop
-- [x] Guitar Tools wired in Binder: Metronome, PracticeTimer, PlingTrainer, PitchRoom, BreathingGate, RhythmEngine
-- [x] FretboardSheet wired into SlideViewer exercise slides
-- [x] Fret 5 — Interval Visualizer (©SHEARL) ✅
-- [x] Fret 8 — Microtonal Tracker (©FHEAL) ✅
-- [x] Fret 11 — Multi-Key Hub (©FHEAL) ✅
-- [x] Workspace cleanup and rename (daydream-website → voix-vive) — May 18 2026
+- [x] All 12 Fret tools wired and interactive (12/12 ✅)
+- [x] **Fret 9 — Vertiscale Imagination Engine** ✅
+  - Phase 1 Flash: REVEAL → DARK → TAP → RESULT (8 rounds, progressive difficulty)
+  - Phase 1 Imagine: REVEAL → HOLD → RESULT (sustain scoring, breathing pulse)
+  - Phase 2 Audiate: OrbEngine + PitchGateUI wired (needs live testing)
+  - Phase 3 Reflect: Journal textarea + dynamic coaching cues + localStorage persistence
+- [x] Menu reframed: Inner Fretboard / Inner Ear / Inner Voice
+- [x] Imagination Management Framework documented in game design doc
+- [x] PracticeRecorder, AmbientPlayer, Metronome, WelcomeOnboarding, SEO
+- [x] Digital Binder (practice log, tools tab, submissions)
+- [x] Workspace cleanup and rename (daydream-website → voix-vive)
 
 ### 🟡 Needs Bertrand's Input
 - [ ] Stripe Payment Links — Bertrand creates Stripe account, we plug in URLs
 - [ ] Venmo QR image — need actual QR code screenshot
-- [ ] PayPal.me and Ko-fi URLs
 - [ ] Review StudioPage copy for accuracy
+- [ ] Thursday review call feedback
 
-### 🔴 Remaining Dev Work
-- [ ] **Fret 9 — Vertiscale Engine** (©SHEARL) — the main gamification event
-  - Phase 1: show vertical scale pattern, hide it, student taps from memory, score + streak
-  - Phase 2: PLING! mic validation
-  - Phase 3: FHEAL freeplay tracker
-- [ ] ch9-12 artwork (35 images via AI generation)
-- [ ] ch8 artwork completion (missing: exercise-0, exercise-1, fretboard, meditation, quote, end)
-- [ ] PracticeRecorder → actual upload pipeline (Cloudflare R2 or DaaS tunnel)
-- [ ] Production deployment (voix-vive.com domain + Vercel DNS)
+### 🔴 Next Game Workflows (Priority Order)
+
+These are the next tasks for game development sessions. Each one should be a focused session.
+
+**Workflow 1: Live Testing + Bug Fixes** (1 session)
+- Spin up dev server, test all 4 game modes in browser
+- Verify Phase 1 Flash (regression — should still work)
+- Verify Phase 1 Imagine (new — sustain hold + breathing pulse)
+- Verify Phase 2 Audiate (new — OrbEngine + PitchGateUI integration)
+- Verify Phase 3 Reflect (new — journal + coaching cues)
+- Fix any runtime errors, visual glitches, or UX issues
+
+**Workflow 2: Audiation Pause for Phase 2** (1 session)
+- Add the "imagine before you sing" UI affordance to OrbEngine
+- Visual: note name appears → countdown → mic activates (the pause IS the training)
+- This is the single most important game mechanic — it's what separates this from Guitar Hero
+- Update `10_design_doc_03_vertiscale_game.md` if the design changes
+
+**Workflow 3: Pattern Library + Menu Expansion** (1 session)
+- Add scale type selector to game menu (pentatonic / major / minor / CAGED)
+- Wire `vertiscalePatterns.js` to generate all scale types for selected root
+- This is pure content expansion — triples the playable material
+
+**Workflow 4: Session Persistence + Phase Unlock Gates** (1 session)
+- Reconcile sessionLogger.js with VertiscaleEngine's inline localStorage
+- Implement phase unlock gates: 5 successful Phase 1 → unlock Phase 2, etc.
+- Wire `computePhaseUnlock()` from scoreCalculator into the menu
+
+**Workflow 5: Troubadour Adventure UI** (1-2 sessions)
+- Build adventure scene renderer component
+- Wire `troubadour.js` (484 lines of pitch-gated narrative, 12 scenes, branching)
+- This is where imagination management becomes narrative — the student IS a character
+- Biggest untapped asset in the codebase
+
+**Workflow 6: Eyes-Closed Mode + Somatic Deepening** (1 session)
+- Add "eyes closed" variant of Flash mode — screen goes black, taps are from pure imagination
+- Add imagination vividness self-rating after each round
+- Add body scan prompt rotation to Phase 3 journal
 
 ### 🚀 Future: VR/AI Masterclass (the premium product)
 - [ ] Bevy ECS + Rust/WASM + OpenXR architecture document
 - [ ] Fine-tune Gemma 4 model on Bertrand's teaching data
 - [ ] Android app shell in Android Studio
 - [ ] VR classroom: avatar, fretboard overlay, pitch detection
+
+### 🎨 Remaining Non-Game Work
+- [ ] ch9-12 artwork (35 images via AI generation)
+- [ ] PracticeRecorder → actual upload pipeline (Cloudflare R2)
+- [ ] Production deployment (voix-vive.com domain + Vercel DNS)
 
 ---
 
@@ -260,21 +350,30 @@ INSTRUCTIONS FOR AI:
 2. Project root: /home/joshua-atkinson/antigravity/voix-vive/
    App: /home/joshua-atkinson/antigravity/voix-vive/bertrand-masterclass/
 
-3. THE CORE EXPERIENCE is the SlideViewer.jsx (free curriculum) +
-   StudioPage.jsx (business landing with pricing, testimonials, and CTAs).
+3. THE GAME (Fret 9 — Vertiscale Imagination Engine) is the current dev focus.
+   Read research/10_design_doc_03_vertiscale_game.md for the Imagination
+   Management Framework BEFORE making game changes.
 
-4. PAYMENT: Use Stripe Payment Links (no backend needed). Bertrand also
-   accepts Venmo. Display both options prominently.
+4. The game trains IMAGINATION, not fingers. Three phases:
+   - THE INNER FRETBOARD: Flash (prediction speed) + Imagine (prediction stability)
+   - THE INNER EAR: Audiate (imagine pitch → sing → verify → place)
+   - THE INNER VOICE: Reflect (journal + coaching cues)
 
-5. RESPECT THE IP BOUNDARY (§5): Don't import Great Game concepts without permission.
+5. Game code lives in src/game/ (7 files) and src/hooks/useFlashTimer.js.
+   Game data lives in src/data/vertiscalePatterns.js, harmonicData.js,
+   and adventures/troubadour.js.
 
-6. THE LIVING TEXTBOOK IS FREE. Do not gate chapters behind payment.
-   The FUTURE Masterclass is a separate VR/AI product (Bevy + Gemma 4).
+6. RESPECT THE IP BOUNDARY (§5): Don't import Great Game concepts without permission.
 
-7. Run: cd /home/joshua-atkinson/antigravity/voix-vive/bertrand-masterclass && npm run dev
+7. THE LIVING TEXTBOOK IS FREE. Do not gate chapters behind payment.
 
-8. Bertrand has family in France he hasn't visited in years.
-   This platform needs to fund that trip. Build accordingly.
+8. Run: cd /home/joshua-atkinson/antigravity/voix-vive/bertrand-masterclass && npm run dev
+
+9. When changing game mechanics, UPDATE the game design doc in the same session.
+   Documentation is the lens that prevents scope creep.
+
+10. Bertrand has family in France he hasn't visited in years.
+    This platform needs to fund that trip. Build accordingly.
 ```
 
 ### Academic Context

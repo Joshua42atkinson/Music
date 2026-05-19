@@ -2,6 +2,8 @@
 
 > **Last Updated:** 2026-05-18  
 > **Timeline:** 8 weeks from today (target completion: July 12, 2026)  
+> **Milestone:** Thursday Review with Bertrand (Client Stakeholder)
+> **Status:** Rough Draft Mode — not going live until approved. Building functional prototypes so the client can "add flavor" rather than building from scratch.
 > **Goal:** Sustainable income for Bertrand Laurence via free-textbook marketing funnel + paid coaching/VR product
 
 ---
@@ -60,23 +62,19 @@ PREMIUM LAYER (Future)
 
 ---
 
-## Phase 1: Go Live 🔥 (Week 1 — May 18-24)
+## Phase 1: Stakeholder Review (Week 1 — May 18-24)
 
-**Goal:** Process Bertrand's first paid booking through the platform.
+**Goal:** Present a fully functional, "rough draft" prototype of the entire Masterclass platform to Bertrand on Thursday for his approval and "flavor" additions. We will NOT go live until he approves.
 
 | Task | Owner | Priority |
 |------|-------|----------|
-| Bertrand creates Stripe account + Payment Links | Bertrand | P0 |
-| Plug Stripe URLs into `pricingData.js` | Joshua | P0 |
-| Generate ch9-12 artwork (35 images) | Joshua/AI | P1 |
+| Refine Vertiscale Engine & Adventure Game | AI | P0 |
+| Configure `voix-vive.com` domain in Vercel | Joshua | P1 |
+| Collect Stripe Payment Links | Bertrand | P1 |
 | Get Venmo QR screenshot from Bertrand | Bertrand | P1 |
-| Set up production domain (voixvive.com?) | Joshua | P1 |
-| Deploy to Vercel production | Joshua | P1 |
-| Delete dead code (TheMentor.jsx, MentorshipHub.jsx) | Joshua | P2 |
-| Remove `react-youtube` from package.json | Joshua | P2 |
 | Thursday review call with Bertrand | Both | P0 |
 
-**Exit Criteria:** A student can tap "Book Trial Lesson" and complete payment.
+**Exit Criteria:** Bertrand reviews the working platform on Thursday, approves the direction, and provides his custom pedagogical flavor.
 
 ---
 
@@ -124,7 +122,7 @@ PREMIUM LAYER (Future)
 
 ---
 
-## Phase 1.6: Complete The 12 Tools 🛠️ (11/12 Done — Fret 9 Remaining)
+## Phase 1.6: Complete The 12 Tools 🛠️ ✅ (Complete — May 19 2026)
 
 **Goal:** Bring all 12 frets to life so the tools grid is fully interactive.
 
@@ -132,15 +130,10 @@ PREMIUM LAYER (Future)
 |------|------|----------|--------|
 | **5** | **Interval Visualizer** | ©SHEARL | ✅ Complete — tap-two-notes fretboard, interval name + semitone count |
 | **8** | **Microtonal Tracker** | ©FHEAL | ✅ Complete — real-time cents needle (−50¢ to +50¢) via mic |
-| **9** | **Vertiscale Engine** | ©SHEARL | 🔴 **NEXT** — full gamified scale memory game |
+| **9** | **Vertiscale Engine** | ©SHEARL+©FHEAL | ✅ **Complete** — The Imagination Engine: Flash + Imagine modes, OrbEngine wired, Journal + coaching cues |
 | **11** | **Multi-Key Hub** | ©FHEAL | ✅ Complete — all-12-keys scale overlay extending FretboardExplorer |
 
-### Fret 9 — Vertiscale Engine Build Plan:
-- Phase 1: Show vertical scale pattern → hide → student taps from memory → score + streak
-- Phase 2: PLING! mic validation (sing the note before tapping)
-- Phase 3: FHEAL freeplay tracker (creative improv on scale)
-
-**Exit Criteria:** All 12 fret cards are interactive with real UIs. No "Coming Soon" cards remain.
+**Exit Criteria:** All 12 fret cards are interactive with real UIs. ✅ Achieved.
 
 ## Phase 2: Async Coaching Pipeline 📹 (Week 2 — May 25-31)
 
@@ -283,7 +276,7 @@ At $6,465/mo, Bertrand saves $3,000/mo → France trip funded in **6 weeks**.
 4. SSL auto-provisions via Let's Encrypt (~10 min)
 
 ### Deployment Checklist
-- [ ] Purchase `voix-vive.com` on Squarespace
+- [x] Purchase `voix-vive.com` on Squarespace
 - [ ] Add domain in Vercel project settings
 - [ ] Update DNS at Squarespace registrar
 - [ ] Confirm SSL and www → root redirect
@@ -299,3 +292,13 @@ At $6,465/mo, Bertrand saves $3,000/mo → France trip funded in **6 weeks**.
 | 2026-05-18 | DigitalBinder wrapped in max-width 640px | Matches StudioPage on desktop, no full-width stretch |
 | 2026-05-18 | Workspace renamed daydream-website → voix-vive | Align local folder with project brand |
 | 2026-05-18 | Root legacy files (Cargo, old README, old node_modules) deleted | Project is 100% in bertrand-masterclass/ — root was dead weight |
+
+### Key Decisions — 2026-05-19
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-05-19 | Vertiscale Engine reframed as "Imagination Engine" | Grounded in Gordon's audiation theory + predictive processing neuroscience. The game trains the internal model, not the fingers. |
+| 2026-05-19 | Three Inners framework: Inner Fretboard / Inner Ear / Inner Voice | Maps Boethius's Three Musics to game phases. Moves from instrumentalis → humana. |
+| 2026-05-19 | Flash + Imagine dual modes for Phase 1 | "The Opposite Principle" — speed trains prediction velocity, stillness trains prediction stability |
+| 2026-05-19 | Phase 3 reframed from Freeplay to Journal + Coaching | v1 implements metacognitive reflection. Freeplay deferred to v2. |
+| 2026-05-19 | Fret 9 (Vertiscale Engine) complete — all 12/12 tools live | Phase 1.6 exit criteria achieved |

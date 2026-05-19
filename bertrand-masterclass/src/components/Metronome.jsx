@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Square, Settings, Volume2, Plus, Minus } from 'lucide-react';
+import { getAudioContext, resumeAudio, playMetronomeClick } from '../audio/audioEngine';
 
 const Metronome = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -8,22 +9,14 @@ const Metronome = () => {
   const [currentBeat, setCurrentBeat] = useState(0);
   const [volume, setVolume] = useState(0.5);
 
-  const audioContextRef = useRef(null);
   const nextNoteTimeRef = useRef(0);
   const currentBeatRef = useRef(0);
   const timerIDRef = useRef(null);
   const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
   const scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)
 
-  // Initialize Audio Context on first interaction
   const initAudio = () => {
-    if (!audioContextRef.current) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioContextRef.current = new AudioContext();
-    }
-    if (audioContextRef.current.state === 'suspended') {
-      audioContextRef.current.resume();
-    }
+    resumeAudio();
   };
 
   const nextNote = useCallback(() => {
@@ -35,28 +28,15 @@ const Metronome = () => {
   }, [bpm, beatsPerMeasure]);
 
   const scheduleNote = useCallback((beatNumber, time) => {
-    if (!audioContextRef.current) return;
-    const osc = audioContextRef.current.createOscillator();
-    const envelope = audioContextRef.current.createGain();
-
-    osc.connect(envelope);
-    envelope.connect(audioContextRef.current.destination);
-
-    // High beep for downbeat, low beep for other beats
-    osc.frequency.value = beatNumber === 0 ? 880.0 : 440.0;
-    
-    // Envelope for a sharp click
-    envelope.gain.value = 1 * volume;
-    envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
-
-    osc.start(time);
-    osc.stop(time + 0.1);
+    playMetronomeClick(beatNumber === 0, time, volume);
   }, [volume]);
 
   const scheduler = useCallback(() => {
     // While there are notes that will need to play before the next interval,
     // schedule them and advance the pointer.
-    while (nextNoteTimeRef.current < audioContextRef.current.currentTime + scheduleAheadTime) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    while (nextNoteTimeRef.current < ctx.currentTime + scheduleAheadTime) {
       scheduleNote(currentBeatRef.current, nextNoteTimeRef.current);
       nextNote();
     }
@@ -69,7 +49,8 @@ const Metronome = () => {
       if (!timerIDRef.current) {
         currentBeatRef.current = 0;
         setCurrentBeat(0);
-        nextNoteTimeRef.current = audioContextRef.current.currentTime + 0.05;
+        const ctx = getAudioContext();
+        nextNoteTimeRef.current = (ctx ? ctx.currentTime : 0) + 0.05;
         scheduler();
       }
     } else {

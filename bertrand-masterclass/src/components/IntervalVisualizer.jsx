@@ -1,6 +1,7 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Interval } from '@tonaljs/tonal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getAudioContext, resumeAudio } from '../audio/audioEngine';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 
@@ -47,18 +48,10 @@ const CONSONANCE_COLORS = {
 const IntervalVisualizer = () => {
   const [tappedNotes, setTappedNotes] = useState([]); // [{midi, stringIdx, fret, noteName}]
   const [playedInterval, setPlayedInterval] = useState(null);
-  const audioCtxRef = useRef(null);
-
-  useEffect(() => {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (AC) audioCtxRef.current = new AC();
-    return () => { if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close(); };
-  }, []);
 
   const playNote = useCallback((freq, duration = 1.2) => {
-    const ctx = audioCtxRef.current;
+    const ctx = resumeAudio();
     if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const now = ctx.currentTime;

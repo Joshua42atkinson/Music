@@ -18,8 +18,9 @@ const ORB_HEIGHT_PX = 36;
 const LANE_HEIGHT   = 280; // px — visual descent distance
 const GATE_POSITION = 0.5; // 50% of descent triggers mic gate
 
-// BPM → ms per beat
 const bpmToMs = (bpm) => 60000 / bpm;
+
+import { playPling } from '../audio/audioEngine';
 
 // Difficulty presets (never called Easy/Medium/Hard)
 export const DIFFICULTY_PRESETS = {
@@ -62,6 +63,7 @@ function OrbEngine({
 }) {
   const [orbs, setOrbs] = useState([]);         // active orbs on screen
   const [progress, setProgress] = useState({}); // orbId → 0.0–1.0
+  const [bursts, setBursts] = useState([]);     // visual bursts on tap
   const seqIdxRef     = useRef(0);
   const rafRef        = useRef(null);
   const spawnTimerRef = useRef(null);
@@ -159,8 +161,18 @@ function OrbEngine({
 
     onOrbTap?.(orb.id, { correct: gateResult === 'passed', centsDev, breathState, fret: orb.fret, stringIdx: orb.stringIdx });
 
+    // Visual burst + Audio if passed
+    if (gateResult === 'passed') {
+      playPling(orb.note?.freq);
+      setBursts(prev => [...prev, {
+        id: Date.now() + Math.random(),
+        stringIdx: orb.stringIdx,
+        p: progress[orb.id] ?? 0
+      }]);
+    }
+
     setOrbs(prev => prev.map(o => o.id === orb.id ? { ...o, tapped: true } : o));
-  }, [noteInfo, preset, breathState, onOrbTap, onGateResult]);
+  }, [noteInfo, preset, breathState, onOrbTap, onGateResult, audioCtxRef, progress]);
 
   if (!active || orbs.length === 0) return null;
 
@@ -211,6 +223,30 @@ function OrbEngine({
                 />
               )}
             </motion.div>
+          );
+        })}
+        {/* Render Visual Bursts */}
+        {bursts.map(burst => {
+          const top = burst.p * (LANE_HEIGHT - ORB_HEIGHT_PX);
+          const left = `${(burst.stringIdx / 5) * 85 + 5}%`;
+          return (
+            <motion.div
+              key={burst.id}
+              initial={{ opacity: 0.8, scale: 1, borderWidth: '2px' }}
+              animate={{ opacity: 0, scale: 2.5, borderWidth: '0px' }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              onAnimationComplete={() => setBursts(prev => prev.filter(b => b.id !== burst.id))}
+              style={{
+                position: 'absolute',
+                top, left,
+                width: ORB_HEIGHT_PX, height: ORB_HEIGHT_PX,
+                borderRadius: '50%',
+                borderColor: '#2ed573',
+                borderStyle: 'solid',
+                boxShadow: '0 0 20px rgba(46,213,115,0.8)',
+                pointerEvents: 'none',
+              }}
+            />
           );
         })}
       </AnimatePresence>

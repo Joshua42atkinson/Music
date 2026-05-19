@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Disc3, SkipForward, Music, Minus, Plus, Square } from 'lucide-react';
+import { getAudioContext, resumeAudio, playMetronomeClick } from '../audio/audioEngine';
 
 // ═══════════════════════════════════════════════════════════
 // AMBIENT PLAYER — Music + Metronome, globally persistent
@@ -32,7 +33,6 @@ function useMetronome() {
   const [lastTap, setLastTap]     = useState(null);
   const [tapHistory, setTapHistory] = useState([]);
 
-  const ctxRef   = useRef(null);
   const nextRef  = useRef(0);
   const beatRef  = useRef(0);
   const timerRef = useRef(null);
@@ -48,29 +48,15 @@ function useMetronome() {
   useEffect(() => { playRef.current = isPlaying; }, [isPlaying]);
 
   const initCtx = () => {
-    if (!ctxRef.current) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      ctxRef.current = new AC();
-    }
-    if (ctxRef.current.state === 'suspended') ctxRef.current.resume();
+    resumeAudio();
   };
 
   const scheduleNote = useCallback((beat, time) => {
-    const ctx = ctxRef.current;
-    if (!ctx) return;
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = beat === 0 ? 880 : 440;
-    gain.gain.value = volRef.current;
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
-    osc.start(time);
-    osc.stop(time + 0.08);
+    playMetronomeClick(beat === 0, time, volRef.current);
   }, []);
 
   const scheduler = useCallback(() => {
-    const ctx = ctxRef.current;
+    const ctx = getAudioContext();
     if (!ctx || !playRef.current) return;
     while (nextRef.current < ctx.currentTime + 0.1) {
       scheduleNote(beatRef.current, nextRef.current);
@@ -85,7 +71,8 @@ function useMetronome() {
     if (isPlaying) {
       initCtx();
       beatRef.current = 0;
-      nextRef.current = ctxRef.current.currentTime + 0.05;
+      const ctx = getAudioContext();
+      nextRef.current = (ctx ? ctx.currentTime : 0) + 0.05;
       scheduler();
     } else {
       clearTimeout(timerRef.current);

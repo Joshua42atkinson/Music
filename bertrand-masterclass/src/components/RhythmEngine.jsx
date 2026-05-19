@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Square, Settings, Music } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getAudioContext, resumeAudio, playPluckedString, playMetronomeClick } from '../audio/audioEngine';
 
 // A sample JS-Hero style track mapping
 const SAMPLE_TRACK = [
@@ -23,7 +24,6 @@ const RhythmEngine = () => {
   const [currentMeasure, setCurrentMeasure] = useState(1);
   const [currentBeat, setCurrentBeat] = useState(0);
 
-  const audioContextRef = useRef(null);
   const nextNoteTimeRef = useRef(0);
   const currentTickRef = useRef({ measure: 1, beat: 0 }); // 0 to 3.75 (sixteenth notes)
   const timerIDRef = useRef(null);
@@ -32,13 +32,7 @@ const RhythmEngine = () => {
   const scheduleAheadTime = 0.1; 
 
   const initAudio = () => {
-    if (!audioContextRef.current) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioContextRef.current = new AudioContext();
-    }
-    if (audioContextRef.current.state === 'suspended') {
-      audioContextRef.current.resume();
-    }
+    resumeAudio();
   };
 
   const nextTick = useCallback(() => {
@@ -64,42 +58,22 @@ const RhythmEngine = () => {
   }, [bpm]);
 
   const scheduleNote = useCallback((measure, beat, time) => {
-    if (!audioContextRef.current) return;
-
     // Check if there is a note in the track at this exact measure/beat
     const note = SAMPLE_TRACK.find(n => n.measure === measure && n.beat === beat);
     
     if (note) {
-      const osc = audioContextRef.current.createOscillator();
-      const envelope = audioContextRef.current.createGain();
-      osc.connect(envelope);
-      envelope.connect(audioContextRef.current.destination);
-      
-      // Simple frequency mapping: base frequency + fret offset
-      // Just a placeholder sound for the rhythm game
-      osc.frequency.value = 220.0 * Math.pow(2, (note.fret + (note.string * 5)) / 12);
-      
-      envelope.gain.value = 0.5;
-      envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
-      
-      osc.start(time);
-      osc.stop(time + 0.3);
+      const freq = 220.0 * Math.pow(2, (note.fret + (note.string * 5)) / 12);
+      playPluckedString(freq, time);
     } else if (beat % 1 === 0) {
       // Metronome click
-      const osc = audioContextRef.current.createOscillator();
-      const envelope = audioContextRef.current.createGain();
-      osc.connect(envelope);
-      envelope.connect(audioContextRef.current.destination);
-      osc.frequency.value = beat === 0 ? 880.0 : 440.0;
-      envelope.gain.value = 0.1;
-      envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
-      osc.start(time);
-      osc.stop(time + 0.05);
+      playMetronomeClick(beat === 0, time);
     }
   }, []);
 
   const scheduler = useCallback(() => {
-    while (nextNoteTimeRef.current < audioContextRef.current.currentTime + scheduleAheadTime) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    while (nextNoteTimeRef.current < ctx.currentTime + scheduleAheadTime) {
       scheduleNote(currentTickRef.current.measure, currentTickRef.current.beat, nextNoteTimeRef.current);
       nextTick();
     }
@@ -113,7 +87,8 @@ const RhythmEngine = () => {
         currentTickRef.current = { measure: 1, beat: 0 };
         setCurrentMeasure(1);
         setCurrentBeat(0);
-        nextNoteTimeRef.current = audioContextRef.current.currentTime + 0.05;
+        const ctx = getAudioContext();
+        nextNoteTimeRef.current = (ctx ? ctx.currentTime : 0) + 0.05;
         scheduler();
       }
     } else {
