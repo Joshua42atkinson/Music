@@ -7,24 +7,11 @@ import PitchGateUI from './PitchGateUI';
 import useFlashTimer, { FLASH_STATES } from '../hooks/useFlashTimer';
 import usePitchDetector from '../hooks/usePitchDetector';
 import { computePhase1Score, computeSustainScore, computePhase2Score, checkStreakEligible, computePhaseUnlock } from './scoreCalculator';
-import { computeVertiscale, NOTE_NAMES, STRING_TUNING, midiToFreq } from '../data/vertiscalePatterns';
+import { computeVertiscale, NOTE_NAMES, STRING_TUNING, midiToFreq, VERTISCALE_PATTERNS, getScaleCategories } from '../data/vertiscalePatterns';
 import NeckMenu from '../components/NeckMenu';
 import AdventurePlayer from './AdventurePlayer';
 import Glossary from '../components/Glossary';
-
-// ── Inline progress helpers (localStorage, replaces sessionLogger until tractionStore is built) ──
-const VS_KEY = 'voixvive_vertiscale_progress';
-function getVertiscaleProgress() {
-  try { return JSON.parse(localStorage.getItem(VS_KEY) || '{}'); }
-  catch { return {}; }
-}
-function logVertiscaleSession(data) {
-  const progress = getVertiscaleProgress();
-  const key = data.phase === 1 ? 'phase1Sessions' : data.phase === 2 ? 'phase2Sessions' : 'phase3Sessions';
-  if (!progress[key]) progress[key] = [];
-  progress[key].push({ ...data, mode: data.mode || 'flash', timestamp: Date.now() });
-  localStorage.setItem(VS_KEY, JSON.stringify(progress));
-}
+import { logVertiscaleSession, getVertiscaleProgress } from './sessionLogger';
 
 // ═══════════════════════════════════════════════════════════
 // VERTISCALE ENGINE — State Machine
@@ -58,6 +45,7 @@ function VertiscaleEngine({ onClose }) {
   const [engineState, setEngineState] = useState(ENGINE_STATES.MENU);
   const [rootNote, setRootNote]       = useState('E');
   const [gameMode, setGameMode]       = useState('flash'); // 'flash' | 'imagine'
+  const [scaleType, setScaleType]     = useState('minor pentatonic'); // tonalName from vertiscalePatterns
   const [difficulty, setDifficulty]   = useState('beginner'); // 'beginner' | 'standard' | 'challenge'
   const [showTutorial, setShowTutorial] = useState(false);
   const [round, setRound]            = useState(0);
@@ -77,7 +65,9 @@ function VertiscaleEngine({ onClose }) {
 
   // ── Vertiscale pattern (with progressive difficulty) ──
   const rootIndex = rootNote ? ROOT_NOTES.indexOf(rootNote) : 0;
-  const rawPattern = computeVertiscale({ rootIndex: Math.max(0, rootIndex), tonalName: 'minor pentatonic', minFret: 0, maxFret: 7 });
+  const activePattern = VERTISCALE_PATTERNS.find(p => p.tonalName === scaleType && p.rootIndex === Math.max(0, rootIndex));
+  const maxFret = activePattern?.maxFret || 7;
+  const rawPattern = computeVertiscale({ rootIndex: Math.max(0, rootIndex), tonalName: scaleType, minFret: activePattern?.minFret || 0, maxFret });
   
   // Calculate current stage (1 to 4) based on round (0 to 7)
   const currentStage = Math.floor(round / 2) + 1;
@@ -118,7 +108,18 @@ function VertiscaleEngine({ onClose }) {
 
   // ── Load progress on mount ──
   useEffect(() => {
-    // Phases are now permanently unlocked by default since gated content is still under construction.
+    try {
+      const progress = getVertiscaleProgress();
+      if (progress && (progress.phase1Sessions || progress.phase2Sessions)) {
+        const unlock = computePhaseUnlock(progress);
+        setPhaseUnlock(unlock);
+      }
+      // Dev note: to permanently unlock all phases during development, uncomment:
+      // setPhaseUnlock({ phase1Unlocked: true, phase2Unlocked: true, phase3Unlocked: true });
+    } catch (e) {
+      // Graceful fallback — all phases unlocked if persistence fails
+      console.warn('[VertiscaleEngine] Could not load progress:', e);
+    }
   }, []);
 
   // ── Fret tap handler ──
@@ -309,6 +310,8 @@ function VertiscaleEngine({ onClose }) {
               onClose={onClose}
               difficulty={difficulty}
               setDifficulty={setDifficulty}
+              scaleType={scaleType}
+              setScaleType={setScaleType}
             />
           )}
 
@@ -389,7 +392,7 @@ function VertiscaleEngine({ onClose }) {
                     playerTaps={playerTaps}
                     flashState={flashState}
                     onTap={handleTap}
-                    maxFret={7}
+                    maxFret={maxFret}
                     holdProgressPct={holdProgressPct}
                     breathState={breathState}
                   />
@@ -482,7 +485,7 @@ function VertiscaleEngine({ onClose }) {
 // Sub-components
 // ═══════════════════════════════════════════════════════════
 
-function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isListening, onStartMic, onClose, difficulty, setDifficulty }) {
+function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isListening, onStartMic, onClose, difficulty, setDifficulty, scaleType, setScaleType }) {
   const mappedRoots = ROOT_NOTES.map((note, idx) => ({
     id: note,
     fret: idx + 1,
@@ -560,6 +563,37 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
             color: difficulty === d.key ? '#c9a96e' : '#5a6a80',
             transition: 'all 0.2s',
           }}>{d.label}</button>
+        ))}
+      </div>
+
+      {/* Scale type selector */}
+      <div style={{
+        display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20,
+        padding: '8px 12px', background: 'rgba(255,255,255,0.02)', borderRadius: 8,
+        border: '1px solid rgba(255,255,255,0.04)',
+      }}>
+        <p style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+          color: '#5a6a80', letterSpacing: '0.1em', textTransform: 'uppercase',
+          margin: '0 8px 0 0', display: 'flex', alignItems: 'center', width: '100%',
+          justifyContent: 'center', marginBottom: 4,
+        }}>SCALE TYPE:</p>
+        {[
+          { key: 'minor pentatonic', label: '♪ Pentatonic' },
+          { key: 'major', label: '♫ Major' },
+          { key: 'minor', label: '♭ Minor' },
+          { key: 'dorian', label: '♮ Dorian' },
+          { key: 'mixolydian', label: '♯ Mixolydian' },
+          { key: 'minor blues', label: '🎷 Blues' },
+        ].map(s => (
+          <button key={s.key} onClick={() => setScaleType(s.key)} style={{
+            padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+            background: scaleType === s.key ? 'rgba(201,169,110,0.15)' : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${scaleType === s.key ? 'rgba(201,169,110,0.4)' : 'rgba(255,255,255,0.06)'}`,
+            color: scaleType === s.key ? '#c9a96e' : '#5a6a80',
+            transition: 'all 0.2s',
+          }}>{s.label}</button>
         ))}
       </div>
 
@@ -656,12 +690,13 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
   );
 }
 
-// ── Phase 2 Screen — PLING! Orbs ──
+// ── Phase 2 Screen — PLING! Orbs (with Audiation Pause) ──
 function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListening, audioCtxRef, onSessionLog, onComplete, onBack }) {
   const [orbActive, setOrbActive] = React.useState(false);
   const [orbScores, setOrbScores] = React.useState([]);
   const [currentTarget, setCurrentTarget] = React.useState(null);
   const [gateState, setGateState] = React.useState('waiting');
+  const [audiatePhase, setAudiatePhase] = React.useState(null); // null | { note }
 
   // Transform pattern array into orbSequence format for OrbEngine
   const orbSequence = React.useMemo(() => {
@@ -698,12 +733,33 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
           letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase',
         }}>🎵 THE INNER EAR · {rootNote} Vertiscale</p>
         <p style={{ fontSize: '1rem', color: '#8090a8', marginTop: 8, lineHeight: 1.6 }}>
-          Notes will descend the screen. When a note crosses the gate line, sing or hum it into your microphone. Tap the orb when you're ready.
+          Notes descend the screen. When a note hits the <span style={{ color: '#9b7acc' }}>purple line</span>, <strong>imagine the sound in your mind</strong> — don't sing yet.
+          When it crosses the <span style={{ color: '#c9a96e' }}>gold line</span>, sing it into your mic. Tap the orb when you're ready.
         </p>
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80', marginTop: 8 }}>
           {orbScores.length}/{orbSequence.length} notes completed
         </p>
       </div>
+
+      {/* Audiation status indicator */}
+      {audiatePhase && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            textAlign: 'center', padding: '10px 16px', borderRadius: 8,
+            background: 'rgba(155,122,204,0.08)', border: '1px solid rgba(155,122,204,0.2)',
+          }}
+        >
+          <p style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+            letterSpacing: '0.12em', color: '#9b7acc', textTransform: 'uppercase', margin: 0,
+          }}>🧠 AUDIATING — {audiatePhase.note?.name}</p>
+          <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '4px 0 0', fontStyle: 'italic' }}>
+            Hear the note in your mind. Don't sing yet…
+          </p>
+        </motion.div>
+      )}
 
       <OrbEngine
         orbSequence={orbSequence}
@@ -713,7 +769,14 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
         breathState={breathState}
         active={orbActive}
         audioCtxRef={audioCtxRef}
+        onAudiateStart={(orbId, targetNote) => {
+          // Audiation pause begins — show "imagine the sound" prompt
+          setAudiatePhase({ note: targetNote });
+          setGateState('waiting');
+        }}
         onGateOpen={(orbId, targetNote) => {
+          // Audiation pause ends — mic gate opens
+          setAudiatePhase(null);
           setCurrentTarget(targetNote);
           setGateState('open');
         }}
@@ -733,6 +796,7 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
           onSessionLog({ phase: 2, ...score, orbId });
           setGateState('waiting');
           setCurrentTarget(null);
+          setAudiatePhase(null);
         }}
         onOrbMiss={(orbId) => {
           const missScore = { composite: 0, breakdown: { placement: 0, pitch: 0, breath: 0, consistency: 0 } };
@@ -740,6 +804,7 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
           onSessionLog({ phase: 2, ...missScore, orbId, missed: true });
           setGateState('waiting');
           setCurrentTarget(null);
+          setAudiatePhase(null);
         }}
       />
 

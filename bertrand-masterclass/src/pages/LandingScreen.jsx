@@ -80,7 +80,7 @@ export default function LandingScreen() {
         /* ── WORDMARK HEADER ── */
         .wordmark-wrap {
           width: 100%;
-          max-width: 480px;
+          max-width: 540px;
           padding-top: max(32px, env(safe-area-inset-top));
           position: relative;
           z-index: 1;
@@ -112,7 +112,7 @@ export default function LandingScreen() {
           flex-direction: column;
           gap: 16px;
           width: 100%;
-          max-width: 480px;
+          max-width: 540px;
           position: relative;
           z-index: 1;
         }
@@ -244,7 +244,7 @@ export default function LandingScreen() {
         /* ── DESKTOP: wider layout ── */
         @media (min-width: 768px) {
           .portals-grid { max-width: 600px; }
-          .wordmark-wrap { max-width: 560px; }
+          .wordmark-wrap { max-width: 600px; }
         }
 
         /* ── THUMB ANCHOR ── */

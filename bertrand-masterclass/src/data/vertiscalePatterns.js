@@ -199,6 +199,73 @@ export const VERTISCALE_PATTERNS = [
     phase1Eligible: true,
     level: 'flow',
   },
+
+  // ── CAGED SHAPES (position-based patterns) ──
+  {
+    id: 'c_shape_a',
+    label: 'CAGED: C Shape (A Root)',
+    description: 'The C chord shape at the A position. Open voicing meets barre territory.',
+    tonalName: 'major',
+    rootIndex: 9,          // A
+    minFret: 0,
+    maxFret: 4,
+    stringsActive: [0, 1, 2, 3, 4, 5],
+    phase1Eligible: true,
+    level: 'practice',
+    category: 'caged',
+  },
+  {
+    id: 'a_shape_c',
+    label: 'CAGED: A Shape (C Root)',
+    description: 'The A chord shape at the C position. Root on the 5th string.',
+    tonalName: 'major',
+    rootIndex: 0,          // C
+    minFret: 2,
+    maxFret: 6,
+    stringsActive: [0, 1, 2, 3, 4, 5],
+    phase1Eligible: true,
+    level: 'practice',
+    category: 'caged',
+  },
+  {
+    id: 'g_shape_a',
+    label: 'CAGED: G Shape (A Root)',
+    description: 'The G chord shape at the A position. Wide stretch, rewarding reach.',
+    tonalName: 'major',
+    rootIndex: 9,          // A
+    minFret: 4,
+    maxFret: 9,
+    stringsActive: [0, 1, 2, 3, 4, 5],
+    phase1Eligible: true,
+    level: 'flow',
+    category: 'caged',
+  },
+  {
+    id: 'e_shape_g',
+    label: 'CAGED: E Shape (G Root)',
+    description: 'The E chord shape at the G position. Barre chord territory.',
+    tonalName: 'major',
+    rootIndex: 7,          // G
+    minFret: 2,
+    maxFret: 6,
+    stringsActive: [0, 1, 2, 3, 4, 5],
+    phase1Eligible: true,
+    level: 'practice',
+    category: 'caged',
+  },
+  {
+    id: 'd_shape_e',
+    label: 'CAGED: D Shape (E Root)',
+    description: 'The D chord shape at the E position. Upper register, bright tone.',
+    tonalName: 'major',
+    rootIndex: 4,          // E
+    minFret: 4,
+    maxFret: 9,
+    stringsActive: [0, 1, 2, 3, 4, 5],
+    phase1Eligible: true,
+    level: 'flow',
+    category: 'caged',
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -210,6 +277,24 @@ export function getPatternsForLevel(level) {
   const levels = { awakening: ['awakening'], practice: ['awakening', 'practice'], flow: ['awakening', 'practice', 'flow'] };
   const allowed = levels[level] || ['awakening'];
   return VERTISCALE_PATTERNS.filter(p => p.phase1Eligible && allowed.includes(p.level));
+}
+
+/** Get all unique scale categories for building filter UIs */
+export function getScaleCategories() {
+  const categories = new Map();
+  VERTISCALE_PATTERNS.forEach(p => {
+    const cat = p.category || p.tonalName;
+    if (!categories.has(cat)) {
+      categories.set(cat, { id: cat, label: cat.charAt(0).toUpperCase() + cat.slice(1), count: 0 });
+    }
+    categories.get(cat).count++;
+  });
+  return Array.from(categories.values());
+}
+
+/** Get patterns filtered by scale category (e.g., 'minor pentatonic', 'major', 'caged') */
+export function getPatternsByCategory(category) {
+  return VERTISCALE_PATTERNS.filter(p => (p.category || p.tonalName) === category && p.phase1Eligible);
 }
 
 /** Resolve a pattern to its full fretboard positions */
@@ -229,3 +314,4 @@ export function resolvePattern(patternId) {
 export function midiToFreq(midi) {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
+

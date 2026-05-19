@@ -24,6 +24,8 @@ const NeckMenu = ({
         .neck-container {
           min-height: 100vh;
           width: 100%;
+          max-width: 540px;
+          margin: 0 auto;
           font-family: 'Inter', sans-serif;
           position: relative;
           overflow-x: hidden;
@@ -37,6 +39,11 @@ const NeckMenu = ({
             #12100e 95%,
             #0d0d14 100%
           );
+        }
+        @media (min-width: 768px) {
+          .neck-container {
+            max-width: 600px;
+          }
         }
 
         /* ═══════ THE NUT / HEADSTOCK ═══════ */
