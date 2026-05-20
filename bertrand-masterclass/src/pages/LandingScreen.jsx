@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Circle } from 'lucide-react';
 import CoachingPortal from '../components/CoachingPortal';
 import PinModal from '../components/PinModal';
 import ProfileModal from '../components/ProfileModal';
+const AdventurePlayer = React.lazy(() => import('../game/AdventurePlayer'));
 import { useBackendBridge } from '../hooks/useBackendBridge';
 import { useLocale } from '../hooks/useLocale';
 
@@ -52,7 +53,7 @@ export default function LandingScreen() {
 
   const { 
     getProfiles, getProfile, upsertProfile, verifyProfilePin,
-    earnFlorins, spendFlorins, generateTroubadourBook
+    earnFlorins, spendFlorins
   } = useBackendBridge();
   
   const [profiles, setProfiles] = useState([]);
@@ -70,12 +71,8 @@ export default function LandingScreen() {
   const [enteredPin, setEnteredPin] = useState('');
   const [pinError, setPinError] = useState(false);
 
-  // Troubadour Economy & Bookshelf states
-  const [showTroubadourModal, setShowTroubadourModal] = useState(false);
-  const [purchasedBooks, setPurchasedBooks] = useState([]);
-  const [activeBook, setActiveBook] = useState(null);
-  const [activeChapterIndex, setActiveChapterIndex] = useState(0);
-  const [generatingBookId, setGeneratingBookId] = useState(null);
+  // Adventure state
+  const [showAdventure, setShowAdventure] = useState(false);
 
   useEffect(() => {
     const syncProfiles = async () => {
@@ -107,16 +104,7 @@ export default function LandingScreen() {
     syncProfiles();
   }, [getProfiles, upsertProfile, activeProfileName]);
 
-  useEffect(() => {
-    if (activeProfileName) {
-      const saved = localStorage.getItem(`unlocked_books_${activeProfileName}`);
-      if (saved) {
-        setPurchasedBooks(JSON.parse(saved));
-      } else {
-        setPurchasedBooks([]);
-      }
-    }
-  }, [activeProfileName]);
+
 
   const handlePinSubmit = async (pin) => {
     const isCorrect = await verifyProfilePin(pinTargetName, pin);
@@ -475,7 +463,7 @@ export default function LandingScreen() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
-            onClick={() => setShowTroubadourModal(true)}
+            onClick={() => setShowAdventure(true)}
             style={{
               background: 'linear-gradient(135deg, #c9a96e 0%, #a3844d 100%)',
               border: 'none',
@@ -493,7 +481,7 @@ export default function LandingScreen() {
               transition: 'all 0.3s'
             }}
           >
-            {t('adventureStories')}
+            {t('playAdventure')}
           </button>
 
           <button
@@ -562,495 +550,24 @@ export default function LandingScreen() {
         }}
       />
 
-      {/* ── Troubadour Shop & Bookshelf Modal ── */}
+      {/* ── Troubadour Adventure (full-screen overlay) ── */}
       <AnimatePresence>
-        {showTroubadourModal && (
-          <motion.div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 500,
-              background: 'rgba(5,5,8,0.96)',
-              backdropFilter: 'blur(16px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '24px'
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              style={{
-                background: '#0d0d14',
-                border: '1px solid rgba(201,169,110,0.25)',
-                borderRadius: '24px',
-                padding: '32px',
-                width: '100%',
-                maxWidth: '720px',
-                height: '80vh',
-                maxHeight: '650px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                boxShadow: '0 30px 70px rgba(0,0,0,0.9)',
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-              initial={{ scale: 0.95, y: 30 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 30 }}
-            >
-              {/* Header */}
+        {showAdventure && (
+          <Suspense fallback={
+            <div style={{
+              position: 'fixed', inset: 0, zIndex: 300,
+              background: '#030306', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
               <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderBottom: '1px solid rgba(201,169,110,0.15)',
-                paddingBottom: '16px'
-              }}>
-                <div>
-                  <h3 style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: '2rem',
-                    color: '#f0e6d2',
-                    margin: 0
-                  }}>
-                    {activeBook ? t('troubadourLibrary') : t('troubadourStories')}
-                  </h3>
-                  <p style={{
-                    fontSize: '0.75rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: 'rgba(201,169,110,0.5)',
-                    margin: '4px 0 0'
-                  }}>
-                    {activeBook ? `${t('readingLabel')} ${activeBook.title}` : t('bookshelfSubtitle')}
-                  </p>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <button
-                    onClick={() => {
-                      if (activeBook) {
-                        setActiveBook(null);
-                        setActiveChapterIndex(0);
-                      } else {
-                        setShowTroubadourModal(false);
-                      }
-                    }}
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '50%',
-                      width: '36px',
-                      height: '36px',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem'
-                    }}
-                  >
-                    {activeBook ? '⬅️' : '✕'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Body */}
-              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
-                {generatingBookId ? (
-                  /* Generating animation spinner */
-                  <div style={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '20px',
-                    color: '#c9a96e'
-                  }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      border: '3px solid rgba(201,169,110,0.1)',
-                      borderTopColor: '#c9a96e',
-                      animation: 'spinBook 1.5s linear infinite'
-                    }} />
-                    <p style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: '1.4rem',
-                      fontStyle: 'italic',
-                      textAlign: 'center',
-                      animation: 'pulseText 2s ease-in-out infinite'
-                    }}>
-                      {t('distillingScrolls')}
-                    </p>
-                    <p style={{
-                      fontSize: '0.7rem',
-                      fontFamily: "'JetBrains Mono', monospace",
-                      color: 'rgba(255,255,255,0.4)',
-                      maxWidth: '300px',
-                      textAlign: 'center'
-                    }}>
-                      {isFrench 
-                        ? `Rédaction de chapitres somatiques historiques personnalisés pour votre style de guitare : ${activeProfile?.coaching_tier === 'Acoustic' ? 'Acoustique' : activeProfile?.coaching_tier === 'Classical' ? 'Classique' : (activeProfile?.coaching_tier || 'Acoustique')}.`
-                        : `Drafting customized historical somatic chapters for your ${activeProfile?.coaching_tier || 'Acoustic'} guitar style target.`}
-                    </p>
-                    <style>{`
-                      @keyframes spinBook { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-                      @keyframes pulseText { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-                    `}</style>
-                  </div>
-                ) : activeBook ? (
-                  /* parchment book reader */
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1.2fr 1fr',
-                    gap: '24px',
-                    height: '100%',
-                    minHeight: '340px'
-                  }}>
-                    {/* Left Page: Prose Narrative */}
-                    <div style={{
-                      background: '#fcf8f2',
-                      border: '1px solid #e3d2bd',
-                      borderRadius: '16px',
-                      padding: '24px',
-                      color: '#2b221a',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderBottom: '1px solid rgba(43,34,26,0.1)',
-                        paddingBottom: '8px',
-                        marginBottom: '12px'
-                      }}>
-                        <span style={{
-                          fontFamily: "'JetBrains Mono', monospace",
-                          fontSize: '0.65rem',
-                          color: '#8c6e54',
-                          fontWeight: 'bold'
-                        }}>
-                          {isFrench ? `CHAPITRE ${activeBook.chapters[activeChapterIndex]?.number || (activeChapterIndex + 1)}` : `CHAPTER ${activeBook.chapters[activeChapterIndex]?.number || (activeChapterIndex + 1)}`}
-                        </span>
-                        <h4 style={{
-                          fontFamily: "'Cormorant Garamond', serif",
-                          fontSize: '1.2rem',
-                          margin: 0,
-                          fontWeight: 'bold',
-                          color: '#2b221a'
-                        }}>
-                          {activeBook.chapters[activeChapterIndex]?.title}
-                        </h4>
-                      </div>
-
-                      <div style={{ flex: 1, overflowY: 'auto' }}>
-                        <p style={{
-                          fontFamily: "'Cormorant Garamond', serif",
-                          fontSize: '1.15rem',
-                          lineHeight: '1.6',
-                          textAlign: 'justify',
-                          margin: 0
-                        }}>
-                          {activeBook.chapters[activeChapterIndex]?.prose}
-                        </p>
-                      </div>
-
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: '16px',
-                        paddingTop: '12px',
-                        borderTop: '1px solid rgba(43,34,26,0.1)'
-                      }}>
-                        <button
-                          disabled={activeChapterIndex === 0}
-                          onClick={() => setActiveChapterIndex(prev => prev - 1)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: activeChapterIndex === 0 ? '#c7bcae' : '#8c6e54',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '0.7rem',
-                            cursor: activeChapterIndex === 0 ? 'default' : 'pointer',
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          {t('prevPage')}
-                        </button>
-
-                        <span style={{
-                          fontSize: '0.7rem',
-                          fontFamily: "'JetBrains Mono', monospace",
-                          color: '#8c6e54'
-                        }}>
-                          {activeChapterIndex + 1} / {activeBook.chapters.length}
-                        </span>
-
-                        <button
-                          disabled={activeChapterIndex === activeBook.chapters.length - 1}
-                          onClick={() => setActiveChapterIndex(prev => prev + 1)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: activeChapterIndex === activeBook.chapters.length - 1 ? '#c7bcae' : '#8c6e54',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '0.7rem',
-                            cursor: activeChapterIndex === activeBook.chapters.length - 1 ? 'default' : 'pointer',
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          {t('nextPage')}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Right Page: Somatic Pitch Lesson */}
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '16px'
-                    }}>
-                      <div style={{
-                        background: 'rgba(201,169,110,0.04)',
-                        border: '1px solid rgba(201,169,110,0.15)',
-                        borderRadius: '16px',
-                        padding: '20px',
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between'
-                      }}>
-                        <div>
-                          <span style={{
-                            display: 'inline-block',
-                            background: 'rgba(201,169,110,0.1)',
-                            border: '1px solid rgba(201,169,110,0.2)',
-                            borderRadius: '6px',
-                            padding: '3px 8px',
-                            fontSize: '0.6rem',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            color: '#c9a96e',
-                            textTransform: 'uppercase',
-                            marginBottom: '10px'
-                          }}>
-                            {t('somaticVocalLesson')}
-                          </span>
-                          <h4 style={{
-                            fontFamily: "'Cormorant Garamond', serif",
-                            fontSize: '1.3rem',
-                            color: '#f0e6d2',
-                            margin: '0 0 10px'
-                          }}>
-                            {t('autonomicAlignChallenge')}
-                          </h4>
-                          <p style={{
-                            fontSize: '0.85rem',
-                            color: 'rgba(255,255,255,0.7)',
-                            lineHeight: '1.5',
-                            margin: 0
-                          }}>
-                            {activeBook.chapters[activeChapterIndex]?.lesson}
-                          </p>
-                        </div>
-
-                        <button
-                          onClick={() => {
-                            setShowTroubadourModal(false);
-                            navigate('/guitar');
-                          }}
-                          style={{
-                            width: '100%',
-                            background: 'rgba(201,169,110,0.12)',
-                            border: '1px solid #c9a96e',
-                            borderRadius: '10px',
-                            padding: '12px',
-                            color: '#c9a96e',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '0.75rem',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.background = '#c9a96e';
-                            e.currentTarget.style.color = '#0d0d14';
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.background = 'rgba(201,169,110,0.12)';
-                            e.currentTarget.style.color = '#c9a96e';
-                          }}
-                        >
-                          {t('enterPracticum')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* Shop grid */
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: '20px',
-                    paddingTop: '8px'
-                  }}>
-                    {[
-                      {
-                        id: 'occitan-lute',
-                        title: isFrench ? 'Le Code du Luth Occitan' : 'The Occitan Lute Code',
-                        price: 120,
-                        description: isFrench ? 'Un manuscrit ancien du sud de la France révélant les secrets du ton fondamental et de l’alignement vagal.' : 'An ancient scroll from southern France detailing the secrets of finding your fundamental tone and aligning the vagal nerve.',
-                        cover: '📜',
-                        accentColor: '#c9a96e'
-                      },
-                      {
-                        id: 'chanson-bertrand',
-                        title: isFrench ? 'Chanson de Bertrand' : 'Chanson de Bertrand',
-                        price: 200,
-                        description: isFrench ? 'L’épopée légendaire de Maître Bertrand, détaillant les techniques vocales au feu de bois et le souffle flamenco.' : 'The legendary epic of Master Bertrand, detailing firelight vocal techniques and flamenco autonomic breathing.',
-                        cover: '🔥',
-                        accentColor: '#cc5555'
-                      },
-                      {
-                        id: 'vagal-quest',
-                        title: isFrench ? 'La Quête Végale' : 'The Vagal Quest',
-                        price: 350,
-                        description: isFrench ? 'Un manuel souverain de médecine sonore, détaillant l’intervalle de quinte parfaite et la résonance cardiaque.' : 'A sovereign manual of sound medicine, detailing the perfect fifth interval and cardiac-vagal resonance.',
-                        cover: '🏺',
-                        accentColor: '#7a9ab8'
-                      }
-                    ].map(book => {
-                      const isOwned = purchasedBooks.some(pb => pb.id === book.id);
-                      return (
-                        <div
-                          key={book.id}
-                          style={{
-                            background: 'rgba(255,255,255,0.02)',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            borderRadius: '16px',
-                            padding: '20px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            gap: '12px',
-                            transition: 'all 0.3s',
-                            position: 'relative',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {/* Top accent badge */}
-                          <div style={{
-                            position: 'absolute',
-                            top: 0, left: 0, right: 0,
-                            height: '4px',
-                            background: book.accentColor
-                          }} />
-
-                          <div>
-                            <div style={{
-                              fontSize: '2.5rem',
-                              margin: '10px 0',
-                              textAlign: 'center'
-                            }}>
-                              {book.cover}
-                            </div>
-                            <h4 style={{
-                              fontFamily: "'Cormorant Garamond', serif",
-                              fontSize: '1.25rem',
-                              color: '#f0e6d2',
-                              textAlign: 'center',
-                              margin: '0 0 6px'
-                            }}>
-                              {book.title}
-                            </h4>
-                            <p style={{
-                              fontSize: '0.75rem',
-                              color: 'rgba(255,255,255,0.5)',
-                              lineHeight: '1.4',
-                              textAlign: 'center',
-                              margin: 0
-                            }}>
-                              {book.description}
-                            </p>
-                          </div>
-
-                          {isOwned ? (
-                            <button
-                              onClick={() => {
-                                const found = purchasedBooks.find(pb => pb.id === book.id);
-                                if (found) {
-                                  setActiveBook(found);
-                                  setActiveChapterIndex(0);
-                                }
-                              }}
-                              style={{
-                                width: '100%',
-                                background: 'rgba(201,169,110,0.12)',
-                                border: '1px solid rgba(201,169,110,0.3)',
-                                borderRadius: '10px',
-                                padding: '10px',
-                                color: '#c9a96e',
-                                fontFamily: "'JetBrains Mono', monospace",
-                                fontSize: '0.7rem',
-                                fontWeight: 'bold',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              {t('readBook')}
-                            </button>
-                          ) : (
-                            <button
-                              onClick={async () => {
-                                if (!activeProfile) return;
-                                setGeneratingBookId(book.id);
-                                
-                                // Trigger dynamic generation directly for free!
-                                const generated = await generateTroubadourBook(activeProfile.coaching_tier, book.title);
-                                const bookData = {
-                                  id: book.id,
-                                  title: book.title,
-                                  cover: book.cover,
-                                  accentColor: book.accentColor,
-                                  chapters: generated?.chapters || []
-                                };
-                                
-                                const updatedPurchased = [...purchasedBooks, bookData];
-                                setPurchasedBooks(updatedPurchased);
-                                localStorage.setItem(`unlocked_books_${activeProfileName}`, JSON.stringify(updatedPurchased));
-                                setGeneratingBookId(null);
-                              }}
-                              style={{
-                                width: '100%',
-                                background: 'linear-gradient(135deg, #c9a96e 0%, #a3844d 100%)',
-                                border: 'none',
-                                borderRadius: '10px',
-                                padding: '10px',
-                                color: '#0d0d14',
-                                fontFamily: "'JetBrains Mono', monospace",
-                                fontSize: '0.7rem',
-                                fontWeight: 'bold',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              {t('unlockFree')}
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
+                width: 28, height: 28, borderRadius: '50%',
+                border: '1px solid rgba(201,169,110,0.3)',
+                animation: 'breatheLoad 3s ease-in-out infinite',
+              }} />
+              <style>{`@keyframes breatheLoad { 0%,100%{opacity:.3;transform:scale(.95)} 50%{opacity:1;transform:scale(1.05)} }`}</style>
+            </div>
+          }>
+            <AdventurePlayer onClose={() => setShowAdventure(false)} />
+          </Suspense>
         )}
       </AnimatePresence>
 

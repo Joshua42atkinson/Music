@@ -9,7 +9,7 @@ import usePitchDetector from '../hooks/usePitchDetector';
 import PitchGateUI from './PitchGateUI';
 import { playReferenceTone } from '../audio/audioEngine';
 import Tavern3DVisualizer from '../components/Tavern3DVisualizer';
-import BiometricSanctum from '../components/BiometricSanctum';
+
 import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
@@ -64,13 +64,7 @@ function AdventurePlayer({ onClose }) {
   const [activeChoice, setActiveChoice] = useState(null);
   const [showArt, setShowArt] = useState(true);
   const [artError, setArtError] = useState(false);
-  
-  // Biometric feedback context states (EEG Muse + HRV Vagal Tone)
-  const [biometrics, setBiometrics] = useState({
-    flowIndex: 1.0,
-    stressLevel: 0.0,
-    hrv: 50,
-  });
+
   const [showSkipGate, setShowSkipGate] = useState(false);
   const skipTimerRef = useRef(null);
 
@@ -220,7 +214,7 @@ function AdventurePlayer({ onClose }) {
     }}>
       {/* Top Bar */}
       <div style={{
-        display: 'flex', alignItems: 'center', justifyBetween: 'space-between',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '12px 16px', paddingTop: 'max(12px, env(safe-area-inset-top))',
         background: 'rgba(8,8,14,0.95)', borderBottom: `1px solid ${atmo.accent}20`,
         zIndex: 10, flexShrink: 0,
@@ -256,20 +250,29 @@ function AdventurePlayer({ onClose }) {
               exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.6 }}
               style={{ display: 'flex', flexDirection: 'column' }}>
 
-              {/* Scene Art */}
+              {/* Scene Art + 3D Visualizer */}
               <div style={{
                 width: '100%', aspectRatio: '16/9', position: 'relative',
                 background: `linear-gradient(135deg, ${atmo.bg}, #030306)`, overflow: 'hidden',
               }}>
+                {/* Scene illustration as ambient background */}
+                {scene.art && (
+                  <img
+                    src={scene.art}
+                    alt=""
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                    style={{
+                      position: 'absolute', inset: 0, width: '100%', height: '100%',
+                      objectFit: 'cover', opacity: 0.35, filter: 'blur(1px)',
+                    }}
+                  />
+                )}
                 <Tavern3DVisualizer
                   pitch={pitch}
                   cents={noteInfo?.cents || 0}
                   volume={volume}
                   gateState={gateState}
                   atmosphere={scene.atmosphere}
-                  flowIndex={biometrics.flowIndex}
-                  stressLevel={biometrics.stressLevel}
-                  hrv={biometrics.hrv}
                 />
                 {/* Gradient overlay */}
                 <div style={{
@@ -322,10 +325,7 @@ function AdventurePlayer({ onClose }) {
                     }}>— {localize(coachingCue)}</motion.p>
                 )}
 
-                {/* Somatic Biometrics Sanctum Panel */}
-                <div style={{ marginTop: 20 }}>
-                  <BiometricSanctum onBiometricsChange={setBiometrics} />
-                </div>
+
 
                 {/* Phase: Listening — prompt to start gate */}
                 {phase === 'listening' && (

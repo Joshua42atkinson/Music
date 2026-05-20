@@ -39,22 +39,12 @@ const TRANSLATIONS = {
     securityPin: 'Security PIN (Optional, 4 Digits)',
     create: 'Create',
 
-    // Troubadour Bookshelf
-    troubadourLibrary: 'Troubadour Library',
-    troubadourStories: 'Troubadour Adventure Stories',
-    readingLabel: 'Reading:',
-    bookshelfSubtitle: 'Access dynamic local instruction bards and somatic coaching chapters',
-    distillingScrolls: 'Distilling Occitan historical scrolls via LM Studio...',
-    draftingChapters: 'Drafting customized historical somatic chapters for your',
-    guitarStyleSuffix: 'guitar style target.',
-    chapter: 'CHAPTER',
-    prevPage: '◀ PREV PAGE',
-    nextPage: 'NEXT PAGE ▶',
-    somaticVocalLesson: 'Somatic Vocal Lesson',
-    autonomicAlignChallenge: 'Autonomic Align Challenge',
-    enterPracticum: '🎙️ ENTER PRACTICUM',
-    readBook: '📖 READ BOOK',
-    unlockFree: '🔓 UNLOCK FREE',
+    // Troubadour Adventure
+    playAdventure: '🎭 TROUBADOUR ADVENTURE',
+    adventureSubtitle: 'A pitch-gated story in Eleanor of Aquitaine\'s court',
+    adventureResume: '🎭 RESUME ADVENTURE',
+    adventureNewGame: 'Begin the Journey',
+    adventureContinue: 'Continue from where you left off',
 
     // Mentor Dashboard
     mentorTitle: 'Sovereign Mentor Dashboard',
@@ -127,22 +117,12 @@ const TRANSLATIONS = {
     securityPin: 'Code PIN de Sécurité (Optionnel, 4 Chiffres)',
     create: 'Créer',
 
-    // Troubadour Bookshelf
-    troubadourLibrary: 'Bibliothèque Troubadour',
-    troubadourStories: 'Histoires d\'Aventure',
-    readingLabel: 'Lecture :',
-    bookshelfSubtitle: 'Accédez à des guides d\'apprentissage bardiques dynamiques et des leçons somatiques',
-    distillingScrolls: 'Distillation des parchemins occitans via LM Studio...',
-    draftingChapters: 'Rédaction de chapitres somatiques historiques personnalisés pour votre style',
-    guitarStyleSuffix: 'de guitare.',
-    chapter: 'CHAPITRE',
-    prevPage: '◀ PAGE PRÉC',
-    nextPage: 'PAGE SUIV ▶',
-    somaticVocalLesson: 'Leçon Vocale Somatique',
-    autonomicAlignChallenge: 'Défi d\'Alignement Autonome',
-    enterPracticum: '🎙️ COMMENCER LA PRATIQUE',
-    readBook: '📖 LIRE LE LIVRE',
-    unlockFree: '🔓 DÉVERROUILLER GRATUIT',
+    // Troubadour Adventure
+    playAdventure: '🎭 AVENTURE TROUBADOUR',
+    adventureSubtitle: 'Une histoire à portail de ton dans la cour d\'Aliénor d\'Aquitaine',
+    adventureResume: '🎭 REPRENDRE L\'AVENTURE',
+    adventureNewGame: 'Commencer le Voyage',
+    adventureContinue: 'Reprendre là où vous en étiez',
 
     // Mentor Dashboard
     mentorTitle: 'Tableau de Mentorat Souverain',

@@ -269,23 +269,7 @@ export function useBackendBridge() {
     return null;
   };
 
-  const generateTroubadourBook = async (styleTarget, bookTitle) => {
-    if (!isDaaSConnected) return null;
-    try {
-      const resp = await fetch(`${DAAS_API_BASE}/troubadour/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style_target: styleTarget, book_title: bookTitle }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data.success) return data.book;
-      }
-    } catch (e) {
-      console.error('Failed to generate troubadour book:', e);
-    }
-    return null;
-  };
+
 
   useEffect(() => {
     checkConnection();
@@ -310,7 +294,6 @@ export function useBackendBridge() {
     verifyProfilePin,
     earnFlorins,
     spendFlorins,
-    generateTroubadourBook,
     refreshConnection: checkConnection,
   };
 }
