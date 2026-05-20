@@ -37,7 +37,14 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
     <div style={styles.shell}>
       {/* Header */}
       <div style={styles.header}>
-        <button style={styles.backBtn} onClick={backHandler}>←</button>
+        <button style={styles.backBtn} onClick={backHandler} aria-label="Return to home">
+          <img
+            src="/assets/wordmark.png"
+            alt="Voix Vive"
+            style={{ height: '32px', width: 'auto' }}
+            draggable={false}
+          />
+        </button>
         <div style={styles.headerCenter}>
           <h1 style={styles.title}>
             {isFrench ? 'Le Grimoire du Troubadour' : "Troubadour's Playbook"}

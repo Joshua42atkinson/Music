@@ -380,7 +380,12 @@ const NeckMenu = ({
       <div className="neck-nut">
         {showBackButton && (
           <button className="back-to-portal" onClick={() => navigate('/')} aria-label="Return to portal">
-            {isFrench ? '← Accueil' : '← Home'}
+            <img
+              src="/assets/wordmark.png"
+              alt="Voix Vive"
+              className="h-8 w-auto"
+              draggable={false}
+            />
           </button>
         )}
         <motion.h1
