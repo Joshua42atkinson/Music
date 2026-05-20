@@ -2,7 +2,7 @@
 # Voix Vive — Workspace Cleanup Script
 # Run once from anywhere. Safe to re-run (uses -f flags).
 
-ROOT="/home/joshua-atkinson/antigravity/voix-vive"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "=== Voix Vive Workspace Cleanup ==="
 

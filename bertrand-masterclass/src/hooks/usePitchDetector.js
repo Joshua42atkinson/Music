@@ -74,6 +74,30 @@ function autoCorrelate(buf, sampleRate) {
   }
 
   let T0 = maxpos;
+  
+  // Harmonic correction: check if twice the period (lower octave) also has a strong correlation peak.
+  // This is extremely effective for low pitch signals (under ~200Hz) where the 2nd harmonic is dominant.
+  const freqEstimate = sampleRate / T0;
+  if (freqEstimate < 300) { 
+    const doublePeriod = Math.round(T0 * 2);
+    if (doublePeriod < SIZE) {
+      let localMax = -1;
+      let localMaxPos = doublePeriod;
+      const searchWindow = 4; // search +/- 4 samples for subharmonic peak
+      for (let i = doublePeriod - searchWindow; i <= doublePeriod + searchWindow; i++) {
+        if (i >= 0 && i < SIZE && c[i] > localMax) {
+          localMax = c[i];
+          localMaxPos = i;
+        }
+      }
+      // If the correlation at the double period is at least 80% as strong as the first peak,
+      // it means the true fundamental is the lower octave.
+      if (localMax > maxval * 0.8) {
+        T0 = localMaxPos;
+      }
+    }
+  }
+
   const x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
   const a = (x1 + x3 - 2 * x2) / 2;
   const b = (x3 - x1) / 2;

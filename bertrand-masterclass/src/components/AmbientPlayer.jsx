@@ -2,25 +2,16 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Disc3, SkipForward, Music, Minus, Plus, Square } from 'lucide-react';
 import { getAudioContext, resumeAudio, playMetronomeClick } from '../audio/audioEngine';
+import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
 // AMBIENT PLAYER — Music + Metronome, globally persistent
-//
-// Mode A — ♫ Music : Bertrand's ambient tracks
-// Mode B — ♩ Click : Web Audio metronome
-//
-// Rules:
-//  • Only ONE can play at a time — starting one stops the other
-//  • Switching mode tabs immediately stops the active one
-//  • External events:
-//      window.dispatchEvent(new CustomEvent('ambient:open', { detail: { mode: 'click' | 'music' } }))
-//      window.dispatchEvent(new CustomEvent('ambient:pause'))
-//      window.dispatchEvent(new CustomEvent('ambient:resume'))
+// Fully localized and animated with a slow pulsating glow
 // ═══════════════════════════════════════════════════════════
 
 const TRACKS = [
   { id: 'houlton-skies', title: 'Houlton Skies',  artist: 'Bertrand Laurence', src: '/assets/houlton_skies.m4a' },
-  { id: 'home-ambient',  title: 'Home Sessions',   artist: 'Bertrand Laurence', src: '/assets/home_audio.m4a'   },
+  { id: 'home-ambient',  title: { en: 'Home Sessions', fr: 'Sessions Maison' }, artist: 'Bertrand Laurence', src: '/assets/home_audio.m4a' },
 ];
 
 // ── Metronome Web Audio engine ──────────────────────────────────────────
@@ -36,7 +27,6 @@ function useMetronome() {
   const nextRef  = useRef(0);
   const beatRef  = useRef(0);
   const timerRef = useRef(null);
-  // Refs so scheduler closure always sees fresh values
   const bpmRef    = useRef(bpm);
   const beatsRef  = useRef(beats);
   const volRef    = useRef(volume);
@@ -102,8 +92,14 @@ function useMetronome() {
 
 // ── Main component ──────────────────────────────────────────────────────
 export default function AmbientPlayer() {
+  const { locale, isFrench, t } = useLocale();
   const [mode, setMode]           = useState('music');
   const [showControls, setShowControls] = useState(false);
+  
+  // Track if the player has ever been opened to stop the slow, elegant breathing glow
+  const [hasClickedOnce, setHasClickedOnce] = useState(() => 
+    localStorage.getItem('voix_vive_ambient_clicked') === '1'
+  );
 
   // Music state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -117,11 +113,8 @@ export default function AmbientPlayer() {
   const track    = TRACKS[trackIdx];
 
   const metro = useMetronome();
-
-  // Ref so event listeners always call the latest handleModeSwitch (avoid stale closure)
   const handleModeSwitchRef = useRef(null);
 
-  // ── RULE: mode switch stops both, defined before event registration ──
   const handleModeSwitch = useCallback((newMode) => {
     if (newMode === mode) return;
     audioRef.current?.pause();
@@ -129,22 +122,18 @@ export default function AmbientPlayer() {
     setMode(newMode);
   }, [mode, metro]);
 
-  // Keep ref current so event listeners never go stale
   useEffect(() => { handleModeSwitchRef.current = handleModeSwitch; }, [handleModeSwitch]);
 
-  // ── RULE: starting metro → pause music ───────────────────────────────
   useEffect(() => {
     if (metro.isPlaying) audioRef.current?.pause();
   }, [metro.isPlaying]);
 
-  // ── RULE: starting music → stop metro ────────────────────────────────
   useEffect(() => {
     if (isPlaying) metro.stop();
-  }, [isPlaying]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isPlaying]);
 
-  // ── Init audio element ────────────────────────────────────────────────
   useEffect(() => {
-    let mounted = true; // prevent state updates after unmount/cleanup
+    let mounted = true;
     const audio = new Audio(track.src);
     audio.volume = volume;
     audio.loop   = true;
@@ -155,7 +144,6 @@ export default function AmbientPlayer() {
     const onPlay        = () => { if (mounted) setIsPlaying(true); };
     const onPause       = () => { if (mounted) setIsPlaying(false); };
     const onError       = (e) => {
-      // Ignore errors caused by src='' during cleanup
       if (!mounted) return;
       console.warn('Audio error:', e, audio.error?.message);
       setHasError(true);
@@ -168,26 +156,26 @@ export default function AmbientPlayer() {
     audio.addEventListener('error',         onError);
 
     audioRef.current = audio;
-    setHasError(false); // reset on each track change
+    setHasError(false);
 
     return () => {
       mounted = false;
-      // Remove error listener BEFORE clearing src to avoid phantom error events
       audio.removeEventListener('error', onError);
       audio.pause();
       audio.src = '';
     };
-  }, [trackIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [trackIdx]);
 
-
-  // ── Global events ─────────────────────────────────────────────────────
   useEffect(() => {
     const onPause  = () => audioRef.current?.pause();
     const onResume = () => { if (!metro.isPlaying) audioRef.current?.play().catch(() => {}); };
-    // Use ref so this always calls the latest handleModeSwitch
     const onOpen   = (e) => {
       handleModeSwitchRef.current?.(e.detail?.mode || 'music');
       setShowControls(true);
+      if (!hasClickedOnce) {
+        setHasClickedOnce(true);
+        localStorage.setItem('voix_vive_ambient_clicked', '1');
+      }
     };
     window.addEventListener('ambient:pause',  onPause);
     window.addEventListener('ambient:resume', onResume);
@@ -197,9 +185,8 @@ export default function AmbientPlayer() {
       window.removeEventListener('ambient:resume', onResume);
       window.removeEventListener('ambient:open',   onOpen);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hasClickedOnce]);
 
-  // ── Music controls ────────────────────────────────────────────────────
   const toggleMusic = () => {
     if (!audioRef.current) return;
     isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
@@ -215,20 +202,35 @@ export default function AmbientPlayer() {
 
   const isActive = mode === 'music' ? isPlaying : metro.isPlaying;
 
-  // Never return null — widget must always be present for event listeners
+  const localize = (val) => {
+    if (!val) return '';
+    if (typeof val === 'object') return val[locale] || val['en'] || '';
+    return val;
+  };
+
+  const handleButtonClick = () => {
+    setShowControls(v => !v);
+    if (!hasClickedOnce) {
+      setHasClickedOnce(true);
+      localStorage.setItem('voix_vive_ambient_clicked', '1');
+    }
+  };
+
   return (
     <>
       <div className="fixed top-4 left-4 z-50 flex items-start gap-2">
 
-        {/* Floating button */}
+        {/* Floating button — glows until first clicked */}
         <button
-          onClick={() => setShowControls(v => !v)}
+          onClick={handleButtonClick}
           className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md border-2 shadow-lg transition-all ${
             isActive
               ? 'bg-cf-gold/20 border-cf-gold/50 shadow-[0_0_20px_rgba(201,169,110,0.4)]'
-              : 'bg-[#1a1815]/80 border-cf-gold/30 hover:border-cf-gold/50'
+              : !hasClickedOnce
+                ? 'bg-[#1a1815]/95 animate-pulse-gold border-cf-gold/50'
+                : 'bg-[#1a1815]/80 border-cf-gold/30 hover:border-cf-gold/50'
           }`}
-          title={mode === 'music' ? '♫ Ambient Music' : '♩ Metronome'}
+          title={mode === 'music' ? (isFrench ? '♫ Musique Ambiante' : '♫ Ambient Music') : (isFrench ? '♩ Métronome' : '♩ Metronome')}
         >
           {mode === 'click' ? (
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
@@ -265,7 +267,7 @@ export default function AmbientPlayer() {
                     mode === 'music' ? 'bg-cf-gold text-[#030306] font-bold' : 'text-white/40 hover:text-white'
                   }`}
                 >
-                  <Music size={11} /> Music
+                  <Music size={11} /> {isFrench ? 'Musique' : 'Music'}
                 </button>
                 <button
                   onClick={() => handleModeSwitch('click')}
@@ -277,7 +279,7 @@ export default function AmbientPlayer() {
                     <polygon points="5,3 19,3 15,21 9,21" fill="currentColor" opacity="0.3" />
                     <line x1="12" y1="10" x2="16" y2="5" />
                   </svg>
-                  Click
+                  {isFrench ? 'Métronome' : 'Click'}
                 </button>
               </div>
 
@@ -285,18 +287,22 @@ export default function AmbientPlayer() {
               {mode === 'music' && (
                 <div>
                   <div className="flex items-center justify-between mb-3 border-b border-cf-gold/10 pb-2">
-                    <span className="text-xs font-mono uppercase tracking-widest text-cf-gold">♫ Now Playing</span>
+                    <span className="text-xs font-mono uppercase tracking-widest text-cf-gold">
+                      {isFrench ? '♫ En Lecture' : '♫ Now Playing'}
+                    </span>
                     <button onClick={toggleMute} className="text-cf-slate hover:text-white transition-colors">
                       {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
                     </button>
                   </div>
 
                   {hasError ? (
-                    <p className="text-xs text-white/30 text-center py-4 font-mono">No audio file found</p>
+                    <p className="text-xs text-white/30 text-center py-4 font-mono">
+                      {isFrench ? 'Aucun fichier audio trouvé' : 'No audio file found'}
+                    </p>
                   ) : (
                     <>
                       <div className="mb-3">
-                        <div className="text-sm text-white font-medium truncate">{track.title}</div>
+                        <div className="text-sm text-white font-medium truncate">{localize(track.title)}</div>
                         <div className="text-[10px] text-cf-slate font-mono uppercase tracking-wider">{track.artist}</div>
                       </div>
                       <div className="mb-3">
@@ -337,7 +343,9 @@ export default function AmbientPlayer() {
               {mode === 'click' && (
                 <div>
                   <div className="border-b border-cf-gold/10 pb-2 mb-4">
-                    <span className="text-xs font-mono uppercase tracking-widest text-cf-gold">♩ Metronome</span>
+                    <span className="text-xs font-mono uppercase tracking-widest text-cf-gold">
+                      {isFrench ? '♩ Métronome' : '♩ Metronome'}
+                    </span>
                   </div>
 
                   {/* Beat dots */}
@@ -399,7 +407,7 @@ export default function AmbientPlayer() {
                   <div className="flex gap-2">
                     <button onClick={metro.tap}
                       className="flex-1 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider border border-cf-gold/30 bg-cf-gold/5 text-cf-gold/70 hover:bg-cf-gold/15 hover:text-cf-gold transition-all active:scale-95">
-                      Tap
+                      {isFrench ? 'Taper' : 'Tap'}
                     </button>
                     <button onClick={() => metro.setIsPlaying(v => !v)}
                       className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
@@ -407,7 +415,7 @@ export default function AmbientPlayer() {
                           ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                           : 'bg-cf-gold text-[#030306] shadow-[0_0_12px_rgba(201,169,110,0.2)]'
                       }`}>
-                      {metro.isPlaying ? <><Square size={12} fill="currentColor" /> Stop</> : <><Play size={12} fill="currentColor" /> Start</>}
+                      {metro.isPlaying ? <><Square size={12} fill="currentColor" /> {isFrench ? 'Arrêter' : 'Stop'}</> : <><Play size={12} fill="currentColor" /> {isFrench ? 'Lancer' : 'Start'}</>}
                     </button>
                   </div>
                 </div>
@@ -417,7 +425,22 @@ export default function AmbientPlayer() {
         </AnimatePresence>
       </div>
 
-      <style>{`.animate-spin-slow { animation: spin 8s linear infinite; }`}</style>
+      <style>{`
+        .animate-spin-slow { animation: spin 8s linear infinite; }
+        @keyframes pulseGold {
+          0%, 100% {
+            box-shadow: 0 0 4px rgba(201,169,110,0.2), inset 0 0 2px rgba(201,169,110,0.1);
+            border-color: rgba(201,169,110,0.3);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(201,169,110,0.65), inset 0 0 6px rgba(201,169,110,0.3);
+            border-color: rgba(201,169,110,0.85);
+          }
+        }
+        .animate-pulse-gold {
+          animation: pulseGold 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+      `}</style>
     </>
   );
 }

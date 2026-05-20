@@ -5,14 +5,22 @@
 import TIMELESS_SONG_SLIDES from './timelessSongSlides';
 
 /**
+ * Helper to construct a bilingual object or string depending on input type
+ */
+function constructBilingual(prefix, val, suffix = '') {
+  if (typeof val === 'object' && val !== null) {
+    return {
+      en: `${prefix}${val.en || val.fr || ''}${suffix}`,
+      fr: `${prefix}${val.fr || val.en || ''}${suffix}`
+    };
+  }
+  return `${prefix}${val}${suffix}`;
+}
+
+/**
  * Generates an array of slide objects from a fret.
  * Each slide: { id, type, title, body, image, accent, fret }
  * Types: 'title' | 'yin-philosophy' | 'yin-quote' | 'yin-concept' | 'yin-meditation' | 'yang-instruction' | 'yang-exercise' | 'yang-fretboard' | 'fret-end'
- */
-/**
- * Per-slide image mapping.
- * Key: slideId, Value: path to image in /public/assets/slides/
- * Images are generated per fret; frets without images use gradient fallback.
  */
 const SLIDE_IMAGES = {
   // ── Chapter 1: The Root Note (15 images) ──
@@ -164,28 +172,42 @@ export function generateSlides(fret) {
     ...base,
     id: `${fret.id}-title`,
     type: 'title',
-    label: `FRET ${fret.fret} · ${fret.interval}`,
+    label: constructBilingual(`FRET ${fret.fret} · `, fret.interval),
     title: fret.title,
     subtitle: fret.subtitle,
     body: fret.coreMessage,
-    meta: `${fret.note} · ${fret.interval}`,
+    meta: {
+      en: `${fret.note} · ${typeof fret.interval === 'object' ? fret.interval.en : fret.interval}`,
+      fr: `${fret.note} · ${typeof fret.interval === 'object' ? fret.interval.fr : fret.interval}`
+    },
     icon: fret.icon,
     image: SLIDE_IMAGES[`${fret.id}-title`] || null
   });
 
   // 2. Yin Philosophy slides — split into paragraphs
-  const yinParagraphs = fret.yin.philosophy.split('\n\n');
-  yinParagraphs.forEach((para, i) => {
+  const rawPhilosophy = typeof fret.yin.philosophy === 'object' 
+    ? fret.yin.philosophy
+    : { en: fret.yin.philosophy, fr: fret.yin.philosophy };
+
+  const enParas = rawPhilosophy.en.split('\n\n');
+  const frParas = rawPhilosophy.fr.split('\n\n');
+  
+  // We match indices. If count varies, fallback gracefully
+  const maxParas = Math.max(enParas.length, frParas.length);
+  for (let i = 0; i < maxParas; i++) {
     slides.push({
       ...base,
       id: `${fret.id}-yin-${i}`,
       type: 'yin-philosophy',
-      label: `☽ YIN · ${fret.act}`,
+      label: constructBilingual(`☽ YIN · `, fret.act),
       title: i === 0 ? fret.yin.title : null,
-      body: para,
+      body: {
+        en: enParas[i] || '',
+        fr: frParas[i] || ''
+      },
       image: SLIDE_IMAGES[`${fret.id}-yin-${i}`] || null
     });
-  });
+  }
 
   // 3. Yin Quote slide
   if (fret.yin.quote) {
@@ -193,7 +215,7 @@ export function generateSlides(fret) {
       ...base,
       id: `${fret.id}-quote`,
       type: 'yin-quote',
-      label: '☽ WISDOM',
+      label: { en: '☽ WISDOM', fr: '☽ SAGESSE' },
       title: null,
       quote: fret.yin.quote.text,
       author: fret.yin.quote.author,
@@ -208,7 +230,7 @@ export function generateSlides(fret) {
         ...base,
         id: `${fret.id}-concept-${i}`,
         type: 'yin-concept',
-        label: '☽ KEY CONCEPT',
+        label: { en: '☽ KEY CONCEPT', fr: '☽ CONCEPT CLÉ' },
         title: concept.term,
         body: concept.definition,
         image: SLIDE_IMAGES[`${fret.id}-concept-${i}`] || null
@@ -222,8 +244,8 @@ export function generateSlides(fret) {
       ...base,
       id: `${fret.id}-meditation`,
       type: 'yin-meditation',
-      label: '☽ MEDITATION',
-      title: 'Pause & Reflect',
+      label: { en: '☽ MEDITATION', fr: '☽ MÉDITATION' },
+      title: { en: 'Pause & Reflect', fr: 'Pause & Réflexion' },
       body: fret.yin.meditation.prompt,
       duration: fret.yin.meditation.duration,
       image: SLIDE_IMAGES[`${fret.id}-meditation`] || null
@@ -243,12 +265,12 @@ export function generateSlides(fret) {
     slides.push({
       ...base,
       id: `${fret.id}-western-theory`,
-      type: 'yang-theory', // Mapping to the existing style but new content
-      label: '⚙ HOW IT WORKS',
-      title: 'The Grammar of Sound',
+      type: 'yang-theory',
+      label: { en: '⚙ HOW IT WORKS', fr: '⚙ COMMENT ÇA FONCTIONNE' },
+      title: { en: 'The Grammar of Sound', fr: 'La Grammaire du Son' },
       musicGrammar: fret.westernTheory.musicGrammar,
       guitarGrammar: fret.westernTheory.guitarGrammar,
-      image: SLIDE_IMAGES[`${fret.id}-yang-intro`] || null // Reuse the yang-intro image for the theory slide
+      image: SLIDE_IMAGES[`${fret.id}-yang-intro`] || null
     });
   }
 
@@ -257,7 +279,7 @@ export function generateSlides(fret) {
     ...base,
     id: `${fret.id}-yang-intro`,
     type: 'yang-instruction',
-    label: `☀ YANG · ${fret.pillar}`,
+    label: constructBilingual(`☀ YANG · `, fret.pillar),
     title: fret.yang.title,
     body: fret.yang.instruction,
     image: SLIDE_IMAGES[`${fret.id}-yang-intro`] || null
@@ -270,7 +292,7 @@ export function generateSlides(fret) {
         ...base,
         id: `${fret.id}-exercise-${i}`,
         type: 'yang-exercise',
-        label: `☀ EXERCISE ${i + 1}`,
+        label: { en: `☀ EXERCISE ${i + 1}`, fr: `☀ EXERCICE ${i + 1}` },
         title: exercise.name,
         steps: exercise.steps,
         image: SLIDE_IMAGES[`${fret.id}-exercise-${i}`] || null
@@ -278,16 +300,19 @@ export function generateSlides(fret) {
     });
   }
 
-  // 8. Fretboard focus slide (skip if no exercises — e.g. Chapter 12's free play)
+  // 8. Fretboard focus slide
   if (fret.yang.fretboardFocus && fret.yang.exercises?.length > 0) {
     const ff = fret.yang.fretboardFocus;
     slides.push({
       ...base,
       id: `${fret.id}-fretboard`,
       type: 'yang-fretboard',
-      label: '☀ FRETBOARD FOCUS',
-      title: 'Your Practice Zone',
-      body: `Frets ${ff.startFret}–${ff.endFret} · Pattern: ${ff.pattern}`,
+      label: { en: '☀ FRETBOARD FOCUS', fr: '☀ FOCUS SUR LA TOUCHE' },
+      title: { en: 'Your Practice Zone', fr: 'Votre Zone de Pratique' },
+      body: {
+        en: `Frets ${ff.startFret}–${ff.endFret} · Pattern: ${ff.pattern}`,
+        fr: `Frettes ${ff.startFret}–${ff.endFret} · Schéma : ${ff.pattern}`
+      },
       fretboardFocus: ff,
       image: SLIDE_IMAGES[`${fret.id}-fretboard`] || null
     });
@@ -298,9 +323,15 @@ export function generateSlides(fret) {
     ...base,
     id: `${fret.id}-end`,
     type: 'fret-end',
-    label: `FRET ${fret.id} COMPLETE`,
+    label: {
+      en: `FRET ${fret.id} COMPLETE`,
+      fr: `FRETTE ${fret.id} TERMINÉE`
+    },
     title: fret.title,
-    body: `You have completed "${fret.title}." When you are ready, proceed to the next fret.`,
+    body: {
+      en: `You have completed "${typeof fret.title === 'object' ? fret.title.en : fret.title}." When you are ready, proceed to the next fret.`,
+      fr: `Vous avez terminé "${typeof fret.title === 'object' ? fret.title.fr : fret.title}." Quand vous êtes prêt, passez à la frette suivante.`
+    },
     icon: fret.icon,
     image: SLIDE_IMAGES[`${fret.id}-end`] || null
   });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useLocale } from '../hooks/useLocale';
 
 const DOT_FRETS = [3, 5, 7, 9];
 const DOUBLE_DOT_FRETS = [12];
@@ -17,6 +18,8 @@ const NeckMenu = ({
   children
 }) => {
   const navigate = useNavigate();
+  const { isFrench } = useLocale();
+  const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
 
   return (
     <div className="neck-container">
@@ -376,7 +379,7 @@ const NeckMenu = ({
       <div className="neck-nut">
         {showBackButton && (
           <button className="back-to-portal" onClick={() => navigate('/')} aria-label="Return to portal">
-            ← Home
+            {isFrench ? '← Accueil' : '← Home'}
           </button>
         )}
         <motion.h1
@@ -414,8 +417,9 @@ const NeckMenu = ({
 
         {/* Frets */}
         {items.map((item, idx) => {
-          const prevAct = idx > 0 ? items[idx - 1].act : null;
-          const showAct = item.act && item.act !== prevAct;
+          const currentAct = localize(item.act);
+          const prevAct = idx > 0 ? localize(items[idx - 1].act) : null;
+          const showAct = currentAct && currentAct !== prevAct;
           const hasDot = DOT_FRETS.includes(item.fret);
           const hasDoubleDot = DOUBLE_DOT_FRETS.includes(item.fret);
           const isOctave = item.fret === 12;
@@ -423,7 +427,7 @@ const NeckMenu = ({
 
           return (
             <React.Fragment key={item.id}>
-              {showAct && <div className="neck-act">{item.act}</div>}
+              {showAct && <div className="neck-act">{currentAct}</div>}
 
               <div className={`neck-fret ${isOctave ? 'neck-fret-12' : ''}`}>
                 <motion.div
@@ -464,10 +468,10 @@ const NeckMenu = ({
 
                   <div className="neck-fret-info">
                     <div className="neck-fret-interval" style={{ color: item.color }}>
-                      Fret {item.fret} {item.interval ? `· ${item.interval}` : ''}
+                      Fret {item.fret} {item.interval ? `· ${localize(item.interval)}` : ''}
                     </div>
-                    <div className="neck-fret-title">{item.title}</div>
-                    <div className="neck-fret-sub">{item.subtitle}</div>
+                    <div className="neck-fret-title">{localize(item.title)}</div>
+                    <div className="neck-fret-sub">{localize(item.subtitle)}</div>
                   </div>
 
                   <span className="neck-fret-arrow">›</span>

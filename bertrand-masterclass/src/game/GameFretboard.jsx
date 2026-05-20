@@ -32,6 +32,9 @@ function GameFretboard({
   disabled         = false,
   holdProgressPct  = 0,   // 0.0 → 1.0 for sustain mode progress ring
   breathState      = 'free', // for breathing pulse sync
+  detectedNoteName = null, // real-time somatic pitch tracking
+  cents            = 0,
+  pitch            = 0,
 }) {
   const fretCount = maxFret + 1; // 0 = open
 
@@ -170,7 +173,41 @@ function GameFretboard({
             {Array.from({ length: fretCount }, (_, fret) => {
               const state = getCellState(sIdx, fret);
               const isRoot = correctPositions.some(p => p.stringIdx === sIdx && p.fret === fret && p.isRoot);
-              const ds = dotStyle(state, isRoot);
+              
+              let ds = dotStyle(state, isRoot);
+              const cellNoteName = getNoteName(sIdx, fret);
+              const isActivePitchCell = pitch > 0 && detectedNoteName === cellNoteName;
+
+              // Somatic microtonal cents heatmap overlay
+              if (isActivePitchCell && (state === 'pattern' || state === 'hold-pattern' || state === 'hit' || state === 'hold-hit' || state === 'tappable')) {
+                if (Math.abs(cents) <= 15) {
+                  // Resonant Gold ©PLING!
+                  ds = {
+                    background: 'rgba(201, 169, 110, 0.95)',
+                    border: '2.5px solid #c9a96e',
+                    color: '#000',
+                    boxShadow: '0 0 25px rgba(201, 169, 110, 0.95)',
+                    fontWeight: 'bold',
+                  };
+                } else if (cents > 15) {
+                  // Tensed Violet (Sharp tension)
+                  ds = {
+                    background: 'rgba(123, 106, 170, 0.9)',
+                    border: '2.5px solid #7b6aaa',
+                    color: '#e8dcc8',
+                    boxShadow: '0 0 20px rgba(123, 106, 170, 0.8)',
+                  };
+                } else {
+                  // Flat Sag Indigo
+                  ds = {
+                    background: 'rgba(74, 114, 150, 0.9)',
+                    border: '2.5px solid #4a7296',
+                    color: '#e8dcc8',
+                    boxShadow: '0 0 20px rgba(74, 114, 150, 0.8)',
+                  };
+                }
+              }
+
               const breathAnim = getBreathAnimation(state);
               const breathTrans = getBreathTransition(state);
               return (

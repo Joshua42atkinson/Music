@@ -8,6 +8,9 @@ import {
 import usePitchDetector from '../hooks/usePitchDetector';
 import PitchGateUI from './PitchGateUI';
 import { playReferenceTone } from '../audio/audioEngine';
+import Tavern3DVisualizer from '../components/Tavern3DVisualizer';
+import BiometricSanctum from '../components/BiometricSanctum';
+import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
 // ADVENTURE PLAYER — Narrative game mode
@@ -30,9 +33,23 @@ const ATMOSPHERE_COLORS = {
   'luminous-gold':   { bg: 'rgba(220,180,60,0.12)',  accent: '#e8c44a', glow: 'rgba(232,196,74,0.18)' },
 };
 
-const ACT_LABELS = { 1: 'ACT I · THE ARRIVAL', 2: 'ACT II · THE TEACHING', 3: 'ACT III · THE PERFORMANCE' };
+const ACT_LABELS = { 
+  1: { en: 'ACT I · THE ARRIVAL', fr: "ACTE I · L'ARRIVÉE" }, 
+  2: { en: 'ACT II · THE TEACHING', fr: "ACTE II · L'ENSEIGNEMENT" }, 
+  3: { en: 'ACT III · THE PERFORMANCE', fr: "ACTE III · LA PERFORMANCE" } 
+};
 
 function AdventurePlayer({ onClose }) {
+  const { locale, isFrench, t } = useLocale();
+
+  const localize = useCallback((val) => {
+    if (!val) return '';
+    if (typeof val === 'object') {
+      return val[locale] || val['en'] || '';
+    }
+    return val;
+  }, [locale]);
+
   const {
     isListening, pitch, noteInfo, volume, breathState, error: micError,
     startListening, stopListening,
@@ -47,6 +64,13 @@ function AdventurePlayer({ onClose }) {
   const [activeChoice, setActiveChoice] = useState(null);
   const [showArt, setShowArt] = useState(true);
   const [artError, setArtError] = useState(false);
+  
+  // Biometric feedback context states (EEG Muse + HRV Vagal Tone)
+  const [biometrics, setBiometrics] = useState({
+    flowIndex: 1.0,
+    stressLevel: 0.0,
+    hrv: 50,
+  });
   const [showSkipGate, setShowSkipGate] = useState(false);
   const skipTimerRef = useRef(null);
 
@@ -114,10 +138,10 @@ function AdventurePlayer({ onClose }) {
   const handleSkipGate = useCallback(() => {
     setGateState('skipped');
     setShowSkipGate(false);
-    setCoachingCue('No worries — you can always come back to practice this pitch later.');
+    setCoachingCue(isFrench ? 'Pas de soucis — vous pouvez toujours revenir pratiquer ce ton plus tard.' : 'No worries — you can always come back to practice this pitch later.');
     setSession(prev => ({ ...prev, streak: 0 }));
     setTimeout(() => setPhase('choose'), 1000);
-  }, []);
+  }, [isFrench]);
 
   const handleChoice = useCallback((choice) => {
     if (choice.mode === 'sing') {
@@ -196,7 +220,7 @@ function AdventurePlayer({ onClose }) {
     }}>
       {/* Top Bar */}
       <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        display: 'flex', alignItems: 'center', justifyBetween: 'space-between',
         padding: '12px 16px', paddingTop: 'max(12px, env(safe-area-inset-top))',
         background: 'rgba(8,8,14,0.95)', borderBottom: `1px solid ${atmo.accent}20`,
         zIndex: 10, flexShrink: 0,
@@ -205,11 +229,11 @@ function AdventurePlayer({ onClose }) {
           background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
           color: '#8090a8', borderRadius: 8, fontSize: '1rem', cursor: 'pointer',
           padding: '8px 14px', fontFamily: 'JetBrains Mono, monospace',
-        }}>← Exit</button>
+        }}>{isFrench ? '← Quitter' : '← Exit'}</button>
         <span style={{
           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
           letterSpacing: '0.15em', textTransform: 'uppercase', color: atmo.accent,
-        }}>{ACT_LABELS[scene.act] || 'ADVENTURE'}</span>
+        }}>{localize(ACT_LABELS[scene.act]) || 'ADVENTURE'}</span>
         <span style={{
           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80',
         }}>🔥 {session.streak}</span>
@@ -219,7 +243,7 @@ function AdventurePlayer({ onClose }) {
       <div style={{ flex: 1, overflow: 'auto', padding: '0 0 100px' }}>
         <AnimatePresence mode="wait">
           {phase === 'summary' ? (
-            <SummaryView key="summary" summary={summary} session={session} onClose={onClose} />
+            <SummaryView key="summary" summary={summary} session={session} localize={localize} isFrench={isFrench} onClose={onClose} />
           ) : phase === 'transition' ? (
             <motion.div key="transition" initial={{ opacity: 1 }} animate={{ opacity: 0 }}
               transition={{ duration: 1 }}
@@ -237,11 +261,16 @@ function AdventurePlayer({ onClose }) {
                 width: '100%', aspectRatio: '16/9', position: 'relative',
                 background: `linear-gradient(135deg, ${atmo.bg}, #030306)`, overflow: 'hidden',
               }}>
-                {!artError && (
-                  <img src={scene.art} alt="" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7,
-                  }} onError={() => setArtError(true)} />
-                )}
+                <Tavern3DVisualizer
+                  pitch={pitch}
+                  cents={noteInfo?.cents || 0}
+                  volume={volume}
+                  gateState={gateState}
+                  atmosphere={scene.atmosphere}
+                  flowIndex={biometrics.flowIndex}
+                  stressLevel={biometrics.stressLevel}
+                  hrv={biometrics.hrv}
+                />
                 {/* Gradient overlay */}
                 <div style={{
                   position: 'absolute', inset: 0,
@@ -256,7 +285,7 @@ function AdventurePlayer({ onClose }) {
                   <span style={{
                     fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                     letterSpacing: '0.12em', color: atmo.accent,
-                  }}>{scene.intervalName} · {scene.pitchLabel}</span>
+                  }}>{localize(scene.intervalName)} · {localize(scene.pitchLabel)}</span>
                 </div>
               </div>
 
@@ -266,7 +295,7 @@ function AdventurePlayer({ onClose }) {
                 <p style={{
                   fontFamily: 'EB Garamond, serif', fontSize: '1.05rem', lineHeight: 1.8,
                   color: '#d0d8e0', marginTop: -20, position: 'relative', zIndex: 2,
-                }}>{scene.setting}</p>
+                }}>{localize(scene.setting)}</p>
 
                 {/* Mentor Line */}
                 <div style={{
@@ -281,7 +310,7 @@ function AdventurePlayer({ onClose }) {
                   <p style={{
                     fontFamily: 'EB Garamond, serif', fontSize: '1.1rem', fontStyle: 'italic',
                     color: atmo.accent, lineHeight: 1.7, margin: 0,
-                  }}>"{scene.mentorLine}"</p>
+                  }}>"{localize(scene.mentorLine)}"</p>
                 </div>
 
                 {/* Coaching Cue */}
@@ -290,8 +319,13 @@ function AdventurePlayer({ onClose }) {
                     style={{
                       fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
                       color: '#5a6a80', fontStyle: 'italic', marginTop: 12, textAlign: 'center',
-                    }}>— {coachingCue}</motion.p>
+                    }}>— {localize(coachingCue)}</motion.p>
                 )}
+
+                {/* Somatic Biometrics Sanctum Panel */}
+                <div style={{ marginTop: 20 }}>
+                  <BiometricSanctum onBiometricsChange={setBiometrics} />
+                </div>
 
                 {/* Phase: Listening — prompt to start gate */}
                 {phase === 'listening' && (
@@ -303,7 +337,7 @@ function AdventurePlayer({ onClose }) {
                         background: 'rgba(46,213,115,0.1)', border: '1px solid rgba(46,213,115,0.3)',
                         color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                         fontSize: '0.9rem',
-                      }}>🎤 Enable Microphone</button>
+                      }}>{isFrench ? '🎤 Activer le Micro' : '🎤 Enable Microphone'}</button>
                     )}
                     <button onClick={handleStartGate} style={{
                       display: 'block', width: '100%', maxWidth: 300, margin: '0 auto',
@@ -311,7 +345,7 @@ function AdventurePlayer({ onClose }) {
                       background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
                       color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                       fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
-                    }}>🎵 Find the {scene.targetNote}</button>
+                    }}>{isFrench ? '🎵 Trouver le ' : '🎵 Find the '}{scene.targetNote}</button>
                   </motion.div>
                 )}
 
@@ -334,9 +368,9 @@ function AdventurePlayer({ onClose }) {
                           background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
                           color: '#5a6a80', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                           fontSize: '0.85rem',
-                        }}>Skip this pitch →</button>
+                        }}>{isFrench ? 'Sauter cette note →' : 'Skip this pitch →'}</button>
                         <p style={{ fontSize: '0.8rem', color: '#5a6a80', marginTop: 6, fontStyle: 'italic' }}>
-                          No penalty — the story continues
+                          {isFrench ? "Sans pénalité — l'histoire continue" : "No penalty — the story continues"}
                         </p>
                       </motion.div>
                     )}
@@ -351,7 +385,7 @@ function AdventurePlayer({ onClose }) {
                       fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                       letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
                       textAlign: 'center', marginBottom: 4,
-                    }}>YOUR RESPONSE</p>
+                    }}>{isFrench ? 'VOTRE RÉPONSE' : 'YOUR RESPONSE'}</p>
                     {scene.choices.map(choice => (
                       <button key={choice.id} onClick={() => handleChoice(choice)} style={{
                         padding: '16px 20px', borderRadius: 10, textAlign: 'left',
@@ -363,8 +397,8 @@ function AdventurePlayer({ onClose }) {
                           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                           letterSpacing: '0.1em', color: choice.mode === 'sing' ? atmo.accent : '#8090a8',
                           margin: '0 0 4px',
-                        }}>{choice.label}</p>
-                        <p style={{ fontSize: '1rem', color: '#8090a8', margin: 0 }}>{choice.description}</p>
+                        }}>{localize(choice.label)}</p>
+                        <p style={{ fontSize: '1rem', color: '#8090a8', margin: 0 }}>{localize(choice.description)}</p>
                       </button>
                     ))}
                   </motion.div>
@@ -385,7 +419,7 @@ function AdventurePlayer({ onClose }) {
                     <p style={{
                       fontFamily: 'EB Garamond, serif', fontSize: '1rem', fontStyle: 'italic',
                       color: atmo.accent, marginBottom: 16,
-                    }}>Sing your response...</p>
+                    }}>{isFrench ? 'Chantez votre réponse...' : 'Sing your response...'}</p>
                     {isListening && pitch && (
                       <p style={{
                         fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
@@ -397,7 +431,7 @@ function AdventurePlayer({ onClose }) {
                       background: 'rgba(46,213,115,0.15)', border: '1px solid rgba(46,213,115,0.4)',
                       color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                       fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
-                    }}>✓ Complete Response</button>
+                    }}>{isFrench ? '✓ Terminer la Réponse' : '✓ Complete Response'}</button>
                   </motion.div>
                 )}
 
@@ -409,17 +443,17 @@ function AdventurePlayer({ onClose }) {
                       fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                       letterSpacing: '0.2em', color: atmo.accent, textTransform: 'uppercase',
                       marginBottom: 16,
-                    }}>{scene.endingType === 'commission' ? '★ THE COMMISSION' : 'THE PATRONAGE'}</p>
+                    }}>{scene.endingType === 'commission' ? (isFrench ? '★ LA COMMANDE' : '★ THE COMMISSION') : (isFrench ? 'LE PATRONAGE' : 'THE PATRONAGE')}</p>
                     <p style={{
                       fontFamily: 'EB Garamond, serif', fontSize: '1.1rem', lineHeight: 1.7,
                       color: '#d0d8e0',
-                    }}>{scene.setting}</p>
+                    }}>{localize(scene.setting)}</p>
                     <button onClick={handleFinish} style={{
                       marginTop: 24, padding: '14px 28px', borderRadius: 8,
                       background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
                       color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                       fontSize: '1rem', letterSpacing: '0.1em',
-                    }}>View Journey Summary</button>
+                    }}>{isFrench ? 'Voir le résumé du voyage' : 'View Journey Summary'}</button>
                   </motion.div>
                 )}
               </div>
@@ -440,7 +474,7 @@ function AdventurePlayer({ onClose }) {
 }
 
 // ── Summary View ──
-function SummaryView({ summary, session, onClose }) {
+function SummaryView({ summary, session, localize, isFrench, onClose }) {
   if (!summary) return null;
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -451,19 +485,19 @@ function SummaryView({ summary, session, onClose }) {
       <p style={{
         fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
         letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
-      }}>ADVENTURE COMPLETE</p>
+      }}>{isFrench ? 'AVENTURE TERMINÉE' : 'ADVENTURE COMPLETE'}</p>
 
       <h2 style={{
         fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem',
         fontWeight: 300, color: '#e8edf2', textAlign: 'center',
-      }}>The Troubadour of Occitania</h2>
+      }}>{localize(TROUBADOUR.title)}</h2>
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', maxWidth: 300 }}>
-        <StatBox label="Pitch Accuracy" value={`${summary.accuracy}%`} />
-        <StatBox label="Scenes" value={summary.scenesCompleted} />
-        <StatBox label="Bonus Paths" value={summary.bonusBranches} />
-        <StatBox label="Sung Responses" value={summary.sungResponses} />
+        <StatBox label={isFrench ? 'Précision de Ton' : 'Pitch Accuracy'} value={`${summary.accuracy}%`} />
+        <StatBox label={isFrench ? 'Scènes' : 'Scenes'} value={summary.scenesCompleted} />
+        <StatBox label={isFrench ? 'Chemins Bonus' : 'Bonus Paths'} value={summary.bonusBranches} />
+        <StatBox label={isFrench ? 'Chants Réalisés' : 'Sung Responses'} value={summary.sungResponses} />
       </div>
 
       {/* Impression */}
@@ -474,7 +508,7 @@ function SummaryView({ summary, session, onClose }) {
         <p style={{
           fontFamily: 'EB Garamond, serif', fontSize: '1rem', fontStyle: 'italic',
           color: '#c9a96e', lineHeight: 1.7, margin: 0,
-        }}>"{summary.impression}"</p>
+        }}>"{localize(summary.impression)}"</p>
         <p style={{
           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
           color: '#5a6a80', marginTop: 8, letterSpacing: '0.1em',
@@ -486,7 +520,7 @@ function SummaryView({ summary, session, onClose }) {
         background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.3)',
         color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
         fontSize: '0.9rem',
-      }}>Return to Menu</button>
+      }}>{isFrench ? 'Retour au Menu' : 'Return to Menu'}</button>
     </motion.div>
   );
 }
@@ -498,7 +532,7 @@ function StatBox({ label, value }) {
       background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
     }}>
       <p style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: '1rem',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
         color: '#5a6a80', letterSpacing: '0.12em', marginBottom: 4,
       }}>{label}</p>
       <p style={{ fontSize: '1.1rem', color: '#e8edf2', fontWeight: 300, margin: 0 }}>{value}</p>

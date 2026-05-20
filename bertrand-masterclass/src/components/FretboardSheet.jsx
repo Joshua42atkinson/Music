@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import FretboardExplorer from './FretboardExplorer';
+import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
 // FRETBOARD SHEET — Bottom-sheet overlay for in-slide practice
@@ -54,6 +55,8 @@ const FretboardSheet = ({
   fretboardFocus,
   standalone = false,
 }) => {
+  const { isFrench } = useLocale();
+  const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
   const [sheetState, setSheetState] = useState('peek');
   const dragControls = useDragControls();
   const sheetRef = useRef(null);
@@ -266,7 +269,7 @@ const FretboardSheet = ({
         {fret && (
           <div className="fbs-fret-info">
             <span className="fbs-fret-label">
-              Ch.{fret.id} · {fret.title}
+              Ch.{fret.id} · {localize(fret.title)}
             </span>
             <div className="fbs-preset-badge">
               {fretboardFocus && (

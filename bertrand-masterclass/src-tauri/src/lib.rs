@@ -1,10 +1,11 @@
+mod db;
+mod inference;
 mod server;
+mod ffmpeg;
+mod socratic_judge;
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use std::sync::Arc;
+use tokio::sync::RwLock;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -13,11 +14,22 @@ pub fn run() {
         .setup(|_app| {
             // Spawn the Axum DaaS server in the background
             tauri::async_runtime::spawn(async {
-                server::start_server().await;
+                // Initialize SQLite Local-First DB
+                let db = Arc::new(db::Database::init().await);
+                
+                // Initialize LLM Inference Router
+                let mut inference_router = inference::InferenceRouter::new();
+                
+                // Run auto-detection of local AI instances (LM Studio / Ollama)
+                inference_router.auto_detect().await;
+                
+                let router = Arc::new(RwLock::new(inference_router));
+                
+                // Start DaaS Server with db and router context
+                server::start_server(db, router).await;
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

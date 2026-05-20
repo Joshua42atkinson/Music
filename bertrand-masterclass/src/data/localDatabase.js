@@ -26,6 +26,9 @@ db.version(1).stores({
 
   // Homework outbox queue (videos ready to sync when online)
   outbox: '++id, fretId, blob, status', // status: 'queued', 'syncing', 'synced'
+
+  // Student's Vertiscale sessions (pitch accuracy, biometric flow/stress, timing)
+  vertiscaleSessions: '++id, phase, patternId, timestamp, successful',
 });
 
 // ─────────────────────────────────────────────────────────────

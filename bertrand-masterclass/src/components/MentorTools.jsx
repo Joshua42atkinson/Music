@@ -1,17 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DigitalBinder from './DigitalBinder';
 import StudioPage from '../pages/StudioPage';
+import MentorDashboard from './MentorDashboard';
+import { Shield } from 'lucide-react';
 
 export default function MentorTools() {
+  const [showDashboard, setShowDashboard] = useState(false);
+
   return (
-    <div className="mentor-tools-wrapper bg-cf-void w-full">
-      {/* 
-        This is The Sword: 
-        The top half is the Binder (The daily practice tools).
-        The bottom half is the Studio (The mentorship storefront).
-        This solves the traffic problem: students use the tools daily,
-        and naturally scroll down to see the mentorship options.
-      */}
+    <div className="mentor-tools-wrapper bg-cf-void w-full relative">
+      {/* Sovereign Coach Portal entry point */}
+      <div className="max-w-[1200px] mx-auto px-4 pt-4 flex justify-end">
+        <button
+          onClick={() => setShowDashboard(true)}
+          className="flex items-center gap-2 px-4 py-2.5 text-xs font-mono tracking-widest uppercase text-cf-gold bg-cf-gold/10 hover:bg-cf-gold/20 border border-cf-gold/20 hover:border-cf-gold/40 rounded-xl transition-all"
+        >
+          <Shield size={14} className="animate-pulse" /> Seeker Coach Portal
+        </button>
+      </div>
+
+      {showDashboard && <MentorDashboard onClose={() => setShowDashboard(false)} />}
       
       {/* The Tools (The Sword) */}
       <div className="tools-section">

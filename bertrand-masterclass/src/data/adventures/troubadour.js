@@ -1,21 +1,17 @@
 // Adventure I — The Troubadour of Occitania
 // Eleanor of Aquitaine's court, Poitiers, 1165 CE
 // Mentor: Bernard de Ventadorn
-//
-// Three-part gate per scene:
-//   1. breathState === 'free'  → composure bonus
-//   2. pitch within ±20¢       → gate passes
-//   3. sung response (>2s)     → bonus branch unlocks
-//
-// Breath maps to character power:
-//   free    = "your voice fills the hall"
-//   shallow = "your voice wavers but holds"
-//   held    = "Eleanor frowns — she hears the fear"
 
 export const TROUBADOUR = {
   id: 'troubadour-occitania',
-  title: 'The Troubadour of Occitania',
-  subtitle: 'Eleanor of Aquitaine\'s court · Poitiers · 1165 CE',
+  title: {
+    en: 'The Troubadour of Occitania',
+    fr: "Le Troubadour d'Occitanie"
+  },
+  subtitle: {
+    en: "Eleanor of Aquitaine's court · Poitiers · 1165 CE",
+    fr: "La cour d'Aliénor d'Aquitaine · Poitiers · 1165 ap. J.-C."
+  },
   mentor: 'Bernard de Ventadorn',
   startSceneId: 'arrival',
   premiumRequired: false,
@@ -33,28 +29,64 @@ export const TROUBADOUR = {
     arrival: {
       id: 'arrival',
       act: 1,
-      intervalName: 'Unison',
+      intervalName: {
+        en: 'Unison',
+        fr: 'Unisson'
+      },
       targetNote: 'A4',
       targetFreq: 440,
-      pitchLabel: 'A · 440 Hz · The tuning note',
-      setting: 'The gates of Poitiers. Dust on the road. You have walked three weeks to reach Eleanor\'s court. A guard asks your name and your purpose.',
+      pitchLabel: {
+        en: 'A · 440 Hz · The tuning note',
+        fr: 'La · 440 Hz · La note de référence'
+      },
+      setting: {
+        en: "The gates of Poitiers. Dust on the road. You have walked three weeks to reach Eleanor's court. A guard asks your name and your purpose.",
+        fr: "Les portes de Poitiers. De la poussière sur le chemin. Vous avez marché trois semaines pour rejoindre la cour d'Aliénor. Un garde vous demande votre nom et le but de votre voyage."
+      },
       art: '/assets/adventures/troubadour/arrival.png',
       atmosphere: 'amber-dusk',
-      mentorLine: 'Before you enter, find your note. Every troubadour must first know where they stand.',
+      mentorLine: {
+        en: "Before you enter, find your note. Every troubadour must first know where they stand.",
+        fr: "Avant d'entrer, trouvez votre note. Chaque troubadour doit d'abord savoir où il se situe."
+      },
       coachingCues: {
-        onSceneEnter: 'The road ends here. The court begins.',
-        onPitchPass: 'Bernard nods. "That is you. Now do not lose it inside."',
-        onPitchStruggle: 'Bernard waits. "The note is already in you. You are just not listening yet."',
-        onSingBonus: '"You announced yourself in song. The guard will remember that."',
-        onBreathFree: 'Your shoulders drop. The tension of the road leaves your body.',
-        onBreathHeld: 'Bernard touches your arm. "Breathe. You have already arrived."',
+        onSceneEnter: {
+          en: 'The road ends here. The court begins.',
+          fr: "La route s'achève ici. La cour commence."
+        },
+        onPitchPass: {
+          en: 'Bernard nods. "That is you. Now do not lose it inside."',
+          fr: 'Bernard acquiesce. "C\'est vous. À présent, ne la perdez pas à l\'intérieur."'
+        },
+        onPitchStruggle: {
+          en: 'Bernard waits. "The note is already in you. You are just not listening yet."',
+          fr: 'Bernard patiente. "La note est déjà en vous. Vous n\'écoutez pas encore."'
+        },
+        onSingBonus: {
+          en: '"You announced yourself in song. The guard will remember that."',
+          fr: '"Vous vous êtes annoncé en chanson. Le garde s\'en souviendra."'
+        },
+        onBreathFree: {
+          en: 'Your shoulders drop. The tension of the road leaves your body.',
+          fr: 'Vos épaules se relâchent. La tension de la route quitte votre corps.'
+        },
+        onBreathHeld: {
+          en: 'Bernard touches your arm. "Breathe. You have already arrived."',
+          fr: 'Bernard vous touche le bras. "Respirez. Vous êtes déjà arrivé."'
+        },
       },
       choices: [
         {
           id: 'arrival-speak',
-          label: 'State your name and purpose',
+          label: {
+            en: 'State your name and purpose',
+            fr: 'Déclarez votre nom et votre but'
+          },
           mode: 'speak',
-          description: 'You speak your name to the guard. He writes it in his ledger.',
+          description: {
+            en: 'You speak your name to the guard. He writes it in his ledger.',
+            fr: "Vous dites votre nom au garde. Il l'inscrit sur son registre."
+          },
           leadsTo: 'great-hall',
           requiresPitchGate: true,
           bonusCondition: null,
@@ -62,9 +94,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'arrival-sing',
-          label: '★ Sing your name to the guard',
+          label: {
+            en: '★ Sing your name to the guard',
+            fr: '★ Chantez votre nom au garde'
+          },
           mode: 'sing',
-          description: 'You sing your introduction — name, origin, purpose — on one note.',
+          description: {
+            en: 'You sing your introduction — name, origin, purpose — on one note.',
+            fr: 'Vous chantez votre présentation — nom, origine, but — sur une seule note.'
+          },
           leadsTo: 'great-hall',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.5 },
@@ -76,28 +114,64 @@ export const TROUBADOUR = {
     'great-hall': {
       id: 'great-hall',
       act: 1,
-      intervalName: 'Major 2nd',
+      intervalName: {
+        en: 'Major 2nd',
+        fr: 'Seconde Majeure'
+      },
       targetNote: 'B4',
       targetFreq: 493.88,
-      pitchLabel: 'B · One step above A · 9:8 ratio',
-      setting: 'The great hall of Poitiers. Eleanor sits elevated on a carved stone chair. Forty courtiers watch as you approach. A rival troubadour — Peire d\'Alvernha — stands to her left, already smiling at your discomfort.',
+      pitchLabel: {
+        en: 'B · One step above A · 9:8 ratio',
+        fr: 'Si · Un ton au-dessus du La · Rapport 9:8'
+      },
+      setting: {
+        en: "The great hall of Poitiers. Eleanor sits elevated on a carved stone chair. Forty courtiers watch as you approach. A rival troubadour — Peire d'Alvernha — stands to her left, already smiling at your discomfort.",
+        fr: "La grande salle de Poitiers. Aliénor siège sur un fauteuil en pierre sculptée. Quarante courtisans vous observent approcher. Un troubadour rival — Peire d'Alvernha — se tient à sa gauche, souriant déjà de votre embarras."
+      },
       art: '/assets/adventures/troubadour/great-hall.png',
       atmosphere: 'cool-stone',
-      mentorLine: 'Step one note higher. Just one. That is all the court requires of you right now.',
+      mentorLine: {
+        en: "Step one note higher. Just one. That is all the court requires of you right now.",
+        fr: "Montez d'une note. Une seule. C'est tout ce que la cour exige de vous à cet instant."
+      },
       coachingCues: {
-        onSceneEnter: 'Eleanor does not look at you yet. That is information.',
-        onPitchPass: '"She looked up," Bernard whispers. "One note was enough."',
-        onPitchStruggle: '"The court hears everything. Your silence is also a sound."',
-        onSingBonus: '"Peire\'s smile has changed. He did not expect that from you."',
-        onBreathFree: 'The courtiers settle. Your calm has set the room\'s temperature.',
-        onBreathHeld: 'Peire notices. He will use this later.',
+        onSceneEnter: {
+          en: 'Eleanor does not look at you yet. That is information.',
+          fr: "Aliénor ne vous regarde pas encore. C'est une information."
+        },
+        onPitchPass: {
+          en: '"She looked up," Bernard whispers. "One note was enough."',
+          fr: '"Elle a levé les yeux," chuchote Bernard. "Une seule note a suffi."'
+        },
+        onPitchStruggle: {
+          en: '"The court hears everything. Your silence is also a sound."',
+          fr: '"La cour entend tout. Votre silence est également un son."'
+        },
+        onSingBonus: {
+          en: '"Peire\'s smile has changed. He did not expect that from you."',
+          fr: '"Le sourire de Peire a changé. Il ne s\'attendait pas à cela de votre part."'
+        },
+        onBreathFree: {
+          en: 'The courtiers settle. Your calm has set the room\'s temperature.',
+          fr: "Les courtisans s'apaisent. Votre calme a réglé la température de la pièce."
+        },
+        onBreathHeld: {
+          en: 'Peire notices. He will use this later.',
+          fr: "Peire le remarque. Il l'utilisera plus tard."
+        },
       },
       choices: [
         {
           id: 'hall-bow',
-          label: 'Bow and wait to be addressed',
+          label: {
+            en: 'Bow and wait to be addressed',
+            fr: 'Inclinez-vous et attendez d\'être invité à parler'
+          },
           mode: 'speak',
-          description: 'You bow deeply. A safe, correct move. Eleanor nods permission to approach.',
+          description: {
+            en: 'You bow deeply. A safe, correct move. Eleanor nods permission to approach.',
+            fr: "Vous vous inclinez profondément. Un geste sûr et correct. Aliénor fait signe d'approcher."
+          },
           leadsTo: 'eleanor-question',
           requiresPitchGate: true,
           bonusCondition: null,
@@ -105,9 +179,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'hall-challenge',
-          label: '★ Meet Peire\'s eyes and sing one note',
+          label: {
+            en: '★ Meet Peire\'s eyes and sing one note',
+            fr: '★ Croisez le regard de Peire et chantez une note'
+          },
           mode: 'sing',
-          description: 'You hold the B. Just one note, directed at Peire. A statement, not an attack.',
+          description: {
+            en: 'You hold the B. Just one note, directed at Peire. A statement, not an attack.',
+            fr: "Vous tenez le Si. Une seule note, dirigée vers Peire. Une déclaration, pas une attaque."
+          },
           leadsTo: 'eleanor-question',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.6 },
@@ -119,28 +199,64 @@ export const TROUBADOUR = {
     'great-hall-recognized': {
       id: 'great-hall-recognized',
       act: 1,
-      intervalName: 'Major 2nd',
+      intervalName: {
+        en: 'Major 2nd',
+        fr: 'Seconde Majeure'
+      },
       targetNote: 'B4',
       targetFreq: 493.88,
-      pitchLabel: 'B · One step above A · 9:8 ratio',
-      setting: 'The guard announced your arrival with a description: "A troubadour who sings their own name." Eleanor is already watching the door when you enter.',
+      pitchLabel: {
+        en: 'B · One step above A · 9:8 ratio',
+        fr: 'Si · Un ton au-dessus du La · Rapport 9:8'
+      },
+      setting: {
+        en: 'The guard announced your arrival with a description: "A troubadour who sings their own name." Eleanor is already watching the door when you enter.',
+        fr: 'Le garde a annoncé votre arrivée par ces mots : "Un troubadour qui chante son propre nom." Aliénor regarde déjà vers la porte quand vous entrez.'
+      },
       art: '/assets/adventures/troubadour/great-hall-recognized.png',
       atmosphere: 'warm-gold',
-      mentorLine: 'She is already listening. Step one note higher — carefully.',
+      mentorLine: {
+        en: 'She is already listening. Step one note higher — carefully.',
+        fr: "Elle écoute déjà. Montez d'un ton — avec soin."
+      },
       coachingCues: {
-        onSceneEnter: 'This is the bonus of your first choice. Eleanor\'s attention is already yours.',
-        onPitchPass: '"Good. You have not wasted what you earned at the gate."',
-        onPitchStruggle: '"She is patient. But attention is not infinite."',
-        onSingBonus: '"Bernard laughs quietly. You are making this look easy."',
-        onBreathFree: 'Eleanor leans forward slightly.',
-        onBreathHeld: 'You tighten. Even the favorable start can be lost.',
+        onSceneEnter: {
+          en: 'This is the bonus of your first choice. Eleanor\'s attention is already yours.',
+          fr: "C'est la récompense de votre premier choix. L'attention d'Aliénor vous appartient déjà."
+        },
+        onPitchPass: {
+          en: '"Good. You have not wasted what you earned at the gate."',
+          fr: '"Bien. Vous n\'avez pas gaspillé ce que vous avez gagné aux portes."'
+        },
+        onPitchStruggle: {
+          en: '"She is patient. But attention is not infinite."',
+          fr: '"Elle est patiente. Mais l\'attention n\'est pas infinie."'
+        },
+        onSingBonus: {
+          en: '"Bernard laughs quietly. You are making this look easy."',
+          fr: '"Bernard rit doucement. Vous rendez cela presque trop facile."'
+        },
+        onBreathFree: {
+          en: 'Eleanor leans forward slightly.',
+          fr: "Aliénor se penche légèrement en avant."
+        },
+        onBreathHeld: {
+          en: 'You tighten. Even the favorable start can be lost.',
+          fr: "Vous vous crispez. Même un départ idéal peut être gâché."
+        },
       },
       choices: [
         {
           id: 'recognized-bow',
-          label: 'Bow and let her speak first',
+          label: {
+            en: 'Bow and let her speak first',
+            fr: 'Inclinez-vous et laissez-la parler en premier'
+          },
           mode: 'speak',
-          description: 'A wise move — you give the court back to Eleanor.',
+          description: {
+            en: 'A wise move — you give the court back to Eleanor.',
+            fr: "Un choix judicieux — vous laissez la préséance de la cour à Aliénor."
+          },
           leadsTo: 'eleanor-question',
           requiresPitchGate: true,
           bonusCondition: null,
@@ -148,9 +264,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'recognized-offer',
-          label: '★ Offer the second note of your song',
+          label: {
+            en: '★ Offer the second note of your song',
+            fr: '★ Offrez la deuxième note de votre chant'
+          },
           mode: 'sing',
-          description: 'You began with your name at the gate. You offer the next phrase now.',
+          description: {
+            en: 'You began with your name at the gate. You offer the next phrase now.',
+            fr: "Vous avez commencé avec votre nom à la porte. Vous offrez la phrase suivante à présent."
+          },
           leadsTo: 'eleanor-impressed',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.5 },
@@ -162,28 +284,64 @@ export const TROUBADOUR = {
     'eleanor-question': {
       id: 'eleanor-question',
       act: 1,
-      intervalName: 'Minor 3rd',
+      intervalName: {
+        en: 'Minor 3rd',
+        fr: 'Tierce Mineure'
+      },
       targetNote: 'C5',
       targetFreq: 523.25,
-      pitchLabel: 'C · Minor 3rd above A · 6:5 ratio',
-      setting: 'Eleanor speaks: "Every troubadour who comes to my court tells me they have found something new. What have you found?" The room is silent. Peire watches.',
+      pitchLabel: {
+        en: 'C · Minor 3rd above A · 6:5 ratio',
+        fr: 'Do · Tierce mineure au-dessus du La · Rapport 6:5'
+      },
+      setting: {
+        en: 'Eleanor speaks: "Every troubadour who comes to my court tells me they have found something new. What have you found?" The room is silent. Peire watches.',
+        fr: 'Aliénor prend la parole : "Chaque troubadour qui vient dans ma cour me dit avoir trouvé quelque chose de nouveau. Qu\'avez-vous trouvé ?" La salle est silencieuse. Peire observe.'
+      },
       art: '/assets/adventures/troubadour/eleanor-question.png',
       atmosphere: 'deep-violet',
-      mentorLine: 'The minor third. The sound of longing. Answer her from there.',
+      mentorLine: {
+        en: 'The minor third. The sound of longing. Answer her from there.',
+        fr: "La tierce mineure. Le son de la nostalgie et du désir. Répondez-lui depuis cet espace."
+      },
       coachingCues: {
-        onSceneEnter: 'This is the real entrance examination. Not the gate. This.',
-        onPitchPass: '"The minor third," Bernard murmurs. "You felt it before you named it."',
-        onPitchStruggle: '"Do not think. What are you longing for? Find that — the note follows."',
-        onSingBonus: '"Eleanor sits back. That is the posture of someone who has heard something true."',
-        onBreathFree: 'Your answer will come from a still place. That is rare in this hall.',
-        onBreathHeld: 'Breathe first. The answer you give from a held breath will be smaller than you are.',
+        onSceneEnter: {
+          en: 'This is the real entrance examination. Not the gate. This.',
+          fr: "C'est le véritable examen d'entrée. Pas la porte extérieure. Celui-ci."
+        },
+        onPitchPass: {
+          en: '"The minor third," Bernard murmurs. "You felt it before you named it."',
+          fr: '"La tierce mineure," murmure Bernard. "Vous l\'avez ressentie avant de la nommer."'
+        },
+        onPitchStruggle: {
+          en: '"Do not think. What are you longing for? Find that — the note follows."',
+          fr: '"Ne réfléchissez pas. De quoi languissez-vous ? Trouvez cela — la note suivra."'
+        },
+        onSingBonus: {
+          en: '"Eleanor sits back. That is the posture of someone who has heard something true."',
+          fr: '"Aliénor se rassied. C\'est l\'attitude de quelqu\'un qui vient d\'entendre une vérité."'
+        },
+        onBreathFree: {
+          en: 'Your answer will come from a still place. That is rare in this hall.',
+          fr: "Votre réponse viendra d'un endroit serein. C'est si rare dans cette salle."
+        },
+        onBreathHeld: {
+          en: 'Breathe first. The answer you give from a held breath will be smaller than you are.',
+          fr: "Respirez d'abord. Une réponse donnée le souffle bloqué sera plus petite que vous."
+        },
       },
       choices: [
         {
           id: 'eleanor-q-speak',
-          label: 'I have found that the voice is the instrument',
+          label: {
+            en: 'I have found that the voice is the instrument',
+            fr: 'J\'ai découvert que la voix elle-même est l\'instrument'
+          },
           mode: 'speak',
-          description: 'You speak your answer. It lands cleanly. Eleanor considers it.',
+          description: {
+            en: 'You speak your answer. It lands cleanly. Eleanor considers it.',
+            fr: "Vous dites votre réponse à voix haute. Elle résonne avec clarté. Aliénor y réfléchit."
+          },
           leadsTo: 'bernards-lesson',
           requiresPitchGate: true,
           bonusCondition: { streak: 3 },
@@ -191,9 +349,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'eleanor-q-sing',
-          label: '★ Sing your answer to her question',
+          label: {
+            en: '★ Sing your answer to her question',
+            fr: '★ Chantez votre réponse à sa question'
+          },
           mode: 'sing',
-          description: 'You do not speak. You sing the answer — whatever the song is, it is yours.',
+          description: {
+            en: 'You do not speak. You sing the answer — whatever the song is, it is yours.',
+            fr: "Vous ne parlez pas. Vous chantez votre réponse — quelle que soit la chanson, elle est vôtre."
+          },
           leadsTo: 'bernards-lesson',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.65 },
@@ -205,28 +369,64 @@ export const TROUBADOUR = {
     'eleanor-impressed': {
       id: 'eleanor-impressed',
       act: 1,
-      intervalName: 'Minor 3rd',
+      intervalName: {
+        en: 'Minor 3rd',
+        fr: 'Tierce Mineure'
+      },
       targetNote: 'C5',
       targetFreq: 523.25,
-      pitchLabel: 'C · Minor 3rd above A · 6:5 ratio',
-      setting: 'Eleanor raises her hand for silence. "Leave us," she says to the court. She keeps you. And Bernard. And sends everyone else away.',
+      pitchLabel: {
+        en: 'C · Minor 3rd above A · 6:5 ratio',
+        fr: 'Do · Tierce mineure au-dessus du La · Rapport 6:5'
+      },
+      setting: {
+        en: 'Eleanor raises her hand for silence. "Leave us," she says to the court. She keeps you. And Bernard. And sends everyone else away.',
+        fr: 'Aliénor lève la main pour réclamer le silence. "Laissez-nous," dit-elle à la cour. Elle vous retient. Vous et Bernard. Elle congédie tous les autres.'
+      },
       art: '/assets/adventures/troubadour/eleanor-private-early.png',
       atmosphere: 'amber-intimate',
-      mentorLine: 'She has given you something rare. Speak from the minor third — the note of honest longing.',
+      mentorLine: {
+        en: 'She has given you something rare. Speak from the minor third — the note of honest longing.',
+        fr: "Elle vous offre un instant rare. Parlez depuis la tierce mineure — la note du désir sincère."
+      },
       coachingCues: {
-        onSceneEnter: 'This scene is only reached by those who sang when they could have spoken.',
-        onPitchPass: 'Bernard exhales. You have earned the room.',
-        onPitchStruggle: '"Even here, the note must be found. Especially here."',
-        onSingBonus: '"Eleanor smiles. Not the court smile. A real one."',
-        onBreathFree: 'The room is small. Your breath fills it.',
-        onBreathHeld: '"Breathe," Eleanor says. "I did not keep you here to watch you shrink."',
+        onSceneEnter: {
+          en: 'This scene is only reached by those who sang when they could have spoken.',
+          fr: "Cette scène n'est offerte qu'à ceux qui ont osé chanter au lieu de parler."
+        },
+        onPitchPass: {
+          en: 'Bernard exhales. You have earned the room.',
+          fr: "Bernard expire de soulagement. Vous avez conquis la pièce."
+        },
+        onPitchStruggle: {
+          en: '"Even here, the note must be found. Especially here."',
+          fr: '"Même ici, la note doit être trouvée. Surtout ici."'
+        },
+        onSingBonus: {
+          en: '"Eleanor smiles. Not the court smile. A real one."',
+          fr: '"Aliénor sourit. Pas son sourire de cour. Un vrai sourire."'
+        },
+        onBreathFree: {
+          en: 'The room is small. Your breath fills it.',
+          fr: "La pièce est intime. Votre souffle l'emplit tout entière."
+        },
+        onBreathHeld: {
+          en: '"Breathe," Eleanor says. "I did not keep you here to watch you shrink."',
+          fr: '"Respirez," dit Aliénor. "Je ne vous ai pas gardé ici pour vous regarder vous recroqueviller."'
+        },
       },
       choices: [
         {
           id: 'impressed-speak',
-          label: 'Ask what she wants to hear',
+          label: {
+            en: 'Ask what she wants to hear',
+            fr: 'Demandez-lui ce qu\'elle souhaite entendre'
+          },
           mode: 'speak',
-          description: 'A honest question. Eleanor appreciates the directness.',
+          description: {
+            en: 'A honest question. Eleanor appreciates the directness.',
+            fr: "Une question honnête. Aliénor apprécie cette franchise directe."
+          },
           leadsTo: 'bernards-lesson',
           requiresPitchGate: true,
           bonusCondition: null,
@@ -234,9 +434,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'impressed-sing',
-          label: '★ Begin the song without being asked',
+          label: {
+            en: '★ Begin the song without being asked',
+            fr: '★ Entonnez le chant sans attendre d\'invitation'
+          },
           mode: 'sing',
-          description: 'You simply begin. Whatever the song is.',
+          description: {
+            en: 'You simply begin. Whatever the song is.',
+            fr: "Vous commencez tout simplement. Quel que soit ce chant."
+          },
           leadsTo: 'eleanor-riveted',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.6 },
@@ -252,28 +458,64 @@ export const TROUBADOUR = {
     'bernards-lesson': {
       id: 'bernards-lesson',
       act: 2,
-      intervalName: 'Perfect 4th',
+      intervalName: {
+        en: 'Perfect 4th',
+        fr: 'Quarte Juste'
+      },
       targetNote: 'D5',
       targetFreq: 587.33,
-      pitchLabel: 'D · Perfect 4th above A · 4:3 ratio',
-      setting: 'That evening, Bernard finds you in the courtyard. "You did well enough," he says. "Now let me show you why \'well enough\' is not why we came here." He hums a note and waits.',
+      pitchLabel: {
+        en: 'D · Perfect 4th above A · 4:3 ratio',
+        fr: 'Ré · Quarte juste au-dessus du La · Rapport 4:3'
+      },
+      setting: {
+        en: 'That evening, Bernard finds you in the courtyard. "You did well enough," he says. "Now let me show you why \'well enough\' is not why we came here." He hums a note and waits.',
+        fr: 'Le soir même, Bernard vous retrouve dans la cour. "Vous vous en êtes bien sorti," dit-il. "Mais laissez-moi vous montrer pourquoi \'bien s\'en sortir\' n\'est pas la raison de notre voyage." Il fredonne une note et attend.'
+      },
       art: '/assets/adventures/troubadour/bernards-lesson.png',
       atmosphere: 'cool-night',
-      mentorLine: 'The Perfect Fourth. The foundation. The tuning of every string on your instrument. Find it.',
+      mentorLine: {
+        en: 'The Perfect Fourth. The foundation. The tuning of every string on your instrument. Find it.',
+        fr: "La quarte juste. La fondation. L'accordage de chaque corde de votre instrument. Trouvez-la."
+      },
       coachingCues: {
-        onSceneEnter: 'This is where the real teaching begins. The court was the entrance exam.',
-        onPitchPass: '"Yes. That is the architecture. Everything else is built on that."',
-        onPitchStruggle: '"Listen to the distance. It is exactly 4:3. Let your body measure it."',
-        onSingBonus: '"Bernard stops walking. He listens to all of it before he responds."',
-        onBreathFree: '"Good. Now you are an instrument, not a person trying to be one."',
-        onBreathHeld: '"You are gripping the note. Release it. Let it vibrate."',
+        onSceneEnter: {
+          en: 'This is where the real teaching begins. The court was the entrance exam.',
+          fr: "C'est ici que le véritable enseignement commence. La cour n'était qu'un filtre."
+        },
+        onPitchPass: {
+          en: '"Yes. That is the architecture. Everything else is built on that."',
+          fr: '"Oui. Voilà l\'architecture. Tout le reste est bâti là-dessus."'
+        },
+        onPitchStruggle: {
+          en: '"Listen to the distance. It is exactly 4:3. Let your body measure it."',
+          fr: '"Écoutez la distance. C\'est exactement 4:3. Laissez votre corps la mesurer."'
+        },
+        onSingBonus: {
+          en: '"Bernard stops walking. He listens to all of it before he responds."',
+          fr: '"Bernard s\'arrête de marcher. Il écoute l\'ensemble avant de répondre."'
+        },
+        onBreathFree: {
+          en: '"Good. Now you are an instrument, not a person trying to be one."',
+          fr: '"Bien. À présent vous êtes un instrument, pas quelqu\'un qui s\'efforce d\'en être un."'
+        },
+        onBreathHeld: {
+          en: '"You are gripping the note. Release it. Let it vibrate."',
+          fr: '"Vous agrippez la note. Relâchez-la. Laissez-la vibrer librement."'
+        },
       },
       choices: [
         {
           id: 'lesson-ask-why',
-          label: 'Ask why the Perfect 4th matters',
+          label: {
+            en: 'Ask why the Perfect 4th matters',
+            fr: 'Demandez pourquoi la quarte juste est si importante'
+          },
           mode: 'speak',
-          description: 'Bernard explains: every lute string is tuned in Perfect 4ths. The instrument is Pythagorean.',
+          description: {
+            en: 'Bernard explains: every lute string is tuned in Perfect 4ths. The instrument is Pythagorean.',
+            fr: "Bernard vous explique : chaque corde du luth est accordée en quartes justes. L'instrument est pythagoricien."
+          },
           leadsTo: 'rival-encounter',
           requiresPitchGate: true,
           bonusCondition: { streak: 4 },
@@ -281,9 +523,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'lesson-sing-response',
-          label: '★ Sing the interval back — and add one more note',
+          label: {
+            en: '★ Sing the interval back — and add one more note',
+            fr: '★ Chantez l\'intervalle en retour — et ajoutez une note de plus'
+          },
           mode: 'sing',
-          description: 'You echo the D, then move somewhere. An improvised phrase.',
+          description: {
+            en: 'You echo the D, then move somewhere. An improvised phrase.',
+            fr: "Vous faites écho au Ré, puis vous glissez vers une autre note. Une phrase improvisée."
+          },
           leadsTo: 'rival-encounter',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.7 },
@@ -295,28 +543,64 @@ export const TROUBADOUR = {
     'rival-encounter': {
       id: 'rival-encounter',
       act: 2,
-      intervalName: 'Tritone',
+      intervalName: {
+        en: 'Tritone',
+        fr: 'Triton'
+      },
       targetNote: 'Eb5',
       targetFreq: 622.25,
-      pitchLabel: 'Eb · Tritone · The devil in music',
-      setting: 'Peire d\'Alvernha corners you in the corridor. "You don\'t belong here," he says. "Your accent is wrong. Your tuning is rough. Eleanor is being polite." He is not entirely wrong.',
+      pitchLabel: {
+        en: 'Eb · Tritone · The devil in music',
+        fr: 'Mi bémol · Le Triton · Le diable dans la musique'
+      },
+      setting: {
+        en: 'Peire d\'Alvernha corners you in the corridor. "You don\'t belong here," he says. "Your accent is wrong. Your tuning is rough. Eleanor is being polite." He is not entirely wrong.',
+        fr: 'Peire d\'Alvernha vous coince dans le couloir. "Vous n\'avez rien à faire ici," lance-t-il. "Votre accent est faux. Votre accordage est approximatif. Aliénor est juste polie." Il n\'a pas tout à fait tort.'
+      },
       art: '/assets/adventures/troubadour/rival-encounter.png',
       atmosphere: 'red-tension',
-      mentorLine: 'The tritone. The forbidden interval. It is not your enemy — it is the engine of all resolution. Find it without flinching.',
+      mentorLine: {
+        en: 'The tritone. The forbidden interval. It is not your enemy — it is the engine of all resolution. Find it without flinching.',
+        fr: "Le triton. L'intervalle interdit. Ce n'est pas votre ennemi — c'est le moteur de toute résolution. Trouvez-le sans ciller."
+      },
       coachingCues: {
-        onSceneEnter: 'Peire is testing you. The tritone is the test. Both want the same thing: your response.',
-        onPitchPass: '"The dissonance did not break you. That tells Peire everything he needs to know."',
-        onPitchStruggle: '"Do not avoid the tension. Sit in it. It will resolve — but only if you hold it."',
-        onSingBonus: '"Peire goes silent. You sang where he expected argument."',
-        onBreathFree: 'You hold the tritone steady. Your breath is the anchor.',
-        onBreathHeld: 'The tension of the interval meets the tension of your body. One of them will break.',
+        onSceneEnter: {
+          en: 'Peire is testing you. The tritone is the test. Both want the same thing: your response.',
+          fr: "Peire vous teste. Le triton est l'épreuve. Tous deux cherchent la même chose : votre réponse."
+        },
+        onPitchPass: {
+          en: '"The dissonance did not break you. That tells Peire everything he needs to know."',
+          fr: '"La dissonance ne vous a pas brisé. Cela dit à Peire tout ce qu\'il a besoin de savoir."'
+        },
+        onPitchStruggle: {
+          en: '"Do not avoid the tension. Sit in it. It will resolve — but only if you hold it."',
+          fr: '"Ne fuyez pas la tension. Habitez-la. Elle se résoudra — mais seulement si vous la tenez."'
+        },
+        onSingBonus: {
+          en: '"Peire goes silent. You sang where he expected argument."',
+          fr: '"Peire se tait. Vous avez chanté là où il s\'attendait à une dispute."'
+        },
+        onBreathFree: {
+          en: 'You hold the tritone steady. Your breath is the anchor.',
+          fr: "Vous tenez le triton avec stabilité. Votre souffle est l'ancre."
+        },
+        onBreathHeld: {
+          en: 'The tension of the interval meets the tension of your body. One of them will break.',
+          fr: "La tension de l'intervalle rencontre la tension de votre corps. L'une d'elles finira par rompre."
+        },
       },
       choices: [
         {
           id: 'rival-speak',
-          label: 'Agree with him — partially',
+          label: {
+            en: 'Agree with him — partially',
+            fr: 'Accordez-lui raison — en partie'
+          },
           mode: 'speak',
-          description: '"You\'re right about the accent. Wrong about the rest." Peire is disarmed by agreement.',
+          description: {
+            en: '"You\'re right about the accent. Wrong about the rest." Peire is disarmed by agreement.',
+            fr: '"Tu as raison pour l\'accent. Tort pour le reste." Peire est désarmé par cet accord inattendu.'
+          },
           leadsTo: 'eleanor-test',
           requiresPitchGate: true,
           bonusCondition: { streak: 5 },
@@ -324,9 +608,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'rival-sing',
-          label: '★ Respond by singing the tritone directly at him',
+          label: {
+            en: '★ Respond by singing the tritone directly at him',
+            fr: '★ Répondez en chantant le triton directement vers lui'
+          },
           mode: 'sing',
-          description: 'You hold the Eb — the devil\'s interval — and let it ring between you.',
+          description: {
+            en: 'You hold the Eb — the devil\'s interval — and let it ring between you.',
+            fr: "Vous soutenez le Mi bémol — l'intervalle du diable — et le laissez résonner entre vous deux."
+          },
           leadsTo: 'eleanor-test',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.65 },
@@ -342,28 +632,64 @@ export const TROUBADOUR = {
     'eleanor-test': {
       id: 'eleanor-test',
       act: 3,
-      intervalName: 'Perfect 5th',
+      intervalName: {
+        en: 'Perfect 5th',
+        fr: 'Quinte Juste'
+      },
       targetNote: 'E5',
       targetFreq: 659.25,
-      pitchLabel: 'E · Perfect 5th above A · 3:2 ratio',
-      setting: 'Eleanor summons you. "Tonight there is a feast. I want you to perform. One song. Your own — not Bernard\'s. Not anything you learned on the road. Yours." She leaves no room for argument.',
+      pitchLabel: {
+        en: 'E · Perfect 5th above A · 3:2 ratio',
+        fr: 'Mi · Quinte juste au-dessus du La · Rapport 3:2'
+      },
+      setting: {
+        en: 'Eleanor summons you. "Tonight there is a feast. I want you to perform. One song. Your own — not Bernard\'s. Not anything you learned on the road. Yours." She leaves no room for argument.',
+        fr: 'Aliénor vous fait appeler. "Ce soir a lieu un banquet. Je veux que vous chantiez. Une chanson. La vôtre — pas celle de Bernard. Pas un air appris en chemin. La vôtre." Elle ne laisse place à aucune négociation.'
+      },
       art: '/assets/adventures/troubadour/eleanor-test.png',
       atmosphere: 'deep-gold',
-      mentorLine: 'The Perfect Fifth. 3:2. The first overtone above the octave. It was always in the string. Your song was always in you.',
+      mentorLine: {
+        en: 'The Perfect Fifth. 3:2. The first overtone above the octave. It was always in the string. Your song was always in you.',
+        fr: "La quinte juste. Rapport 3:2. Le premier harmonique au-dessus de l'octave. Elle a toujours été dans la corde. Votre chant a toujours été en vous."
+      },
       coachingCues: {
-        onSceneEnter: 'This is what you came for. The interval is the same. The stakes are different.',
-        onPitchPass: '"Bernard says nothing. He smiles. That is his standing ovation."',
-        onPitchStruggle: '"Breathe. The 3:2 ratio is not difficult. You have been doing it all week."',
-        onSingBonus: '"The hall goes quiet before you finish. That quiet is the real applause."',
-        onBreathFree: 'Your voice carries to the back of the hall without effort.',
-        onBreathHeld: '"Release," Bernard whispers. "The song is bigger than your fear."',
+        onSceneEnter: {
+          en: 'This is what you came for. The interval is the same. The stakes are different.',
+          fr: "C'est pour cela que vous êtes venu. L'intervalle est le même. Les enjeux sont tout autres."
+        },
+        onPitchPass: {
+          en: '"Bernard says nothing. He smiles. That is his standing ovation."',
+          fr: '"Bernard ne dit rien. Il sourit. C\'est son ovation debout à lui."'
+        },
+        onPitchStruggle: {
+          en: '"Breathe. The 3:2 ratio is not difficult. You have been doing it all week."',
+          fr: '"Respirez. Le rapport 3:2 n\'est pas difficile. Vous l\'avez pratiqué toute la semaine."'
+        },
+        onSingBonus: {
+          en: '"The hall goes quiet before you finish. That quiet is the real applause."',
+          fr: '"La salle fait silence avant même que vous n\'ayez fini. Ce silence est le vrai applaudissement."'
+        },
+        onBreathFree: {
+          en: 'Your voice carries to the back of the hall without effort.',
+          fr: "Votre voix porte jusqu'au fond de la grande salle sans aucun effort."
+        },
+        onBreathHeld: {
+          en: '"Release," Bernard whispers. "The song is bigger than your fear."',
+          fr: '"Relâchez," chuchote Bernard. "La chanson est bien plus grande que votre peur."'
+        },
       },
       choices: [
         {
           id: 'test-speak',
-          label: 'Ask Bernard what song to perform',
+          label: {
+            en: 'Ask Bernard what song to perform',
+            fr: 'Demandez à Bernard quelle chanson interpréter'
+          },
           mode: 'speak',
-          description: 'Bernard shakes his head. "Eleanor said yours. Not mine. I cannot give you this one."',
+          description: {
+            en: 'Bernard shakes his head. "Eleanor said yours. Not mine. I cannot give you this one."',
+            fr: 'Bernard secoue la tête. "Aliénor a dit la vôtre. Pas la mienne. Je ne peux pas vous la donner."'
+          },
           leadsTo: 'final-performance',
           requiresPitchGate: true,
           bonusCondition: null,
@@ -371,9 +697,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'test-sing',
-          label: '★ Begin composing the song right now',
+          label: {
+            en: '★ Begin composing the song right now',
+            fr: '★ Commencez à composer la chanson dès maintenant'
+          },
           mode: 'sing',
-          description: 'You do not wait for the feast. The song starts here, in Eleanor\'s anteroom, unrehearsed.',
+          description: {
+            en: 'You do not wait for the feast. The song starts here, in Eleanor\'s anteroom, unrehearsed.',
+            fr: "Vous n'attendez pas le banquet. Le chant commence ici, dans l'antichambre d'Aliénor, sans répétition."
+          },
           leadsTo: 'final-performance',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.6 },
@@ -385,28 +717,64 @@ export const TROUBADOUR = {
     'final-performance': {
       id: 'final-performance',
       act: 3,
-      intervalName: 'Octave',
+      intervalName: {
+        en: 'Octave',
+        fr: 'Octave'
+      },
       targetNote: 'A5',
       targetFreq: 880,
-      pitchLabel: 'A · Octave · 2:1 ratio · The return',
-      setting: 'The feast. Forty courtiers. Eleanor in the center. Peire watching from the side. Bernard standing at the back, arms folded. You have the floor.',
+      pitchLabel: {
+        en: 'A · Octave · 2:1 ratio · The return',
+        fr: 'La · Octave · Rapport 2:1 · Le retour'
+      },
+      setting: {
+        en: 'The feast. Forty courtiers. Eleanor in the center. Peire watching from the side. Bernard standing at the back, arms folded. You have the floor.',
+        fr: 'Le banquet. Quarante courtisans. Aliénor au centre. Peire observe depuis le côté. Bernard se tient au fond, les bras croisés. La parole — et le chant — sont à vous.'
+      },
       art: '/assets/adventures/troubadour/final-performance.png',
       atmosphere: 'warm-firelight',
-      mentorLine: 'The octave. The same note, one level higher. You began here. You return here — transformed.',
+      mentorLine: {
+        en: 'The octave. The same note, one level higher. You began here. You return here — transformed.',
+        fr: "L'octave. La même note, à l'étage supérieur. Vous avez débuté ici. Vous y retournez — métamorphosé."
+      },
       coachingCues: {
-        onSceneEnter: 'Every interval you have found this week is in this moment.',
-        onPitchPass: '"The octave rings. The hall hears their own breathing stop."',
-        onPitchStruggle: '"It is the same A you found at the gate. You already know it."',
-        onSingBonus: 'Eleanor stands. In her court, this means something specific: she is moved.',
-        onBreathFree: 'Your breath moves the room. This is *voix vive* — the living voice.',
-        onBreathHeld: '"Release everything," Bernard says from the back. "All of it."',
+        onSceneEnter: {
+          en: 'Every interval you have found this week is in this moment.',
+          fr: "Chaque intervalle trouvé cette semaine converge vers cet instant précis."
+        },
+        onPitchPass: {
+          en: '"The octave rings. The hall hears their own breathing stop."',
+          fr: '"L\'octave résonne. La salle entière sent son propre souffle se suspendre."'
+        },
+        onPitchStruggle: {
+          en: '"It is the same A you found at the gate. You already know it."',
+          fr: '"C\'est le même La que vous avez trouvé à la porte. Vous le connaissez déjà."'
+        },
+        onSingBonus: {
+          en: 'Eleanor stands. In her court, this means something specific: she is moved.',
+          fr: "Aliénor se lève. Dans sa cour, cela a un sens précis : elle est profondément touchée."
+        },
+        onBreathFree: {
+          en: 'Your breath moves the room. This is *voix vive* — the living voice.',
+          fr: "Votre souffle anime toute la pièce. C'est cela, la *voix vive*."
+        },
+        onBreathHeld: {
+          en: '"Release everything," Bernard says from the back. "All of it."',
+          fr: '"Relâchez tout," dit Bernard depuis le fond. "Absolument tout."'
+        },
       },
       choices: [
         {
           id: 'final-speak',
-          label: 'Perform the song as prepared',
+          label: {
+            en: 'Perform the song as prepared',
+            fr: 'Interprétez la chanson telle que préparée'
+          },
           mode: 'speak',
-          description: 'You sing the song you have been building all week. The court listens.',
+          description: {
+            en: 'You sing the song you have been building all week. The court listens.',
+            fr: "Vous chantez l'œuvre que vous avez bâtie toute la semaine. La cour écoute."
+          },
           leadsTo: 'ending-patronage',
           requiresPitchGate: true,
           bonusCondition: { streak: 6 },
@@ -414,9 +782,15 @@ export const TROUBADOUR = {
         },
         {
           id: 'final-sing',
-          label: '★ Improvise — let the audience complete the song',
+          label: {
+            en: '★ Improvise — let the audience complete the song',
+            fr: '★ Improvisez — laissez l\'audience achever le chant'
+          },
           mode: 'sing',
-          description: 'You begin, and you leave a phrase unfinished — an open question for Eleanor to answer.',
+          description: {
+            en: 'You begin, and you leave a phrase unfinished — an open question for Eleanor to answer.',
+            fr: "Vous commencez, puis vous laissez une phrase en suspens — une question ouverte à laquelle Aliénor devra répondre."
+          },
           leadsTo: 'ending-patronage',
           requiresPitchGate: true,
           bonusCondition: { singingScore: 0.75 },
@@ -432,21 +806,51 @@ export const TROUBADOUR = {
     'ending-patronage': {
       id: 'ending-patronage',
       act: 3,
-      intervalName: 'Octave',
+      intervalName: {
+        en: 'Octave',
+        fr: 'Octave'
+      },
       targetNote: 'A5',
       targetFreq: 880,
-      pitchLabel: 'A · The return home',
-      setting: 'Eleanor grants you winter quarters at Poitiers. Not a commission — something better. Time. Space. The court will hear you again in spring.',
+      pitchLabel: {
+        en: 'A · The return home',
+        fr: 'La · Le retour au port'
+      },
+      setting: {
+        en: 'Eleanor grants you winter quarters at Poitiers. Not a commission — something better. Time. Space. The court will hear you again in spring.',
+        fr: "Aliénor vous accorde vos quartiers d'hiver à Poitiers. Pas une simple commande — mieux encore. Du temps. De l'espace. La cour vous entendra à nouveau au printemps."
+      },
       art: '/assets/adventures/troubadour/ending-patronage.png',
       atmosphere: 'ember-warm',
-      mentorLine: 'Bernard says: "You did not come here to be given a song. You came to find out you already had one."',
+      mentorLine: {
+        en: 'Bernard says: "You did not come here to be given a song. You came to find out you already had one."',
+        fr: 'Bernard vous dit : "Vous n\'êtes pas venu pour qu\'on vous donne un chant. Vous êtes venu pour découvrir que vous en portiez déjà un en vous."'
+      },
       coachingCues: {
-        onSceneEnter: 'This is a real ending. Not all endings are commissions.',
-        onPitchPass: 'The session is complete.',
-        onPitchStruggle: 'Even at the end, the note matters.',
-        onSingBonus: 'You sing the last note of the adventure. It rings longer than expected.',
-        onBreathFree: 'You breathe easily for the first time since the gate.',
-        onBreathHeld: 'Let it go. The story is done.',
+        onSceneEnter: {
+          en: 'This is a real ending. Not all endings are commissions.',
+          fr: "C'est un véritable dénouement. Les plus beaux lauriers ne sont pas toujours des commandes."
+        },
+        onPitchPass: {
+          en: 'The session is complete.',
+          fr: "La session est accomplie."
+        },
+        onPitchStruggle: {
+          en: 'Even at the end, the note matters.',
+          fr: "Même à la fin, la note garde toute son importance."
+        },
+        onSingBonus: {
+          en: 'You sing the last note of the adventure. It rings longer than expected.',
+          fr: "Vous chantez la note finale de l'aventure. Elle résonne plus longuement que prévu."
+        },
+        onBreathFree: {
+          en: 'You breathe easily for the first time since the gate.',
+          fr: "Vous respirez avec aisance pour la première fois depuis les portes."
+        },
+        onBreathHeld: {
+          en: 'Let it go. The story is done.',
+          fr: "Lâchez prise. L'histoire est accomplie."
+        },
       },
       choices: [],
       isEnding: true,
@@ -456,21 +860,51 @@ export const TROUBADOUR = {
     'ending-commission': {
       id: 'ending-commission',
       act: 3,
-      intervalName: 'Octave',
+      intervalName: {
+        en: 'Octave',
+        fr: 'Octave'
+      },
       targetNote: 'A5',
       targetFreq: 880,
-      pitchLabel: 'A · The return, transformed',
-      setting: 'Eleanor commissions a canso — a full song cycle — for the court of spring. She hands you a sealed letter for the court of Bordeaux. You are no longer a visitor. You are a troubadour of Occitania.',
+      pitchLabel: {
+        en: 'A · The return, transformed',
+        fr: 'La · Le retour, transformé'
+      },
+      setting: {
+        en: 'Eleanor commissions a canso — a full song cycle — for the court of spring. She hands you a sealed letter for the court of Bordeaux. You are no longer a visitor. You are a troubadour of Occitania.',
+        fr: "Aliénor vous commande une canso — un cycle complet de chants — pour sa cour printanière. Elle vous remet une lettre scellée pour la cour de Bordeaux. Vous n'êtes plus un simple visiteur. Vous êtes un troubadour d'Occitanie."
+      },
       art: '/assets/adventures/troubadour/ending-commission.png',
       atmosphere: 'luminous-gold',
-      mentorLine: '"Now," Bernard says, "write the song about where you came from. That is always the second one."',
+      mentorLine: {
+        en: '"Now," Bernard says, "write the song about where you came from. That is always the second one."',
+        fr: '"À présent," dit Bernard, "écris la chanson sur l\'endroit d\'où tu viens. C\'est toujours la seconde."'
+      },
       coachingCues: {
-        onSceneEnter: 'This ending is only available to those who sang their choices. Well done.',
-        onPitchPass: 'The adventure is complete. Adventure II unlocks.',
-        onPitchStruggle: 'Even now.',
-        onSingBonus: 'The living voice. It was always yours.',
-        onBreathFree: 'Free breath. Free voice. The same thing.',
-        onBreathHeld: 'One last time: release.',
+        onSceneEnter: {
+          en: 'This ending is only available to those who sang their choices. Well done.',
+          fr: "Cette fin n'était accessible qu'à ceux qui ont osé chanter leurs choix. Bravo."
+        },
+        onPitchPass: {
+          en: 'The adventure is complete. Adventure II unlocks.',
+          fr: "L'aventure est achevée. L'Aventure II est déverrouillée."
+        },
+        onPitchStruggle: {
+          en: 'Even now.',
+          fr: "Même maintenant."
+        },
+        onSingBonus: {
+          en: 'The living voice. It was always yours.',
+          fr: "La voix vivante. Elle a toujours été vôtre."
+        },
+        onBreathFree: {
+          en: 'Free breath. Free voice. The same thing.',
+          fr: "Souffle libre. Voix libre. C'est la même et unique chose."
+        },
+        onBreathHeld: {
+          en: 'One last time: release.',
+          fr: "Une dernière fois : relâchez."
+        },
       },
       choices: [],
       isEnding: true,

@@ -17,6 +17,8 @@ import MicrotonalTracker from './MicrotonalTracker';
 import MultiKeyHub from './MultiKeyHub';
 import VertiscaleEngine from '../game/VertiscaleEngine';
 import NeckMenu from './NeckMenu';
+import { useBackendBridge } from '../hooks/useBackendBridge';
+import { useLocale } from '../hooks/useLocale';
 
 /* ── Protocol colour map ── */
 const PROTOCOL_COLORS = {
@@ -26,7 +28,7 @@ const PROTOCOL_COLORS = {
 };
 
 /* ── Single tool card ── */
-const FretToolCard = ({ tool, onClick }) => {
+const FretToolCard = ({ tool, onClick, isFrench }) => {
   const isAvailable = tool.status === 'available';
   const colors = PROTOCOL_COLORS[tool.protocol] || PROTOCOL_COLORS['SHEARL'];
   const hasInlay = FRET_INLAY_POSITIONS.has(tool.id);
@@ -57,7 +59,7 @@ const FretToolCard = ({ tool, onClick }) => {
             border: `1px solid ${isAvailable ? colors.border : 'rgba(255,255,255,0.08)'}`,
           }}
         >
-          Fret {tool.id}
+          {isFrench ? 'Frette' : 'Fret'} {tool.id}
         </span>
         {hasInlay && (
           <div
@@ -115,7 +117,7 @@ const FretToolCard = ({ tool, onClick }) => {
           className="absolute top-2 right-2 text-[8px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded"
           style={{ color: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          Soon
+          {isFrench ? 'Bientôt' : 'Soon'}
         </div>
       )}
     </motion.div>
@@ -139,7 +141,7 @@ const ProtocolLegend = () => (
 );
 
 /* ── Guitar neck nut bar ── */
-const NeckNut = () => (
+const NeckNut = ({ isFrench }) => (
   <div className="relative mb-1 mx-2">
     <div
       className="h-2 rounded-sm w-full"
@@ -149,7 +151,7 @@ const NeckNut = () => (
       }}
     />
     <p className="text-[9px] font-mono tracking-widest text-center mt-1" style={{ color: 'rgba(201,169,110,0.4)' }}>
-      ── THE 12 TOOLS ── ONE PER FRET ──
+      {isFrench ? '── LES 12 OUTILS ── UN PAR FRETTE ──' : '── THE 12 TOOLS ── ONE PER FRET ──'}
     </p>
   </div>
 );
@@ -158,14 +160,46 @@ const NeckNut = () => (
    MAIN COMPONENT
 ══════════════════════════════════════════ */
 const DigitalBinder = () => {
+  const { locale, isFrench, t } = useLocale();
   const [activeToolId, setActiveToolId] = useState(null);
+  
+  const {
+    isDaaSConnected,
+    activeBackend,
+    availableBackends,
+    loading,
+    switchBackend,
+    detectBackends,
+    getLogs,
+  } = useBackendBridge();
 
   const [habits, setHabits] = useState(() => {
     const saved = localStorage.getItem('bertrand_habits');
     return saved ? JSON.parse(saved) : [
-      { id: 1, name: 'Checked Shoulder Posture', completed: false },
-      { id: 2, name: 'Tuned Guitar', completed: false },
-      { id: 3, name: 'Reviewed CAGED Maps', completed: false },
+      { 
+        id: 1, 
+        name: {
+          en: 'Checked Shoulder Posture',
+          fr: 'Vérifié la Posture des Épaules'
+        }, 
+        completed: false 
+      },
+      { 
+        id: 2, 
+        name: {
+          en: 'Tuned Guitar',
+          fr: 'Accordé la Guitare'
+        }, 
+        completed: false 
+      },
+      { 
+        id: 3, 
+        name: {
+          en: 'Reviewed CAGED Maps',
+          fr: 'Revu les Cartographies CAGED'
+        }, 
+        completed: false 
+      },
     ];
   });
 
@@ -173,6 +207,36 @@ const DigitalBinder = () => {
   const [submissions, setSubmissions] = useState(() =>
     JSON.parse(localStorage.getItem('voixvive_submissions') || '[]')
   );
+
+  // Sync SQLite logs if DaaS is active
+  useEffect(() => {
+    if (isDaaSConnected) {
+      getLogs().then(sqLogs => {
+        if (sqLogs && sqLogs.length > 0) {
+          const formattedSqLogs = sqLogs.map(log => ({
+            id: log.id,
+            exerciseName: log.notes || 'Somatic Exercise',
+            mediaType: log.recording_path ? 'video' : 'audio',
+            duration: Math.round(log.score) || 45,
+            timestamp: log.timestamp,
+            status: 'reviewed',
+          }));
+          setSubmissions(prev => {
+            const merged = [...formattedSqLogs, ...prev];
+            const unique = [];
+            const seen = new Set();
+            for (const item of merged) {
+              if (!seen.has(item.id)) {
+                seen.add(item.id);
+                unique.push(item);
+              }
+            }
+            return unique;
+          });
+        }
+      });
+    }
+  }, [isDaaSConnected]);
 
   useEffect(() => {
     localStorage.setItem('bertrand_habits', JSON.stringify(habits));
@@ -183,11 +247,6 @@ const DigitalBinder = () => {
 
   const resetDaily = () =>
     setHabits(habits.map(h => ({ ...h, completed: false })));
-
-  const handleRecorderClose = () => {
-    setShowRecorder(false);
-    setSubmissions(JSON.parse(localStorage.getItem('voixvive_submissions') || '[]'));
-  };
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60);
@@ -200,7 +259,12 @@ const DigitalBinder = () => {
   // Tools that open the ambient widget instead of a full-screen overlay
   const WIDGET_TOOLS = {
     4: 'click',  // Metronome → open in Click mode
-    // (future: tool that links to Music mode could go here)
+  };
+
+  const localize = (val) => {
+    if (!val) return '';
+    if (typeof val === 'object') return val[locale] || val['en'] || '';
+    return val;
   };
 
   const mappedTools = TOOLS_CATALOG.map(tool => ({
@@ -253,7 +317,7 @@ const DigitalBinder = () => {
             </div>
             <div>
               <p className="text-xs font-mono tracking-widest uppercase mb-2" style={{ color: colors.text }}>
-                Fret {activeTool.id} · Coming Soon
+                {isFrench ? 'Frette' : 'Fret'} {activeTool.id} · {isFrench ? 'À Venir' : 'Coming Soon'}
               </p>
               <h3 className="text-2xl font-cormorant font-bold text-white mb-3">{activeTool.name}</h3>
               <p className="text-sm text-white/50 leading-relaxed max-w-xs">{activeTool.telemetry}</p>
@@ -270,142 +334,224 @@ const DigitalBinder = () => {
     );
   };
 
-
-
   return (
     <NeckMenu
       items={mappedTools}
       activeId={activeToolId}
       onItemClick={handleToolClick}
       renderContent={renderToolContent}
-      headerTitle="Digital Binder"
-      headerSubtitle="Track your practice and access tools."
+      headerTitle={isFrench ? 'Classeur Numérique' : 'Digital Binder'}
+      headerSubtitle={isFrench ? 'Suivez vos entraînements et accédez aux outils.' : 'Track your practice and access tools.'}
       showBackButton={true}
     >
       {/* ── PRACTICE LOG ── */}
       <div style={{ maxWidth: '640px', margin: '0 auto', width: '100%', paddingTop: '40px' }}>
-        <AnimatePresence>
-            {showRecorder && (
-              <PracticeRecorder onClose={handleRecorderClose} exerciseName="PLING! Protocol — Minor 3rd" />
-            )}
-          </AnimatePresence>
-
-          <div className="space-y-6 text-white font-inter">
-
-              {/* Active Assignment */}
-              <div>
-                <div className="flex justify-between items-end mb-4 px-2">
-                  <h2 className="text-lg font-bold">Active Assignments</h2>
-                  <span className="text-xs text-cf-sage">1 Due</span>
-                </div>
-                <div className="bg-cf-deep border border-cf-border rounded-2xl p-5 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-3 opacity-10">
-                    <UploadCloud size={80} />
-                  </div>
-                  <div className="relative z-10">
-                    <span className="inline-block px-2 py-1 rounded bg-cf-sage/20 text-cf-sage text-[10px] font-mono tracking-widest mb-3 uppercase">
-                      Due Thursday
-                    </span>
-                    <h3 className="text-lg font-bold text-white mb-2">Record PLING! Protocol</h3>
-                    <p className="text-sm text-cf-whisper mb-6">
-                      Record a 2-minute audio clip of yourself singing the minor 3rd interval and finding it on the A string.
-                    </p>
-                    <button
-                      onClick={() => setShowRecorder(true)}
-                      className="w-full py-3 rounded-xl bg-cf-sage text-cf-deep font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
-                    >
-                      <Video size={18} /> Record & Submit
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Submissions */}
-              {submissions.length > 0 && (
+        
+        {/* DaaS Server Panel */}
+        <div className="bg-cf-deep border border-cf-border/60 rounded-2xl p-5 mb-6 backdrop-blur-md relative overflow-hidden" 
+             style={{ background: 'rgba(13, 13, 20, 0.65)' }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full ${isDaaSConnected ? 'bg-green-500 animate-pulse' : 'bg-white/20'}`} />
+              <h3 className="text-sm font-mono tracking-wider uppercase text-white/80">
+                {isFrench ? 'Service de Bureau (DaaS)' : 'Desktop Service (DaaS)'}
+              </h3>
+            </div>
+            <span className="text-[10px] font-mono text-cf-gold px-2 py-0.5 bg-cf-gold/10 rounded-full border border-cf-gold/20">
+              {isDaaSConnected ? (isFrench ? '🎙️ souverain local' : '🎙️ sovereign local-first') : (isFrench ? '💤 aperçu hors-ligne' : '💤 offline preview')}
+            </span>
+          </div>
+          
+          {isDaaSConnected ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10">
                 <div>
-                  <h2 className="text-sm font-mono tracking-widest text-white/40 uppercase mb-4 px-2">My Submissions</h2>
-                  <div className="space-y-2">
-                    {submissions.slice(0, 5).map((sub) => (
-                      <div key={sub.id} className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          sub.status === 'reviewed' ? 'bg-green-500/20' :
-                          sub.status === 'sent' ? 'bg-blue-500/20' : 'bg-yellow-500/20'
-                        }`}>
-                          {sub.status === 'reviewed' ? <CheckCircle size={16} className="text-green-400" /> :
-                           sub.status === 'sent'     ? <Send size={16} className="text-blue-400" /> :
-                                                       <Clock size={16} className="text-yellow-400" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold truncate">{sub.exerciseName}</h4>
-                          <p className="text-xs text-white/50">
-                            {sub.mediaType === 'video' ? '📹' : '🎙️'} {formatTime(sub.duration)} ·{' '}
-                            {new Date(sub.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </p>
-                        </div>
-                        <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded ${
-                          sub.status === 'reviewed' ? 'bg-green-500/20 text-green-400' :
-                          sub.status === 'sent'     ? 'bg-blue-500/20 text-blue-400' :
-                                                      'bg-yellow-500/20 text-yellow-400'
-                        }`}>
-                          {sub.status === 'reviewed' ? 'Reviewed' : sub.status === 'sent' ? 'Sent' : 'Queued'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Pre-Practice Checklist */}
-              <div>
-                <div className="flex justify-between items-end mb-4 px-2">
-                  <h2 className="text-lg font-bold">Pre-Practice Ritual</h2>
-                  <button onClick={resetDaily} className="text-xs text-cf-gold hover:underline">Reset Daily</button>
-                </div>
-                <div className="space-y-2">
-                  {habits.map(habit => (
-                    <div
-                      key={habit.id}
-                      onClick={() => toggleHabit(habit.id)}
-                      className={`flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
-                        habit.completed
-                          ? 'bg-green-500/10 border-green-500/20 opacity-70'
-                          : 'bg-white/5 border-white/10 hover:bg-white/10'
-                      }`}
-                    >
-                      <div className={`w-6 h-6 rounded-md flex items-center justify-center border transition-colors ${
-                        habit.completed ? 'bg-green-500 border-green-500 text-[#030306]' : 'border-white/20'
-                      }`}>
-                        {habit.completed && <CheckCircle size={16} />}
-                      </div>
-                      <span className={`text-sm ${habit.completed ? 'text-white/60 line-through' : 'text-white'}`}>
-                        {habit.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bertrand's Feedback */}
-              <div>
-                <h2 className="text-sm font-mono tracking-widest text-white/40 uppercase mb-4 px-2">Bertrand's Feedback</h2>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full overflow-hidden border border-cf-gold/30 flex-shrink-0">
-                      <img src="/assets/bertrand_profile.jpg" alt="Bertrand" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold">CAGED Map Submission</h4>
-                      <p className="text-xs text-white/50">May 12, 2026</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-cf-ink-bright italic border-l-2 border-cf-gold/50 pl-3">
-                    "Your transition from the C-shape to the A-shape is much smoother. Keep watching that left thumb."
+                  <p className="text-[10px] font-mono text-white/40 uppercase">
+                    {isFrench ? "Cerveau d'IA Local Actif" : 'Active Local AI Brain'}
+                  </p>
+                  <p className="text-sm font-bold text-white mt-0.5">
+                    {activeBackend && typeof activeBackend === 'object' ? activeBackend.name : (activeBackend || 'Detecting...')}
                   </p>
                 </div>
+                <button 
+                  onClick={detectBackends}
+                  disabled={loading}
+                  className="px-3 py-1.5 rounded-lg bg-cf-gold/20 hover:bg-cf-gold/30 text-cf-gold border border-cf-gold/30 text-xs font-mono tracking-wider transition-all disabled:opacity-50"
+                >
+                  {loading ? (isFrench ? 'Recherche...' : 'Probing...') : (isFrench ? '🔄 Redétecter' : '🔄 Redetect')}
+                </button>
               </div>
 
+              {availableBackends.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  {availableBackends.map(b => (
+                    <button
+                      key={b.name}
+                      disabled={loading || b.active}
+                      onClick={() => switchBackend(b.name)}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border transition-all ${
+                        b.active 
+                          ? 'bg-cf-gold text-cf-deep border-cf-gold font-bold' 
+                          : b.healthy 
+                            ? 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10'
+                            : 'bg-white/2 opacity-30 text-white/40 border-transparent cursor-not-allowed'
+                      }`}
+                    >
+                      {b.name} {b.healthy ? '•' : 'x'}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+          ) : (
+            <p className="text-xs text-white/40 leading-relaxed">
+              {isFrench ? (
+                "Fonctionne en mode aperçu. Lancez l'application de bureau Voix Vive Masterclass pour débloquer le stockage local SQLite, la détection des modèles IA locaux (LM Studio / Ollama), et la synchronisation DaaS complète."
+              ) : (
+                "Running in preview mode. Launch the Voix Vive Masterclass Desktop App on your computer to unlock SQLite local storage, auto-detected local AI models (LM Studio / Ollama), and full DaaS sync."
+              )}
+            </p>
+          )}
         </div>
+        
+        <AnimatePresence>
+          {showRecorder && (
+            <PracticeRecorder onClose={() => setShowRecorder(false)} exerciseName="PLING! Protocol — Minor 3rd" />
+          )}
+        </AnimatePresence>
+
+        <div className="space-y-6 text-white font-inter">
+
+          {/* Active Assignment */}
+          <div>
+            <div className="flex justify-between items-end mb-4 px-2">
+              <h2 className="text-lg font-bold">{isFrench ? 'Devoirs Actifs' : 'Active Assignments'}</h2>
+              <span className="text-xs text-cf-sage">{isFrench ? '1 Requis' : '1 Due'}</span>
+            </div>
+            <div className="bg-cf-deep border border-cf-border rounded-2xl p-5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-3 opacity-10">
+                <UploadCloud size={80} />
+              </div>
+              <div className="relative z-10">
+                <span className="inline-block px-2 py-1 rounded bg-cf-sage/20 text-cf-sage text-[10px] font-mono tracking-widest mb-3 uppercase">
+                  {isFrench ? 'Pour Jeudi' : 'Due Thursday'}
+                </span>
+                <h3 className="text-lg font-bold text-white mb-2">
+                  {isFrench ? 'Enregistrer le Protocole PLING!' : 'Record PLING! Protocol'}
+                </h3>
+                <p className="text-sm text-cf-whisper mb-6">
+                  {isFrench ? (
+                    "Enregistrez un clip audio de 2 minutes de vous-même chantant l'intervalle de tierce mineure et le trouvant sur la corde de La."
+                  ) : (
+                    "Record a 2-minute audio clip of yourself singing the minor 3rd interval and finding it on the A string."
+                  )}
+                </p>
+                <button
+                  onClick={() => setShowRecorder(true)}
+                  className="w-full py-3 rounded-xl bg-cf-sage text-cf-deep font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
+                >
+                  <Video size={18} /> {isFrench ? 'Enregistrer & Soumettre' : 'Record & Submit'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Submissions */}
+          {submissions.length > 0 && (
+            <div>
+              <h2 className="text-sm font-mono tracking-widest text-white/40 uppercase mb-4 px-2">
+                {isFrench ? 'Mes Soumissions' : 'My Submissions'}
+              </h2>
+              <div className="space-y-2">
+                {submissions.slice(0, 5).map((sub) => (
+                  <div key={sub.id} className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      sub.status === 'reviewed' ? 'bg-green-500/20' :
+                      sub.status === 'sent' ? 'bg-blue-500/20' : 'bg-yellow-500/20'
+                    }`}>
+                      {sub.status === 'reviewed' ? <CheckCircle size={16} className="text-green-400" /> :
+                       sub.status === 'sent'     ? <Send size={16} className="text-blue-400" /> :
+                                                   <Clock size={16} className="text-yellow-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold truncate">{sub.exerciseName}</h4>
+                      <p className="text-xs text-white/50">
+                        {sub.mediaType === 'video' ? '📹' : '🎙️'} {formatTime(sub.duration)} ·{' '}
+                        {new Date(sub.timestamp).toLocaleDateString(isFrench ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                    <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded ${
+                      sub.status === 'reviewed' ? 'bg-green-500/20 text-green-400' :
+                      sub.status === 'sent'     ? 'bg-blue-500/20 text-blue-400' :
+                                                  'bg-yellow-500/20 text-yellow-400'
+                    }`}>
+                      {sub.status === 'reviewed' ? (isFrench ? 'Corrigé' : 'Reviewed') : sub.status === 'sent' ? (isFrench ? 'Envoyé' : 'Sent') : (isFrench ? 'En Attente' : 'Queued')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pre-Practice Checklist */}
+          <div>
+            <div className="flex justify-between items-end mb-4 px-2">
+              <h2 className="text-lg font-bold">{isFrench ? 'Rituel de Pré-Pratique' : 'Pre-Practice Ritual'}</h2>
+              <button onClick={resetDaily} className="text-xs text-cf-gold hover:underline">
+                {isFrench ? 'Réinitialiser' : 'Reset Daily'}
+              </button>
+            </div>
+            <div className="space-y-2">
+              {habits.map(habit => (
+                <div
+                  key={habit.id}
+                  onClick={() => toggleHabit(habit.id)}
+                  className={`flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${
+                    habit.completed
+                      ? 'bg-green-500/10 border-green-500/20 opacity-70'
+                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center border transition-colors ${
+                    habit.completed ? 'bg-green-500 border-green-500 text-[#030306]' : 'border-white/20'
+                  }`}>
+                    {habit.completed && <CheckCircle size={16} />}
+                  </div>
+                  <span className={`text-sm ${habit.completed ? 'text-white/60 line-through' : 'text-white'}`}>
+                    {localize(habit.name)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bertrand's Feedback */}
+          <div>
+            <h2 className="text-sm font-mono tracking-widest text-white/40 uppercase mb-4 px-2">
+              {isFrench ? 'Retours de Bertrand' : "Bertrand's Feedback"}
+            </h2>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-cf-gold/30 flex-shrink-0">
+                  <img src="/assets/bertrand_profile.jpg" alt="Bertrand" className="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold">{isFrench ? 'Soumission de Cartographie CAGED' : 'CAGED Map Submission'}</h4>
+                  <p className="text-xs text-white/50">{isFrench ? '12 Mai 2026' : 'May 12, 2026'}</p>
+                </div>
+              </div>
+              <p className="text-sm text-cf-ink-bright italic border-l-2 border-cf-gold/50 pl-3">
+                {isFrench ? (
+                  '"Votre transition de la forme C à la forme A est beaucoup plus fluide. Continuez à surveiller la position de votre pouce gauche."'
+                ) : (
+                  '"Your transition from the C-shape to the A-shape is much smoother. Keep watching that left thumb."'
+                )}
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </NeckMenu>
   );
 };

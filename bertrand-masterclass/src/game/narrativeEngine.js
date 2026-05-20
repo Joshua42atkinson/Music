@@ -187,16 +187,31 @@ export function getSessionSummary(session) {
 
 function generateImpression(accuracy, bonusBranches, sungResponses) {
   if (accuracy >= 85 && sungResponses >= 3) {
-    return 'The living voice. You did not just play — you sang the story into being.';
+    return {
+      en: 'The living voice. You did not just play — you sang the story into being.',
+      fr: "La voix vivante. Vous n'avez pas seulement joué — vous avez donné vie à l'histoire en chantant."
+    };
   }
   if (accuracy >= 70 && bonusBranches >= 2) {
-    return 'The ear is opening. You found paths most students never see.';
+    return {
+      en: 'The ear is opening. You found paths most students never see.',
+      fr: "L'oreille s'ouvre. Vous avez trouvé des chemins que la plupart des élèves ne voient jamais."
+    };
   }
   if (sungResponses >= 1) {
-    return 'You sang when you could have spoken. That is the beginning of everything.';
+    return {
+      en: 'You sang when you could have spoken. That is the beginning of everything.',
+      fr: "Vous avez chanté alors que vous auriez pu parler. C'est le début de tout."
+    };
   }
   if (accuracy >= 60) {
-    return 'The pitch is finding you. Return and it will be closer.';
+    return {
+      en: 'The pitch is finding you. Return and it will be closer.',
+      fr: "La justesse vous trouve. Revenez et elle sera plus proche."
+    };
   }
-  return 'Every attempt is a note. The song is longer than one session.';
+  return {
+    en: 'Every attempt is a note. The song is longer than one session.',
+    fr: "Chaque tentative est une note. La chanson est plus longue qu'une seule session."
+  };
 }

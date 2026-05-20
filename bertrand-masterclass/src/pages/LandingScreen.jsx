@@ -1,7 +1,10 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Circle } from 'lucide-react';
+import CoachingPortal from '../components/CoachingPortal';
+import { useBackendBridge } from '../hooks/useBackendBridge';
+import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
 // LANDING SCREEN — "The Trinity"
@@ -12,35 +15,124 @@ import { Circle } from 'lucide-react';
 const PORTALS = [
   {
     id: 'song',
-    name: 'The Song',
-    subtitle: 'Read & Learn',
+    name: { en: 'The Song', fr: 'Le Chant' },
+    subtitle: { en: 'Read & Learn', fr: 'Lire & Apprendre' },
     path: '/song',
     color: '#c9a96e',
     image: '/assets/portal_song.png',
-    description: 'Discover the story behind the music',
+    description: { en: 'Discover the story behind the music', fr: 'Découvrez l’histoire derrière la chanson' },
   },
   {
     id: 'guitar',
-    name: 'The Guitar',
-    subtitle: 'Play & Practice',
+    name: { en: 'The Guitar', fr: 'La Guitare' },
+    subtitle: { en: 'Play & Practice', fr: 'Jouer & S’entraîner' },
     path: '/guitar',
     color: '#7aaa88',
     image: '/assets/portal_guitar.png',
-    description: 'Train your memory with fretboard games',
+    description: { en: 'Train your memory with fretboard games', fr: 'Entraînez votre mémoire avec des jeux de frette' },
   },
   {
     id: 'player',
-    name: 'The Player',
-    subtitle: 'Breathe & Record',
+    name: { en: 'The Player', fr: 'Le Joueur' },
+    subtitle: { en: 'Breathe & Record', fr: 'Respirer & Enregistrer' },
     path: '/player',
     color: '#c07898',
     image: '/assets/portal_player.png',
-    description: 'Take care of yourself as a musician',
+    description: { en: 'Take care of yourself as a musician', fr: 'Prenez soin de vous en tant que musicien' },
   },
 ];
 
 export default function LandingScreen() {
   const navigate = useNavigate();
+  const [showCoaching, setShowCoaching] = useState(false);
+  const { locale, isFrench, toggleLocale } = useLocale();
+  const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
+
+  const { 
+    getProfiles, getProfile, upsertProfile, verifyProfilePin,
+    earnFlorins, spendFlorins, generateTroubadourBook
+  } = useBackendBridge();
+  
+  const [profiles, setProfiles] = useState([]);
+  const [activeProfileName, setActiveProfileName] = useState(() => {
+    return localStorage.getItem('active_student_profile') || 'Jean-Luc';
+  });
+  const [activeProfile, setActiveProfile] = useState(null);
+  
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [newProfileName, setNewProfileName] = useState('');
+  const [newProfileStyle, setNewProfileStyle] = useState('Acoustic');
+  const [newProfilePin, setNewProfilePin] = useState('');
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pinTargetName, setPinTargetName] = useState('');
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState(false);
+
+  // Troubadour Economy & Bookshelf states
+  const [showTroubadourModal, setShowTroubadourModal] = useState(false);
+  const [purchasedBooks, setPurchasedBooks] = useState([]);
+  const [activeBook, setActiveBook] = useState(null);
+  const [activeChapterIndex, setActiveChapterIndex] = useState(0);
+  const [generatingBookId, setGeneratingBookId] = useState(null);
+
+  useEffect(() => {
+    const syncProfiles = async () => {
+      let list = await getProfiles();
+      
+      if (list.length === 0) {
+        const defaultProfiles = [
+          { id: 'jean-luc', name: 'Jean-Luc', current_chapter: 1, xp: 120, coaching_tier: 'premium', florins: 150 },
+          { id: 'clara-laurent', name: 'Dr. Clara Laurent', current_chapter: 3, xp: 350, coaching_tier: 'premium', florins: 420 },
+          { id: 'marcellus', name: 'Marcellus Henderson', current_chapter: 2, xp: 210, coaching_tier: 'free', florins: 80 }
+        ];
+        for (const p of defaultProfiles) {
+          await upsertProfile(p);
+        }
+        list = await getProfiles();
+      }
+      setProfiles(list);
+
+      const found = list.find(p => p.name === activeProfileName);
+      if (found) {
+        setActiveProfile(found);
+      } else if (list.length > 0) {
+        setActiveProfile(list[0]);
+        setActiveProfileName(list[0].name);
+        localStorage.setItem('active_student_profile', list[0].name);
+      }
+    };
+    
+    syncProfiles();
+  }, [getProfiles, upsertProfile, activeProfileName]);
+
+  useEffect(() => {
+    if (activeProfileName) {
+      const saved = localStorage.getItem(`unlocked_books_${activeProfileName}`);
+      if (saved) {
+        setPurchasedBooks(JSON.parse(saved));
+      } else {
+        setPurchasedBooks([]);
+      }
+    }
+  }, [activeProfileName]);
+
+  const handlePinSubmit = async (pin) => {
+    const isCorrect = await verifyProfilePin(pinTargetName, pin);
+    if (isCorrect) {
+      setActiveProfileName(pinTargetName);
+      localStorage.setItem('active_student_profile', pinTargetName);
+      
+      const found = profiles.find(p => p.name === pinTargetName);
+      if (found) setActiveProfile(found);
+
+      setShowPinModal(false);
+      setEnteredPin('');
+      setPinError(false);
+    } else {
+      setPinError(true);
+      setEnteredPin('');
+    }
+  };
 
   return (
     <div className="landing-hub">
@@ -272,6 +364,45 @@ export default function LandingScreen() {
           0%, 100% { opacity: 0.5; transform: scale(0.97); }
           50% { opacity: 1; transform: scale(1.03); }
         }
+
+        /* ── PROFILE SWITCHER HEADER ── */
+        .profile-switcher-bar {
+          width: 100%;
+          max-width: 540px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 16px;
+          margin-top: 4px;
+          margin-bottom: 20px;
+          border-radius: 12px;
+          background: rgba(201, 169, 110, 0.03);
+          border: 1px solid rgba(201, 169, 110, 0.15);
+          backdrop-filter: blur(10px);
+          position: relative;
+          z-index: 100;
+        }
+        .profile-selector-dropdown {
+          background: #0d0d14;
+          border: 1px solid rgba(201, 169, 110, 0.25);
+          color: #c9a96e;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.75rem;
+          padding: 6px 12px;
+          border-radius: 8px;
+          outline: none;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        .profile-selector-dropdown:hover {
+          border-color: #c9a96e;
+          box-shadow: 0 0 10px rgba(201, 169, 110, 0.2);
+        }
+        .profile-info-label {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.7rem;
+          color: rgba(201,169,110,0.55);
+        }
       `}</style>
 
       {/* ── Voix Vive Wordmark ── */}
@@ -296,8 +427,970 @@ export default function LandingScreen() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.6 }}
       >
-        Choose your portal
+        {isFrench ? 'Choisissez votre portail' : 'Choose your portal'}
       </motion.p>
+
+      {/* ── Zen Student Profile Switcher Header ── */}
+      <motion.div
+        className="profile-switcher-bar"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span className="profile-info-label">{isFrench ? 'PROFIL ÉTUDIANT :' : 'STUDENT PROFILE:'}</span>
+          <select
+            className="profile-selector-dropdown"
+            value={activeProfileName}
+            onChange={(e) => {
+              if (e.target.value === 'NEW') {
+                setShowProfileModal(true);
+              } else {
+                const selectedProfile = profiles.find(p => p.name === e.target.value);
+                if (selectedProfile && selectedProfile.has_pin) {
+                  setPinTargetName(selectedProfile.name);
+                  setEnteredPin('');
+                  setPinError(false);
+                  setShowPinModal(true);
+                } else {
+                  setActiveProfileName(e.target.value);
+                  localStorage.setItem('active_student_profile', e.target.value);
+                  
+                  const found = profiles.find(p => p.name === e.target.value);
+                  if (found) setActiveProfile(found);
+                }
+              }
+            }}
+          >
+            {profiles.map(p => (
+              <option key={p.id} value={p.name}>
+                ⚜️ {p.name} ({isFrench ? (p.coaching_tier === 'Acoustic' ? 'Acoustique' : p.coaching_tier === 'Classical' ? 'Classique' : p.coaching_tier) : p.coaching_tier}) {p.has_pin ? '🔒' : ''}
+              </option>
+            ))}
+            <option value="NEW">{isFrench ? '➕ Créer un Nouveau Profil...' : '➕ Create New Profile...'}</option>
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            onClick={() => setShowTroubadourModal(true)}
+            style={{
+              background: 'linear-gradient(135deg, #c9a96e 0%, #a3844d 100%)',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              color: '#050508',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 12px rgba(201, 169, 110, 0.25)',
+              transition: 'all 0.3s'
+            }}
+          >
+            {isFrench ? '📚 HISTOIRES D’AVENTURE' : '📚 ADVENTURE STORIES'}
+          </button>
+
+          <button
+            onClick={toggleLocale}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              color: '#f0e6d2',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.3s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+          >
+            🌐 {isFrench ? 'EN' : 'FR'}
+          </button>
+        </div>
+      </motion.div>
+
+      {/* ── Tactile PIN Verification Modal ── */}
+      <AnimatePresence>
+        {showPinModal && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 600,
+              background: 'rgba(0,0,0,0.94)',
+              backdropFilter: 'blur(12px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px'
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              style={{
+                background: '#0a0a0f',
+                border: '1px solid rgba(201,169,110,0.3)',
+                borderRadius: '24px',
+                padding: '28px',
+                width: '100%',
+                maxWidth: '320px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '20px',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.9)'
+              }}
+              initial={{ scale: 0.9, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 30 }}
+            >
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: '1.6rem',
+                  color: '#f0e6d2',
+                  margin: '0 0 4px'
+                }}>
+                  {isFrench ? 'Vérifier l\'Identité' : 'Verify Identity'}
+                </h3>
+                <p style={{
+                  fontSize: '0.75rem',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: 'rgba(255,255,255,0.4)',
+                  margin: 0
+                }}>
+                  {isFrench ? `Saisir le PIN pour ${pinTargetName}` : `Enter PIN for ${pinTargetName}`}
+                </p>
+              </div>
+
+              {/* Display Dot Indicators */}
+              <div style={{ display: 'flex', gap: '12px', margin: '10px 0' }}>
+                {[0, 1, 2, 3].map((idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      background: enteredPin.length > idx 
+                        ? '#c9a96e' 
+                        : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${enteredPin.length > idx ? '#c9a96e' : 'rgba(201,169,110,0.25)'}`,
+                      boxShadow: enteredPin.length > idx 
+                        ? '0 0 12px #c9a96e' 
+                        : 'none',
+                      transition: 'all 0.15s ease'
+                    }}
+                  />
+                ))}
+              </div>
+
+              {pinError && (
+                <motion.p
+                  animate={{ x: [-10, 10, -10, 10, 0] }}
+                  transition={{ duration: 0.4 }}
+                  style={{
+                    color: '#ff6b6b',
+                    fontSize: '0.75rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    margin: 0
+                  }}
+                >
+                  {isFrench ? 'Code PIN incorrect. Réessayez.' : 'Incorrect PIN. Try again.'}
+                </motion.p>
+              )}
+
+              {/* Glassmorphic Numeric Keypad */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '12px',
+                width: '100%'
+              }}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => {
+                      if (enteredPin.length < 4) {
+                        const newPin = enteredPin + num;
+                        setEnteredPin(newPin);
+                        setPinError(false);
+                        if (newPin.length === 4) {
+                          handlePinSubmit(newPin);
+                        }
+                      }
+                    }}
+                    style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      background: 'rgba(255,255,255,0.01)',
+                      border: '1px solid rgba(201,169,110,0.1)',
+                      color: '#f0e6d2',
+                      fontSize: '1.25rem',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      cursor: 'pointer',
+                      transition: 'all 0.1s',
+                      outline: 'none'
+                    }}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button
+                  onClick={() => {
+                    setEnteredPin('');
+                    setPinError(false);
+                  }}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.01)',
+                    border: '1px solid rgba(201,169,110,0.1)',
+                    color: 'rgba(255,255,255,0.3)',
+                    fontSize: '0.75rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  {isFrench ? 'EFFACER' : 'CLEAR'}
+                </button>
+                <button
+                  onClick={() => {
+                    if (enteredPin.length < 4) {
+                      const newPin = enteredPin + '0';
+                      setEnteredPin(newPin);
+                      setPinError(false);
+                      if (newPin.length === 4) {
+                        handlePinSubmit(newPin);
+                      }
+                    }
+                  }}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.01)',
+                    border: '1px solid rgba(201,169,110,0.1)',
+                    color: '#f0e6d2',
+                    fontSize: '1.25rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  0
+                </button>
+                <button
+                  onClick={() => {
+                    setShowPinModal(false);
+                    setEnteredPin('');
+                    setPinError(false);
+                  }}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,40,40,0.04)',
+                    border: '1px solid rgba(255,40,40,0.15)',
+                    color: '#ff6b6b',
+                    fontSize: '0.75rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  {isFrench ? 'ANNULER' : 'CANCEL'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Create Profile Modal ── */}
+      <AnimatePresence>
+        {showProfileModal && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 500,
+              background: 'rgba(0,0,0,0.92)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px'
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              style={{
+                background: '#0d0d14',
+                border: '1px solid rgba(201,169,110,0.25)',
+                borderRadius: '20px',
+                padding: '24px',
+                width: '100%',
+                maxWidth: '360px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
+              }}
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+            >
+              <h3 style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: '1.5rem',
+                color: '#f0e6d2',
+                borderBottom: '1px solid rgba(201, 169, 110, 0.15)',
+                paddingBottom: '8px',
+                margin: 0
+              }}>
+                {isFrench ? 'Créer un Profil Zen' : 'Create Zen Profile'}
+              </h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(201,169,110,0.6)', textTransform: 'uppercase' }}>
+                  {isFrench ? 'Nom de l\'Étudiant' : 'Student Name'}
+                </label>
+                <input
+                  type="text"
+                  value={newProfileName}
+                  onChange={(e) => setNewProfileName(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#050508',
+                    border: '1px solid rgba(201,169,110,0.2)',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    fontSize: '0.8rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: 'white',
+                    outline: 'none'
+                  }}
+                  placeholder={isFrench ? 'ex. Jean-Luc' : 'e.g. Jean-Luc'}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(201,169,110,0.6)', textTransform: 'uppercase' }}>
+                  {isFrench ? 'Style de Guitare Ciblé' : 'Guitar Style Target'}
+                </label>
+                <select
+                  value={newProfileStyle}
+                  onChange={(e) => setNewProfileStyle(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#050508',
+                    border: '1px solid rgba(201,169,110,0.2)',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    fontSize: '0.8rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: 'white',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="Acoustic">{isFrench ? 'Mélodie Acoustique' : 'Acoustic Melody'}</option>
+                  <option value="Classical">{isFrench ? 'Polyphonie Classique' : 'Classical Polyphony'}</option>
+                  <option value="Flamenco">{isFrench ? 'Flamenco Autonome' : 'Flamenco Autonomic'}</option>
+                  <option value="Jazz">{isFrench ? 'Flux d\'Accords de Jazz' : 'Jazz Chord Flow'}</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(201,169,110,0.6)', textTransform: 'uppercase' }}>
+                  {isFrench ? 'Code PIN de Sécurité (Optionnel, 4 Chiffres)' : 'Security PIN (Optional, 4 Digits)'}
+                </label>
+                <input
+                  type="password"
+                  maxLength={4}
+                  value={newProfilePin}
+                  onChange={(e) => setNewProfilePin(e.target.value.replace(/[^0-9]/g, ''))}
+                  style={{
+                    width: '100%',
+                    background: '#050508',
+                    border: '1px solid rgba(201,169,110,0.2)',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    fontSize: '0.8rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: 'white',
+                    outline: 'none',
+                    letterSpacing: '0.3em'
+                  }}
+                  placeholder="e.g. 1234"
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', paddingTop: '8px' }}>
+                <button
+                  onClick={() => {
+                    setShowProfileModal(false);
+                    setNewProfilePin('');
+                    setNewProfileName('');
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#8a9aaa',
+                    fontSize: '0.75rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isFrench ? 'Annuler' : 'Cancel'}
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!newProfileName.trim()) return;
+                    const id = newProfileName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                    const profileObj = {
+                      id,
+                      name: newProfileName.trim(),
+                      current_chapter: 1,
+                      xp: 0,
+                      coaching_tier: newProfileStyle,
+                      pin: newProfilePin || null
+                    };
+                    await upsertProfile(profileObj);
+                    const list = await getProfiles();
+                    setProfiles(list);
+                    setActiveProfileName(profileObj.name);
+                    localStorage.setItem('active_student_profile', profileObj.name);
+                    setShowProfileModal(false);
+                    setNewProfileName('');
+                    setNewProfilePin('');
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    background: '#c9a96e',
+                    border: 'none',
+                    color: '#0d0d14',
+                    fontSize: '0.75rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isFrench ? 'Créer' : 'Create'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Troubadour Shop & Bookshelf Modal ── */}
+      <AnimatePresence>
+        {showTroubadourModal && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 500,
+              background: 'rgba(5,5,8,0.96)',
+              backdropFilter: 'blur(16px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '24px'
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              style={{
+                background: '#0d0d14',
+                border: '1px solid rgba(201,169,110,0.25)',
+                borderRadius: '24px',
+                padding: '32px',
+                width: '100%',
+                maxWidth: '720px',
+                height: '80vh',
+                maxHeight: '650px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                boxShadow: '0 30px 70px rgba(0,0,0,0.9)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              initial={{ scale: 0.95, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 30 }}
+            >
+              {/* Header */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '1px solid rgba(201,169,110,0.15)',
+                paddingBottom: '16px'
+              }}>
+                <div>
+                  <h3 style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: '2rem',
+                    color: '#f0e6d2',
+                    margin: 0
+                  }}>
+                    {activeBook ? (isFrench ? 'Bibliothèque Troubadour' : 'Troubadour Library') : (isFrench ? 'Histoires d\'Aventure' : 'Troubadour Adventure Stories')}
+                  </h3>
+                  <p style={{
+                    fontSize: '0.75rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: 'rgba(201,169,110,0.5)',
+                    margin: '4px 0 0'
+                  }}>
+                    {activeBook ? (isFrench ? `Lecture : ${activeBook.title}` : `Reading: ${activeBook.title}`) : (isFrench ? 'Accédez à des guides d\'apprentissage bardiques dynamiques et des leçons somatiques' : 'Access dynamic local instruction bards and somatic coaching chapters')}
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <button
+                    onClick={() => {
+                      if (activeBook) {
+                        setActiveBook(null);
+                        setActiveChapterIndex(0);
+                      } else {
+                        setShowTroubadourModal(false);
+                      }
+                    }}
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '50%',
+                      width: '36px',
+                      height: '36px',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem'
+                    }}
+                  >
+                    {activeBook ? '⬅️' : '✕'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
+                {generatingBookId ? (
+                  /* Generating animation spinner */
+                  <div style={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '20px',
+                    color: '#c9a96e'
+                  }}>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      border: '3px solid rgba(201,169,110,0.1)',
+                      borderTopColor: '#c9a96e',
+                      animation: 'spinBook 1.5s linear infinite'
+                    }} />
+                    <p style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: '1.4rem',
+                      fontStyle: 'italic',
+                      textAlign: 'center',
+                      animation: 'pulseText 2s ease-in-out infinite'
+                    }}>
+                      {isFrench ? 'Distillation des parchemins occitans via LM Studio...' : 'Distilling Occitan historical scrolls via LM Studio...'}
+                    </p>
+                    <p style={{
+                      fontSize: '0.7rem',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      color: 'rgba(255,255,255,0.4)',
+                      maxWidth: '300px',
+                      textAlign: 'center'
+                    }}>
+                      {isFrench 
+                        ? `Rédaction de chapitres somatiques historiques personnalisés pour votre style de guitare : ${activeProfile?.coaching_tier === 'Acoustic' ? 'Acoustique' : activeProfile?.coaching_tier === 'Classical' ? 'Classique' : (activeProfile?.coaching_tier || 'Acoustique')}.`
+                        : `Drafting customized historical somatic chapters for your ${activeProfile?.coaching_tier || 'Acoustic'} guitar style target.`}
+                    </p>
+                    <style>{`
+                      @keyframes spinBook { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                      @keyframes pulseText { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+                    `}</style>
+                  </div>
+                ) : activeBook ? (
+                  /* parchment book reader */
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1.2fr 1fr',
+                    gap: '24px',
+                    height: '100%',
+                    minHeight: '340px'
+                  }}>
+                    {/* Left Page: Prose Narrative */}
+                    <div style={{
+                      background: '#fcf8f2',
+                      border: '1px solid #e3d2bd',
+                      borderRadius: '16px',
+                      padding: '24px',
+                      color: '#2b221a',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottom: '1px solid rgba(43,34,26,0.1)',
+                        paddingBottom: '8px',
+                        marginBottom: '12px'
+                      }}>
+                        <span style={{
+                          fontFamily: "'JetBrains Mono', monospace",
+                          fontSize: '0.65rem',
+                          color: '#8c6e54',
+                          fontWeight: 'bold'
+                        }}>
+                          {isFrench ? `CHAPITRE ${activeBook.chapters[activeChapterIndex]?.number || (activeChapterIndex + 1)}` : `CHAPTER ${activeBook.chapters[activeChapterIndex]?.number || (activeChapterIndex + 1)}`}
+                        </span>
+                        <h4 style={{
+                          fontFamily: "'Cormorant Garamond', serif",
+                          fontSize: '1.2rem',
+                          margin: 0,
+                          fontWeight: 'bold',
+                          color: '#2b221a'
+                        }}>
+                          {activeBook.chapters[activeChapterIndex]?.title}
+                        </h4>
+                      </div>
+
+                      <div style={{ flex: 1, overflowY: 'auto' }}>
+                        <p style={{
+                          fontFamily: "'Cormorant Garamond', serif",
+                          fontSize: '1.15rem',
+                          lineHeight: '1.6',
+                          textAlign: 'justify',
+                          margin: 0
+                        }}>
+                          {activeBook.chapters[activeChapterIndex]?.prose}
+                        </p>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '16px',
+                        paddingTop: '12px',
+                        borderTop: '1px solid rgba(43,34,26,0.1)'
+                      }}>
+                        <button
+                          disabled={activeChapterIndex === 0}
+                          onClick={() => setActiveChapterIndex(prev => prev - 1)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: activeChapterIndex === 0 ? '#c7bcae' : '#8c6e54',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '0.7rem',
+                            cursor: activeChapterIndex === 0 ? 'default' : 'pointer',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {isFrench ? '◀ PAGE PRÉC' : '◀ PREV PAGE'}
+                        </button>
+
+                        <span style={{
+                          fontSize: '0.7rem',
+                          fontFamily: "'JetBrains Mono', monospace",
+                          color: '#8c6e54'
+                        }}>
+                          {activeChapterIndex + 1} / {activeBook.chapters.length}
+                        </span>
+
+                        <button
+                          disabled={activeChapterIndex === activeBook.chapters.length - 1}
+                          onClick={() => setActiveChapterIndex(prev => prev + 1)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: activeChapterIndex === activeBook.chapters.length - 1 ? '#c7bcae' : '#8c6e54',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '0.7rem',
+                            cursor: activeChapterIndex === activeBook.chapters.length - 1 ? 'default' : 'pointer',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {isFrench ? 'PAGE SUIV ▶' : 'NEXT PAGE ▶'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Right Page: Somatic Pitch Lesson */}
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px'
+                    }}>
+                      <div style={{
+                        background: 'rgba(201,169,110,0.04)',
+                        border: '1px solid rgba(201,169,110,0.15)',
+                        borderRadius: '16px',
+                        padding: '20px',
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                      }}>
+                        <div>
+                          <span style={{
+                            display: 'inline-block',
+                            background: 'rgba(201,169,110,0.1)',
+                            border: '1px solid rgba(201,169,110,0.2)',
+                            borderRadius: '6px',
+                            padding: '3px 8px',
+                            fontSize: '0.6rem',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            color: '#c9a96e',
+                            textTransform: 'uppercase',
+                            marginBottom: '10px'
+                          }}>
+                            {isFrench ? 'Leçon Vocale Somatique' : 'Somatic Vocal Lesson'}
+                          </span>
+                          <h4 style={{
+                            fontFamily: "'Cormorant Garamond', serif",
+                            fontSize: '1.3rem',
+                            color: '#f0e6d2',
+                            margin: '0 0 10px'
+                          }}>
+                            {isFrench ? 'Défi d\'Alignement Autonome' : 'Autonomic Align Challenge'}
+                          </h4>
+                          <p style={{
+                            fontSize: '0.85rem',
+                            color: 'rgba(255,255,255,0.7)',
+                            lineHeight: '1.5',
+                            margin: 0
+                          }}>
+                            {activeBook.chapters[activeChapterIndex]?.lesson}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            setShowTroubadourModal(false);
+                            navigate('/guitar');
+                          }}
+                          style={{
+                            width: '100%',
+                            background: 'rgba(201,169,110,0.12)',
+                            border: '1px solid #c9a96e',
+                            borderRadius: '10px',
+                            padding: '12px',
+                            color: '#c9a96e',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '0.75rem',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = '#c9a96e';
+                            e.currentTarget.style.color = '#0d0d14';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = 'rgba(201,169,110,0.12)';
+                            e.currentTarget.style.color = '#c9a96e';
+                          }}
+                        >
+                          {isFrench ? '🎙️ COMMENCER LA PRATIQUE' : '🎙️ ENTER PRACTICUM'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Shop grid */
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '20px',
+                    paddingTop: '8px'
+                  }}>
+                    {[
+                      {
+                        id: 'occitan-lute',
+                        title: isFrench ? 'Le Code du Luth Occitan' : 'The Occitan Lute Code',
+                        price: 120,
+                        description: isFrench ? 'Un manuscrit ancien du sud de la France révélant les secrets du ton fondamental et de l’alignement vagal.' : 'An ancient scroll from southern France detailing the secrets of finding your fundamental tone and aligning the vagal nerve.',
+                        cover: '📜',
+                        accentColor: '#c9a96e'
+                      },
+                      {
+                        id: 'chanson-bertrand',
+                        title: isFrench ? 'Chanson de Bertrand' : 'Chanson de Bertrand',
+                        price: 200,
+                        description: isFrench ? 'L’épopée légendaire de Maître Bertrand, détaillant les techniques vocales au feu de bois et le souffle flamenco.' : 'The legendary epic of Master Bertrand, detailing firelight vocal techniques and flamenco autonomic breathing.',
+                        cover: '🔥',
+                        accentColor: '#cc5555'
+                      },
+                      {
+                        id: 'vagal-quest',
+                        title: isFrench ? 'La Quête Végale' : 'The Vagal Quest',
+                        price: 350,
+                        description: isFrench ? 'Un manuel souverain de médecine sonore, détaillant l’intervalle de quinte parfaite et la résonance cardiaque.' : 'A sovereign manual of sound medicine, detailing the perfect fifth interval and cardiac-vagal resonance.',
+                        cover: '🏺',
+                        accentColor: '#7a9ab8'
+                      }
+                    ].map(book => {
+                      const isOwned = purchasedBooks.some(pb => pb.id === book.id);
+                      return (
+                        <div
+                          key={book.id}
+                          style={{
+                            background: 'rgba(255,255,255,0.02)',
+                            border: '1px solid rgba(255,255,255,0.05)',
+                            borderRadius: '16px',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            gap: '12px',
+                            transition: 'all 0.3s',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          {/* Top accent badge */}
+                          <div style={{
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0,
+                            height: '4px',
+                            background: book.accentColor
+                          }} />
+
+                          <div>
+                            <div style={{
+                              fontSize: '2.5rem',
+                              margin: '10px 0',
+                              textAlign: 'center'
+                            }}>
+                              {book.cover}
+                            </div>
+                            <h4 style={{
+                              fontFamily: "'Cormorant Garamond', serif",
+                              fontSize: '1.25rem',
+                              color: '#f0e6d2',
+                              textAlign: 'center',
+                              margin: '0 0 6px'
+                            }}>
+                              {book.title}
+                            </h4>
+                            <p style={{
+                              fontSize: '0.75rem',
+                              color: 'rgba(255,255,255,0.5)',
+                              lineHeight: '1.4',
+                              textAlign: 'center',
+                              margin: 0
+                            }}>
+                              {book.description}
+                            </p>
+                          </div>
+
+                          {isOwned ? (
+                            <button
+                              onClick={() => {
+                                const found = purchasedBooks.find(pb => pb.id === book.id);
+                                if (found) {
+                                  setActiveBook(found);
+                                  setActiveChapterIndex(0);
+                                }
+                              }}
+                              style={{
+                                width: '100%',
+                                background: 'rgba(201,169,110,0.12)',
+                                border: '1px solid rgba(201,169,110,0.3)',
+                                borderRadius: '10px',
+                                padding: '10px',
+                                color: '#c9a96e',
+                                fontFamily: "'JetBrains Mono', monospace",
+                                fontSize: '0.7rem',
+                                fontWeight: 'bold',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {isFrench ? '📖 LIRE LE LIVRE' : '📖 READ BOOK'}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={async () => {
+                                if (!activeProfile) return;
+                                setGeneratingBookId(book.id);
+                                
+                                // Trigger dynamic generation directly for free!
+                                const generated = await generateTroubadourBook(activeProfile.coaching_tier, book.title);
+                                const bookData = {
+                                  id: book.id,
+                                  title: book.title,
+                                  cover: book.cover,
+                                  accentColor: book.accentColor,
+                                  chapters: generated?.chapters || []
+                                };
+                                
+                                const updatedPurchased = [...purchasedBooks, bookData];
+                                setPurchasedBooks(updatedPurchased);
+                                localStorage.setItem(`unlocked_books_${activeProfileName}`, JSON.stringify(updatedPurchased));
+                                setGeneratingBookId(null);
+                              }}
+                              style={{
+                                width: '100%',
+                                background: 'linear-gradient(135deg, #c9a96e 0%, #a3844d 100%)',
+                                border: 'none',
+                                borderRadius: '10px',
+                                padding: '10px',
+                                color: '#0d0d14',
+                                fontFamily: "'JetBrains Mono', monospace",
+                                fontSize: '0.7rem',
+                                fontWeight: 'bold',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {isFrench ? '🔓 DÉVERROUILLER GRATUIT' : '🔓 UNLOCK FREE'}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Three Portal Cards ── */}
       <div className="portals-grid">
@@ -314,7 +1407,7 @@ export default function LandingScreen() {
             {/* Art */}
             <img
               src={portal.image}
-              alt={portal.name}
+              alt={localize(portal.name)}
               className="portal-art"
               draggable={false}
             />
@@ -322,9 +1415,9 @@ export default function LandingScreen() {
             {/* Info overlay */}
             <div className="portal-info">
               <div className="portal-text">
-                <span className="portal-tag">{portal.subtitle}</span>
-                <span className="portal-name">{portal.name}</span>
-                <span className="portal-desc">{portal.description}</span>
+                <span className="portal-tag">{localize(portal.subtitle)}</span>
+                <span className="portal-name">{localize(portal.name)}</span>
+                <span className="portal-desc">{localize(portal.description)}</span>
               </div>
               <span className="portal-arrow">›</span>
             </div>
@@ -363,7 +1456,7 @@ export default function LandingScreen() {
           onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.8)'}
           onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.5)'}
         >
-          Learn with Bertrand →
+          {isFrench ? 'Apprendre avec Bertrand →' : 'Learn with Bertrand →'}
         </a>
         <p style={{
           fontFamily: "'JetBrains Mono', monospace",
@@ -373,9 +1466,40 @@ export default function LandingScreen() {
           textTransform: 'uppercase',
           marginTop: 6,
         }}>
-          Private lessons · Async coaching · Inner Circle
+          {isFrench ? 'Leçons privées · Mentorat asynchrone · Cercle restreint' : 'Private lessons · Async coaching · Inner Circle'}
         </p>
+
+        {/* Somatic Onboarding Trigger */}
+        <div style={{ marginTop: 24 }}>
+          <button
+            onClick={() => setShowCoaching(true)}
+            style={{
+              padding: '12px 28px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, rgba(201,169,110,0.15), rgba(201,169,110,0.02))',
+              border: '1px solid rgba(201,169,110,0.25)',
+              color: '#c9a96e',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.75rem',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: '0 8px 32px rgba(201,169,110,0.05)',
+              transition: 'all 0.3s',
+            }}
+          >
+            {isFrench ? '⚜️ Candidature Mentorat Privé' : '⚜️ Private Coaching Intake'}
+          </button>
+        </div>
       </motion.div>
+
+      {/* Somatic Practice Portal Modal Overlay */}
+      <AnimatePresence>
+        {showCoaching && (
+          <CoachingPortal onClose={() => setShowCoaching(false)} />
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

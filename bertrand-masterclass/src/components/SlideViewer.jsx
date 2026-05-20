@@ -6,6 +6,7 @@ import FretboardSheet from './FretboardSheet';
 import PlingTrainer from './PlingTrainer';
 import { TOOLS_CATALOG } from '../data/toolsData';
 import { saveSlidePosition, getSlidePosition } from '../data/localDatabase';
+import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
 // SLIDE VIEWER — Phone-native swipeable chapter reader
@@ -25,6 +26,16 @@ const slideVariants = {
 };
 
 const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
+  const { locale, isFrench, t } = useLocale();
+
+  const localize = useCallback((val) => {
+    if (!val) return '';
+    if (typeof val === 'object') {
+      return val[locale] || val['en'] || '';
+    }
+    return val;
+  }, [locale]);
+
   const fret = frets.find(c => c.id === fretId) || frets[0];
   const slides = generateSlides(fret);
   // Initialize from the student's last saved position for this fret
@@ -396,8 +407,8 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
 
       {/* ── Top Bar ── */}
       <div className="sv-topbar">
-        <button className="sv-back" onClick={onBack}>← Back</button>
-        <span className="sv-chapter-label">Ch.{fret.id} · {fret.title}</span>
+        <button className="sv-back" onClick={onBack}>{isFrench ? '← Retour' : '← Back'}</button>
+        <span className="sv-chapter-label">{isFrench ? 'Ch.' : 'Ch.'}{fret.id} · {localize(fret.title)}</span>
         <span className="sv-page-num">{currentIdx + 1}/{slides.length}</span>
       </div>
 
@@ -447,6 +458,8 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
                 slide={slide}
                 onOpenFretboard={openFretboard}
                 onNextFret={goNextFret}
+                localize={localize}
+                isFrench={isFrench}
               />
             </div>
           </motion.div>
@@ -477,7 +490,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
                   transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
                   style={{ display: 'inline-block' }}
                 >
-                  ← Swipe to read →
+                  {isFrench ? '← Balayez pour lire →' : '← Swipe to read →'}
                 </motion.span>
               </div>
             </motion.div>
@@ -492,7 +505,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           <button
             className={`sv-fret-toggle ${fretboardOpen ? 'active' : ''}`}
             onClick={() => fretboardOpen ? setFretboardOpen(false) : openFretboard()}
-            title="Open Fretboard"
+            title={isFrench ? 'Ouvrir la touche' : 'Open Fretboard'}
           >
             🎸
           </button>
@@ -529,78 +542,82 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
 
 // ── Slide Content Renderer ──
 
-function SlideContent({ slide, onOpenFretboard, onNextFret }) {
+function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }) {
   switch (slide.type) {
     case 'title':
       return (
         <>
-          <p className="sv-label" style={{ color: slide.accent }}>{slide.label}</p>
-          <h1 className="sv-title">{slide.title}</h1>
-          <p className="sv-subtitle">{slide.subtitle}</p>
-          <p className="sv-meta">{slide.meta}</p>
-          <div className="sv-body"><p>{slide.body}</p></div>
+          <p className="sv-label" style={{ color: slide.accent }}>{localize(slide.label)}</p>
+          <h1 className="sv-title">{localize(slide.title)}</h1>
+          <p className="sv-subtitle">{localize(slide.subtitle)}</p>
+          <p className="sv-meta">{localize(slide.meta)}</p>
+          <div className="sv-body"><p>{localize(slide.body)}</p></div>
         </>
       );
 
     case 'yin-philosophy':
       return (
         <>
-          <p className="sv-label" style={{ color: '#7b6aaa' }}>{slide.label}</p>
-          {slide.title && <h2 className="sv-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.2rem)' }}>{slide.title}</h2>}
-          <div className="sv-body"><p>{slide.body}</p></div>
+          <p className="sv-label" style={{ color: '#7b6aaa' }}>{localize(slide.label)}</p>
+          {slide.title && <h2 className="sv-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.2rem)' }}>{localize(slide.title)}</h2>}
+          <div className="sv-body"><p>{localize(slide.body)}</p></div>
         </>
       );
 
     case 'yin-quote':
       return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-          <p className="sv-label" style={{ color: '#7b6aaa', textAlign: 'center' }}>{slide.label}</p>
-          <p className="sv-quote">"{slide.quote}"</p>
-          <p className="sv-author">— {slide.author}</p>
+          <p className="sv-label" style={{ color: '#7b6aaa', textAlign: 'center' }}>{localize(slide.label)}</p>
+          <p className="sv-quote">"{localize(slide.quote)}"</p>
+          <p className="sv-author">— {localize(slide.author)}</p>
         </div>
       );
 
     case 'yin-concept':
       return (
         <>
-          <p className="sv-label" style={{ color: '#7b6aaa' }}>{slide.label}</p>
-          <h2 className="sv-concept-term">{slide.title}</h2>
-          <p className="sv-concept-def">{slide.body}</p>
+          <p className="sv-label" style={{ color: '#7b6aaa' }}>{localize(slide.label)}</p>
+          <h2 className="sv-concept-term">{localize(slide.title)}</h2>
+          <p className="sv-concept-def">{localize(slide.body)}</p>
         </>
       );
 
     case 'yin-meditation':
       return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-          <p className="sv-label" style={{ color: '#7b6aaa', textAlign: 'center' }}>{slide.label}</p>
-          <p className="sv-meditation-prompt">{slide.body}</p>
-          {slide.duration && <p className="sv-duration">⏱ {slide.duration} seconds</p>}
+          <p className="sv-label" style={{ color: '#7b6aaa', textAlign: 'center' }}>{localize(slide.label)}</p>
+          <p className="sv-meditation-prompt">{localize(slide.body)}</p>
+          {slide.duration && <p className="sv-duration">⏱ {slide.duration} {isFrench ? 'secondes' : 'seconds'}</p>}
         </div>
       );
 
     case 'yang-instruction':
       return (
         <>
-          <p className="sv-label" style={{ color: '#c9a96e' }}>{slide.label}</p>
-          <h2 className="sv-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.2rem)' }}>{slide.title}</h2>
-          <div className="sv-body"><p>{slide.body}</p></div>
+          <p className="sv-label" style={{ color: '#c9a96e' }}>{localize(slide.label)}</p>
+          <h2 className="sv-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.2rem)' }}>{localize(slide.title)}</h2>
+          <div className="sv-body"><p>{localize(slide.body)}</p></div>
         </>
       );
 
     case 'yang-theory':
       return (
         <>
-          <p className="sv-label" style={{ color: '#0abde3' }}>{slide.label}</p>
-          <h2 className="sv-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.2rem)' }}>{slide.title}</h2>
+          <p className="sv-label" style={{ color: '#0abde3' }}>{localize(slide.label)}</p>
+          <h2 className="sv-title" style={{ fontSize: 'clamp(1.5rem, 6vw, 2.2rem)' }}>{localize(slide.title)}</h2>
           
           <div className="mb-6 p-4 rounded-xl bg-[#0abde3]/10 border border-[#0abde3]/30">
-            <h3 className="font-bold text-[#0abde3] text-sm mb-2 font-mono uppercase tracking-wider">How Music Works</h3>
-            <p className="sv-body text-sm">{slide.musicGrammar}</p>
+            <h3 className="font-bold text-[#0abde3] text-sm mb-2 font-mono uppercase tracking-wider">
+              {isFrench ? 'Comment fonctionne la musique' : 'How Music Works'}
+            </h3>
+            <p className="sv-body text-sm">{localize(slide.musicGrammar)}</p>
           </div>
           
           <div className="mb-6 p-4 rounded-xl bg-cf-gold/10 border border-cf-gold/30">
-            <h3 className="font-bold text-cf-gold text-sm mb-2 font-mono uppercase tracking-wider">How Guitar Works</h3>
-            <p className="sv-body text-sm">{slide.guitarGrammar}</p>
+            <h3 className="font-bold text-cf-gold text-sm mb-2 font-mono uppercase tracking-wider">
+              {isFrench ? 'Comment fonctionne la guitare' : 'How Guitar Works'}
+            </h3>
+            <p className="sv-body text-sm">{localize(slide.guitarGrammar)}</p>
           </div>
         </>
       );
@@ -608,8 +625,8 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
     case 'yang-exercise':
       return (
         <>
-          <p className="sv-label" style={{ color: '#c9a96e' }}>{slide.label}</p>
-          <h2 className="sv-title" style={{ fontSize: 'clamp(1.4rem, 5vw, 1.8rem)' }}>{slide.title}</h2>
+          <p className="sv-label" style={{ color: '#c9a96e' }}>{localize(slide.label)}</p>
+          <h2 className="sv-title" style={{ fontSize: 'clamp(1.4rem, 5vw, 1.8rem)' }}>{localize(slide.title)}</h2>
           <div>
             {slide.steps?.map((step, i) => (
               <div key={i} className="sv-step">
@@ -617,7 +634,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
                   background: `${slide.accent}20`,
                   color: slide.accent
                 }}>{i + 1}</span>
-                <span className="sv-step-text">{step}</span>
+                <span className="sv-step-text">{localize(step)}</span>
               </div>
             ))}
           </div>
@@ -646,7 +663,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
                     }
                   }}
                 >
-                  {activeTool.status === 'available' ? 'Launch Tool' : 'Coming Soon'}
+                  {activeTool.status === 'available' ? (isFrench ? 'Lancer l\'Outil' : 'Launch Tool') : (isFrench ? 'À Venir' : 'Coming Soon')}
                 </button>
               </div>
             );
@@ -655,7 +672,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
           {/* Inline fretboard access from exercises */}
           <button className="sv-fretboard-fab" onClick={onOpenFretboard}>
             <span className="sv-fretboard-fab-icon">🎸</span>
-            <span className="sv-fretboard-fab-text">Practice on Fretboard</span>
+            <span className="sv-fretboard-fab-text">{isFrench ? 'Pratiquer sur la touche' : 'Practice on Fretboard'}</span>
             <span className="sv-fretboard-fab-arrow">↑</span>
           </button>
         </>
@@ -664,14 +681,14 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
     case 'yang-fretboard':
       return (
         <>
-          <p className="sv-label" style={{ color: '#c9a96e' }}>{slide.label}</p>
-          <h2 className="sv-title" style={{ fontSize: 'clamp(1.4rem, 5vw, 1.8rem)' }}>{slide.title}</h2>
-          <div className="sv-body"><p>{slide.body}</p></div>
+          <p className="sv-label" style={{ color: '#c9a96e' }}>{localize(slide.label)}</p>
+          <h2 className="sv-title" style={{ fontSize: 'clamp(1.4rem, 5vw, 1.8rem)' }}>{localize(slide.title)}</h2>
+          <div className="sv-body"><p>{localize(slide.body)}</p></div>
           {/* Main fretboard CTA */}
           <button className="sv-fretboard-fab" onClick={onOpenFretboard}>
             <span className="sv-fretboard-fab-icon">🎸</span>
             <span className="sv-fretboard-fab-text">
-              Open Fretboard — Frets {slide.fretboardFocus?.startFret}–{slide.fretboardFocus?.endFret}
+              {isFrench ? 'Ouvrir la touche — Frettes' : 'Open Fretboard — Frets'} {slide.fretboardFocus?.startFret}–{slide.fretboardFocus?.endFret}
             </span>
             <span className="sv-fretboard-fab-arrow">↑</span>
           </button>
@@ -682,11 +699,11 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', textAlign: 'center' }}>
           <div className="sv-end-icon">{slide.icon}</div>
-          <h2 className="sv-end-title">{slide.title}</h2>
-          <p className="sv-end-body">{slide.body}</p>
+          <h2 className="sv-end-title">{localize(slide.title)}</h2>
+          <p className="sv-end-body">{localize(slide.body)}</p>
           {slide.fretId < 12 && (
             <button className="sv-next-btn" onClick={onNextFret}>
-              Next Fret →
+              {isFrench ? 'Frette Suivante →' : 'Next Fret →'}
             </button>
           )}
         </div>
@@ -697,7 +714,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
           {/* Label + ratio badge */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <p className="sv-label" style={{ color: '#c9a96e', margin: 0 }}>{slide.label}</p>
+            <p className="sv-label" style={{ color: '#c9a96e', margin: 0 }}>{localize(slide.label)}</p>
             {slide.ratio && (
               <span style={{
                 fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
@@ -715,12 +732,12 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
             fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.6rem, 6vw, 2.4rem)',
             fontWeight: 400, color: '#e8edf2', lineHeight: 1.15, margin: 0,
           }}>
-            {slide.title}
+            {localize(slide.title)}
           </h2>
 
           {/* POV body — split by \n\n into paragraphs */}
           <div style={{ fontSize: '1rem', lineHeight: 1.9, color: '#b0b8c8' }}>
-            {(slide.body || '').split('\n\n').map((para, i) => (
+            {(localize(slide.body) || '').split('\n\n').map((para, i) => (
               <p key={i} style={{ marginBottom: '1em' }}>{para}</p>
             ))}
           </div>
@@ -732,7 +749,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
               color: '#5a6a80', letterSpacing: '0.12em', textTransform: 'uppercase',
               borderLeft: '2px solid rgba(201,169,110,0.3)', paddingLeft: '0.75rem',
             }}>
-              {slide.subtext}
+              {localize(slide.subtext)}
             </p>
           )}
 
@@ -746,14 +763,14 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
                 fontFamily: 'EB Garamond, serif', fontSize: '1.05rem',
                 fontStyle: 'italic', color: '#c9a96e', lineHeight: 1.7, margin: 0,
               }}>
-                "{slide.quote}"
+                "{localize(slide.quote)}"
               </p>
               {slide.author && (
                 <p style={{
                   fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                   color: '#5a6a80', marginTop: '0.5rem', letterSpacing: '0.1em',
                 }}>
-                  — {slide.author}
+                  — {localize(slide.author)}
                 </p>
               )}
             </div>
@@ -761,18 +778,18 @@ function SlideContent({ slide, onOpenFretboard, onNextFret }) {
 
           {/* References panel — expandable */}
           {slide.references?.length > 0 && (
-            <ReferencesPanel references={slide.references} accent={slide.accent} />
+            <ReferencesPanel references={slide.references} accent={slide.accent} isFrench={isFrench} />
           )}
         </div>
       );
 
     default:
-      return <p className="sv-body">{slide.body}</p>;
+      return <p className="sv-body">{localize(slide.body)}</p>;
   }
 }
 
 // ── References Panel — Expandable citations ──
-function ReferencesPanel({ references, accent }) {
+function ReferencesPanel({ references, accent, isFrench }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ marginTop: '0.5rem' }}>
@@ -792,7 +809,7 @@ function ReferencesPanel({ references, accent }) {
       >
         <span style={{ fontSize: '1rem' }}>📚</span>
         <span style={{ flex: 1 }}>
-          {open ? 'HIDE' : 'VIEW'} REFERENCES ({references.length})
+          {open ? (isFrench ? 'MASQUER' : 'HIDE') : (isFrench ? 'VOIR' : 'VIEW')} {isFrench ? 'LES RÉFÉRENCES' : 'REFERENCES'} ({references.length})
         </span>
         <span style={{ opacity: 0.5 }}>{open ? '▲' : '▼'}</span>
       </button>
