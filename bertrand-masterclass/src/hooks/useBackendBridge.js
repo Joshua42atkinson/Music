@@ -158,7 +158,7 @@ export function useBackendBridge() {
   };
 
   // 6. SQLite Student Profile operations
-  const getProfiles = async () => {
+  const getProfiles = useCallback(async () => {
     if (!isDaaSConnected) return [];
     try {
       const resp = await fetch(`${DAAS_API_BASE}/db/profiles`);
@@ -170,9 +170,9 @@ export function useBackendBridge() {
       console.error('Failed to fetch student profiles from SQLite:', e);
     }
     return [];
-  };
+  }, [isDaaSConnected]);
 
-  const getProfile = async (name) => {
+  const getProfile = useCallback(async (name) => {
     if (!isDaaSConnected) return null;
     try {
       const url = name ? `${DAAS_API_BASE}/db/profile?name=${encodeURIComponent(name)}` : `${DAAS_API_BASE}/db/profile`;
@@ -185,9 +185,9 @@ export function useBackendBridge() {
       console.error('Failed to get student profile from SQLite:', e);
     }
     return null;
-  };
+  }, [isDaaSConnected]);
 
-  const upsertProfile = async (profile) => {
+  const upsertProfile = useCallback(async (profile) => {
     if (!isDaaSConnected) return false;
     try {
       const resp = await fetch(`${DAAS_API_BASE}/db/profile`, {
@@ -200,10 +200,10 @@ export function useBackendBridge() {
       console.error('Failed to upsert student profile to SQLite:', e);
     }
     return false;
-  };
+  }, [isDaaSConnected]);
 
   // 7. SQLite Practice Logs operations
-  const getLogs = async (studentName) => {
+  const getLogs = useCallback(async (studentName) => {
     if (!isDaaSConnected) return [];
     try {
       const url = studentName ? `${DAAS_API_BASE}/db/logs?student_name=${encodeURIComponent(studentName)}` : `${DAAS_API_BASE}/db/logs`;
@@ -216,9 +216,9 @@ export function useBackendBridge() {
       console.error('Failed to fetch practice logs from SQLite:', e);
     }
     return [];
-  };
+  }, [isDaaSConnected]);
 
-  const insertLog = async (log) => {
+  const insertLog = useCallback(async (log) => {
     if (!isDaaSConnected) return false;
     try {
       const resp = await fetch(`${DAAS_API_BASE}/db/logs`, {
@@ -231,11 +231,11 @@ export function useBackendBridge() {
       console.error('Failed to insert practice log into SQLite:', e);
     }
     return false;
-  };
+  }, [isDaaSConnected]);
 
 
 
-  const earnFlorins = async (name, amount) => {
+  const earnFlorins = useCallback(async (name, amount) => {
     if (!isDaaSConnected) return null;
     try {
       const resp = await fetch(`${DAAS_API_BASE}/db/profiles/earn`, {
@@ -251,9 +251,9 @@ export function useBackendBridge() {
       console.error('Failed to earn florins:', e);
     }
     return null;
-  };
+  }, [isDaaSConnected]);
 
-  const spendFlorins = async (name, amount) => {
+  const spendFlorins = useCallback(async (name, amount) => {
     if (!isDaaSConnected) return null;
     try {
       const resp = await fetch(`${DAAS_API_BASE}/db/profiles/spend`, {
@@ -269,7 +269,7 @@ export function useBackendBridge() {
       console.error('Failed to spend florins:', e);
     }
     return null;
-  };
+  }, [isDaaSConnected]);
 
 
 

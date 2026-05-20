@@ -68,6 +68,7 @@ export default function LandingScreen() {
   const [activeProfileName, setActiveProfileName] = useState(() => {
     return localStorage.getItem('active_student_profile') || 'Jean-Luc';
   });
+  const [isSyncingProfiles, setIsSyncingProfiles] = useState(true);
   
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [newProfileName, setNewProfileName] = useState('');
@@ -79,10 +80,12 @@ export default function LandingScreen() {
 
   useEffect(() => {
     const syncProfiles = async () => {
+      console.log('[LandingScreen] Starting profile sync...');
       try {
         let list = await getProfiles();
         
         if (list.length === 0) {
+          console.log('[LandingScreen] No profiles found, creating defaults...');
           const defaultProfiles = [
             { id: 'jean-luc', name: 'Jean-Luc', current_chapter: 1, xp: 120, coaching_tier: 'premium', florins: 150 },
             { id: 'clara-laurent', name: 'Dr. Clara Laurent', current_chapter: 3, xp: 350, coaching_tier: 'premium', florins: 420 },
@@ -93,13 +96,8 @@ export default function LandingScreen() {
           }
           list = await getProfiles();
         }
+        console.log('[LandingScreen] Profile sync complete, loaded', list.length, 'profiles');
         setProfiles(list);
-
-        const found = list.find(p => p.name === activeProfileName);
-        if (!found && list.length > 0) {
-          setActiveProfileName(list[0].name);
-          localStorage.setItem('active_student_profile', list[0].name);
-        }
       } catch (error) {
         console.error('[LandingScreen] Profile sync failed:', error);
         // Use local fallback profiles if backend fails
@@ -109,11 +107,25 @@ export default function LandingScreen() {
           { id: 'marcellus', name: 'Marcellus Henderson', current_chapter: 2, xp: 210, coaching_tier: 'free', florins: 80 }
         ];
         setProfiles(fallbackProfiles);
+      } finally {
+        setIsSyncingProfiles(false);
       }
     };
 
     syncProfiles();
-  }, [getProfiles, upsertProfile, activeProfileName]);
+  }, [getProfiles, upsertProfile]);
+
+  // Validate active profile exists in the list
+  useEffect(() => {
+    if (profiles.length > 0) {
+      const found = profiles.find(p => p.name === activeProfileName);
+      if (!found) {
+        console.log('[LandingScreen] Active profile not found, switching to first profile');
+        setActiveProfileName(profiles[0].name);
+        localStorage.setItem('active_student_profile', profiles[0].name);
+      }
+    }
+  }, [profiles, activeProfileName]);
 
 
   return (
@@ -485,6 +497,7 @@ export default function LandingScreen() {
           <select
             className="profile-selector-dropdown"
             value={activeProfileName}
+            disabled={isSyncingProfiles}
             onChange={(e) => {
               if (e.target.value === 'NEW') {
                 setShowProfileModal(true);
