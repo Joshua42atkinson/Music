@@ -38,6 +38,7 @@ export default function PrivacyPolicy() {
           background: none;
           border: none;
           padding: 8px 0;
+          margin-left: 52px;
         }
         .legal-back:hover { opacity: 0.7; }
         .legal-page h1 {

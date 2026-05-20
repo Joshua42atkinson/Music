@@ -1,4 +1,4 @@
-import{c as i,j as e}from"./index-COtau4ew.js";function t(){const r=i();return e.jsxs("div",{className:"legal-page",children:[e.jsx("style",{children:`
+import{c as i,j as e}from"./index-CNmSeRp3.js";function t(){const r=i();return e.jsxs("div",{className:"legal-page",children:[e.jsx("style",{children:`
         .legal-page {
           min-height: 100vh;
           background: #0a0a0f;
@@ -24,6 +24,7 @@ import{c as i,j as e}from"./index-COtau4ew.js";function t(){const r=i();return e
           background: none;
           border: none;
           padding: 8px 0;
+          margin-left: 52px;
         }
         .legal-back:hover { opacity: 0.7; }
         .legal-page h1 {

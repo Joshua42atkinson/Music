@@ -317,6 +317,7 @@ function VertiscaleEngine({ onClose }) {
                 cursor: 'pointer', padding: '10px 16px',
                 fontFamily: 'JetBrains Mono, monospace',
                 display: 'flex', alignItems: 'center', gap: 6,
+                marginLeft: '52px',
               }}>{isFrench ? '← Quitter' : '← Exit'}</button>
             ) : (
               <button onClick={() => navigate('/')} style={{
@@ -325,6 +326,7 @@ function VertiscaleEngine({ onClose }) {
                 cursor: 'pointer', padding: '10px 16px',
                 fontFamily: 'JetBrains Mono, monospace',
                 display: 'flex', alignItems: 'center', gap: 6,
+                marginLeft: '52px',
               }}>{isFrench ? '← Accueil' : '← Home'}</button>
             )}
 
