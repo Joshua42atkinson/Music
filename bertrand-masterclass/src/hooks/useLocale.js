@@ -11,6 +11,51 @@ const TRANSLATIONS = {
     activeBrain: 'Active Local AI Brain',
     switchLanguage: 'Langue: Français',
 
+    // Landing Screen
+    choosePortal: 'Choose your portal',
+    studentProfile: 'STUDENT PROFILE:',
+    createNewProfile: '➕ Create New Profile...',
+    adventureStories: '📚 ADVENTURE STORIES',
+    learnWithBertrand: 'Learn with Bertrand →',
+    privateLessons: 'Private lessons · Async coaching · Inner Circle',
+    privateCoachingIntake: '⚜️ Private Coaching Intake',
+
+    // PIN Modal
+    verifyIdentity: 'Verify Identity',
+    enterPinFor: 'Enter PIN for',
+    incorrectPin: 'Incorrect PIN. Try again.',
+    clear: 'CLEAR',
+    cancel: 'Cancel',
+
+    // Profile Modal
+    createZenProfile: 'Create Zen Profile',
+    studentName: 'Student Name',
+    namePlaceholder: 'e.g. Jean-Luc',
+    guitarStyleTarget: 'Guitar Style Target',
+    acousticMelody: 'Acoustic Melody',
+    classicalPolyphony: 'Classical Polyphony',
+    flamencoAutonomic: 'Flamenco Autonomic',
+    jazzChordFlow: 'Jazz Chord Flow',
+    securityPin: 'Security PIN (Optional, 4 Digits)',
+    create: 'Create',
+
+    // Troubadour Bookshelf
+    troubadourLibrary: 'Troubadour Library',
+    troubadourStories: 'Troubadour Adventure Stories',
+    readingLabel: 'Reading:',
+    bookshelfSubtitle: 'Access dynamic local instruction bards and somatic coaching chapters',
+    distillingScrolls: 'Distilling Occitan historical scrolls via LM Studio...',
+    draftingChapters: 'Drafting customized historical somatic chapters for your',
+    guitarStyleSuffix: 'guitar style target.',
+    chapter: 'CHAPTER',
+    prevPage: '◀ PREV PAGE',
+    nextPage: 'NEXT PAGE ▶',
+    somaticVocalLesson: 'Somatic Vocal Lesson',
+    autonomicAlignChallenge: 'Autonomic Align Challenge',
+    enterPracticum: '🎙️ ENTER PRACTICUM',
+    readBook: '📖 READ BOOK',
+    unlockFree: '🔓 UNLOCK FREE',
+
     // Mentor Dashboard
     mentorTitle: 'Sovereign Mentor Dashboard',
     mentorSubtitle: "Review student submissions, trigger Pythagoras acoustics analysis, and draft Socratic somatic responses offline.",
@@ -53,6 +98,51 @@ const TRANSLATIONS = {
     offlinePreview: '💤 aperçu hors-ligne',
     activeBrain: 'Cerveau IA local actif',
     switchLanguage: 'Language: English',
+
+    // Landing Screen
+    choosePortal: 'Choisissez votre portail',
+    studentProfile: 'PROFIL ÉTUDIANT :',
+    createNewProfile: '➕ Créer un Nouveau Profil...',
+    adventureStories: '📚 HISTOIRES D\'AVENTURE',
+    learnWithBertrand: 'Apprendre avec Bertrand →',
+    privateLessons: 'Leçons privées · Mentorat asynchrone · Cercle restreint',
+    privateCoachingIntake: '⚜️ Candidature Mentorat Privé',
+
+    // PIN Modal
+    verifyIdentity: 'Vérifier l\'Identité',
+    enterPinFor: 'Saisir le PIN pour',
+    incorrectPin: 'Code PIN incorrect. Réessayez.',
+    clear: 'EFFACER',
+    cancel: 'Annuler',
+
+    // Profile Modal
+    createZenProfile: 'Créer un Profil Zen',
+    studentName: 'Nom de l\'Étudiant',
+    namePlaceholder: 'ex. Jean-Luc',
+    guitarStyleTarget: 'Style de Guitare Ciblé',
+    acousticMelody: 'Mélodie Acoustique',
+    classicalPolyphony: 'Polyphonie Classique',
+    flamencoAutonomic: 'Flamenco Autonome',
+    jazzChordFlow: 'Flux d\'Accords de Jazz',
+    securityPin: 'Code PIN de Sécurité (Optionnel, 4 Chiffres)',
+    create: 'Créer',
+
+    // Troubadour Bookshelf
+    troubadourLibrary: 'Bibliothèque Troubadour',
+    troubadourStories: 'Histoires d\'Aventure',
+    readingLabel: 'Lecture :',
+    bookshelfSubtitle: 'Accédez à des guides d\'apprentissage bardiques dynamiques et des leçons somatiques',
+    distillingScrolls: 'Distillation des parchemins occitans via LM Studio...',
+    draftingChapters: 'Rédaction de chapitres somatiques historiques personnalisés pour votre style',
+    guitarStyleSuffix: 'de guitare.',
+    chapter: 'CHAPITRE',
+    prevPage: '◀ PAGE PRÉC',
+    nextPage: 'PAGE SUIV ▶',
+    somaticVocalLesson: 'Leçon Vocale Somatique',
+    autonomicAlignChallenge: 'Défi d\'Alignement Autonome',
+    enterPracticum: '🎙️ COMMENCER LA PRATIQUE',
+    readBook: '📖 LIRE LE LIVRE',
+    unlockFree: '🔓 DÉVERROUILLER GRATUIT',
 
     // Mentor Dashboard
     mentorTitle: 'Tableau de Mentorat Souverain',

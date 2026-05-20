@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Circle } from 'lucide-react';
 import CoachingPortal from '../components/CoachingPortal';
+import PinModal from '../components/PinModal';
+import ProfileModal from '../components/ProfileModal';
 import { useBackendBridge } from '../hooks/useBackendBridge';
 import { useLocale } from '../hooks/useLocale';
 
@@ -45,7 +47,7 @@ const PORTALS = [
 export default function LandingScreen() {
   const navigate = useNavigate();
   const [showCoaching, setShowCoaching] = useState(false);
-  const { locale, isFrench, toggleLocale } = useLocale();
+  const { locale, isFrench, toggleLocale, t } = useLocale();
   const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
 
   const { 
@@ -427,7 +429,7 @@ export default function LandingScreen() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.6 }}
       >
-        {isFrench ? 'Choisissez votre portail' : 'Choose your portal'}
+        {t('choosePortal')}
       </motion.p>
 
       {/* ── Zen Student Profile Switcher Header ── */}
@@ -438,7 +440,7 @@ export default function LandingScreen() {
         transition={{ delay: 0.5, duration: 0.6 }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="profile-info-label">{isFrench ? 'PROFIL ÉTUDIANT :' : 'STUDENT PROFILE:'}</span>
+          <span className="profile-info-label">{t('studentProfile')}</span>
           <select
             className="profile-selector-dropdown"
             value={activeProfileName}
@@ -467,7 +469,7 @@ export default function LandingScreen() {
                 ⚜️ {p.name} ({isFrench ? (p.coaching_tier === 'Acoustic' ? 'Acoustique' : p.coaching_tier === 'Classical' ? 'Classique' : p.coaching_tier) : p.coaching_tier}) {p.has_pin ? '🔒' : ''}
               </option>
             ))}
-            <option value="NEW">{isFrench ? '➕ Créer un Nouveau Profil...' : '➕ Create New Profile...'}</option>
+            <option value="NEW">{t('createNewProfile')}</option>
           </select>
         </div>
 
@@ -491,7 +493,7 @@ export default function LandingScreen() {
               transition: 'all 0.3s'
             }}
           >
-            {isFrench ? '📚 HISTOIRES D’AVENTURE' : '📚 ADVENTURE STORIES'}
+            {t('adventureStories')}
           </button>
 
           <button
@@ -516,389 +518,49 @@ export default function LandingScreen() {
         </div>
       </motion.div>
 
-      {/* ── Tactile PIN Verification Modal ── */}
-      <AnimatePresence>
-        {showPinModal && (
-          <motion.div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 600,
-              background: 'rgba(0,0,0,0.94)',
-              backdropFilter: 'blur(12px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '16px'
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              style={{
-                background: '#0a0a0f',
-                border: '1px solid rgba(201,169,110,0.3)',
-                borderRadius: '24px',
-                padding: '28px',
-                width: '100%',
-                maxWidth: '320px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '20px',
-                boxShadow: '0 25px 60px rgba(0,0,0,0.9)'
-              }}
-              initial={{ scale: 0.9, y: 30 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 30 }}
-            >
-              <div style={{ textAlign: 'center' }}>
-                <h3 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: '1.6rem',
-                  color: '#f0e6d2',
-                  margin: '0 0 4px'
-                }}>
-                  {isFrench ? 'Vérifier l\'Identité' : 'Verify Identity'}
-                </h3>
-                <p style={{
-                  fontSize: '0.75rem',
-                  fontFamily: "'JetBrains Mono', monospace",
-                  color: 'rgba(255,255,255,0.4)',
-                  margin: 0
-                }}>
-                  {isFrench ? `Saisir le PIN pour ${pinTargetName}` : `Enter PIN for ${pinTargetName}`}
-                </p>
-              </div>
-
-              {/* Display Dot Indicators */}
-              <div style={{ display: 'flex', gap: '12px', margin: '10px 0' }}>
-                {[0, 1, 2, 3].map((idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      borderRadius: '50%',
-                      background: enteredPin.length > idx 
-                        ? '#c9a96e' 
-                        : 'rgba(255,255,255,0.03)',
-                      border: `1px solid ${enteredPin.length > idx ? '#c9a96e' : 'rgba(201,169,110,0.25)'}`,
-                      boxShadow: enteredPin.length > idx 
-                        ? '0 0 12px #c9a96e' 
-                        : 'none',
-                      transition: 'all 0.15s ease'
-                    }}
-                  />
-                ))}
-              </div>
-
-              {pinError && (
-                <motion.p
-                  animate={{ x: [-10, 10, -10, 10, 0] }}
-                  transition={{ duration: 0.4 }}
-                  style={{
-                    color: '#ff6b6b',
-                    fontSize: '0.75rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    margin: 0
-                  }}
-                >
-                  {isFrench ? 'Code PIN incorrect. Réessayez.' : 'Incorrect PIN. Try again.'}
-                </motion.p>
-              )}
-
-              {/* Glassmorphic Numeric Keypad */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '12px',
-                width: '100%'
-              }}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <button
-                    key={num}
-                    onClick={() => {
-                      if (enteredPin.length < 4) {
-                        const newPin = enteredPin + num;
-                        setEnteredPin(newPin);
-                        setPinError(false);
-                        if (newPin.length === 4) {
-                          handlePinSubmit(newPin);
-                        }
-                      }
-                    }}
-                    style={{
-                      padding: '16px',
-                      borderRadius: '12px',
-                      background: 'rgba(255,255,255,0.01)',
-                      border: '1px solid rgba(201,169,110,0.1)',
-                      color: '#f0e6d2',
-                      fontSize: '1.25rem',
-                      fontFamily: "'JetBrains Mono', monospace",
-                      cursor: 'pointer',
-                      transition: 'all 0.1s',
-                      outline: 'none'
-                    }}
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button
-                  onClick={() => {
-                    setEnteredPin('');
-                    setPinError(false);
-                  }}
-                  style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.01)',
-                    border: '1px solid rgba(201,169,110,0.1)',
-                    color: 'rgba(255,255,255,0.3)',
-                    fontSize: '0.75rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    cursor: 'pointer',
-                    outline: 'none'
-                  }}
-                >
-                  {isFrench ? 'EFFACER' : 'CLEAR'}
-                </button>
-                <button
-                  onClick={() => {
-                    if (enteredPin.length < 4) {
-                      const newPin = enteredPin + '0';
-                      setEnteredPin(newPin);
-                      setPinError(false);
-                      if (newPin.length === 4) {
-                        handlePinSubmit(newPin);
-                      }
-                    }
-                  }}
-                  style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.01)',
-                    border: '1px solid rgba(201,169,110,0.1)',
-                    color: '#f0e6d2',
-                    fontSize: '1.25rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    cursor: 'pointer',
-                    outline: 'none'
-                  }}
-                >
-                  0
-                </button>
-                <button
-                  onClick={() => {
-                    setShowPinModal(false);
-                    setEnteredPin('');
-                    setPinError(false);
-                  }}
-                  style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    background: 'rgba(255,40,40,0.04)',
-                    border: '1px solid rgba(255,40,40,0.15)',
-                    color: '#ff6b6b',
-                    fontSize: '0.75rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    cursor: 'pointer',
-                    outline: 'none'
-                  }}
-                >
-                  {isFrench ? 'ANNULER' : 'CANCEL'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ── PIN Verification Modal ── */}
+      <PinModal
+        show={showPinModal}
+        pinTargetName={pinTargetName}
+        enteredPin={enteredPin}
+        setEnteredPin={setEnteredPin}
+        pinError={pinError}
+        setPinError={setPinError}
+        onSubmit={handlePinSubmit}
+        onClose={() => { setShowPinModal(false); setEnteredPin(''); setPinError(false); }}
+      />
 
       {/* ── Create Profile Modal ── */}
-      <AnimatePresence>
-        {showProfileModal && (
-          <motion.div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 500,
-              background: 'rgba(0,0,0,0.92)',
-              backdropFilter: 'blur(8px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '16px'
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              style={{
-                background: '#0d0d14',
-                border: '1px solid rgba(201,169,110,0.25)',
-                borderRadius: '20px',
-                padding: '24px',
-                width: '100%',
-                maxWidth: '360px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
-              }}
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-            >
-              <h3 style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: '1.5rem',
-                color: '#f0e6d2',
-                borderBottom: '1px solid rgba(201, 169, 110, 0.15)',
-                paddingBottom: '8px',
-                margin: 0
-              }}>
-                {isFrench ? 'Créer un Profil Zen' : 'Create Zen Profile'}
-              </h3>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(201,169,110,0.6)', textTransform: 'uppercase' }}>
-                  {isFrench ? 'Nom de l\'Étudiant' : 'Student Name'}
-                </label>
-                <input
-                  type="text"
-                  value={newProfileName}
-                  onChange={(e) => setNewProfileName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: '#050508',
-                    border: '1px solid rgba(201,169,110,0.2)',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    fontSize: '0.8rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: 'white',
-                    outline: 'none'
-                  }}
-                  placeholder={isFrench ? 'ex. Jean-Luc' : 'e.g. Jean-Luc'}
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(201,169,110,0.6)', textTransform: 'uppercase' }}>
-                  {isFrench ? 'Style de Guitare Ciblé' : 'Guitar Style Target'}
-                </label>
-                <select
-                  value={newProfileStyle}
-                  onChange={(e) => setNewProfileStyle(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: '#050508',
-                    border: '1px solid rgba(201,169,110,0.2)',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    fontSize: '0.8rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: 'white',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <option value="Acoustic">{isFrench ? 'Mélodie Acoustique' : 'Acoustic Melody'}</option>
-                  <option value="Classical">{isFrench ? 'Polyphonie Classique' : 'Classical Polyphony'}</option>
-                  <option value="Flamenco">{isFrench ? 'Flamenco Autonome' : 'Flamenco Autonomic'}</option>
-                  <option value="Jazz">{isFrench ? 'Flux d\'Accords de Jazz' : 'Jazz Chord Flow'}</option>
-                </select>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(201,169,110,0.6)', textTransform: 'uppercase' }}>
-                  {isFrench ? 'Code PIN de Sécurité (Optionnel, 4 Chiffres)' : 'Security PIN (Optional, 4 Digits)'}
-                </label>
-                <input
-                  type="password"
-                  maxLength={4}
-                  value={newProfilePin}
-                  onChange={(e) => setNewProfilePin(e.target.value.replace(/[^0-9]/g, ''))}
-                  style={{
-                    width: '100%',
-                    background: '#050508',
-                    border: '1px solid rgba(201,169,110,0.2)',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    fontSize: '0.8rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: 'white',
-                    outline: 'none',
-                    letterSpacing: '0.3em'
-                  }}
-                  placeholder="e.g. 1234"
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px', paddingTop: '8px' }}>
-                <button
-                  onClick={() => {
-                    setShowProfileModal(false);
-                    setNewProfilePin('');
-                    setNewProfileName('');
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: '#8a9aaa',
-                    fontSize: '0.75rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    cursor: 'pointer'
-                  }}
-                >
-                  {isFrench ? 'Annuler' : 'Cancel'}
-                </button>
-                <button
-                  onClick={async () => {
-                    if (!newProfileName.trim()) return;
-                    const id = newProfileName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                    const profileObj = {
-                      id,
-                      name: newProfileName.trim(),
-                      current_chapter: 1,
-                      xp: 0,
-                      coaching_tier: newProfileStyle,
-                      pin: newProfilePin || null
-                    };
-                    await upsertProfile(profileObj);
-                    const list = await getProfiles();
-                    setProfiles(list);
-                    setActiveProfileName(profileObj.name);
-                    localStorage.setItem('active_student_profile', profileObj.name);
-                    setShowProfileModal(false);
-                    setNewProfileName('');
-                    setNewProfilePin('');
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    borderRadius: '10px',
-                    background: '#c9a96e',
-                    border: 'none',
-                    color: '#0d0d14',
-                    fontSize: '0.75rem',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontWeight: 'bold',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {isFrench ? 'Créer' : 'Create'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ProfileModal
+        show={showProfileModal}
+        newProfileName={newProfileName}
+        setNewProfileName={setNewProfileName}
+        newProfileStyle={newProfileStyle}
+        setNewProfileStyle={setNewProfileStyle}
+        newProfilePin={newProfilePin}
+        setNewProfilePin={setNewProfilePin}
+        onClose={() => { setShowProfileModal(false); setNewProfilePin(''); setNewProfileName(''); }}
+        onCreate={async () => {
+          if (!newProfileName.trim()) return;
+          const id = newProfileName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+          const profileObj = {
+            id,
+            name: newProfileName.trim(),
+            current_chapter: 1,
+            xp: 0,
+            coaching_tier: newProfileStyle,
+            pin: newProfilePin || null
+          };
+          await upsertProfile(profileObj);
+          const list = await getProfiles();
+          setProfiles(list);
+          setActiveProfileName(profileObj.name);
+          localStorage.setItem('active_student_profile', profileObj.name);
+          setShowProfileModal(false);
+          setNewProfileName('');
+          setNewProfilePin('');
+        }}
+      />
 
       {/* ── Troubadour Shop & Bookshelf Modal ── */}
       <AnimatePresence>
@@ -955,7 +617,7 @@ export default function LandingScreen() {
                     color: '#f0e6d2',
                     margin: 0
                   }}>
-                    {activeBook ? (isFrench ? 'Bibliothèque Troubadour' : 'Troubadour Library') : (isFrench ? 'Histoires d\'Aventure' : 'Troubadour Adventure Stories')}
+                    {activeBook ? t('troubadourLibrary') : t('troubadourStories')}
                   </h3>
                   <p style={{
                     fontSize: '0.75rem',
@@ -963,7 +625,7 @@ export default function LandingScreen() {
                     color: 'rgba(201,169,110,0.5)',
                     margin: '4px 0 0'
                   }}>
-                    {activeBook ? (isFrench ? `Lecture : ${activeBook.title}` : `Reading: ${activeBook.title}`) : (isFrench ? 'Accédez à des guides d\'apprentissage bardiques dynamiques et des leçons somatiques' : 'Access dynamic local instruction bards and somatic coaching chapters')}
+                    {activeBook ? `${t('readingLabel')} ${activeBook.title}` : t('bookshelfSubtitle')}
                   </p>
                 </div>
 
@@ -1024,7 +686,7 @@ export default function LandingScreen() {
                       textAlign: 'center',
                       animation: 'pulseText 2s ease-in-out infinite'
                     }}>
-                      {isFrench ? 'Distillation des parchemins occitans via LM Studio...' : 'Distilling Occitan historical scrolls via LM Studio...'}
+                      {t('distillingScrolls')}
                     </p>
                     <p style={{
                       fontSize: '0.7rem',
@@ -1122,7 +784,7 @@ export default function LandingScreen() {
                             fontWeight: 'bold'
                           }}
                         >
-                          {isFrench ? '◀ PAGE PRÉC' : '◀ PREV PAGE'}
+                          {t('prevPage')}
                         </button>
 
                         <span style={{
@@ -1146,7 +808,7 @@ export default function LandingScreen() {
                             fontWeight: 'bold'
                           }}
                         >
-                          {isFrench ? 'PAGE SUIV ▶' : 'NEXT PAGE ▶'}
+                          {t('nextPage')}
                         </button>
                       </div>
                     </div>
@@ -1180,7 +842,7 @@ export default function LandingScreen() {
                             textTransform: 'uppercase',
                             marginBottom: '10px'
                           }}>
-                            {isFrench ? 'Leçon Vocale Somatique' : 'Somatic Vocal Lesson'}
+                            {t('somaticVocalLesson')}
                           </span>
                           <h4 style={{
                             fontFamily: "'Cormorant Garamond', serif",
@@ -1188,7 +850,7 @@ export default function LandingScreen() {
                             color: '#f0e6d2',
                             margin: '0 0 10px'
                           }}>
-                            {isFrench ? 'Défi d\'Alignement Autonome' : 'Autonomic Align Challenge'}
+                            {t('autonomicAlignChallenge')}
                           </h4>
                           <p style={{
                             fontSize: '0.85rem',
@@ -1227,7 +889,7 @@ export default function LandingScreen() {
                             e.currentTarget.style.color = '#c9a96e';
                           }}
                         >
-                          {isFrench ? '🎙️ COMMENCER LA PRATIQUE' : '🎙️ ENTER PRACTICUM'}
+                          {t('enterPracticum')}
                         </button>
                       </div>
                     </div>
@@ -1342,7 +1004,7 @@ export default function LandingScreen() {
                                 cursor: 'pointer'
                               }}
                             >
-                              {isFrench ? '📖 LIRE LE LIVRE' : '📖 READ BOOK'}
+                              {t('readBook')}
                             </button>
                           ) : (
                             <button
@@ -1378,7 +1040,7 @@ export default function LandingScreen() {
                                 cursor: 'pointer'
                               }}
                             >
-                              {isFrench ? '🔓 DÉVERROUILLER GRATUIT' : '🔓 UNLOCK FREE'}
+                              {t('unlockFree')}
                             </button>
                           )}
                         </div>
@@ -1456,7 +1118,7 @@ export default function LandingScreen() {
           onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.8)'}
           onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.5)'}
         >
-          {isFrench ? 'Apprendre avec Bertrand →' : 'Learn with Bertrand →'}
+          {t('learnWithBertrand')}
         </a>
         <p style={{
           fontFamily: "'JetBrains Mono', monospace",
@@ -1466,7 +1128,7 @@ export default function LandingScreen() {
           textTransform: 'uppercase',
           marginTop: 6,
         }}>
-          {isFrench ? 'Leçons privées · Mentorat asynchrone · Cercle restreint' : 'Private lessons · Async coaching · Inner Circle'}
+          {t('privateLessons')}
         </p>
 
         {/* Somatic Onboarding Trigger */}
@@ -1488,7 +1150,7 @@ export default function LandingScreen() {
               transition: 'all 0.3s',
             }}
           >
-            {isFrench ? '⚜️ Candidature Mentorat Privé' : '⚜️ Private Coaching Intake'}
+            {t('privateCoachingIntake')}
           </button>
         </div>
       </motion.div>
