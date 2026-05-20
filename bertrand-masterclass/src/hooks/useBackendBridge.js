@@ -8,7 +8,10 @@ const DAAS_API_BASE = typeof window !== 'undefined'
 const fetchWithRetry = async (url, options = {}, retries = 3, backoff = 1000) => {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await fetch(url, { ...options, signal: AbortSignal.timeout(5000) });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timeoutId);
       if (response.ok) return response;
     } catch (err) {
       if (i === retries - 1) throw err;
@@ -271,16 +274,9 @@ export function useBackendBridge() {
 
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      checkConnection();
-    }, 0);
-    // Re-check health every 15 seconds
-    const interval = setInterval(checkConnection, 15000);
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, [checkConnection]);
+    // Don't auto-connect - make it manual to prevent blocking
+    // checkConnection will be called manually via refreshConnection
+  }, []);
 
   return {
     isDaaSConnected,

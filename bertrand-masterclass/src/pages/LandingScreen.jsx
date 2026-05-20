@@ -79,28 +79,39 @@ export default function LandingScreen() {
 
   useEffect(() => {
     const syncProfiles = async () => {
-      let list = await getProfiles();
-      
-      if (list.length === 0) {
-        const defaultProfiles = [
+      try {
+        let list = await getProfiles();
+        
+        if (list.length === 0) {
+          const defaultProfiles = [
+            { id: 'jean-luc', name: 'Jean-Luc', current_chapter: 1, xp: 120, coaching_tier: 'premium', florins: 150 },
+            { id: 'clara-laurent', name: 'Dr. Clara Laurent', current_chapter: 3, xp: 350, coaching_tier: 'premium', florins: 420 },
+            { id: 'marcellus', name: 'Marcellus Henderson', current_chapter: 2, xp: 210, coaching_tier: 'free', florins: 80 }
+          ];
+          for (const p of defaultProfiles) {
+            await upsertProfile(p);
+          }
+          list = await getProfiles();
+        }
+        setProfiles(list);
+
+        const found = list.find(p => p.name === activeProfileName);
+        if (!found && list.length > 0) {
+          setActiveProfileName(list[0].name);
+          localStorage.setItem('active_student_profile', list[0].name);
+        }
+      } catch (error) {
+        console.error('[LandingScreen] Profile sync failed:', error);
+        // Use local fallback profiles if backend fails
+        const fallbackProfiles = [
           { id: 'jean-luc', name: 'Jean-Luc', current_chapter: 1, xp: 120, coaching_tier: 'premium', florins: 150 },
           { id: 'clara-laurent', name: 'Dr. Clara Laurent', current_chapter: 3, xp: 350, coaching_tier: 'premium', florins: 420 },
           { id: 'marcellus', name: 'Marcellus Henderson', current_chapter: 2, xp: 210, coaching_tier: 'free', florins: 80 }
         ];
-        for (const p of defaultProfiles) {
-          await upsertProfile(p);
-        }
-        list = await getProfiles();
-      }
-      setProfiles(list);
-
-      const found = list.find(p => p.name === activeProfileName);
-      if (!found && list.length > 0) {
-        setActiveProfileName(list[0].name);
-        localStorage.setItem('active_student_profile', list[0].name);
+        setProfiles(fallbackProfiles);
       }
     };
-    
+
     syncProfiles();
   }, [getProfiles, upsertProfile, activeProfileName]);
 
