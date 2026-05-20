@@ -219,31 +219,37 @@ export function useLocale() {
   }, []);
 
   const toggleLocale = useCallback(() => {
-    try {
-      console.log('[useLocale] toggleLocale called, current:', locale);
-      const newLocale = locale === 'en' ? 'fr' : 'en';
-      console.log('[useLocale] switching to:', newLocale);
-      setLocale(newLocale);
-      console.log('[useLocale] setLocale called successfully');
-      // Pause briefly then refresh to apply language change
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
-    } catch (error) {
-      console.error('[useLocale] toggleLocale error:', error);
-    }
-  }, [locale, setLocale]);
+    setLocaleState(currentLocale => {
+      const newLocale = currentLocale === 'en' ? 'fr' : 'en';
+      try {
+        localStorage.setItem('voixvive_locale', newLocale);
+      } catch {
+        // Ignore localStorage errors
+      }
+      return newLocale;
+    });
+  }, []);
 
   // Translation helper
   const t = useCallback((key) => {
-    const activeDict = TRANSLATIONS[locale] || TRANSLATIONS.en;
-    return activeDict[key] || TRANSLATIONS.en[key] || key;
+    try {
+      const activeDict = TRANSLATIONS[locale] || TRANSLATIONS.en;
+      return activeDict[key] || TRANSLATIONS.en[key] || key;
+    } catch (error) {
+      console.error('[useLocale] Translation error:', error);
+      return key;
+    }
   }, [locale]);
 
   // Localized somatic concepts
   const somatic = useCallback((term) => {
-    const activeSomatic = SOMATIC_TERMS[locale] || SOMATIC_TERMS.en;
-    return activeSomatic[term] || SOMATIC_TERMS.en[term] || term;
+    try {
+      const activeSomatic = SOMATIC_TERMS[locale] || SOMATIC_TERMS.en;
+      return activeSomatic[term] || SOMATIC_TERMS.en[term] || term;
+    } catch (error) {
+      console.error('[useLocale] Somatic translation error:', error);
+      return term;
+    }
   }, [locale]);
 
   return {
