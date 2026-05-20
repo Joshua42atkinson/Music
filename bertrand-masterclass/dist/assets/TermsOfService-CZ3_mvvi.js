@@ -1,4 +1,4 @@
-import{b as i,j as e}from"./index-BdH5zSut.js";function t(){const r=i();return e.jsxs("div",{className:"legal-page",children:[e.jsx("style",{children:`
+import{b as i,j as e}from"./index-BKveDwzU.js";function t(){const r=i();return e.jsxs("div",{className:"legal-page",children:[e.jsx("style",{children:`
         .legal-page {
           min-height: 100vh;
           background: #0a0a0f;

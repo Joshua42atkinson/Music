@@ -132,10 +132,10 @@ function AdventurePlayer({ onClose }) {
   const handleSkipGate = useCallback(() => {
     setGateState('skipped');
     setShowSkipGate(false);
-    setCoachingCue(isFrench ? 'Pas de soucis — vous pouvez toujours revenir pratiquer ce ton plus tard.' : 'No worries — you can always come back to practice this pitch later.');
+    setCoachingCue(t('advSkipCoaching'));
     setSession(prev => ({ ...prev, streak: 0 }));
     setTimeout(() => setPhase('choose'), 1000);
-  }, [isFrench]);
+  }, [t]);
 
   const handleChoice = useCallback((choice) => {
     if (choice.mode === 'sing') {
@@ -223,7 +223,7 @@ function AdventurePlayer({ onClose }) {
           background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
           color: '#8090a8', borderRadius: 8, fontSize: '1rem', cursor: 'pointer',
           padding: '8px 14px', fontFamily: 'JetBrains Mono, monospace',
-        }}>{isFrench ? '← Quitter' : '← Exit'}</button>
+        }}>{t('exit')}</button>
         <span style={{
           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
           letterSpacing: '0.15em', textTransform: 'uppercase', color: atmo.accent,
@@ -237,7 +237,7 @@ function AdventurePlayer({ onClose }) {
       <div style={{ flex: 1, overflow: 'auto', padding: '0 0 100px' }}>
         <AnimatePresence mode="wait">
           {phase === 'summary' ? (
-            <SummaryView key="summary" summary={summary} session={session} localize={localize} isFrench={isFrench} onClose={onClose} />
+            <SummaryView key="summary" summary={summary} session={session} localize={localize} t={t} onClose={onClose} />
           ) : phase === 'transition' ? (
             <motion.div key="transition" initial={{ opacity: 1 }} animate={{ opacity: 0 }}
               transition={{ duration: 1 }}
@@ -337,7 +337,7 @@ function AdventurePlayer({ onClose }) {
                         background: 'rgba(46,213,115,0.1)', border: '1px solid rgba(46,213,115,0.3)',
                         color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                         fontSize: '0.9rem',
-                      }}>{isFrench ? '🎤 Activer le Micro' : '🎤 Enable Microphone'}</button>
+                      }}>{t('enableMic')}</button>
                     )}
                     <button onClick={handleStartGate} style={{
                       display: 'block', width: '100%', maxWidth: 300, margin: '0 auto',
@@ -345,7 +345,7 @@ function AdventurePlayer({ onClose }) {
                       background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
                       color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                       fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
-                    }}>{isFrench ? '🎵 Trouver le ' : '🎵 Find the '}{scene.targetNote}</button>
+                    }}>{t('advFindThe')}{scene.targetNote}</button>
                   </motion.div>
                 )}
 
@@ -368,9 +368,9 @@ function AdventurePlayer({ onClose }) {
                           background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
                           color: '#5a6a80', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                           fontSize: '0.85rem',
-                        }}>{isFrench ? 'Sauter cette note →' : 'Skip this pitch →'}</button>
+                        }}>{t('advSkipPitch')}</button>
                         <p style={{ fontSize: '0.8rem', color: '#5a6a80', marginTop: 6, fontStyle: 'italic' }}>
-                          {isFrench ? "Sans pénalité — l'histoire continue" : "No penalty — the story continues"}
+                          {t('advSkipNoPenalty')}
                         </p>
                       </motion.div>
                     )}
@@ -385,7 +385,7 @@ function AdventurePlayer({ onClose }) {
                       fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                       letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
                       textAlign: 'center', marginBottom: 4,
-                    }}>{isFrench ? 'VOTRE RÉPONSE' : 'YOUR RESPONSE'}</p>
+                    }}>{t('yourResponse')}</p>
                     {scene.choices.map(choice => (
                       <button key={choice.id} onClick={() => handleChoice(choice)} style={{
                         padding: '16px 20px', borderRadius: 10, textAlign: 'left',
@@ -419,7 +419,7 @@ function AdventurePlayer({ onClose }) {
                     <p style={{
                       fontFamily: 'EB Garamond, serif', fontSize: '1rem', fontStyle: 'italic',
                       color: atmo.accent, marginBottom: 16,
-                    }}>{isFrench ? 'Chantez votre réponse...' : 'Sing your response...'}</p>
+                    }}>{t('singResponse')}</p>
                     {isListening && pitch && (
                       <p style={{
                         fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
@@ -431,7 +431,7 @@ function AdventurePlayer({ onClose }) {
                       background: 'rgba(46,213,115,0.15)', border: '1px solid rgba(46,213,115,0.4)',
                       color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                       fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
-                    }}>{isFrench ? '✓ Terminer la Réponse' : '✓ Complete Response'}</button>
+                    }}>{t('advCompleteResponse')}</button>
                   </motion.div>
                 )}
 
@@ -443,7 +443,7 @@ function AdventurePlayer({ onClose }) {
                       fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                       letterSpacing: '0.2em', color: atmo.accent, textTransform: 'uppercase',
                       marginBottom: 16,
-                    }}>{scene.endingType === 'commission' ? (isFrench ? '★ LA COMMANDE' : '★ THE COMMISSION') : (isFrench ? 'LE PATRONAGE' : 'THE PATRONAGE')}</p>
+                    }}>{scene.endingType === 'commission' ? t('advTheCommission') : t('advThePatronage')}</p>
                     <p style={{
                       fontFamily: 'EB Garamond, serif', fontSize: '1.1rem', lineHeight: 1.7,
                       color: '#d0d8e0',
@@ -453,7 +453,7 @@ function AdventurePlayer({ onClose }) {
                       background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
                       color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
                       fontSize: '1rem', letterSpacing: '0.1em',
-                    }}>{isFrench ? 'Voir le résumé du voyage' : 'View Journey Summary'}</button>
+                    }}>{t('viewSummary')}</button>
                   </motion.div>
                 )}
               </div>
@@ -474,7 +474,7 @@ function AdventurePlayer({ onClose }) {
 }
 
 // ── Summary View ──
-function SummaryView({ summary, session, localize, isFrench, onClose }) {
+function SummaryView({ summary, session, localize, t, onClose }) {
   if (!summary) return null;
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -485,7 +485,7 @@ function SummaryView({ summary, session, localize, isFrench, onClose }) {
       <p style={{
         fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
         letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
-      }}>{isFrench ? 'AVENTURE TERMINÉE' : 'ADVENTURE COMPLETE'}</p>
+      }}>{t('advAdventureComplete')}</p>
 
       <h2 style={{
         fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem',
@@ -494,10 +494,10 @@ function SummaryView({ summary, session, localize, isFrench, onClose }) {
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', maxWidth: 300 }}>
-        <StatBox label={isFrench ? 'Précision de Ton' : 'Pitch Accuracy'} value={`${summary.accuracy}%`} />
-        <StatBox label={isFrench ? 'Scènes' : 'Scenes'} value={summary.scenesCompleted} />
-        <StatBox label={isFrench ? 'Chemins Bonus' : 'Bonus Paths'} value={summary.bonusBranches} />
-        <StatBox label={isFrench ? 'Chants Réalisés' : 'Sung Responses'} value={summary.sungResponses} />
+        <StatBox label={t('advPitchAccuracy')} value={`${summary.accuracy}%`} />
+        <StatBox label={t('advScenes')} value={summary.scenesCompleted} />
+        <StatBox label={t('advBonusPaths')} value={summary.bonusBranches} />
+        <StatBox label={t('advSungResponses')} value={summary.sungResponses} />
       </div>
 
       {/* Impression */}
@@ -520,7 +520,7 @@ function SummaryView({ summary, session, localize, isFrench, onClose }) {
         background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.3)',
         color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
         fontSize: '0.9rem',
-      }}>{isFrench ? 'Retour au Menu' : 'Return to Menu'}</button>
+      }}>{t('advReturnToMenu')}</button>
     </motion.div>
   );
 }
