@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ═══════════════════════════════════════════════════════════
@@ -39,14 +40,13 @@ const slides = [
 export default function WelcomeOnboarding({ onComplete }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
-  const [shouldShow, setShouldShow] = useState(false);
-
-  useEffect(() => {
-    const seen = localStorage.getItem(ONBOARDING_KEY);
-    if (!seen) {
-      setShouldShow(true);
+  const [shouldShow, setShouldShow] = useState(() => {
+    try {
+      return !localStorage.getItem(ONBOARDING_KEY);
+    } catch {
+      return true;
     }
-  }, []);
+  });
 
   const handleComplete = () => {
     localStorage.setItem(ONBOARDING_KEY, 'true');

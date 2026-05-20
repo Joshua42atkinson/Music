@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import GameFretboard from './GameFretboard';
@@ -7,11 +8,11 @@ import PitchGateUI from './PitchGateUI';
 import useFlashTimer, { FLASH_STATES } from '../hooks/useFlashTimer';
 import usePitchDetector from '../hooks/usePitchDetector';
 import { computePhase1Score, computeSustainScore, computePhase2Score, checkStreakEligible, computePhaseUnlock } from './scoreCalculator';
-import { computeVertiscale, NOTE_NAMES, STRING_TUNING, midiToFreq, VERTISCALE_PATTERNS, getScaleCategories } from '../data/vertiscalePatterns';
+import { computeVertiscale, NOTE_NAMES, STRING_TUNING, midiToFreq, VERTISCALE_PATTERNS } from '../data/vertiscalePatterns';
 import NeckMenu from '../components/NeckMenu';
 import AdventurePlayer from './AdventurePlayer';
 import Glossary from '../components/Glossary';
-import { logVertiscaleSession, getVertiscaleProgress } from './sessionLogger';
+import { getVertiscaleProgress } from './sessionLogger';
 import BiometricSanctum from '../components/BiometricSanctum';
 import { useBackendBridge } from '../hooks/useBackendBridge';
 import { db } from '../data/localDatabase';
@@ -45,22 +46,30 @@ const ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 
 
 function VertiscaleEngine({ onClose }) {
   const navigate = useNavigate();
-  const { isFrench, somatic } = useLocale();
+  const { isFrench } = useLocale();
   // ── Global state ──
   const [engineState, setEngineState] = useState(ENGINE_STATES.MENU);
   const [rootNote, setRootNote]       = useState('E');
   const [gameMode, setGameMode]       = useState('flash'); // 'flash' | 'imagine'
   const [scaleType, setScaleType]     = useState('minor pentatonic'); // tonalName from vertiscalePatterns
   const [difficulty, setDifficulty]   = useState('beginner'); // 'beginner' | 'standard' | 'challenge'
-  const [showTutorial, setShowTutorial] = useState(false);
   const [round, setRound]            = useState(0);
   const [roundScores, setRoundScores] = useState([]);
   const [playerTaps, setPlayerTaps]   = useState([]);
   const [breathSamples, setBreathSamples] = useState([]);
   const [sessionLog, setSessionLog]   = useState([]);
-  const [phaseUnlock, setPhaseUnlock] = useState({ phase1Unlocked: true, phase2Unlocked: true, phase3Unlocked: true });
-  const [holdStartTime, setHoldStartTime] = useState(null);
-  const pendingLaunchRef = useRef(null);
+  const [phaseUnlock] = useState(() => {
+    try {
+      const progress = getVertiscaleProgress();
+      if (progress && (progress.phase1Sessions || progress.phase2Sessions)) {
+        return computePhaseUnlock(progress);
+      }
+    } catch (e) {
+      console.warn('[VertiscaleEngine] Could not load progress:', e);
+    }
+    return { phase1Unlocked: true, phase2Unlocked: true, phase3Unlocked: true };
+  });
+
   
   // Calculate current stage (1 to 4) based on round (0 to 7)
   const currentStage = Math.floor(round / 2) + 1;
@@ -137,7 +146,7 @@ function VertiscaleEngine({ onClose }) {
   // ── Pitch detector ──
   const {
     isListening, pitch, noteInfo, volume, breathState, error: micError,
-    startListening, stopListening, audioCtxRef,
+    startListening, audioCtxRef,
   } = usePitchDetector();
 
   // ── Vertiscale pattern (with progressive difficulty) ──
@@ -162,7 +171,7 @@ function VertiscaleEngine({ onClose }) {
     : difficultyMultiplier;
 
   const {
-    flashState, tapProgressPct, holdProgressPct, flashDurationMs, holdDurationMs,
+    flashState, tapProgressPct, holdProgressPct,
     startRound: startFlash, startHoldRound, submitTaps, submitHold, reset: resetFlash,
   } = useFlashTimer({
     consistencyScore,
@@ -182,21 +191,7 @@ function VertiscaleEngine({ onClose }) {
     return () => clearInterval(breathIntervalRef.current);
   }, [isListening, engineState, breathState]);
 
-  // ── Load progress on mount ──
-  useEffect(() => {
-    try {
-      const progress = getVertiscaleProgress();
-      if (progress && (progress.phase1Sessions || progress.phase2Sessions)) {
-        const unlock = computePhaseUnlock(progress);
-        setPhaseUnlock(unlock);
-      }
-      // Dev note: to permanently unlock all phases during development, uncomment:
-      // setPhaseUnlock({ phase1Unlocked: true, phase2Unlocked: true, phase3Unlocked: true });
-    } catch (e) {
-      // Graceful fallback — all phases unlocked if persistence fails
-      console.warn('[VertiscaleEngine] Could not load progress:', e);
-    }
-  }, []);
+
 
   // ── Fret tap handler ──
   const handleTap = useCallback((stringIdx, fret) => {
@@ -208,15 +203,6 @@ function VertiscaleEngine({ onClose }) {
   }, []);
 
   const startPhase = useCallback((phase, mode) => {
-    // Show tutorial on first-ever game launch
-    const tutorialSeen = localStorage.getItem('voix_vive_game_tutorial_seen');
-    if (!tutorialSeen && (phase === ENGINE_STATES.PHASE1 || phase === ENGINE_STATES.PHASE2)) {
-      setShowTutorial(true);
-      localStorage.setItem('voix_vive_game_tutorial_seen', '1');
-      // Store pending launch params and return — tutorial dismiss will call startPhase again
-      pendingLaunchRef.current = { phase, mode };
-      return;
-    }
     if (mode) setGameMode(mode);
     setEngineState(phase);
     setRound(0);
@@ -288,7 +274,7 @@ function VertiscaleEngine({ onClose }) {
     } else {
       setTimeout(() => startFlash(), 800);
     }
-  }, [gameMode, pattern, playerTaps, breathSamples, roundScores, round, startFlash, startHoldRound, holdProgressPct, activeBiometrics, noteInfo, handleSessionComplete]);
+  }, [gameMode, pattern, playerTaps, breathSamples, roundScores, round, startFlash, startHoldRound, holdProgressPct, activeBiometrics, noteInfo, handleSessionComplete, sessionLog]);
 
   // ── Submit taps early ──
   const handleSubmit = useCallback(() => {
@@ -452,7 +438,7 @@ function VertiscaleEngine({ onClose }) {
                                 'Breathe in through the nose, out through the mouth.',
                                 'Imagine hearing each note, from low string to high.',
                               ];
-                              const idx = Math.floor((Date.now() / 4000) % holdCues.length);
+                              const idx = round % holdCues.length;
                               return holdCues[idx];
                             })()
                           : (isFrench ? 'Vérification de la précision de votre placement...' : 'Checking your placement accuracy...'))
@@ -635,7 +621,7 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
     color: '#c9a96e',
   }));
 
-  const renderContent = (item) => (
+  const renderContent = () => (
     <div style={{ padding: '24px 16px', color: '#e8edf2' }}>
       {/* What is a Vertiscale? — Expandable explainer for novices */}
       <details style={{
@@ -866,6 +852,7 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
 
 // ── Phase 2 Screen — PLING! Orbs (with Audiation Pause) ──
 function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListening, audioCtxRef, onSessionLog, onComplete, onBack }) {
+  const { isFrench } = useLocale();
   const [orbActive, setOrbActive] = React.useState(false);
   const [orbScores, setOrbScores] = React.useState([]);
   const [currentTarget, setCurrentTarget] = React.useState(null);
@@ -957,7 +944,7 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
           setCurrentTarget(targetNote);
           setGateState('open');
         }}
-        onGateResult={(orbId, result, centsDev) => {
+        onGateResult={(orbId, result) => {
           setGateState(result);
         }}
         onOrbTap={(orbId, result) => {
@@ -1165,7 +1152,6 @@ function SomaticProgressionChart({ sessions }) {
 function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakEligible, onClose, onRestart }) {
   const { isFrench } = useLocale();
   const [journal, setJournal] = React.useState('');
-  const journalKey = `voixvive_journal_${Date.now()}`;
   const [pastSessions, setPastSessions] = React.useState([]);
 
   React.useEffect(() => {
@@ -1202,12 +1188,12 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
   };
   const coaching = getCoachingCue();
 
-  const saveJournal = () => {
+  const saveJournal = React.useCallback(() => {
     if (!journal.trim()) return;
     const entries = JSON.parse(localStorage.getItem('voixvive_journals') || '[]');
     entries.push({ rootNote, avgScore, text: journal, coaching: coaching.text, timestamp: Date.now() });
     localStorage.setItem('voixvive_journals', JSON.stringify(entries));
-  };
+  }, [journal, rootNote, avgScore, coaching.text]);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}

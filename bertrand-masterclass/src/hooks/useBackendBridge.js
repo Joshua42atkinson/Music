@@ -1,8 +1,23 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const DAAS_API_BASE = typeof window !== 'undefined'
   ? `http://${window.location.hostname}:8080/api`
   : 'http://localhost:8080/api';
+
+// Helper: Exponential Backoff Fetch
+const fetchWithRetry = async (url, options = {}, retries = 3, backoff = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, { ...options, signal: AbortSignal.timeout(5000) });
+      if (response.ok) return response;
+    } catch (err) {
+      if (i === retries - 1) throw err;
+    }
+    // Wait exponentially: 1s, 2s, 4s...
+    await new Promise(resolve => setTimeout(resolve, backoff * Math.pow(2, i)));
+  }
+  throw new Error(`Max retries reached for ${url}`);
+};
 
 export function useBackendBridge() {
   const [isDaaSConnected, setIsDaaSConnected] = useState(false);
@@ -10,26 +25,10 @@ export function useBackendBridge() {
   const [availableBackends, setAvailableBackends] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 1. Check health of DaaS Axum Server on port 8080
-  const checkConnection = async () => {
+  // 1. Load Inference Router status
+  const loadInferenceStatus = useCallback(async () => {
     try {
-      const resp = await fetch(`${DAAS_API_BASE}/health`);
-      if (resp.ok) {
-        setIsDaaSConnected(true);
-        // Load active LLM status
-        await loadInferenceStatus();
-        return true;
-      }
-    } catch (_) {
-      setIsDaaSConnected(false);
-    }
-    return false;
-  };
-
-  // 2. Load Inference Router status
-  const loadInferenceStatus = async () => {
-    try {
-      const resp = await fetch(`${DAAS_API_BASE}/inference/status`);
+      const resp = await fetchWithRetry(`${DAAS_API_BASE}/inference/status`, {}, 2, 500);
       if (resp.ok) {
         const data = await resp.json();
         setActiveBackend(data.active_backend);
@@ -38,7 +37,23 @@ export function useBackendBridge() {
     } catch (e) {
       console.error('Failed to load DaaS inference status:', e);
     }
-  };
+  }, []);
+
+  // 2. Check health of DaaS Axum Server on port 8080
+  const checkConnection = useCallback(async (retries = 3) => {
+    try {
+      const resp = await fetchWithRetry(`${DAAS_API_BASE}/health`, {}, retries, 1000);
+      if (resp.ok) {
+        setIsDaaSConnected(true);
+        // Load active LLM status
+        await loadInferenceStatus();
+        return true;
+      }
+    } catch {
+      setIsDaaSConnected(false);
+    }
+    return false;
+  }, [loadInferenceStatus]);
 
   // 3. Switch active LLM backend
   const switchBackend = async (name) => {
@@ -215,23 +230,7 @@ export function useBackendBridge() {
     return false;
   };
 
-  const verifyProfilePin = async (name, pin) => {
-    if (!isDaaSConnected) return false;
-    try {
-      const resp = await fetch(`${DAAS_API_BASE}/db/profiles/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, pin }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        return !!data.success;
-      }
-    } catch (e) {
-      console.error('Failed to verify profile pin:', e);
-    }
-    return false;
-  };
+
 
   const earnFlorins = async (name, amount) => {
     if (!isDaaSConnected) return null;
@@ -272,11 +271,16 @@ export function useBackendBridge() {
 
 
   useEffect(() => {
-    checkConnection();
+    const timer = setTimeout(() => {
+      checkConnection();
+    }, 0);
     // Re-check health every 15 seconds
     const interval = setInterval(checkConnection, 15000);
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [checkConnection]);
 
   return {
     isDaaSConnected,
@@ -291,7 +295,7 @@ export function useBackendBridge() {
     upsertProfile,
     getLogs,
     insertLog,
-    verifyProfilePin,
+    verifyProfilePin: () => { console.warn('[VoixVive] verifyProfilePin is deprecated. Use Cloudflare Access.'); return false; },
     earnFlorins,
     spendFlorins,
     refreshConnection: checkConnection,

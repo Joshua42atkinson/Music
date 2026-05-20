@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Interval } from '@tonaljs/tonal';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { getAudioContext, resumeAudio } from '../audio/audioEngine';
+import { resumeAudio } from '../audio/audioEngine';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 

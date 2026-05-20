@@ -31,6 +31,26 @@ db.version(1).stores({
   vertiscaleSessions: '++id, phase, patternId, timestamp, successful',
 });
 
+// v2: Add Troubadour's Quill songbook
+db.version(2).stores({
+  songs: '++id, title, timestamp, isFavorite',
+});
+
+// v3: Troubadour's Playbook — D&D Player Handbook persistence
+db.version(3).stores({
+  // Post-session journal reflections (one per tool session)
+  journal: '++id, fretId, toolId, timestamp, mood',
+
+  // Web-only student profile (works without Tauri desktop app)
+  studentProfile: 'id, name, createdAt',
+
+  // Granular quest events ("Started Fret 3", "Completed Breathing Gate", etc.)
+  questLog: '++id, fretId, event, timestamp',
+
+  // Cached AI narration (quest intros, level-up text, session summaries)
+  aiNarration: '++id, type, contextKey, timestamp',
+});
+
 // ─────────────────────────────────────────────────────────────
 // TRACTION PERSISTENCE — Full state backup to IndexedDB
 // Key: 'traction_state' in the settings table

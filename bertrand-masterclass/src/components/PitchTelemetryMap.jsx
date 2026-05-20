@@ -6,7 +6,7 @@ export default function PitchTelemetryMap({ telemetryData }) {
     if (typeof telemetryData === 'string') {
       try {
         return JSON.parse(telemetryData);
-      } catch (_) {
+      } catch {
         return [];
       }
     }

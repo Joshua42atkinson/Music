@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 import { FLASH_STATES } from '../hooks/useFlashTimer';
 import { STRING_TUNING, NOTE_NAMES } from '../data/vertiscalePatterns';
 
@@ -84,7 +85,7 @@ function GameFretboard({
     setTimeout(() => setRipple(null), 500);
   }, []);
 
-  const cellStyle = (state, stringIdx) => {
+  const cellStyle = () => {
     const base = {
       width: CELL_W, height: CELL_H,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -211,7 +212,7 @@ function GameFretboard({
               const breathAnim = getBreathAnimation(state);
               const breathTrans = getBreathTransition(state);
               return (
-                <div key={fret} style={cellStyle(state, sIdx)} onClick={() => { handleCellClick(sIdx, fret); triggerRipple(sIdx, fret); }}>
+                <div key={fret} style={cellStyle()} onClick={() => { handleCellClick(sIdx, fret); triggerRipple(sIdx, fret); }}>
                   {/* Tap ripple */}
                   {ripple && ripple.sIdx === sIdx && ripple.fret === fret && (
                     <motion.div

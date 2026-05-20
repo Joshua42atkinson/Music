@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { TROUBADOUR } from '../data/adventures/troubadour';
 import {
@@ -40,7 +41,7 @@ const ACT_LABELS = {
 };
 
 function AdventurePlayer({ onClose }) {
-  const { locale, isFrench, t } = useLocale();
+  const { locale, t } = useLocale();
 
   const localize = useCallback((val) => {
     if (!val) return '';
@@ -51,30 +52,36 @@ function AdventurePlayer({ onClose }) {
   }, [locale]);
 
   const {
-    isListening, pitch, noteInfo, volume, breathState, error: micError,
-    startListening, stopListening,
+    isListening, pitch, noteInfo, volume, breathState,
+    startListening,
   } = usePitchDetector();
 
-  const [session, setSession] = useState(() => createSession('troubadour-occitania'));
-  const [scene, setScene] = useState(null);
+  const [session, setSession] = useState(() => {
+    const initialSession = createSession('troubadour-occitania');
+    const { session: newSession } = loadAdventure(TROUBADOUR, initialSession);
+    return newSession;
+  });
+
+  const [scene, setScene] = useState(() => {
+    const initialSession = createSession('troubadour-occitania');
+    const { scene: firstScene } = loadAdventure(TROUBADOUR, initialSession);
+    return firstScene;
+  });
+
   const [phase, setPhase] = useState('intro'); // intro | listening | gate | choose | transition | singing | ending | summary
   const [gateState, setGateState] = useState('waiting');
-  const [coachingCue, setCoachingCue] = useState('');
+  
+  const [coachingCue, setCoachingCue] = useState(() => {
+    const initialSession = createSession('troubadour-occitania');
+    const { scene: firstScene } = loadAdventure(TROUBADOUR, initialSession);
+    return firstScene?.coachingCues?.onSceneEnter || '';
+  });
+
   const [singingStart, setSingingStart] = useState(null);
   const [activeChoice, setActiveChoice] = useState(null);
-  const [showArt, setShowArt] = useState(true);
-  const [artError, setArtError] = useState(false);
 
   const [showSkipGate, setShowSkipGate] = useState(false);
   const skipTimerRef = useRef(null);
-
-  // Load adventure on mount
-  useEffect(() => {
-    const { scene: firstScene, session: newSession } = loadAdventure(TROUBADOUR, session);
-    setScene(firstScene);
-    setSession(newSession);
-    setCoachingCue(firstScene.coachingCues.onSceneEnter);
-  }, []); // eslint-disable-line
 
   // Auto-advance from intro to listening after delay
   useEffect(() => {
@@ -89,15 +96,18 @@ function AdventurePlayer({ onClose }) {
     if (phase !== 'gate' || !pitch || !noteInfo || !scene) return;
     const { passed, newStreak, coachingCue: cue } = resolvePitch(scene, noteInfo.cents, session.streak);
     if (passed) {
-      setGateState('passed');
-      setCoachingCue(cue);
-      setSession(prev => ({
-        ...prev,
-        streak: newStreak,
-        totalPitchAttempts: prev.totalPitchAttempts + 1,
-        accuratePitchCount: prev.accuratePitchCount + 1,
-      }));
-      setTimeout(() => setPhase('choose'), 1500);
+      setTimeout(() => {
+        setGateState('passed');
+        setCoachingCue(cue);
+        setSession(prev => ({
+          ...prev,
+          streak: newStreak,
+          totalPitchAttempts: prev.totalPitchAttempts + 1,
+          accuratePitchCount: prev.accuratePitchCount + 1,
+        }));
+      }, 0);
+      const t = setTimeout(() => setPhase('choose'), 1500);
+      return () => clearTimeout(t);
     }
   }, [phase, pitch, noteInfo, scene]); // eslint-disable-line
 
@@ -137,6 +147,41 @@ function AdventurePlayer({ onClose }) {
     setTimeout(() => setPhase('choose'), 1000);
   }, [t]);
 
+  const executeChoice = useCallback((choice, singingScore) => {
+    setPhase('transition');
+    const result = resolveChoice(TROUBADOUR, scene, choice, session, singingScore);
+
+    if (result.coachingCue) setCoachingCue(result.coachingCue);
+
+    setTimeout(() => {
+      setSession(result.session);
+      setScene(result.nextScene);
+      setGateState('waiting');
+      setActiveChoice(null);
+      setShowSkipGate(false);
+
+      // Save progress for resume
+      try {
+        localStorage.setItem('voix_vive_adventure_session', JSON.stringify({
+          adventureId: result.session.adventureId,
+          currentSceneId: result.nextScene?.id,
+          session: result.session,
+          timestamp: Date.now(),
+        }));
+      } catch {
+        // Ignore localStorage errors in sandbox mode
+      }
+
+      if (result.nextScene?.isEnding) {
+        setPhase('ending');
+        setCoachingCue(result.nextScene.mentorLine);
+      } else {
+        setPhase('intro');
+        setCoachingCue(result.nextScene?.coachingCues?.onSceneEnter || '');
+      }
+    }, 1200);
+  }, [scene, session]);
+
   const handleChoice = useCallback((choice) => {
     if (choice.mode === 'sing') {
       setActiveChoice(choice);
@@ -147,7 +192,7 @@ function AdventurePlayer({ onClose }) {
     }
     // Speak mode — resolve immediately
     executeChoice(choice, null);
-  }, [isListening, startListening]); // eslint-disable-line
+  }, [isListening, startListening, executeChoice]);
 
   const handleSingComplete = useCallback(() => {
     if (!activeChoice) return;
@@ -161,41 +206,7 @@ function AdventurePlayer({ onClose }) {
       theme: { matched: duration > 2 },
     });
     executeChoice(activeChoice, score);
-  }, [activeChoice, singingStart, session]); // eslint-disable-line
-
-  const executeChoice = useCallback((choice, singingScore) => {
-    setPhase('transition');
-    const result = resolveChoice(TROUBADOUR, scene, choice, session, singingScore);
-
-    if (result.coachingCue) setCoachingCue(result.coachingCue);
-
-    setTimeout(() => {
-      setSession(result.session);
-      setScene(result.nextScene);
-      setGateState('waiting');
-      setActiveChoice(null);
-      setArtError(false);
-      setShowSkipGate(false);
-
-      // Save progress for resume
-      try {
-        localStorage.setItem('voix_vive_adventure_session', JSON.stringify({
-          adventureId: result.session.adventureId,
-          currentSceneId: result.nextScene?.id,
-          session: result.session,
-          timestamp: Date.now(),
-        }));
-      } catch (e) { /* non-critical */ }
-
-      if (result.nextScene?.isEnding) {
-        setPhase('ending');
-        setCoachingCue(result.nextScene.mentorLine);
-      } else {
-        setPhase('intro');
-        setCoachingCue(result.nextScene?.coachingCues?.onSceneEnter || '');
-      }
-    }, 1200);
-  }, [scene, session]);
+  }, [activeChoice, singingStart, session, executeChoice]);
 
   const handleFinish = useCallback(() => {
     setPhase('summary');
@@ -237,7 +248,7 @@ function AdventurePlayer({ onClose }) {
       <div style={{ flex: 1, overflow: 'auto', padding: '0 0 100px' }}>
         <AnimatePresence mode="wait">
           {phase === 'summary' ? (
-            <SummaryView key="summary" summary={summary} session={session} localize={localize} t={t} onClose={onClose} />
+            <SummaryView key="summary" summary={summary} localize={localize} t={t} onClose={onClose} />
           ) : phase === 'transition' ? (
             <motion.div key="transition" initial={{ opacity: 1 }} animate={{ opacity: 0 }}
               transition={{ duration: 1 }}
@@ -474,7 +485,7 @@ function AdventurePlayer({ onClose }) {
 }
 
 // ── Summary View ──
-function SummaryView({ summary, session, localize, t, onClose }) {
+function SummaryView({ summary, localize, t, onClose }) {
   if (!summary) return null;
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}

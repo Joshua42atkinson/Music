@@ -8,5 +8,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-  }
+  },
+  server: {
+    watch: {
+      ignored: ['**/training/**', '**/llama_cpp/**', '**/.venv/**'],
+    },
+  },
 })

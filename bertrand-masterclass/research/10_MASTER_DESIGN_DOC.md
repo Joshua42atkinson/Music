@@ -121,7 +121,7 @@ Each chapter's tool is chosen as a **psychological self-discovery metaphor** —
 
 > **Note:** The **Vertiscale Engine ⭐** (the Game) is NOT a fret-specific tool. It is a standalone game mode accessible via 🎮 Game on the landing screen. It spans ALL frets — any root note, any scale — and represents the synthesis of all 12 tools into a single playable practice loop (SHEARL Flash → PLING! Orbs → FHEAL Impression).
 
-### Digital Binder — Self-Discovery Tool Arc
+### Troubadour Playbook — Self-Discovery Tool Arc
 ```
 SAFETY & COMMITMENT (Frets 1–2)
   Fret 1:  Breathing Gate       — "Am I safe here?"
@@ -351,12 +351,13 @@ Streaks trigger when: 3 consecutive rounds with `breathContinuity > 80%` AND `pl
 
 | Phase | Status | What |
 |---|---|---|
-| 1: Living Textbook | ✅ Complete | React PWA, 12 chapters, Digital Binder (12/12 tools) |
-| 2: Mentored Platform | 🔴 Next | AsyncAssessor pipeline, Bertrand review dashboard, Cloudflare R2 |
+| 1: Living Textbook | ✅ Complete | React PWA, 12 chapters, Troubadour Playbook (12/12 tools) |
+| 2: Mentored Platform | ✅ Complete | AsyncAssessor pipeline, Bertrand review dashboard, local DaaS API, SQLite DB |
 | 3: Android XR | 🔵 Future | Tauri v2 + Bevy ECS + OpenXR + Gemma 4 AI |
 | 4: The School | 🔵 Vision | Multi-instructor, spatialized ensembles, guest masters |
 
-### Current Stack (Phase 1)
+### Current Stack (Phases 1 & 2)
+**Frontend (Student PWA & Teacher Dashboard):**
 ```
 Vite 7.2.4 + React 18 + React Router 7
 Vanilla CSS + custom --bard-* design tokens
@@ -370,6 +371,18 @@ Stripe Payment Links (zero backend)
 JSON-LD LocalBusiness + Open Graph (SEO)
 Fonts: Cormorant Garamond + Inter + JetBrains Mono
 ```
+
+**Backend (The Sovereign Desktop DaaS):**
+```
+Tauri v2 + Rust
+Axum (HTTP REST API with graceful shutdown and timeouts)
+SQLite (via sqlx pool, WAL mode enabled for high concurrency)
+tokio (async runtime for non-blocking local LLM inference)
+Native FFmpeg (audio extraction mapped to async subprocess timeouts)
+```
+
+**Mobile Testing Architecture (Student → Mentor):**
+To maintain strict sovereign privacy (no cloud databases, no email auth), the desktop DaaS acts as the sole source of truth. When testing interactions from a student phone (hitting the Vercel PWA) to the Mentor's desktop, we use a temporary **Ngrok / localtunnel** reverse proxy pointing to `0.0.0.0:8080`. Students authenticate with a 4-digit PIN against the local SQLite database.
 
 ---
 
@@ -468,7 +481,7 @@ The platform license is **to be determined by Bertrand Laurence**. Until a speci
 
 1. **The Living Textbook** — Swipe through Frets 1–12 on his phone. Let him see the AI artwork, the pedagogical slides, the Timeless Song historical layer, and the 📚 References panel. This is his curriculum made visible.
 
-2. **The 12 Tools** — Open the Digital Binder → The 12 Tools tab. All 12 are wired and functional. Demonstrate:
+2. **The 12 Tools** — Open the Troubadour Playbook → The 12 Tools tab. All 12 are wired and functional. Demonstrate:
    - Breathing Gate (somatic entry)
    - PLING! Trainer (mic-based pitch singing)
    - Vertiscale Engine (the game — Phase 1 SHEARL Flash)
@@ -500,7 +513,7 @@ The platform license is **to be determined by Bertrand Laurence**. Until a speci
 - Which payment methods to list
 - Whether to launch immediately or wait
 - Chapter titles and slide text (content changes, not structural)
-- Tool names and descriptions in the Digital Binder
+- Tool names and descriptions in the Troubadour Playbook
 - Whether to add/remove the Francophone marketing section
 
 ### Open Questions For Bertrand

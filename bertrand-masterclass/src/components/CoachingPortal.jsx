@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, UserCheck, BarChart3, ArrowRight, Award, Compass, Heart, Activity, CheckCircle, ChevronRight, FileText, Send, Sparkles } from 'lucide-react';
 import { useLocale } from '../hooks/useLocale';
@@ -85,7 +86,7 @@ export default function CoachingPortal({ onClose }) {
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
 
   // SQLite Integration
-  const { getProfiles, getLogs, upsertProfile } = useBackendBridge();
+  const { getProfiles, getLogs } = useBackendBridge();
   const [profiles, setProfiles] = useState([]);
   const [profileLogs, setProfileLogs] = useState({});
 

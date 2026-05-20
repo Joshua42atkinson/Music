@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PHASES = [
@@ -28,7 +29,12 @@ const BreathingGate = ({ fretTitle, onComplete, isCleared = false }) => {
 
   // If already cleared, skip the gate
   useEffect(() => {
-    if (isCleared) setPhase('complete');
+    if (isCleared) {
+      const timer = setTimeout(() => {
+        setPhase('complete');
+      }, 0);
+      return () => clearTimeout(timer);
+    }
   }, [isCleared]);
 
   // Elapsed timer

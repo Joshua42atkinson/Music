@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import FretboardExplorer from './FretboardExplorer';
 import { useLocale } from '../hooks/useLocale';
@@ -53,7 +54,6 @@ const FretboardSheet = ({
   onClose,
   fret,
   fretboardFocus,
-  standalone = false,
 }) => {
   const { isFrench } = useLocale();
   const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
@@ -70,7 +70,12 @@ const FretboardSheet = ({
 
   // Reset to peek when opened
   useEffect(() => {
-    if (isOpen) setSheetState('peek');
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setSheetState('peek');
+      }, 0);
+      return () => clearTimeout(timer);
+    }
   }, [isOpen]);
 
   // Haptic on open

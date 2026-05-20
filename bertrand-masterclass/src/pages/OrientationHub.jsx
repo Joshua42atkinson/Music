@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import frets from '../data/chapterData';
 import SlideViewer from '../components/SlideViewer';
 import NeckMenu from '../components/NeckMenu';
-import DigitalBinder from '../components/DigitalBinder';
-import StudioPage from '../pages/StudioPage';
-import { useNavigate } from 'react-router-dom';
+import SongwritingCompanion from '../components/SongwritingCompanion';
 import { generateSlides } from '../data/slideGenerator';
 import { getChapterProgress } from '../data/localDatabase';
+import { Feather, X } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -41,8 +40,8 @@ const DOT_FRETS = [3, 5, 7, 9];
 const DOUBLE_DOT_FRETS = [12];
 
 const OrientationHub = () => {
-  const navigate = useNavigate();
   const [activeFret, setActiveFret] = useState(null);
+  const [showQuill, setShowQuill] = useState(false);
 
   if (activeFret) {
     return (
@@ -69,14 +68,59 @@ const OrientationHub = () => {
   });
 
   return (
-    <NeckMenu
-      items={mappedFrets}
-      activeId={null} // We use SlideViewer instead of inline content
-      onItemClick={(id) => setActiveFret(id)}
-      headerTitle="Voix Vive"
-      headerSubtitle="Your 12-chapter journey through the guitar"
-      showBackButton={true}
-    />
+    <>
+      <NeckMenu
+        items={mappedFrets}
+        activeId={null} // We use SlideViewer instead of inline content
+        onItemClick={(id) => setActiveFret(id)}
+        headerTitle="Voix Vive"
+        headerSubtitle="Your 12-chapter journey through the guitar"
+        showBackButton={true}
+      />
+
+      {/* ── Troubadour's Quill Floating Action Button ── */}
+      <button
+        onClick={() => setShowQuill(true)}
+        aria-label="Open Troubadour's Quill"
+        style={{
+          position: 'fixed', bottom: '72px', right: '16px', zIndex: 400,
+          width: '52px', height: '52px', borderRadius: '50%',
+          background: 'linear-gradient(135deg, rgba(123,106,170,0.4) 0%, rgba(123,106,170,0.15) 100%)',
+          border: '1px solid rgba(123,106,170,0.4)',
+          color: '#b09cd8', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(123,106,170,0.3)',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        <Feather size={22} />
+      </button>
+
+      {/* ── Quill Overlay ── */}
+      {showQuill && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 600,
+          background: 'rgba(5,5,8,0.97)', backdropFilter: 'blur(12px)',
+          overflowY: 'auto',
+        }}>
+          <button
+            onClick={() => setShowQuill(false)}
+            style={{
+              position: 'sticky', top: '12px', right: '16px', float: 'right',
+              zIndex: 601, background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '50%', width: '40px', height: '40px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', color: 'rgba(255,255,255,0.5)',
+              margin: '12px 16px',
+            }}
+          >
+            <X size={18} />
+          </button>
+          <SongwritingCompanion />
+        </div>
+      )}
+    </>
   );
 };
 

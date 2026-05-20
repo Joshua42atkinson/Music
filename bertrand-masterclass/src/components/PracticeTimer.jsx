@@ -50,26 +50,28 @@ const PracticeTimer = () => {
         setTimeLeft(t => t - 1);
       }, 1000);
     } else if (timeLeft === 0) {
-      setIsActive(false);
-      if (mode === 'focus') {
-        setCompletionMessage({
-          icon: '✓',
-          title: 'Session complete.',
-          body: 'Take a moment to breathe and integrate. Deep sleep consolidates what you just practiced.',
-          color: 'text-cf-gold',
-        });
-        setMode('break');
-        setTimeLeft(5 * 60);
-      } else {
-        setCompletionMessage({
-          icon: '♫',
-          title: 'Break over.',
-          body: 'Ready to dive back into the microscopic dance?',
-          color: 'text-cf-sage',
-        });
-        setMode('focus');
-        setTimeLeft(minutes * 60);
-      }
+      setTimeout(() => {
+        setIsActive(false);
+        if (mode === 'focus') {
+          setCompletionMessage({
+            icon: '✓',
+            title: 'Session complete.',
+            body: 'Take a moment to breathe and integrate. Deep sleep consolidates what you just practiced.',
+            color: 'text-cf-gold',
+          });
+          setMode('break');
+          setTimeLeft(5 * 60);
+        } else {
+          setCompletionMessage({
+            icon: '♫',
+            title: 'Break over.',
+            body: 'Ready to dive back into the microscopic dance?',
+            color: 'text-cf-sage',
+          });
+          setMode('focus');
+          setTimeLeft(minutes * 60);
+        }
+      }, 0);
     }
     return () => clearInterval(interval);
   }, [isActive, timeLeft, mode, minutes]);

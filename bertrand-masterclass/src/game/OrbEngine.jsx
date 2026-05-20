@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ═══════════════════════════════════════════════════════════
@@ -30,7 +31,7 @@ const bpmToMs = (bpm) => 60000 / bpm;
 import { playPling } from '../audio/audioEngine';
 
 // Difficulty presets (never called Easy/Medium/Hard)
-export const DIFFICULTY_PRESETS = {
+const DIFFICULTY_PRESETS = {
   awakening: { bpm: 80,  tolerance: 35, beatsPerOrb: 4, label: 'Kinesthetic Awakening' },
   practice:  { bpm: 120, tolerance: 20, beatsPerOrb: 2, label: 'Applied Practice' },
   flow:      { bpm: 160, tolerance: 10, beatsPerOrb: 1, label: 'Flow State' },
@@ -79,6 +80,9 @@ function OrbEngine({
   const preset        = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.awakening;
   const descentMs     = bpmToMs(preset.bpm) * preset.beatsPerOrb * 4; // 4 beats of descent
 
+  const spawnNextRef  = useRef();
+  const tickRef       = useRef();
+
   // ── Spawn next orb from sequence ──
   const spawnNext = useCallback(() => {
     if (!active || seqIdxRef.current >= orbSequence.length) return;
@@ -94,8 +98,14 @@ function OrbEngine({
 
     // Schedule next spawn
     const msPerOrb = bpmToMs(preset.bpm) * preset.beatsPerOrb;
-    spawnTimerRef.current = setTimeout(spawnNext, msPerOrb);
+    spawnTimerRef.current = setTimeout(() => {
+      spawnNextRef.current?.();
+    }, msPerOrb);
   }, [active, orbSequence, descentMs, preset, audioCtxRef]);
+
+  useEffect(() => {
+    spawnNextRef.current = spawnNext;
+  }, [spawnNext]);
 
   // ── rAF loop: update orb positions + gate logic ──
   const tick = useCallback(() => {
@@ -151,14 +161,22 @@ function OrbEngine({
       return next;
     });
 
-    rafRef.current = requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(() => {
+      tickRef.current?.();
+    });
   }, [pitch, noteInfo, preset, onAudiateStart, onGateOpen, onGateResult, onOrbMiss, audioCtxRef]);
+
+  useEffect(() => {
+    tickRef.current = tick;
+  }, [tick]);
 
   useEffect(() => {
     if (active) {
       seqIdxRef.current = 0;
       spawnNext();
-      rafRef.current = requestAnimationFrame(tick);
+      rafRef.current = requestAnimationFrame(() => {
+        tickRef.current?.();
+      });
     }
     return () => {
       clearTimeout(spawnTimerRef.current);
@@ -188,7 +206,7 @@ function OrbEngine({
     }
 
     setOrbs(prev => prev.map(o => o.id === orb.id ? { ...o, tapped: true } : o));
-  }, [noteInfo, preset, breathState, onOrbTap, onGateResult, audioCtxRef, progress]);
+  }, [noteInfo, preset, breathState, onOrbTap, onGateResult, progress]);
 
   if (!active || orbs.length === 0) return null;
 

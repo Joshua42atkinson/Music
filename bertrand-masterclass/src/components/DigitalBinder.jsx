@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   BookOpen, CheckCircle, UploadCloud, Clock, Send, Video, Lock, Sparkles
 } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
 import PracticeRecorder from './PracticeRecorder';
 import { TOOLS_CATALOG, FRET_INLAY_POSITIONS } from '../data/toolsData';
@@ -10,7 +11,7 @@ import FretboardExplorer from './FretboardExplorer';
 import PlingTrainer from './PlingTrainer';
 import PitchRoom from './PitchRoom';
 import BreathingGate from './BreathingGate';
-import Metronome from './Metronome';
+import SongwritingCompanion from './SongwritingCompanion';
 import PracticeTimer from './PracticeTimer';
 import IntervalVisualizer from './IntervalVisualizer';
 import MicrotonalTracker from './MicrotonalTracker';
@@ -160,7 +161,7 @@ const NeckNut = ({ isFrench }) => (
    MAIN COMPONENT
 ══════════════════════════════════════════ */
 const DigitalBinder = () => {
-  const { locale, isFrench, t } = useLocale();
+  const { locale, isFrench } = useLocale();
   const [activeToolId, setActiveToolId] = useState(null);
   
   const {
@@ -236,7 +237,7 @@ const DigitalBinder = () => {
         }
       });
     }
-  }, [isDaaSConnected]);
+  }, [isDaaSConnected, getLogs]);
 
   useEffect(() => {
     localStorage.setItem('bertrand_habits', JSON.stringify(habits));
@@ -254,11 +255,11 @@ const DigitalBinder = () => {
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const activeTool = TOOLS_CATALOG.find(t => t.id === activeToolId);
+  // activeTool is defined in renderToolContent instead
 
   // Tools that open the ambient widget instead of a full-screen overlay
   const WIDGET_TOOLS = {
-    4: 'click',  // Metronome → open in Click mode
+    // Previously Metronome (Fret 4) opened as a widget — now Troubadour's Quill renders inline
   };
 
   const localize = (val) => {
@@ -297,7 +298,7 @@ const DigitalBinder = () => {
         {item.id === 1  && <BreathingGate />}
         {item.id === 2  && <PracticeTimer />}
         {item.id === 3  && <PitchRoom />}
-        {item.id === 4  && <Metronome />}
+        {item.id === 4  && <SongwritingCompanion />}
         {item.id === 5  && <IntervalVisualizer />}
         {item.id === 6  && <FretboardExplorer compact={false} />}
         {item.id === 7  && <PlingTrainer />}
@@ -340,8 +341,8 @@ const DigitalBinder = () => {
       activeId={activeToolId}
       onItemClick={handleToolClick}
       renderContent={renderToolContent}
-      headerTitle={isFrench ? 'Classeur Numérique' : 'Digital Binder'}
-      headerSubtitle={isFrench ? 'Suivez vos entraînements et accédez aux outils.' : 'Track your practice and access tools.'}
+      headerTitle={isFrench ? "L'Atelier du Troubadour" : "Troubadour's Workshop"}
+      headerSubtitle={isFrench ? 'Vos 12 outils de pratique — un par frette.' : 'Your 12 practice tools — one per fret.'}
       showBackButton={true}
     >
       {/* ── PRACTICE LOG ── */}

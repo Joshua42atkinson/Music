@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getAudioContext, resumeAudio } from '../audio/audioEngine';
+import React, { useState, useEffect, useCallback } from 'react';
+import { resumeAudio } from '../audio/audioEngine';
 
 const intervals = [
   { name: 'Minor 2nd', semitones: 1 },
@@ -24,7 +24,7 @@ const PitchRoom = () => {
   const [options, setOptions] = useState([]);
 
 
-  const generateInterval = () => {
+  const generateInterval = useCallback(() => {
     // Pick a random base frequency between 220Hz (A3) and 440Hz (A4)
     const baseFreq = 220 * Math.pow(2, Math.random());
     
@@ -49,7 +49,7 @@ const PitchRoom = () => {
     opts.sort(() => Math.random() - 0.5);
     setOptions(opts);
     setFeedback('');
-  };
+  }, [score]);
 
   const playSynthesizedInterval = (baseFreq, targetFreq) => {
     const ctx = resumeAudio();
@@ -100,7 +100,10 @@ const PitchRoom = () => {
   // Helper effect to automatically play when a new interval is generated
   useEffect(() => {
     if (currentInterval) {
-      playSynthesizedInterval(currentInterval.baseFreq, currentInterval.targetFreq);
+      const timer = setTimeout(() => {
+        playSynthesizedInterval(currentInterval.baseFreq, currentInterval.targetFreq);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [currentInterval]);
 

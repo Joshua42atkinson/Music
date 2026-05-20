@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Disc3, SkipForward, Music, Minus, Plus, Square } from 'lucide-react';
 import { getAudioContext, resumeAudio, playMetronomeClick } from '../audio/audioEngine';
@@ -45,6 +46,8 @@ function useMetronome() {
     playMetronomeClick(beat === 0, time, volRef.current);
   }, []);
 
+  const schedulerRef = useRef();
+
   const scheduler = useCallback(() => {
     const ctx = getAudioContext();
     if (!ctx || !playRef.current) return;
@@ -54,8 +57,12 @@ function useMetronome() {
       beatRef.current  = (beatRef.current + 1) % beatsRef.current;
       setBeat(beatRef.current);
     }
-    timerRef.current = setTimeout(scheduler, 25);
+    timerRef.current = setTimeout(schedulerRef.current, 25);
   }, [scheduleNote]);
+
+  useEffect(() => {
+    schedulerRef.current = scheduler;
+  }, [scheduler]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -92,7 +99,7 @@ function useMetronome() {
 
 // ── Main component ──────────────────────────────────────────────────────
 export default function AmbientPlayer() {
-  const { locale, isFrench, t } = useLocale();
+  const { locale, isFrench } = useLocale();
   const [mode, setMode]           = useState('music');
   const [showControls, setShowControls] = useState(false);
   
@@ -111,6 +118,11 @@ export default function AmbientPlayer() {
   const [hasError, setHasError]   = useState(false);
   const audioRef = useRef(null);
   const track    = TRACKS[trackIdx];
+  const volumeRef = useRef(volume);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
 
   const metro = useMetronome();
   const handleModeSwitchRef = useRef(null);
@@ -130,12 +142,12 @@ export default function AmbientPlayer() {
 
   useEffect(() => {
     if (isPlaying) metro.stop();
-  }, [isPlaying]);
+  }, [isPlaying, metro]);
 
   useEffect(() => {
     let mounted = true;
     const audio = new Audio(track.src);
-    audio.volume = volume;
+    audio.volume = volumeRef.current;
     audio.loop   = true;
     audio.preload = 'auto';
 
@@ -156,7 +168,9 @@ export default function AmbientPlayer() {
     audio.addEventListener('error',         onError);
 
     audioRef.current = audio;
-    setHasError(false);
+    setTimeout(() => {
+      if (mounted) setHasError(false);
+    }, 0);
 
     return () => {
       mounted = false;
@@ -164,7 +178,7 @@ export default function AmbientPlayer() {
       audio.pause();
       audio.src = '';
     };
-  }, [trackIdx]);
+  }, [track.src, trackIdx]);
 
   useEffect(() => {
     const onPause  = () => audioRef.current?.pause();
@@ -185,7 +199,7 @@ export default function AmbientPlayer() {
       window.removeEventListener('ambient:resume', onResume);
       window.removeEventListener('ambient:open',   onOpen);
     };
-  }, [hasClickedOnce]);
+  }, [hasClickedOnce, metro.isPlaying]);
 
   const toggleMusic = () => {
     if (!audioRef.current) return;

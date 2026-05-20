@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FolderOpen, User, BookOpen, Send, Sparkles, CheckCircle, 
@@ -45,12 +46,16 @@ export default function MentorDashboard({ onClose }) {
         const data = await resp.json();
         setActiveLLM(data.active_backend?.name || 'Local LLM (Ollama/LM Studio)');
       }
-    } catch (_) {}
+    } catch {
+      // Offline fallback
+    }
   };
 
   useEffect(() => {
-    loadSubmissions();
-    loadInferenceStatus();
+    setTimeout(() => {
+      loadSubmissions();
+      loadInferenceStatus();
+    }, 0);
   }, []);
 
   // 3. Selection handler

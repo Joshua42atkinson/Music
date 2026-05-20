@@ -1,9 +1,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Circle } from 'lucide-react';
 import CoachingPortal from '../components/CoachingPortal';
-import PinModal from '../components/PinModal';
 import ProfileModal from '../components/ProfileModal';
 const AdventurePlayer = React.lazy(() => import('../game/AdventurePlayer'));
 import { useBackendBridge } from '../hooks/useBackendBridge';
@@ -43,33 +43,36 @@ const PORTALS = [
     image: '/assets/portal_player.png',
     description: { en: 'Take care of yourself as a musician', fr: 'Prenez soin de vous en tant que musicien' },
   },
+  {
+    id: 'playbook',
+    name: { en: 'The Playbook', fr: 'Le Grimoire' },
+    subtitle: { en: 'Your Hero\'s Guide', fr: 'Guide du Héros' },
+    path: '/playbook',
+    color: '#7b6aaa',
+    image: '/assets/portal_playbook.png',
+    description: { en: 'Character sheet, quests, journal & songwriting', fr: 'Fiche de personnage, quêtes, journal & écriture' },
+  },
 ];
 
 export default function LandingScreen() {
   const navigate = useNavigate();
   const [showCoaching, setShowCoaching] = useState(false);
-  const { locale, isFrench, toggleLocale, t } = useLocale();
+  const { isFrench, toggleLocale, t } = useLocale();
   const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
 
   const { 
-    getProfiles, getProfile, upsertProfile, verifyProfilePin,
-    earnFlorins, spendFlorins
+    getProfiles, upsertProfile
   } = useBackendBridge();
   
   const [profiles, setProfiles] = useState([]);
   const [activeProfileName, setActiveProfileName] = useState(() => {
     return localStorage.getItem('active_student_profile') || 'Jean-Luc';
   });
-  const [activeProfile, setActiveProfile] = useState(null);
   
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [newProfileName, setNewProfileName] = useState('');
   const [newProfileStyle, setNewProfileStyle] = useState('Acoustic');
   const [newProfilePin, setNewProfilePin] = useState('');
-  const [showPinModal, setShowPinModal] = useState(false);
-  const [pinTargetName, setPinTargetName] = useState('');
-  const [enteredPin, setEnteredPin] = useState('');
-  const [pinError, setPinError] = useState(false);
 
   // Adventure state
   const [showAdventure, setShowAdventure] = useState(false);
@@ -92,10 +95,7 @@ export default function LandingScreen() {
       setProfiles(list);
 
       const found = list.find(p => p.name === activeProfileName);
-      if (found) {
-        setActiveProfile(found);
-      } else if (list.length > 0) {
-        setActiveProfile(list[0]);
+      if (!found && list.length > 0) {
         setActiveProfileName(list[0].name);
         localStorage.setItem('active_student_profile', list[0].name);
       }
@@ -104,25 +104,6 @@ export default function LandingScreen() {
     syncProfiles();
   }, [getProfiles, upsertProfile, activeProfileName]);
 
-
-
-  const handlePinSubmit = async (pin) => {
-    const isCorrect = await verifyProfilePin(pinTargetName, pin);
-    if (isCorrect) {
-      setActiveProfileName(pinTargetName);
-      localStorage.setItem('active_student_profile', pinTargetName);
-      
-      const found = profiles.find(p => p.name === pinTargetName);
-      if (found) setActiveProfile(found);
-
-      setShowPinModal(false);
-      setEnteredPin('');
-      setPinError(false);
-    } else {
-      setPinError(true);
-      setEnteredPin('');
-    }
-  };
 
   return (
     <div className="landing-hub">
@@ -327,6 +308,67 @@ export default function LandingScreen() {
         @media (min-width: 768px) {
           .portals-grid { max-width: 600px; }
           .wordmark-wrap { max-width: 600px; }
+          .bertrand-banner { max-width: 600px; }
+        }
+
+        /* ── BERTRAND MARKETING BANNER ── */
+        .bertrand-banner {
+          width: 100%;
+          max-width: 540px;
+          padding: 14px 20px;
+          margin-bottom: 20px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, rgba(160,130,80,0.02) 100%);
+          border: 1px solid rgba(201,169,110,0.18);
+          backdrop-filter: blur(12px);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          position: relative;
+          z-index: 1;
+          transition: all 0.3s ease;
+        }
+        .bertrand-banner:hover {
+          border-color: rgba(201,169,110,0.35);
+          box-shadow: 0 4px 24px rgba(201,169,110,0.08);
+        }
+        .bertrand-banner-text {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .bertrand-banner-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1rem;
+          color: #f0e6d2;
+          font-weight: 500;
+        }
+        .bertrand-banner-sub {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.6rem;
+          color: rgba(201,169,110,0.45);
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+        .bertrand-banner-btn {
+          padding: 8px 16px;
+          border-radius: 10px;
+          background: linear-gradient(135deg, rgba(201,169,110,0.18), rgba(201,169,110,0.05));
+          border: 1px solid rgba(201,169,110,0.3);
+          color: #c9a96e;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.65rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.3s;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .bertrand-banner-btn:hover {
+          background: linear-gradient(135deg, rgba(201,169,110,0.3), rgba(201,169,110,0.1));
+          box-shadow: 0 4px 16px rgba(201,169,110,0.15);
         }
 
         /* ── THUMB ANCHOR ── */
@@ -436,25 +478,14 @@ export default function LandingScreen() {
               if (e.target.value === 'NEW') {
                 setShowProfileModal(true);
               } else {
-                const selectedProfile = profiles.find(p => p.name === e.target.value);
-                if (selectedProfile && selectedProfile.has_pin) {
-                  setPinTargetName(selectedProfile.name);
-                  setEnteredPin('');
-                  setPinError(false);
-                  setShowPinModal(true);
-                } else {
-                  setActiveProfileName(e.target.value);
-                  localStorage.setItem('active_student_profile', e.target.value);
-                  
-                  const found = profiles.find(p => p.name === e.target.value);
-                  if (found) setActiveProfile(found);
-                }
+                setActiveProfileName(e.target.value);
+                localStorage.setItem('active_student_profile', e.target.value);
               }
             }}
           >
             {profiles.map(p => (
               <option key={p.id} value={p.name}>
-                ⚜️ {p.name} ({isFrench ? (p.coaching_tier === 'Acoustic' ? 'Acoustique' : p.coaching_tier === 'Classical' ? 'Classique' : p.coaching_tier) : p.coaching_tier}) {p.has_pin ? '🔒' : ''}
+                ⚜️ {p.name} ({isFrench ? (p.coaching_tier === 'Acoustic' ? 'Acoustique' : p.coaching_tier === 'Classical' ? 'Classique' : p.coaching_tier) : p.coaching_tier})
               </option>
             ))}
             <option value="NEW">{t('createNewProfile')}</option>
@@ -506,17 +537,30 @@ export default function LandingScreen() {
         </div>
       </motion.div>
 
-      {/* ── PIN Verification Modal ── */}
-      <PinModal
-        show={showPinModal}
-        pinTargetName={pinTargetName}
-        enteredPin={enteredPin}
-        setEnteredPin={setEnteredPin}
-        pinError={pinError}
-        setPinError={setPinError}
-        onSubmit={handlePinSubmit}
-        onClose={() => { setShowPinModal(false); setEnteredPin(''); setPinError(false); }}
-      />
+      {/* ── Bertrand Marketing Banner (always visible) ── */}
+      <motion.div
+        className="bertrand-banner"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+      >
+        <div className="bertrand-banner-text">
+          <span className="bertrand-banner-title">
+            {isFrench ? 'Apprenez avec Bertrand →' : 'Learn with Bertrand →'}
+          </span>
+          <span className="bertrand-banner-sub">
+            {t('privateLessons')}
+          </span>
+        </div>
+        <button
+          className="bertrand-banner-btn"
+          onClick={() => setShowCoaching(true)}
+        >
+          {isFrench ? '⚜️ Coaching' : '⚜️ Book a Lesson'}
+        </button>
+      </motion.div>
+
+
 
       {/* ── Create Profile Modal ── */}
       <ProfileModal

@@ -127,45 +127,48 @@ export default function usePitchDetector() {
   const breathLowSince = useRef(null);
 
   const tick = useCallback(() => {
-    const analyser = analyserRef.current;
-    const ctx      = ctxRef.current;
-    if (!analyser || !ctx || ctx.state === 'closed') return;
+    const runTick = () => {
+      const analyser = analyserRef.current;
+      const ctx      = ctxRef.current;
+      if (!analyser || !ctx || ctx.state === 'closed') return;
 
-    const buffer = new Float32Array(analyser.fftSize);
-    analyser.getFloatTimeDomainData(buffer);
+      const buffer = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(buffer);
 
-    // Volume (RMS)
-    let rmsSum = 0;
-    for (let i = 0; i < buffer.length; i++) rmsSum += buffer[i] * buffer[i];
-    const rms = Math.sqrt(rmsSum / buffer.length);
-    const vol = Math.min(100, rms * 1500);
-    setVolume(vol);
+      // Volume (RMS)
+      let rmsSum = 0;
+      for (let i = 0; i < buffer.length; i++) rmsSum += buffer[i] * buffer[i];
+      const rms = Math.sqrt(rmsSum / buffer.length);
+      const vol = Math.min(100, rms * 1500);
+      setVolume(vol);
 
-    // ── Breath state detection ──
-    if (rms < BREATH_HELD_THRESHOLD) {
-      if (!breathLowSince.current) breathLowSince.current = performance.now();
-      const elapsed = performance.now() - breathLowSince.current;
-      if (elapsed >= BREATH_HELD_DURATION) setBreathState('held');
-      else if (elapsed >= 300)            setBreathState('shallow');
-    } else {
-      breathLowSince.current = null;
-      setBreathState('free');
-    }
+      // ── Breath state detection ──
+      if (rms < BREATH_HELD_THRESHOLD) {
+        if (!breathLowSince.current) breathLowSince.current = performance.now();
+        const elapsed = performance.now() - breathLowSince.current;
+        if (elapsed >= BREATH_HELD_DURATION) setBreathState('held');
+        else if (elapsed >= 300)            setBreathState('shallow');
+      } else {
+        breathLowSince.current = null;
+        setBreathState('free');
+      }
 
-    // ── Pitch detection ──
-    const freq = autoCorrelate(buffer, ctx.sampleRate);
-    if (freq !== -1) {
-      const noteNum  = noteFromPitch(freq);
-      const noteName = NOTE_STRINGS[noteNum % 12];
-      const octave   = Math.floor(noteNum / 12) - 1;
-      const cents    = centsOffFromPitch(freq, noteNum);
-      setPitch(freq);
-      setNoteInfo({ name: noteName, cents, octave, midi: noteNum });
-    } else {
-      setPitch(null);
-    }
+      // ── Pitch detection ──
+      const freq = autoCorrelate(buffer, ctx.sampleRate);
+      if (freq !== -1) {
+        const noteNum  = noteFromPitch(freq);
+        const noteName = NOTE_STRINGS[noteNum % 12];
+        const octave   = Math.floor(noteNum / 12) - 1;
+        const cents    = centsOffFromPitch(freq, noteNum);
+        setPitch(freq);
+        setNoteInfo({ name: noteName, cents, octave, midi: noteNum });
+      } else {
+        setPitch(null);
+      }
 
-    rafIdRef.current = requestAnimationFrame(tick);
+      rafIdRef.current = requestAnimationFrame(runTick);
+    };
+    runTick();
   }, []);
 
   const startListening = useCallback(async () => {

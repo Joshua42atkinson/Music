@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Square, Settings, Music } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { getAudioContext, resumeAudio, playPluckedString, playMetronomeClick } from '../audio/audioEngine';
 
@@ -27,6 +28,7 @@ const RhythmEngine = () => {
   const nextNoteTimeRef = useRef(0);
   const currentTickRef = useRef({ measure: 1, beat: 0 }); // 0 to 3.75 (sixteenth notes)
   const timerIDRef = useRef(null);
+  const schedulerRef = useRef(null);
   
   const lookahead = 25.0; 
   const scheduleAheadTime = 0.1; 
@@ -77,19 +79,27 @@ const RhythmEngine = () => {
       scheduleNote(currentTickRef.current.measure, currentTickRef.current.beat, nextNoteTimeRef.current);
       nextTick();
     }
-    timerIDRef.current = setTimeout(scheduler, lookahead);
+    timerIDRef.current = setTimeout(() => {
+      if (schedulerRef.current) schedulerRef.current();
+    }, lookahead);
   }, [nextTick, scheduleNote]);
+
+  useEffect(() => {
+    schedulerRef.current = scheduler;
+  }, [scheduler]);
 
   useEffect(() => {
     if (isPlaying) {
       initAudio();
       if (!timerIDRef.current) {
         currentTickRef.current = { measure: 1, beat: 0 };
-        setCurrentMeasure(1);
-        setCurrentBeat(0);
+        setTimeout(() => {
+          setCurrentMeasure(1);
+          setCurrentBeat(0);
+          scheduler();
+        }, 0);
         const ctx = getAudioContext();
         nextNoteTimeRef.current = (ctx ? ctx.currentTime : 0) + 0.05;
-        scheduler();
       }
     } else {
       clearTimeout(timerIDRef.current);

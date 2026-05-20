@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Scale, Interval } from '@tonaljs/tonal';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { resumeAudio } from '../audio/audioEngine';
 

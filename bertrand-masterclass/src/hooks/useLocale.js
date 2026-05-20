@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 const TRANSLATIONS = {
   en: {
@@ -203,7 +203,7 @@ export function useLocale() {
     try {
       const saved = localStorage.getItem('voixvive_locale');
       return saved === 'fr' ? 'fr' : 'en';
-    } catch (e) {
+    } catch {
       return 'en';
     }
   });
@@ -215,7 +215,9 @@ export function useLocale() {
       localStorage.setItem('voixvive_locale', loc);
       // Dispatch custom event to let other components know language changed
       window.dispatchEvent(new CustomEvent('locale:changed', { detail: { locale: loc } }));
-    } catch (e) {}
+    } catch {
+      // Ignore localStorage errors in sandboxed/restricted environments
+    }
   }, []);
 
   const toggleLocale = useCallback(() => {

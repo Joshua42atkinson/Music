@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wind, Timer, Music, Clock, Grid3x3, BookOpen, Mic, Activity, Zap, Video, Layers, Play } from 'lucide-react';
+import { Wind, Timer, Music, Feather, Grid3x3, BookOpen, Mic, Activity, Zap, Video, Layers, Play } from 'lucide-react';
 
 // Fret marker positions — mirroring standard guitar dot inlays
 export const FRET_INLAY_POSITIONS = new Set([3, 5, 7, 9, 12]);
@@ -24,10 +24,10 @@ export const TOOLS_CATALOG = [
     status: 'available', icon: <Music size={20} />,
   },
   {
-    id: 4, name: 'Metronome', shortName: 'Click', desc: 'Tactile Fretboard Contact',
-    telemetry: 'Tap tempo, BPM control, and rhythmic alignment',
-    protocol: 'SHEARL', phase: 'Align', chromatic: 'D#', monomyth: 'Crossing the Threshold',
-    status: 'available', icon: <Clock size={20} />,
+    id: 4, name: "Troubadour's Quill", shortName: 'Quill', desc: 'Reflective Songwriting',
+    telemetry: 'AI-assisted songwriting from your practice journals and somatic reflections',
+    protocol: 'FHEAL', phase: 'Create', chromatic: 'D#', monomyth: 'Crossing the Threshold',
+    status: 'available', icon: <Feather size={20} />,
   },
   {
     id: 5, name: 'Interval Visualizer', shortName: 'Intervals', desc: 'Interval Visualization',

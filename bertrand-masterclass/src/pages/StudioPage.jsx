@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Star, ExternalLink, Play, Gift, Users, Video, BookOpen, Mic, MessageCircle } from 'lucide-react';
 import { SERVICES, PAYMENT_METHODS, CREDENTIALS, STYLES } from '../data/pricingData';
@@ -35,7 +36,7 @@ export default function StudioPage() {
     return () => clearInterval(testimonialTimer.current);
   }, []);
 
-  const handlePayment = (stripeLink, service) => {
+  const handlePayment = (stripeLink) => {
     if (stripeLink) {
       window.open(stripeLink, '_blank');
     } else {
@@ -557,7 +558,7 @@ export default function StudioPage() {
         <div className="cta-banner">
           <h3>🎸 First Lesson — Special Rate</h3>
           <p>"Give you everything in bites... just enough to bring you to that next step."</p>
-          <button className="cta-button" onClick={() => handlePayment(null, 'trial')}>
+          <button className="cta-button" onClick={() => handlePayment(null)}>
             Book Trial Lesson — $45
           </button>
         </div>
@@ -622,7 +623,7 @@ export default function StudioPage() {
                         <div
                           key={i}
                           className="pricing-option"
-                          onClick={() => handlePayment(option.stripeLink, service)}
+                          onClick={() => handlePayment(option.stripeLink)}
                         >
                           <div>
                             <div className="pricing-label">{option.label}</div>

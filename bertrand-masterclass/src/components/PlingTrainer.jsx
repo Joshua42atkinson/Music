@@ -142,7 +142,6 @@ export default function PlingTrainer() {
   // Visual calculations
   const centsDisplay = pitch ? Math.abs(noteInfo.cents) : 0;
   const isTuned = pitch && Math.abs(noteInfo.cents) < 10;
-  const dialRotation = pitch ? (noteInfo.cents * 1.5) : 0; // Max 50 cents = 75deg rotation
 
   return (
     <div className="bard-card my-6 relative overflow-hidden backdrop-blur-xl border border-white/10 bg-white/5 rounded-2xl p-6 text-center">

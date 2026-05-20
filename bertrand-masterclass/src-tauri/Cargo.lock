@@ -5019,6 +5019,7 @@ dependencies = [
  "pin-project-lite",
  "sync_wrapper",
  "tokio",
+ "tokio-util",
  "tower-layer",
  "tower-service",
  "tracing",
@@ -5036,6 +5037,7 @@ dependencies = [
  "http-body",
  "http-body-util",
  "pin-project-lite",
+ "tokio",
  "tower-layer",
  "tower-service",
 ]
@@ -5336,6 +5338,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tokio",
  "tokio-stream",
+ "tower",
  "tower-http 0.5.2",
  "tracing",
 ]

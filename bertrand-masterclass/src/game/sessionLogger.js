@@ -4,7 +4,7 @@
 // Computes phase unlock eligibility after each session.
 // ═══════════════════════════════════════════════════════════
 
-import { loadTraction, saveTraction, updateFretTraction } from '../data/tractionStore';
+import { loadTraction, updateFretTraction } from '../data/tractionStore';
 import { db } from '../data/localDatabase';
 import { computeConsistencyRatio, computePhaseUnlock, PHASE_CONSISTENCY_MINIMUM } from './scoreCalculator';
 
@@ -18,11 +18,12 @@ const FRET_ID = 9; // Vertiscale Engine lives at Fret 9
 //   patternId: string,
 //   rounds: RoundScore[],      // array of composite scores from scoreCalculator
 //   breathEvents: string[],    // all breath samples across the session
+//   // note: breathEvents is logged to Vertiscale DB inside rounds or discarded
 // }
 // ─────────────────────────────────────────────────────────────
 
 export async function logVertiscaleSession(sessionData) {
-  const { phase, patternId, rounds, breathEvents } = sessionData;
+  const { phase, patternId, rounds } = sessionData;
 
   const compositeScores = rounds.map(r => r.composite);
   const consistencyRatio = computeConsistencyRatio(compositeScores);

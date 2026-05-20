@@ -60,7 +60,7 @@ MOONSHOT LAYER (Built after income is proven)
 | PracticeRecorder (video/audio → IndexedDB) | ✅ |
 | AmbientPlayer (Bertrand's "Houlton Skies") | ✅ |
 | Welcome onboarding flow | ✅ |
-| Digital Binder (practice log + submissions) | ✅ |
+| Troubadour Playbook (practice log + submissions) | ✅ |
 | FretboardExplorer (14-fret + scales + Web Audio) | ✅ |
 | SEO (JSON-LD, Open Graph, Twitter Cards) | ✅ |
 | Bottom nav (Chapters, Fretboard, Binder, Studio) | ✅ |

@@ -1,4 +1,6 @@
-use std::process::Command;
+use tokio::process::Command;
+use tokio::time::timeout;
+use std::time::Duration;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
@@ -36,10 +38,10 @@ pub fn frequency_to_note(freq: f64) -> (String, f64) {
 }
 
 /// Spawns local ffmpeg command to extract mono 16kHz WAV from video
-pub fn extract_audio_ffmpeg(video_path: &str, wav_output_path: &str) -> anyhow::Result<()> {
+pub async fn extract_audio_ffmpeg(video_path: &str, wav_output_path: &str) -> anyhow::Result<()> {
     info!("🎬 Spawning FFmpeg to extract audio: {} -> {}", video_path, wav_output_path);
     
-    let status = Command::new("ffmpeg")
+    let mut child = Command::new("ffmpeg")
         .args(&[
             "-y",
             "-i", video_path,
@@ -49,7 +51,15 @@ pub fn extract_audio_ffmpeg(video_path: &str, wav_output_path: &str) -> anyhow::
             "-ac", "1",
             wav_output_path
         ])
-        .status()?;
+        .spawn()?;
+
+    let status = match timeout(Duration::from_secs(30), child.wait()).await {
+        Ok(res) => res?,
+        Err(_) => {
+            child.kill().await.ok();
+            return Err(anyhow::anyhow!("FFmpeg audio extraction timed out after 30 seconds"));
+        }
+    };
         
     if !status.success() {
         return Err(anyhow::anyhow!("FFmpeg audio extraction failed with status {:?}", status));
@@ -140,14 +150,14 @@ pub fn analyze_wav_pitch(wav_path: &str) -> anyhow::Result<Vec<PitchPoint>> {
 }
 
 /// Combined processing utility: processes video, extracts pitch telemetry and saves to DB
-pub fn preprocess_video(video_path: &str) -> anyhow::Result<(String, Vec<PitchPoint>)> {
+pub async fn preprocess_video(video_path: &str) -> anyhow::Result<(String, Vec<PitchPoint>)> {
     let video_dir = Path::new(video_path).parent().unwrap_or_else(|| Path::new("."));
     let file_stem = Path::new(video_path).file_stem().and_then(|s| s.to_str()).unwrap_or("temp");
     
     let wav_path = video_dir.join(format!("{}.wav", file_stem));
     let wav_path_str = wav_path.to_string_lossy().to_string();
     
-    extract_audio_ffmpeg(video_path, &wav_path_str)?;
+    extract_audio_ffmpeg(video_path, &wav_path_str).await?;
     let points = analyze_wav_pitch(&wav_path_str)?;
     
     Ok((wav_path_str, points))

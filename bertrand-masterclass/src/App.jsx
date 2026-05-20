@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ScaffoldingProvider } from './components/ScaffoldingProvider';
 import AmbientPlayer from './components/AmbientPlayer';
+import HealthPulse from './components/HealthPulse';
 import WelcomeOnboarding from './components/WelcomeOnboarding';
 
 // ── Eagerly loaded: first paint ──
@@ -14,6 +15,7 @@ const OrientationHub = React.lazy(() => import('./pages/OrientationHub'));
 const StudioPage = React.lazy(() => import('./pages/StudioPage'));
 const VertiscaleEngine = React.lazy(() => import('./game/VertiscaleEngine'));
 const MentorTools = React.lazy(() => import('./components/MentorTools'));
+const PlaybookShell = React.lazy(() => import('./components/playbook/PlaybookShell'));
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = React.lazy(() => import('./pages/TermsOfService'));
 
@@ -64,6 +66,7 @@ function AppContent() {
     <div className="min-h-screen bg-cf-void text-cf-ink relative">
       <WelcomeOnboarding />
       <AmbientPlayer />
+      <HealthPulse />
       <Suspense fallback={<LoadingScreen />}>
         <AnimatePresence mode="wait">
           <Routes>
@@ -71,6 +74,7 @@ function AppContent() {
             <Route path="/song" element={<OrientationHub />} />
             <Route path="/guitar" element={<ErrorBoundary><VertiscaleEngine /></ErrorBoundary>} />
             <Route path="/player" element={<ErrorBoundary><MentorTools /></ErrorBoundary>} />
+            <Route path="/playbook" element={<ErrorBoundary><PlaybookShell /></ErrorBoundary>} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/studio" element={<ErrorBoundary><StudioPage /></ErrorBoundary>} />

@@ -70,33 +70,39 @@ export default function useFlashTimer({
 
   // Countdown ticker for TAP window (for UI progress bar)
   const tickTapCountdown = useCallback((endTime) => {
-    const now = performance.now();
-    const remaining = Math.max(0, endTime - now);
-    setTimeRemaining(remaining);
-    if (remaining > 0) {
-      rafRef.current = requestAnimationFrame(() => tickTapCountdown(endTime));
-    }
+    const tick = () => {
+      const now = performance.now();
+      const remaining = Math.max(0, endTime - now);
+      setTimeRemaining(remaining);
+      if (remaining > 0) {
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+    tick();
   }, []);
 
   // Count-UP ticker for HOLD window (for UI progress ring)
   const tickHoldCountup = useCallback((startTime, durationMs) => {
-    const now = performance.now();
-    const elapsed = now - startTime;
-    const remaining = Math.max(0, durationMs - elapsed);
-    setTimeRemaining(remaining);
-    if (elapsed >= durationMs) {
-      // Hold complete!
-      setFlashState(FLASH_STATES.HOLD_RESULT);
-      setTimeRemaining(0);
-      onHoldComplete?.();
+    const tick = () => {
+      const now = performance.now();
+      const elapsed = now - startTime;
+      const remaining = Math.max(0, durationMs - elapsed);
+      setTimeRemaining(remaining);
+      if (elapsed >= durationMs) {
+        // Hold complete!
+        setFlashState(FLASH_STATES.HOLD_RESULT);
+        setTimeRemaining(0);
+        onHoldComplete?.();
 
-      timerRef.current = setTimeout(() => {
-        setFlashState(FLASH_STATES.IDLE);
-        onHoldResultEnd?.();
-      }, RESULT_DISPLAY_MS);
-      return;
-    }
-    rafRef.current = requestAnimationFrame(() => tickHoldCountup(startTime, durationMs));
+        timerRef.current = setTimeout(() => {
+          setFlashState(FLASH_STATES.IDLE);
+          onHoldResultEnd?.();
+        }, RESULT_DISPLAY_MS);
+        return;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    tick();
   }, [onHoldComplete, onHoldResultEnd]);
 
   // ── FLASH MODE: start a round ──

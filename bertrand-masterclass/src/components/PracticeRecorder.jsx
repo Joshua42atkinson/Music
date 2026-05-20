@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Video, Mic, Square, Play, Pause, RotateCcw, Send, X, Clock, CheckCircle } from 'lucide-react';
 import { db } from '../data/localDatabase';
@@ -29,6 +30,13 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
   const videoLiveRef = useRef(null);
   const blobRef = useRef(null);
 
+  const stopStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  };
+
   // ── Cleanup on unmount ──
   useEffect(() => {
     return () => {
@@ -36,13 +44,6 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
       clearInterval(timerRef.current);
     };
   }, []);
-
-  const stopStream = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-  };
 
   // ── Start Recording ──
   const startRecording = async () => {

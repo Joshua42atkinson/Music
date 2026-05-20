@@ -10,8 +10,6 @@ pub struct StudentProfile {
     pub current_chapter: i32,
     pub xp: i32,
     pub coaching_tier: String,
-    pub has_pin: Option<bool>,
-    pub pin: Option<String>,
     pub florins: Option<i32>,
 }
 
@@ -44,13 +42,7 @@ pub struct Database {
     pub pool: SqlitePool,
 }
 
-fn hash_pin(pin: &str) -> String {
-    let mut hash: u64 = 5381;
-    for c in pin.chars() {
-        hash = ((hash << 5).wrapping_add(hash)).wrapping_add(c as u64);
-    }
-    format!("{:x}", hash)
-}
+
 
 impl Database {
     pub async fn init() -> Self {
@@ -77,6 +69,12 @@ impl Database {
             .connect(&db_url)
             .await
             .expect("Failed to connect to SQLite database");
+
+        // Enforce WAL mode, Normal Synchronous, and a reasonable busy timeout
+        sqlx::query("PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA busy_timeout = 5000;")
+            .execute(&pool)
+            .await
+            .expect("Failed to set SQLite Pragmas");
 
         let db = Self { pool };
         db.run_migrations().await;
@@ -158,129 +156,98 @@ impl Database {
     // --- Helper operations ---
 
     pub async fn get_all_profiles(&self) -> Vec<StudentProfile> {
-        match sqlx::query_as::<_, (String, String, i32, i32, String, Option<bool>, i32)>(
-            "SELECT id, name, current_chapter, xp, coaching_tier, (pin_hash IS NOT NULL AND pin_hash != ''), florins FROM student_profile ORDER BY name ASC"
+        match sqlx::query_as::<_, (String, String, i32, i32, String, i32)>(
+            "SELECT id, name, current_chapter, xp, coaching_tier, florins FROM student_profile ORDER BY name ASC"
         )
         .fetch_all(&self.pool)
         .await {
-            Ok(rows) => rows.into_iter().map(|row| StudentProfile {
-                id: row.0,
-                name: row.1,
-                current_chapter: row.2,
-                xp: row.3,
-                coaching_tier: row.4,
-                has_pin: Some(row.5.unwrap_or(false)),
-                pin: None,
-                florins: Some(row.6),
+            Ok(rows) => rows.into_iter().map(|row| {
+                StudentProfile {
+                    id: row.0,
+                    name: row.1,
+                    current_chapter: row.2,
+                    xp: row.3,
+                    coaching_tier: row.4,
+                    florins: Some(row.5),
+                }
             }).collect(),
-            Err(_) => vec![],
+            Err(e) => {
+                tracing::error!("❌ Failed to get all student profiles from SQLite: {:?}", e);
+                vec![]
+            }
         }
     }
 
     pub async fn get_profile_by_name(&self, name: &str) -> Option<StudentProfile> {
-        sqlx::query_as::<_, (String, String, i32, i32, String, Option<bool>, i32)>(
-            "SELECT id, name, current_chapter, xp, coaching_tier, (pin_hash IS NOT NULL AND pin_hash != ''), florins FROM student_profile WHERE name = ?"
-        )
-        .bind(name)
-        .fetch_optional(&self.pool)
-        .await
-        .ok()
-        .flatten()
-        .map(|row| StudentProfile {
-            id: row.0,
-            name: row.1,
-            current_chapter: row.2,
-            xp: row.3,
-            coaching_tier: row.4,
-            has_pin: Some(row.5.unwrap_or(false)),
-            pin: None,
-            florins: Some(row.6),
-        })
-    }
-
-    pub async fn get_profile(&self) -> Option<StudentProfile> {
-        sqlx::query_as::<_, (String, String, i32, i32, String, Option<bool>, i32)>(
-            "SELECT id, name, current_chapter, xp, coaching_tier, (pin_hash IS NOT NULL AND pin_hash != ''), florins FROM student_profile LIMIT 1"
-        )
-        .fetch_optional(&self.pool)
-        .await
-        .ok()
-        .flatten()
-        .map(|row| StudentProfile {
-            id: row.0,
-            name: row.1,
-            current_chapter: row.2,
-            xp: row.3,
-            coaching_tier: row.4,
-            has_pin: Some(row.5.unwrap_or(false)),
-            pin: None,
-            florins: Some(row.6),
-        })
-    }
-
-    pub async fn verify_profile_pin(&self, name: &str, pin: &str) -> bool {
-        let expected = hash_pin(pin);
-        match sqlx::query_as::<_, (String,)>(
-            "SELECT pin_hash FROM student_profile WHERE name = ?"
+        match sqlx::query_as::<_, (String, String, i32, i32, String, i32)>(
+            "SELECT id, name, current_chapter, xp, coaching_tier, florins FROM student_profile WHERE name = ?"
         )
         .bind(name)
         .fetch_optional(&self.pool)
         .await {
-            Ok(Some(row)) => row.0 == expected,
-            _ => false,
+            Ok(Some(row)) => {
+                Some(StudentProfile {
+                    id: row.0,
+                    name: row.1,
+                    current_chapter: row.2,
+                    xp: row.3,
+                    coaching_tier: row.4,
+                    florins: Some(row.5),
+                })
+            }
+            Ok(None) => None,
+            Err(e) => {
+                tracing::error!("❌ Failed to get student profile by name '{}' from SQLite: {:?}", name, e);
+                None
+            }
+        }
+    }
+
+    pub async fn get_profile(&self) -> Option<StudentProfile> {
+        match sqlx::query_as::<_, (String, String, i32, i32, String, i32)>(
+            "SELECT id, name, current_chapter, xp, coaching_tier, florins FROM student_profile LIMIT 1"
+        )
+        .fetch_optional(&self.pool)
+        .await {
+            Ok(Some(row)) => {
+                Some(StudentProfile {
+                    id: row.0,
+                    name: row.1,
+                    current_chapter: row.2,
+                    xp: row.3,
+                    coaching_tier: row.4,
+                    florins: Some(row.5),
+                })
+            }
+            Ok(None) => None,
+            Err(e) => {
+                tracing::error!("❌ Failed to get student profile from SQLite: {:?}", e);
+                None
+            }
         }
     }
 
     pub async fn upsert_profile(&self, profile: &StudentProfile) -> anyhow::Result<()> {
-        let pin_val = profile.pin.as_deref().unwrap_or("").trim();
-        let hash_val = if !pin_val.is_empty() {
-            Some(hash_pin(pin_val))
-        } else {
-            None
-        };
         let florins_val = profile.florins.unwrap_or(100);
 
-        if hash_val.is_some() {
-            sqlx::query(
-                "INSERT INTO student_profile (id, name, current_chapter, xp, coaching_tier, pin_hash, florins)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                 ON CONFLICT(id) DO UPDATE SET
-                    name = excluded.name,
-                    current_chapter = excluded.current_chapter,
-                    xp = excluded.xp,
-                    coaching_tier = excluded.coaching_tier,
-                    pin_hash = excluded.pin_hash,
-                    florins = excluded.florins"
-            )
-            .bind(&profile.id)
-            .bind(&profile.name)
-            .bind(profile.current_chapter)
-            .bind(profile.xp)
-            .bind(&profile.coaching_tier)
-            .bind(hash_val)
-            .bind(florins_val)
-            .execute(&self.pool)
-            .await?;
-        } else {
-            sqlx::query(
-                "INSERT INTO student_profile (id, name, current_chapter, xp, coaching_tier, florins)
-                 VALUES (?, ?, ?, ?, ?, ?)
-                 ON CONFLICT(id) DO UPDATE SET
-                    name = excluded.name,
-                    current_chapter = excluded.current_chapter,
-                    xp = excluded.xp,
-                    coaching_tier = excluded.coaching_tier,
-                    florins = excluded.florins"
-            )
-            .bind(&profile.id)
-            .bind(&profile.name)
-            .bind(profile.current_chapter)
-            .bind(profile.xp)
-            .bind(&profile.coaching_tier)
-            .bind(florins_val)
-            .execute(&self.pool)
-            .await?;
-        }
+        sqlx::query(
+            "INSERT INTO student_profile (id, name, current_chapter, xp, coaching_tier, florins)
+             VALUES (?, ?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO UPDATE SET
+                name = excluded.name,
+                current_chapter = excluded.current_chapter,
+                xp = excluded.xp,
+                coaching_tier = excluded.coaching_tier,
+                florins = excluded.florins"
+        )
+        .bind(&profile.id)
+        .bind(&profile.name)
+        .bind(profile.current_chapter)
+        .bind(profile.xp)
+        .bind(&profile.coaching_tier)
+        .bind(florins_val)
+        .execute(&self.pool)
+        .await?;
 
         Ok(())
     }
@@ -329,7 +296,10 @@ impl Database {
                 recording_path: row.5,
                 student_name: Some(row.6),
             }).collect(),
-            Err(_) => vec![],
+            Err(e) => {
+                tracing::error!("❌ Failed to get practice logs from SQLite: {:?}", e);
+                vec![]
+            }
         }
     }
 
@@ -349,7 +319,10 @@ impl Database {
                 recording_path: row.5,
                 student_name: Some(row.6),
             }).collect(),
-            Err(_) => vec![],
+            Err(e) => {
+                tracing::error!("❌ Failed to get practice logs by student '{}' from SQLite: {:?}", student_name, e);
+                vec![]
+            }
         }
     }
 
@@ -393,32 +366,39 @@ impl Database {
                 troubadour_draft: row.8,
                 status: row.9,
             }).collect(),
-            Err(_) => vec![],
+            Err(e) => {
+                tracing::error!("❌ Failed to get submissions from SQLite: {:?}", e);
+                vec![]
+            }
         }
     }
 
     pub async fn get_submission_by_id(&self, id: &str) -> Option<StudentSubmission> {
-        sqlx::query_as::<_, (String, String, String, String, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, String)>(
+        match sqlx::query_as::<_, (String, String, String, String, Option<String>, Option<String>, Option<String>, Option<String>, Option<String>, String)>(
             "SELECT id, student_name, exercise_name, video_path, audio_path, transcript, telemetry_json, pythagoras_scorecard, troubadour_draft, status 
              FROM student_submissions WHERE id = ?"
         )
         .bind(id)
         .fetch_optional(&self.pool)
-        .await
-        .ok()
-        .flatten()
-        .map(|row| StudentSubmission {
-            id: row.0,
-            student_name: row.1,
-            exercise_name: row.2,
-            video_path: row.3,
-            audio_path: row.4,
-            transcript: row.5,
-            telemetry_json: row.6,
-            pythagoras_scorecard: row.7,
-            troubadour_draft: row.8,
-            status: row.9,
-        })
+        .await {
+            Ok(Some(row)) => Some(StudentSubmission {
+                id: row.0,
+                student_name: row.1,
+                exercise_name: row.2,
+                video_path: row.3,
+                audio_path: row.4,
+                transcript: row.5,
+                telemetry_json: row.6,
+                pythagoras_scorecard: row.7,
+                troubadour_draft: row.8,
+                status: row.9,
+            }),
+            Ok(None) => None,
+            Err(e) => {
+                tracing::error!("❌ Failed to get submission by id '{}' from SQLite: {:?}", id, e);
+                None
+            }
+        }
     }
 
     pub async fn upsert_submission(&self, sub: &StudentSubmission) -> anyhow::Result<()> {
@@ -450,5 +430,49 @@ impl Database {
         .await?;
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    async fn setup_test_db() -> Database {
+        let pool = SqlitePoolOptions::new()
+            .connect("sqlite::memory:")
+            .await
+            .expect("Failed to connect to in-memory SQLite");
+        
+        let db = Database { pool };
+        db.run_migrations().await;
+        db
+    }
+
+
+    #[tokio::test]
+    async fn test_florin_transactions() {
+        let db = setup_test_db().await;
+        let profile = StudentProfile {
+            id: "test-id-2".to_string(),
+            name: "Florin Test".to_string(),
+            current_chapter: 2,
+            xp: 100,
+            coaching_tier: "free".to_string(),
+            florins: Some(100),
+        };
+
+        db.upsert_profile(&profile).await.unwrap();
+
+        // Earn florins
+        let earned = db.earn_florins("Florin Test", 50).await.unwrap();
+        assert_eq!(earned, 150);
+
+        // Spend florins within limit
+        let spent = db.spend_florins("Florin Test", 30).await.unwrap();
+        assert_eq!(spent, 120);
+
+        // Spend too many florins
+        let overspend = db.spend_florins("Florin Test", 200).await;
+        assert!(overspend.is_err());
     }
 }

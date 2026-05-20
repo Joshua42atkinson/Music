@@ -12,6 +12,7 @@ const Metronome = () => {
   const nextNoteTimeRef = useRef(0);
   const currentBeatRef = useRef(0);
   const timerIDRef = useRef(null);
+  const schedulerRef = useRef(null);
   const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
   const scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)
 
@@ -40,15 +41,23 @@ const Metronome = () => {
       scheduleNote(currentBeatRef.current, nextNoteTimeRef.current);
       nextNote();
     }
-    timerIDRef.current = setTimeout(scheduler, lookahead);
+    timerIDRef.current = setTimeout(() => {
+      if (schedulerRef.current) schedulerRef.current();
+    }, lookahead);
   }, [nextNote, scheduleNote]);
+
+  useEffect(() => {
+    schedulerRef.current = scheduler;
+  }, [scheduler]);
 
   useEffect(() => {
     if (isPlaying) {
       initAudio();
       if (!timerIDRef.current) {
         currentBeatRef.current = 0;
-        setCurrentBeat(0);
+        setTimeout(() => {
+          setCurrentBeat(0);
+        }, 0);
         const ctx = getAudioContext();
         nextNoteTimeRef.current = (ctx ? ctx.currentTime : 0) + 0.05;
         scheduler();

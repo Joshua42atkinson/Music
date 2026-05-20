@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loadTraction, saveTraction, getScaffoldingLevel } from '../data/tractionStore';
 import { saveProgress, getProgress } from '../data/localDatabase';
@@ -17,7 +18,11 @@ const ScaffoldingContext = createContext(null);
 
 export function ScaffoldingProvider({ children }) {
   const [traction, setTraction] = useState(loadTraction());
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(() => {
+    const localState = loadTraction();
+    const isEmptyState = !localState.lastPracticeDate && localState.bardLevel <= 1 && localState.practiceMinutes === 0;
+    return !isEmptyState;
+  });
 
   // ── On mount: hydrate from IndexedDB if localStorage is empty ──
   // This restores progress after a browser data clear or private mode session.
@@ -35,8 +40,6 @@ export function ScaffoldingProvider({ children }) {
         }
         setIsHydrated(true);
       });
-    } else {
-      setIsHydrated(true);
     }
   }, []);
 

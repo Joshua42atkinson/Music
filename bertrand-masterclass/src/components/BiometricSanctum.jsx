@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { Sparkles, Heart } from 'lucide-react';
 import { useLocale } from '../hooks/useLocale';
@@ -19,7 +20,7 @@ const PRESETS = {
 };
 
 export default function BiometricSanctum({ onBiometricsChange }) {
-  const { t, isFrench } = useLocale();
+  const { isFrench } = useLocale();
   const canvasRef = useRef(null);
   const [preset, setPreset] = useState('flow');
   const { hr, hrv, alpha, beta, theta } = PRESETS[preset];
@@ -34,7 +35,7 @@ export default function BiometricSanctum({ onBiometricsChange }) {
       alphaPower: alpha, betaPower: beta, thetaPower: theta,
       isSimulating: true, museConnected: false, pulseConnected: false
     });
-  }, [preset]);
+  }, [preset, flowIndex, stressLevel, hrv, hr, alpha, beta, theta, onBiometricsChange]);
 
   // Scrolling waveform animation
   useEffect(() => {

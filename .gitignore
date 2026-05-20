@@ -20,3 +20,16 @@ generated_pdfs/
 server.log
 conscious_framework_legacy_archive.tar.gz
 Music
+
+# Training artifacts — model weights are too large for git
+bertrand-masterclass/training/outputs*/
+bertrand-masterclass/training/merged_model*/
+bertrand-masterclass/training/.venv/
+bertrand-masterclass/training/unsloth_compiled_cache/
+bertrand-masterclass/training/__pycache__/
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.gguf
+*.onnx

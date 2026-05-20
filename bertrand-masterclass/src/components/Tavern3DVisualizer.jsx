@@ -333,7 +333,7 @@ export default function Tavern3DVisualizer({
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [pitch, cents, volume, gateState, atmosphere]);
+  }, [pitch, cents, volume, gateState, atmosphere, flowIndex, hrv, isFrench, stressLevel]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>

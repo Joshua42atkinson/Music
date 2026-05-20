@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scale, Interval } from '@tonaljs/tonal';
-import { getAudioContext, resumeAudio } from '../audio/audioEngine';
+import { resumeAudio } from '../audio/audioEngine';
 
 // ═══════════════════════════════════════════════════════════
 // FULL 12-FRET FRETBOARD EXPLORER
@@ -52,12 +53,12 @@ const TONAL_SCALES = {
   chromatic:        { label: 'Chromatic', tonalName: 'chromatic', color: '#95a5a6' },
 };
 
-const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = false, presetRoot, presetScale }) => {
+const FretboardExplorer = ({ maxFret, fretLimit, compact = false, presetRoot, presetScale }) => {
   const [activeNote, setActiveNote] = useState(null);
   const [activeScale, setActiveScale] = useState(presetScale || null);
   const [rootNote, setRootNote] = useState(presetRoot ?? 0);
   const [showNoteNames, setShowNoteNames] = useState(true);
-  const [showDots, setShowDots] = useState(true);
+  const [showDots] = useState(true);
   // Orientation: 'auto' detects portrait/landscape; can be manually overridden
   const [orientation, setOrientation] = useState('auto');
   const isPortrait = typeof window !== 'undefined'
@@ -79,10 +80,20 @@ const FretboardExplorer = ({ maxFret, highlightPattern, fretLimit, compact = fal
 
   // Sync presets when they change (e.g. switching chapters)
   useEffect(() => {
-    if (presetRoot != null) setRootNote(presetRoot);
+    if (presetRoot != null) {
+      const timer = setTimeout(() => {
+        setRootNote(presetRoot);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
   }, [presetRoot]);
   useEffect(() => {
-    if (presetScale !== undefined) setActiveScale(presetScale);
+    if (presetScale !== undefined) {
+      const timer = setTimeout(() => {
+        setActiveScale(presetScale);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
   }, [presetScale]);
 
   const playNote = useCallback((freq) => {

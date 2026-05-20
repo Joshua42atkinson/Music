@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import frets from '../data/chapterData';
 import { generateSlides } from '../data/slideGenerator';
@@ -26,7 +27,7 @@ const slideVariants = {
 };
 
 const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
-  const { locale, isFrench, t } = useLocale();
+  const { locale, isFrench } = useLocale();
 
   const localize = useCallback((val) => {
     if (!val) return '';
@@ -37,7 +38,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
   }, [locale]);
 
   const fret = frets.find(c => c.id === fretId) || frets[0];
-  const slides = generateSlides(fret);
+  const slides = useMemo(() => generateSlides(fret), [fret]);
   // Initialize from the student's last saved position for this fret
   const [currentIdx, setCurrentIdx] = useState(() => {
     const saved = getSlidePosition(fretId);
@@ -46,21 +47,25 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
   });
   const [direction, setDirection] = useState(0);
   const [fretboardOpen, setFretboardOpen] = useState(false);
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(() => {
+    try {
+      return !localStorage.getItem('voix_vive_swipe_hint_seen');
+    } catch {
+      return true;
+    }
+  });
   const slide = slides[currentIdx];
 
   // Show swipe hint only once, ever
   useEffect(() => {
-    const seen = localStorage.getItem('voix_vive_swipe_hint_seen');
-    if (!seen) {
-      setShowSwipeHint(true);
+    if (showSwipeHint) {
       const timer = setTimeout(() => {
         setShowSwipeHint(false);
         localStorage.setItem('voix_vive_swipe_hint_seen', '1');
       }, 3500);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [showSwipeHint]);
 
   const goTo = useCallback((idx, dir) => {
     if (idx < 0 || idx >= slides.length) return;
@@ -68,7 +73,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     setCurrentIdx(idx);
     // Persist position so student can resume where they left off
     saveSlidePosition(fretId, idx);
-  }, [slides.length, fretId]);
+  }, [slides, fretId]);
 
   const handleNext = () => goTo(currentIdx + 1, 1);
   const handlePrev = () => goTo(currentIdx - 1, -1);
@@ -89,11 +94,6 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     const nextId = fretId < 12 ? fretId + 1 : 1;
     setCurrentIdx(0);
     if (onFretChange) onFretChange(nextId);
-  };
-  const goPrevFret = () => {
-    const prevId = fretId > 1 ? fretId - 1 : 12;
-    setCurrentIdx(0);
-    if (onFretChange) onFretChange(prevId);
   };
 
   const openFretboard = () => {
@@ -778,7 +778,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
 
           {/* References panel — expandable */}
           {slide.references?.length > 0 && (
-            <ReferencesPanel references={slide.references} accent={slide.accent} isFrench={isFrench} />
+            <ReferencesPanel references={slide.references} isFrench={isFrench} />
           )}
         </div>
       );
@@ -789,7 +789,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
 }
 
 // ── References Panel — Expandable citations ──
-function ReferencesPanel({ references, accent, isFrench }) {
+function ReferencesPanel({ references, isFrench }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ marginTop: '0.5rem' }}>

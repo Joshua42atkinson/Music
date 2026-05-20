@@ -3,18 +3,27 @@ use axum::{
     Router,
     Json,
     extract::State,
+    error_handling::HandleErrorLayer,
+    http::StatusCode,
+    BoxError,
 };
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tower_http::cors::{CorsLayer, Any};
+use tower::{ServiceBuilder, timeout::TimeoutLayer};
+use std::time::Duration;
+use tokio::signal;
 use tracing::{info, error};
 
 use crate::db::{Database, StudentProfile, PracticeLog, StudentSubmission};
 use crate::inference::InferenceRouter;
 use crate::ffmpeg::preprocess_video;
-use crate::socratic_judge::{run_socratic_evaluation, SocraticEvaluation};
+use crate::socratic_judge::{
+    run_socratic_evaluation, SocraticEvaluation,
+    generate_offline_pythagoras_scorecard, generate_offline_troubadour_draft
+};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -47,15 +56,28 @@ pub async fn start_server(db: Arc<Database>, router: Arc<RwLock<InferenceRouter>
         http_client: Client::new(),
     };
 
-    // Enable CORS for DaaS capability (let any local client connect)
+    // CORS: Whitelist known origins only
+    let allowed_origins = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:4173",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    ];
     let cors = CorsLayer::new()
-        .allow_origin(Any)
+        .allow_origin(
+            allowed_origins
+                .iter()
+                .filter_map(|o| o.parse().ok())
+                .collect::<Vec<axum::http::HeaderValue>>(),
+        )
         .allow_methods(Any)
         .allow_headers(Any);
 
     let app = Router::new()
         // Core System
         .route("/api/health", get(health_check))
+        .route("/api/health/deep", get(deep_health_check))
         
         // Inference Router APIs
         .route("/api/inference/status", get(get_inference_status))
@@ -69,7 +91,6 @@ pub async fn start_server(db: Arc<Database>, router: Arc<RwLock<InferenceRouter>
         // Database API Routes
         .route("/api/db/profiles", get(get_all_student_profiles))
         .route("/api/db/profile", get(get_student_profile).post(upsert_student_profile))
-        .route("/api/db/profiles/verify", post(verify_student_profile_pin))
         .route("/api/db/profiles/earn", post(earn_student_florins))
         .route("/api/db/profiles/spend", post(spend_student_florins))
         .route("/api/db/logs", get(get_practice_logs).post(insert_practice_log))
@@ -80,13 +101,27 @@ pub async fn start_server(db: Arc<Database>, router: Arc<RwLock<InferenceRouter>
         .route("/api/mentor/evaluate", post(evaluate_submission))
         .route("/api/mentor/submit_review", post(submit_review))
         
+        .layer(
+            ServiceBuilder::new()
+                .layer(HandleErrorLayer::new(|err: BoxError| async move {
+                    if err.is::<tower::timeout::error::Elapsed>() {
+                        Ok(StatusCode::REQUEST_TIMEOUT)
+                    } else {
+                        Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Unhandled error: {}", err)))
+                    }
+                }))
+                .layer(TimeoutLayer::new(Duration::from_secs(60)))
+        )
         .layer(cors)
         .with_state(state);
 
     match tokio::net::TcpListener::bind("0.0.0.0:8080").await {
         Ok(listener) => {
             info!("🎙️ DaaS Axum Server running on 0.0.0.0:8080");
-            if let Err(e) = axum::serve(listener, app).await {
+            if let Err(e) = axum::serve(listener, app)
+                .with_graceful_shutdown(shutdown_signal())
+                .await 
+            {
                 error!("❌ Failed to serve Axum application: {}", e);
             }
         }
@@ -97,8 +132,55 @@ pub async fn start_server(db: Arc<Database>, router: Arc<RwLock<InferenceRouter>
     }
 }
 
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+    info!("🛑 Shutdown signal received, draining connections gracefully...");
+}
+
 async fn health_check() -> &'static str {
     "Voix Vive DaaS Server is running!"
+}
+
+async fn deep_health_check(
+    State(state): State<AppState>,
+) -> Json<serde_json::Value> {
+    let profiles = state.db.get_all_profiles().await;
+    let logs = state.db.get_logs().await;
+
+    let router_guard = state.router.read().await;
+    let backends = router_guard.get_status();
+    let active = router_guard.active_backend();
+    drop(router_guard);
+
+    Json(serde_json::json!({
+        "status": "healthy",
+        "version": env!("CARGO_PKG_VERSION"),
+        "profiles_count": profiles.len(),
+        "logs_count": logs.len(),
+        "active_llm": active.name,
+        "available_llms": backends.len(),
+        "sqlite": "connected",
+    }))
 }
 
 // --- Inference router APIs ---
@@ -234,21 +316,6 @@ async fn upsert_student_profile(
         Err(e) => Json(serde_json::json!({ "success": false, "error": e.to_string() })),
     }
 }
-
-#[derive(Deserialize)]
-struct PinVerificationRequest {
-    name: String,
-    pin: String,
-}
-
-async fn verify_student_profile_pin(
-    State(state): State<AppState>,
-    Json(payload): Json<PinVerificationRequest>,
-) -> Json<serde_json::Value> {
-    let valid = state.db.verify_profile_pin(&payload.name, &payload.pin).await;
-    Json(serde_json::json!({ "success": valid }))
-}
-
 async fn get_practice_logs(
     State(state): State<AppState>,
     axum::extract::Query(params): axum::extract::Query<LogQuery>,
@@ -315,7 +382,7 @@ async fn evaluate_submission(
     };
 
     // 1. Spawns FFmpeg and analyze pitch
-    let (audio_path, pitch_points) = match preprocess_video(&sub.video_path) {
+    let (audio_path, pitch_points) = match preprocess_video(&sub.video_path).await {
         Ok(res) => (Some(res.0), res.1),
         Err(e) => {
             error!("FFmpeg preprocessing failed: {:?}", e);
@@ -349,9 +416,10 @@ async fn evaluate_submission(
         Ok(eval) => eval,
         Err(e) => {
             error!("Socratic AI evaluation failed: {:?}", e);
+            let is_french = lang == "fr" || lang == "French";
             SocraticEvaluation {
-                pythagoras_scorecard: "### Pythagoras Scorecard\n- Note Accuracy: 92%\n- Rhythm stability: 88%\n- Cents drift: Minor Sharp drift on shift".to_string(),
-                troubadour_draft: "Greetings, fellow seeker of the Pling. Your somatic resonance was strong. Did your thumb feel tense when you shifted from E to F?".to_string(),
+                pythagoras_scorecard: generate_offline_pythagoras_scorecard(&telemetry_str, is_french),
+                troubadour_draft: generate_offline_troubadour_draft(&telemetry_str, &sub.student_name, &sub.exercise_name, &student_struggle, is_french),
             }
         }
     };
