@@ -5,7 +5,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ScaffoldingProvider } from './components/ScaffoldingProvider';
 import AmbientPlayer from './components/AmbientPlayer';
 import HealthPulse from './components/HealthPulse';
-import WelcomeOnboarding from './components/WelcomeOnboarding';
 
 // ── Eagerly loaded: first paint ──
 import LandingScreen from './pages/LandingScreen';
@@ -64,7 +63,6 @@ function App() {
 function AppContent() {
   return (
     <div className="min-h-screen bg-cf-void text-cf-ink relative">
-      <WelcomeOnboarding />
       <AmbientPlayer />
       <HealthPulse />
       <Suspense fallback={<LoadingScreen />}>

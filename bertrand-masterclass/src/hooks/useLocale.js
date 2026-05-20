@@ -213,15 +213,25 @@ export function useLocale() {
     setLocaleState(loc);
     try {
       localStorage.setItem('voixvive_locale', loc);
-      // Dispatch custom event to let other components know language changed
-      window.dispatchEvent(new CustomEvent('locale:changed', { detail: { locale: loc } }));
     } catch {
       // Ignore localStorage errors in sandboxed/restricted environments
     }
   }, []);
 
   const toggleLocale = useCallback(() => {
-    setLocale(locale === 'en' ? 'fr' : 'en');
+    try {
+      console.log('[useLocale] toggleLocale called, current:', locale);
+      const newLocale = locale === 'en' ? 'fr' : 'en';
+      console.log('[useLocale] switching to:', newLocale);
+      setLocale(newLocale);
+      console.log('[useLocale] setLocale called successfully');
+      // Pause briefly then refresh to apply language change
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (error) {
+      console.error('[useLocale] toggleLocale error:', error);
+    }
   }, [locale, setLocale]);
 
   // Translation helper

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Volume2, VolumeX, Disc3, SkipForward, Music, Minus, Plus, Square } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Disc3, SkipForward, Music, Minus, Plus, Square, HelpCircle } from 'lucide-react';
 import { getAudioContext, resumeAudio, playMetronomeClick } from '../audio/audioEngine';
 import { useLocale } from '../hooks/useLocale';
+import HelpMenu from './HelpMenu';
 
 // ═══════════════════════════════════════════════════════════
 // AMBIENT PLAYER — Music + Metronome, globally persistent
@@ -102,6 +103,7 @@ export default function AmbientPlayer() {
   const { locale, isFrench } = useLocale();
   const [mode, setMode]           = useState('music');
   const [showControls, setShowControls] = useState(false);
+  const [showHelp, setShowHelp]   = useState(false);
   
   // Track if the player has ever been opened to stop the slow, elegant breathing glow
   const [hasClickedOnce, setHasClickedOnce] = useState(() => 
@@ -295,6 +297,13 @@ export default function AmbientPlayer() {
                   </svg>
                   {isFrench ? 'Métronome' : 'Click'}
                 </button>
+                <button
+                  onClick={() => setShowHelp(true)}
+                  className="px-2 py-1.5 text-xs font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center text-cf-gold/60 hover:text-cf-gold hover:bg-white/5"
+                  title={isFrench ? 'Aide' : 'Help'}
+                >
+                  <HelpCircle size={11} />
+                </button>
               </div>
 
               {/* ── MUSIC MODE ── */}
@@ -455,6 +464,11 @@ export default function AmbientPlayer() {
           animation: pulseGold 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
       `}</style>
+
+      {/* Help Menu */}
+      {showHelp && (
+        <HelpMenu onClose={() => setShowHelp(false)} />
+      )}
     </>
   );
 }
