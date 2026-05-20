@@ -1,8 +1,8 @@
 # 🎸 VOIX VIVE — Master Context & Business Platform
 
 > **Purpose:** Load this file into a new AI session to instantly recover full project context.  
-> **Last Updated:** 2026-05-19 (Session 9 — PEARL Framework + CRAP Visual Audit + Token Standardization)  
-> **Project Root:** `/home/joshua-atkinson/antigravity/voix-vive/bertrand-masterclass/`  
+> **Last Updated:** 2026-05-20 (Architecture Stabilization — Adventure Integration + i18n Migration + Documentation Refresh)  
+> **Project Root:** `/home/joshua/Workflow/Other/Bertrand-Masterclass/Music/bertrand-masterclass/`  
 > **Dev Server:** `npm run dev` → localhost:5173  
 > **Git Remote:** https://github.com/joshua42atkinson/Music.git  
 > **Deployment:** Vercel → `bertrand-masterclass/dist` (auto-deployed on push)
@@ -142,7 +142,8 @@ Payments:     Stripe Payment Links (no backend required) + Venmo QR
 DB (Local):   Dexie.js / IndexedDB (offline progress + submission outbox)
 Media:        MediaRecorder API (practice video/audio capture)
 SEO:          JSON-LD LocalBusiness, Open Graph, Twitter Cards
-Source Code:  ~616 KB across 16 source files + 7 data files
+Source Code:  ~19,800 LOC across 59 source files (components, hooks, data, game, pages)
+Localization:  Custom useLocale.js hook with 100+ bilingual keys (EN/FR)
 ```
 
 ---
@@ -174,16 +175,19 @@ voix-vive/
     │   ├── index.css           — Design system (~660 LOC, --cf-* + --bard-* tokens)
     │   │
     │   ├── game/                            — ★★ THE IMAGINATION ENGINE (Fret 9)
-    │   │   ├── VertiscaleEngine.jsx         — Core state machine: menu, Phase 1/2/3, scoring
+    │   │   ├── VertiscaleEngine.jsx         — Core state machine: menu, Phase 1/2/3, scoring (1358 LOC)
+    │   │   ├── AdventurePlayer.jsx          — ★ Troubadour adventure UI: scene rendering, pitch gates, choices (543 LOC)
     │   │   ├── GameFretboard.jsx            — Visual layer: 8 cell states, hold animations
     │   │   ├── OrbEngine.jsx               — Phase 2: descending orbs (rAF + AudioContext timing)
     │   │   ├── PitchGateUI.jsx             — Phase 2: pitch needle cents deviation display
-    │   │   ├── narrativeEngine.js           — Adventure state machine (Troubadour scenes)
+    │   │   ├── narrativeEngine.js           — Stateless adventure engine: scene resolution, branching, scoring (218 LOC)
     │   │   ├── scoreCalculator.js           — Flash + Sustain scoring, consistency ratio
     │   │   └── sessionLogger.js             — Persistence: tractionStore + Dexie
     │   │
     │   ├── hooks/
-    │   │   └── useFlashTimer.js             — Timer engine: REVEAL→DARK→TAP→RESULT + HOLD states
+    │   │   ├── useFlashTimer.js             — Timer engine: REVEAL→DARK→TAP→RESULT + HOLD states
+    │   │   ├── useLocale.js                 — ★ Bilingual localization: 100+ keys, t() helper, locale toggle
+    │   │   └── useBackendBridge.js          — DaaS bridge: profiles, florins, connection check (299 LOC)
     │   │
     │   ├── data/
     │   │   ├── chapterData.js      — ★ 12-chapter curriculum (Hero's Journey × Chromatic)
@@ -205,6 +209,12 @@ voix-vive/
     │   │   ├── AmbientPlayer.jsx       — HTML5 Audio: ambient + Metronome (mutually exclusive)
     │   │   ├── DigitalBinder.jsx       — Practice log + Tools tab + submission history
     │   │   ├── NeckMenu.jsx            — Root-note selection menu for game entry
+    │   │   ├── CoachingPortal.jsx      — ★ Seeker Coach intake form + pricing preview
+    │   │   ├── MentorDashboard.jsx     — Bertrand-side: student submission review desk
+    │   │   ├── PinModal.jsx            — ★ Secure PIN verification modal (extracted from LandingScreen)
+    │   │   ├── ProfileModal.jsx        — ★ Student profile creation modal (extracted from LandingScreen)
+    │   │   ├── BiometricSanctum.jsx    — EEG/HRV simulation stub (simplified from 691→175 LOC)
+    │   │   ├── Tavern3DVisualizer.jsx  — 3D ambient scene renderer for adventure
     │   │   ├── ScaffoldingProvider.jsx — React context for traction-aware UI fade
     │   │   ├── FretboardExplorer.jsx   — 14-fret fretboard with scales + Web Audio
     │   │   ├── FretboardSheet.jsx      — Bottom-sheet fretboard overlay for in-slide practice
@@ -219,6 +229,7 @@ voix-vive/
     │   │   └── RhythmEngine.jsx        — Rhythm pattern engine
     │   │
     │   └── pages/
+    │       ├── LandingScreen.jsx      — ★ The Trinity: 3-portal hub + adventure launcher (684 LOC)
     │       ├── OrientationHub.jsx     — ★ Mobile-first chapter list + 4-tab bottom nav
     │       └── StudioPage.jsx         — ★ Business landing (6 services, testimonials, payments)
     │
@@ -267,7 +278,7 @@ The project has a layered documentation system. **Read in this order depending o
 
 ## 8. WHAT'S DONE vs WHAT'S LEFT
 
-### ✅ Complete (as of 2026-05-19)
+### ✅ Complete (as of 2026-05-20)
 - [x] 12-chapter Living Textbook (free, swipeable slides with artwork for ch1-8)
 - [x] StudioPage business landing (6 services, 13 testimonials, payment grid, FAQ, French section)
 - [x] All 12 Fret tools wired and interactive (12/12 ✅)
@@ -276,11 +287,21 @@ The project has a layered documentation system. **Read in this order depending o
   - Phase 1 Imagine: REVEAL → HOLD → RESULT (sustain scoring, breathing pulse)
   - Phase 2 Audiate: OrbEngine + PitchGateUI wired (needs live testing)
   - Phase 3 Reflect: Journal textarea + dynamic coaching cues + localStorage persistence
+- [x] **Troubadour Adventure wired into Landing Page** ✅
+  - 918 lines of bilingual narrative, 12 branching scenes, 3 acts
+  - Pitch-gated progression (Hear → Sing → Choose)
+  - Lazy-loaded as 57 kB chunk, opens as full-screen overlay
+  - Scene art rendered as ambient backgrounds behind 3D visualizer
+- [x] **i18n infrastructure: useLocale.js** with 100+ bilingual keys (EN/FR)
+  - LandingScreen, PinModal, ProfileModal fully migrated to t()
+  - AdventurePlayer fully migrated to t() (21 → 1 isFrench calls)
+- [x] **LandingScreen decomposed** (1168 → 684 lines): PinModal + ProfileModal extracted
 - [x] Menu reframed: Inner Fretboard / Inner Ear / Inner Voice
 - [x] Imagination Management Framework documented in game design doc
 - [x] PracticeRecorder, AmbientPlayer, Metronome, WelcomeOnboarding, SEO
 - [x] Digital Binder (practice log, tools tab, submissions)
 - [x] Workspace cleanup and rename (daydream-website → voix-vive)
+- [x] BiometricSanctum simplified (691 → 175 LOC, removed scope-creep hardware code)
 
 ### 🟡 Needs Bertrand's Input (Thursday May 22)
 > See `MEETING_PREP.md` for the full walkthrough runsheet.
@@ -318,11 +339,11 @@ These are the next tasks for game development sessions. Each one should be a foc
 - Implement phase unlock gates: 5 successful Phase 1 → unlock Phase 2, etc.
 - Wire `computePhaseUnlock()` from scoreCalculator into the menu
 
-**Workflow 5: Troubadour Adventure UI** (1-2 sessions)
-- Build adventure scene renderer component
-- Wire `troubadour.js` (484 lines of pitch-gated narrative, 12 scenes, branching)
-- This is where imagination management becomes narrative — the student IS a character
-- Biggest untapped asset in the codebase
+**Workflow 5: Troubadour Adventure UI** ✅ (Complete — May 20 2026)
+- AdventurePlayer wired into LandingScreen via lazy-loaded overlay
+- Broken bookshelf shop removed (490 lines of dead modal code)
+- Scene art backgrounds, BiometricSanctum noise removed
+- All 21 inline isFrench ternaries migrated to t() lookups
 
 **Workflow 6: Eyes-Closed Mode + Somatic Deepening** (1 session)
 - Add "eyes closed" variant of Flash mode — screen goes black, taps are from pure imagination
@@ -377,7 +398,7 @@ INSTRUCTIONS FOR AI:
 
 7. THE LIVING TEXTBOOK IS FREE. Do not gate chapters behind payment.
 
-8. Run: cd /home/joshua-atkinson/antigravity/voix-vive/bertrand-masterclass && npm run dev
+8. Run: cd /home/joshua/Workflow/Other/Bertrand-Masterclass/Music/bertrand-masterclass && npm run dev
 
 9. When changing game mechanics, UPDATE the game design doc in the same session.
    Documentation is the lens that prevents scope creep.
@@ -387,6 +408,10 @@ INSTRUCTIONS FOR AI:
 
 11. REVENUE-FIRST SEQUENCING: Do not build Android/VR/Roblox until
     the web app is earning income. See ROADMAP.md Phases 2-6 first.
+
+12. i18n: Use t('key') from useLocale.js for new UI strings.
+    Add keys to both EN and FR sections. 194 inline isFrench calls
+    remain in other components — migrate during Phase 3 sprint.
 ```
 
 ### Academic Context

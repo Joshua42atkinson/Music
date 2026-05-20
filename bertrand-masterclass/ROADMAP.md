@@ -1,9 +1,9 @@
 # 🗺️ VOIX VIVE — Development Roadmap
 
-> **Last Updated:** 2026-05-19 (Revised per Market Assessment — revenue-first sequencing)  
+> **Last Updated:** 2026-05-20 (Architecture Stabilization Sprint — adventure integration, i18n migration, docs refresh)  
 > **Timeline:** 8 weeks core platform (target: July 12, 2026), moonshots funded by revenue  
 > **Milestone:** Thursday Review with Bertrand (Client Stakeholder, May 22)  
-> **Status:** Rough Draft Mode — not going live until approved. Building functional prototypes so the client can "add flavor" rather than building from scratch.  
+> **Status:** Rough Draft stabilized — adventure accessible, bookshelf removed, i18n infrastructure live. Not going live until Bertrand approves.  
 > **Goal:** Sustainable income for Bertrand Laurence via free-textbook marketing funnel + paid coaching + AI evaluation + premium curriculum
 
 ---
@@ -71,13 +71,15 @@ MOONSHOT LAYER (Built after income is proven)
 
 **Goal:** Present a fully functional, "rough draft" prototype of the entire Masterclass platform to Bertrand on Thursday for his approval and "flavor" additions. We will NOT go live until he approves.
 
-| Task | Owner | Priority |
-|------|-------|----------|
-| Refine Vertiscale Engine & Adventure Game | AI | P0 |
-| Configure `voix-vive.com` domain in Vercel | Joshua | P1 |
-| Collect Stripe Payment Links | Bertrand | P1 |
-| Get Venmo QR screenshot from Bertrand | Bertrand | P1 |
-| Thursday review call with Bertrand | Both | P0 |
+| Task | Owner | Priority | Status |
+|------|-------|----------|--------|
+| Refine Vertiscale Engine & Adventure Game | AI | P0 | ✅ Done (May 19-20) |
+| Wire Troubadour Adventure into Landing | AI | P0 | ✅ Done (May 20) |
+| Migrate i18n: AdventurePlayer + LandingScreen | AI | P1 | ✅ Done (May 20) |
+| Configure `voix-vive.com` domain in Vercel | Joshua | P1 | ⏳ Pending |
+| Collect Stripe Payment Links | Bertrand | P1 | ⏳ Pending |
+| Get Venmo QR screenshot from Bertrand | Bertrand | P1 | ⏳ Pending |
+| Thursday review call with Bertrand | Both | P0 | 📅 May 22 |
 
 **Exit Criteria:** Bertrand reviews the working platform on Thursday, approves the direction, and provides his custom pedagogical flavor.
 
@@ -405,3 +407,36 @@ At $8,945/mo (Phase 6), Bertrand saves $4,000+/mo → France trip in **3 weeks**
 | 2026-05-19 | Troubadour AI Evaluation System added as Phase 4 | Builds on 5 existing components. First automated revenue stream ($5-$35/eval, zero marginal cost for Bronze/Silver). |
 | 2026-05-19 | Voice Octave (Frets 13-24) added as Phase 5 | Completes brand promise ("Voix Vive" = voice, but only guitar was covered). Premium paywall product. |
 | 2026-05-19 | Roblox Music World added to moonshots | Social learning environment for younger demographic. Gated behind revenue proof. |
+
+### Key Decisions — 2026-05-20 (Architecture Stabilization Sprint)
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-05-20 | **Bookshelf shop removed from LandingScreen** (−490 lines) | The "📚 ADVENTURE STORIES" bookshelf modal relied on `generateTroubadourBook` → the Rust DaaS backend at `/api/troubadour/generate`. Without the backend running, students got empty books. The 3 "book" stubs (Occitan Lute Code, Chanson de Bertrand, Vagal Quest) and the florins economy were dead-end UI — they never connected to the actual adventure engine. |
+| 2026-05-20 | **Adventure wired directly into landing page** | The Troubadour adventure (918 lines, 12 branching scenes, pitch-gated bilingual narrative) was fully built but unreachable. Replaced the broken bookshelf with a single "🎭 TROUBADOUR ADVENTURE" button that opens AdventurePlayer as a full-screen overlay. One button replaces 490 lines of broken modal. |
+| 2026-05-20 | **AdventurePlayer lazy-loaded** via `React.lazy()` | The adventure component tree (Tavern3DVisualizer, pitch detection, narrative engine, scene art) is 57 kB. Lazy-loading keeps it out of the initial landing bundle (482 kB) and loads on demand when the student clicks the button. |
+| 2026-05-20 | **BiometricSanctum removed from adventure** | The EEG Muse + HRV waveform panel was scope creep — the adventure already has its own flow (setting → mentor line → pitch gate → choices). An animated EEG panel breaks narrative immersion. BiometricSanctum preserved as a component but removed from the adventure render. |
+| 2026-05-20 | **CSS `justifyBetween` typo fixed** | AdventurePlayer had `justifyBetween: 'space-between'` instead of `justifyContent: 'space-between'`. This broke the top bar layout, causing the Exit button and streak counter to stack instead of space apart. |
+| 2026-05-20 | **Scene art backgrounds added to adventure** | Each of the 12 Troubadour scenes has a hand-made illustration in `public/assets/adventures/troubadour/`. These were unused. Now rendered as semi-transparent (35% opacity, 1px blur) backgrounds behind the Tavern3DVisualizer, establishing visual sense of place. |
+| 2026-05-20 | **AdventurePlayer i18n: 21 → 1 `isFrench` calls** | All inline ternaries migrated to centralized `t()` lookups. Added 13 adventure-specific keys (`advSkipPitch`, `advCompleteResponse`, `advTheCommission`, etc.) to both EN and FR dictionaries. |
+| 2026-05-20 | **LandingScreen: 1168 → 684 lines (−42%)** | Combined effect of bookshelf removal, state simplification (6 bookshelf states → 1 `showAdventure` boolean), and dead code pruning. |
+| 2026-05-20 | LandingScreen decomposed: PinModal + ProfileModal extracted | Modals extracted to standalone components (`PinModal.jsx`, `ProfileModal.jsx`) using `t()` lookups. Reduces coupling and enables independent testing. |
+| 2026-05-20 | `generateTroubadourBook` removed from useBackendBridge | Dead function that called a backend endpoint requiring the Rust DaaS server. The actual adventure data is handcrafted in `troubadour.js` — no generation needed. |
+
+### Remaining `isFrench` Technical Debt
+
+| File | Count | Priority |
+|------|-------|----------|
+| VertiscaleEngine.jsx | 78 | P2 — largest file (1358 LOC), highest migration effort |
+| DigitalBinder.jsx | 29 | P2 |
+| CoachingPortal.jsx | 29 | P2 |
+| SlideViewer.jsx | 17 | P2 |
+| MentorDashboard.jsx | 11 | P3 |
+| AmbientPlayer.jsx | 9 | P3 |
+| BiometricSanctum.jsx | 8 | P3 |
+| Tavern3DVisualizer.jsx | 4 | P3 |
+| NeckMenu.jsx | 3 | P3 |
+| FretboardSheet.jsx | 2 | P3 |
+| LandingScreen.jsx | 4 | P3 (in localize helper, acceptable) |
+| **Total** | **194** | Migrate in Phase 3 (French i18n sprint) |
+

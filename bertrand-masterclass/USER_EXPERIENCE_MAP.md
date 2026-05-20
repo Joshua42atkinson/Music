@@ -1,8 +1,8 @@
 # VOIX VIVE — User Experience Map
 ## *Your Personal Practice Space for Guitar*
 
-> **Version:** 1.0  
-> **Date:** 2026-05-19  
+> **Version:** 1.1  
+> **Date:** 2026-05-20  
 > **Written for:** Anyone picking up the app for the first time  
 > **Reading level:** 8th grade  
 > **Language:** English (🇫🇷 French translation notes included)
@@ -44,7 +44,9 @@ You can visit any room at any time. There's no required order.
 | Tap **"The Song"** | Opens the reading/history section |
 | Tap **"The Guitar"** | Opens the Vertiscale game + practice tools |
 | Tap **"The Player"** | Opens breathing, recording, and mentor tools |
+| Tap **"🎭 TROUBADOUR ADVENTURE"** | Opens the pitch-gated interactive story |
 | Tap the **gear icon** (top-left) | Opens settings |
+| Tap **FR** | Switches the interface to French |
 
 **What the ambient sound does:** It creates a calm mood — like walking into a quiet studio. You can mute it anytime by tapping the speaker icon in the bottom-left corner. It will stay muted until you turn it back on.
 
@@ -197,7 +199,7 @@ Your journal entries are saved on your device. No one else can see them unless y
 ---
 
 #### 🏰 ADVENTURE · The Troubadour
-**Section:** The Living Story  
+**Section:** The Living Story (also accessible from the Landing Page via "🎭 TROUBADOUR ADVENTURE" button)  
 **What it is:** An interactive story set in medieval France. At key moments, you must **match a musical pitch** to continue the story.
 
 **How it works:**
@@ -445,4 +447,5 @@ These are the rules the app follows. They explain **why** things look and feel t
 ---
 
 *This document is a living map. As the app grows, so does this guide.*  
-*Last updated: 2026-05-19 by Joshua Atkinson*
+*Last updated: 2026-05-20 by Joshua Atkinson*
+

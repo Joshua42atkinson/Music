@@ -26,7 +26,15 @@ Show in this exact order — each builds on the last:
 - Skip to Fret 7 (Tritone / Ordeal) — let him read his own axiom
 - **Ask:** "Is there anything you'd want to change in the text?"
 
-### Step 3: The Guitar — Vertiscale Engine (5 min)
+### Step 3: The Troubadour Adventure (3 min)
+- Tap the "🎭 TROUBADOUR ADVENTURE" gold button
+- Show: "The gates of Poitiers. Dust on the road..." — it's a story, not a quiz
+- Show Bernard de Ventadorn's mentor line
+- Show the pitch gate: "🎵 Find the A4" — sing or skip, no penalty
+- **Ask:** "Does this feel like your teaching philosophy?"
+- Tap "← Exit" to return
+
+### Step 4: The Guitar — Vertiscale Engine (5 min)
 - Go back → tap "The Guitar"
 - Show the 12-fret Vertiscale menu (his paper chart, alive)
 - Tap C → play one round of Flash together
@@ -34,14 +42,14 @@ Show in this exact order — each builds on the last:
 - **Ask:** "Does this feel like your teaching?"
 - Show the scale picker (Pentatonic, Major, Minor, Blues)
 
-### Step 4: The Player — Digital Binder (3 min)
+### Step 5: The Player — Digital Binder (3 min)
 - Go back → tap "The Player"
 - Show all 12 tools mapped to frets
 - Open the Breathing Gate — show the pre-practice ritual
 - Open PLING! Trainer — show mic-based pitch detection
 - **Ask:** "Which of these tools do you want students to use first?"
 
-### Step 5: The Studio — Revenue Layer (5 min)
+### Step 6: The Studio — Revenue Layer (5 min)
 - Tap "Learn with Bertrand →" from landing (or navigate to /studio)
 - Show all 7 service cards with pricing
 - Show the 13 testimonials
@@ -92,11 +100,12 @@ Pick the 4–5 most important. Don't try to cover all 11.
 | 12-chapter Living Textbook (free) | ✅ Complete — all artwork, all slides |
 | 12 interactive tools | ✅ Complete — all wired and functional |
 | Vertiscale game (Flash + Imagine + Audiate) | ✅ Complete — 3 game modes |
-| Troubadour Adventure narrative | ✅ Complete — 12-scene pitch-gated story |
+| **Troubadour Adventure (accessible!)** | **✅ Complete — 12-scene pitch-gated story, reachable from landing** |
 | StudioPage (pricing, testimonials, FAQ) | ✅ Complete — needs Stripe links |
+| Bilingual i18n infrastructure | ✅ Complete — 100+ keys, EN/FR toggle |
 | Privacy Policy + Terms of Service | ✅ Complete — legal pages live |
 | Error boundaries + crash recovery | ✅ Complete |
-| Code-split bundle (433KB initial load) | ✅ Complete |
+| Code-split bundle (482 kB initial + lazy chunks) | ✅ Complete |
 | Ownership: 100% Bertrand's | ✅ Documented everywhere |
 | Vocabulary: "imagination" not "memory" | ✅ Corrected |
 
