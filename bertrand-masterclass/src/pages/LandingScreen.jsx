@@ -2,9 +2,10 @@ import React, { useState, useEffect, Suspense } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Circle } from 'lucide-react';
+import { Circle, X } from 'lucide-react';
 import CoachingPortal from '../components/CoachingPortal';
 import ProfileModal from '../components/ProfileModal';
+import StudioPage from './StudioPage';
 const AdventurePlayer = React.lazy(() => import('../game/AdventurePlayer'));
 import { useBackendBridge } from '../hooks/useBackendBridge';
 import { useLocale } from '../hooks/useLocale';
@@ -77,6 +78,7 @@ export default function LandingScreen() {
 
   // Adventure state
   const [showAdventure, setShowAdventure] = useState(false);
+  const [showBertrandModal, setShowBertrandModal] = useState(false);
 
   useEffect(() => {
     const syncProfiles = async () => {
@@ -387,37 +389,90 @@ export default function LandingScreen() {
           cursor: pointer;
           transition: all 0.3s;
           white-space: nowrap;
-          flex-shrink: 0;
-        }
-        .bertrand-banner-btn:hover {
-          background: linear-gradient(135deg, rgba(201,169,110,0.3), rgba(201,169,110,0.1));
-          box-shadow: 0 4px 16px rgba(201,169,110,0.15);
-        }
 
-        /* ── THUMB ANCHOR ── */
-        .thumb-anchor {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          position: relative;
-          z-index: 1;
-          margin-top: 32px;
-          color: rgba(201,169,110,0.3);
-          animation: breath 5s ease-in-out infinite;
-        }
+.bertrand-circle-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(201,169,110,0.3);
+  background: rgba(201,169,110,0.05);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bertrand-circle-btn:hover {
+  border-color: rgba(201,169,110,0.6);
+  background: rgba(201,169,110,0.15);
+  transform: scale(1.05);
+}
+.bertrand-circle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-        .thumb-label {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8rem;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          color: rgba(201,169,110,0.25);
-        }
+.bertrand-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(5,5,8,0.95);
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+.bertrand-modal-content {
+  max-width: 100%;
+  margin: 0;
+}
+.bertrand-modal-close {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1001;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.bertrand-modal-close:hover {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.9);
+}
 
-        @keyframes breath {
-          0%, 100% { opacity: 0.5; transform: scale(0.97); }
-          50% { opacity: 1; transform: scale(1.03); }
+.thumb-anchor {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(201,169,110,0.3);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.thumb-anchor:hover {
+  color: rgba(201,169,110,0.6);
+}
+.thumb-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
         }
 
         /* ── PROFILE SWITCHER HEADER ── */
@@ -474,6 +529,23 @@ export default function LandingScreen() {
           draggable={false}
         />
       </motion.div>
+
+      {/* ── Bertrand Circle Icon ── */}
+      <motion.button
+        onClick={() => setShowBertrandModal(true)}
+        className="bertrand-circle-btn"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+        aria-label="About Bertrand Laurence"
+      >
+        <img
+          src="/assets/bertrand_profile.jpg"
+          alt="Bertrand Laurence"
+          className="bertrand-circle-img"
+          draggable={false}
+        />
+      </motion.button>
 
       {/* ── Trinity label ── */}
       <motion.p
@@ -708,36 +780,12 @@ export default function LandingScreen() {
         <p style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: '0.65rem',
-          color: 'rgba(201,169,110,0.2)',
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          marginTop: 6,
+          color: 'rgba(201,169,110,0.3)',
+          marginTop: 8,
+          letterSpacing: '0.1em',
         }}>
-          {t('privateLessons')}
+          {isFrench ? 'Cours particuliers · Mentorat · Ateliers' : 'Private lessons · Mentorship · Workshops'}
         </p>
-
-        {/* Somatic Onboarding Trigger */}
-        <div style={{ marginTop: 24 }}>
-          <button
-            onClick={() => setShowCoaching(true)}
-            style={{
-              padding: '12px 28px',
-              borderRadius: '14px',
-              background: 'linear-gradient(135deg, rgba(201,169,110,0.15), rgba(201,169,110,0.02))',
-              border: '1px solid rgba(201,169,110,0.25)',
-              color: '#c9a96e',
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.75rem',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              boxShadow: '0 8px 32px rgba(201,169,110,0.05)',
-              transition: 'all 0.3s',
-            }}
-          >
-            {t('privateCoachingIntake')}
-          </button>
-        </div>
       </motion.div>
 
       {/* Somatic Practice Portal Modal Overlay */}

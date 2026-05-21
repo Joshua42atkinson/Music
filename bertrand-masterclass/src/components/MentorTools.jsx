@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DigitalBinder from './DigitalBinder';
-import StudioPage from '../pages/StudioPage';
 import MentorDashboard from './MentorDashboard';
 import { Shield } from 'lucide-react';
 
@@ -38,13 +37,6 @@ export default function MentorTools() {
       {/* The Tools (The Sword) */}
       <div className="tools-section">
         <DigitalBinder />
-      </div>
-
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-cf-gold/30 to-transparent my-12" />
-
-      {/* The Mentorship (How to wield the Sword) */}
-      <div className="mentorship-section">
-        <StudioPage />
       </div>
     </div>
   );
