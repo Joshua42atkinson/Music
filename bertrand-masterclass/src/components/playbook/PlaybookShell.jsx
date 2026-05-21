@@ -37,14 +37,7 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
     <div style={styles.shell}>
       {/* Header */}
       <div style={styles.header}>
-        <button style={styles.backBtn} onClick={backHandler} aria-label="Return to home">
-          <img
-            src="/assets/wordmark.png"
-            alt="Voix Vive"
-            style={{ height: '32px', width: 'auto' }}
-            draggable={false}
-          />
-        </button>
+        <div style={{ width: '32px' }} /> {/* spacer for centering */}
         <div style={styles.headerCenter}>
           <h1 style={styles.title}>
             {isFrench ? 'Le Grimoire du Troubadour' : "Troubadour's Playbook"}
@@ -53,7 +46,14 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
             {isFrench ? 'Guide du héros en 12 frettes' : '12-Fret Hero\'s Guide'}
           </p>
         </div>
-        <div style={{ width: '32px' }} /> {/* spacer for centering */}
+        <button style={styles.backBtn} onClick={backHandler} aria-label="Return to home">
+          <img
+            src="/assets/wordmark.png"
+            alt="Voix Vive"
+            style={{ height: '32px', width: 'auto' }}
+            draggable={false}
+          />
+        </button>
       </div>
 
       {/* Tab bar */}

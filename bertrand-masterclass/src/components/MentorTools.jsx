@@ -14,6 +14,12 @@ export default function MentorTools() {
       {/* Home Button with Branding */}
       <div className="max-w-[1200px] mx-auto px-4 pt-4 flex justify-between items-center">
         <button
+          onClick={() => setShowDashboard(true)}
+          className="flex items-center gap-2 px-4 py-2.5 text-xs font-mono tracking-widest uppercase text-cf-gold bg-cf-gold/10 hover:bg-cf-gold/20 border border-cf-gold/20 hover:border-cf-gold/40 rounded-xl transition-all"
+        >
+          <Shield size={14} className="animate-pulse" /> Seeker Coach Portal
+        </button>
+        <button
           onClick={() => navigate('/')}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           aria-label="Return to home"
@@ -24,12 +30,6 @@ export default function MentorTools() {
             className="h-8 w-auto"
             draggable={false}
           />
-        </button>
-        <button
-          onClick={() => setShowDashboard(true)}
-          className="flex items-center gap-2 px-4 py-2.5 text-xs font-mono tracking-widest uppercase text-cf-gold bg-cf-gold/10 hover:bg-cf-gold/20 border border-cf-gold/20 hover:border-cf-gold/40 rounded-xl transition-all"
-        >
-          <Shield size={14} className="animate-pulse" /> Seeker Coach Portal
         </button>
       </div>
 

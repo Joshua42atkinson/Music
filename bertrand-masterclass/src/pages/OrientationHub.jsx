@@ -5,7 +5,7 @@ import NeckMenu from '../components/NeckMenu';
 import SongwritingCompanion from '../components/SongwritingCompanion';
 import { generateSlides } from '../data/slideGenerator';
 import { getChapterProgress } from '../data/localDatabase';
-import { Feather, X } from 'lucide-react';
+import { Guitar, X } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -85,16 +85,23 @@ const OrientationHub = () => {
         style={{
           position: 'fixed', bottom: '72px', right: '16px', zIndex: 400,
           width: '52px', height: '52px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(123,106,170,0.4) 0%, rgba(123,106,170,0.15) 100%)',
-          border: '1px solid rgba(123,106,170,0.4)',
-          color: '#b09cd8', cursor: 'pointer',
+          background: 'linear-gradient(135deg, rgba(201,169,110,0.4) 0%, rgba(201,169,110,0.15) 100%)',
+          border: '1px solid rgba(201,169,110,0.4)',
+          color: '#c9a96e', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(123,106,170,0.3)',
+          boxShadow: '0 4px 20px rgba(201,169,110,0.3), 0 0 30px rgba(201,169,110,0.2)',
           transition: 'all 0.3s ease',
+          animation: 'glow 2s ease-in-out infinite',
         }}
       >
-        <Feather size={22} />
+        <Guitar size={22} />
       </button>
+      <style>{`
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 4px 20px rgba(201,169,110,0.3), 0 0 30px rgba(201,169,110,0.2); }
+          50% { box-shadow: 0 4px 20px rgba(201,169,110,0.5), 0 0 50px rgba(201,169,110,0.4); }
+        }
+      `}</style>
 
       {/* ── Quill Overlay ── */}
       {showQuill && (
