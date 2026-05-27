@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useScaffolding } from '../ScaffoldingProvider';
 import { useLocale } from '../../hooks/useLocale';
+import { useAuth } from '../../hooks/useAuth';
 import {
   getBardTitle, getXpForNextLevel, CORE_STATS, computeStatValue,
   INTERVAL_BADGES, MASTERY_LEVELS, getIntervalMastery,
@@ -25,8 +26,9 @@ import {
 // ╚═════════════════════════════════════════════════════════════════╝
 
 export default function CharacterSheet() {
-  const { traction, bardLevel, practiceMinutes, streak, breathingSessions } = useScaffolding();
+  const { traction, bardLevel, practiceMinutes, streak, breathingSessions, userId } = useScaffolding();
   const { locale, t } = useLocale();
+  const { user } = useAuth();
   const lang = locale;
 
   const title = getBardTitle(bardLevel, lang);
@@ -39,7 +41,12 @@ export default function CharacterSheet() {
   const intervalMastery = useMemo(() => getIntervalMastery(), []);
   const profile = useMemo(() => computeTroubadourProfile(traction), [traction]);
 
+  // Use Google user data when logged in, fallback to localStorage profile
+  const isLoggedIn = !!userId;
+  const googleName = user?.user_metadata?.full_name || user?.email?.split('@')[0];
+  const googleAvatar = user?.user_metadata?.avatar_url;
   const studentName = (() => {
+    if (googleName) return googleName;
     try { return localStorage.getItem('active_student_profile') || t('adventurer'); }
     catch { return t('adventurer'); }
   })();
@@ -49,13 +56,24 @@ export default function CharacterSheet() {
       {/* Header — Name & Level */}
       <div style={styles.header}>
         <div style={styles.portrait}>
-          <span style={styles.portraitEmoji}>🎸</span>
+          {googleAvatar ? (
+            <img
+              src={googleAvatar}
+              alt={studentName}
+              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span style={styles.portraitEmoji}>🎸</span>
+          )}
         </div>
         <div style={styles.headerText}>
           <h2 style={styles.name}>{studentName}</h2>
           <p style={styles.title}>
             Lv.{bardLevel} — {title}
           </p>
+          {isLoggedIn && (
+            <p style={styles.cloudStatus}>☁️ {t('synced') || 'Cloud sync active'}</p>
+          )}
         </div>
       </div>
 
@@ -242,6 +260,14 @@ const styles = {
     color: '#c9a96e',
     letterSpacing: '0.1em',
     margin: 0,
+  },
+  cloudStatus: {
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.6rem',
+    color: '#4ade80',
+    letterSpacing: '0.08em',
+    margin: '4px 0 0',
+    opacity: 0.8,
   },
   xpSection: { marginBottom: '20px' },
   xpLabelRow: {

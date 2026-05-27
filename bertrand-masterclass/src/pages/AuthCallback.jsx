@@ -1,14 +1,19 @@
 // ═══════════════════════════════════════════════════════════
 // AUTH CALLBACK — Handles OAuth redirect from Supabase
 // Route: /auth/callback
+//
+// Supabase with detectSessionInUrl:true auto-processes the URL hash.
+// We listen for onAuthStateChange SIGNED_IN event, then route.
+// Timeout fallback: poll getSession() with retries.
 // ═══════════════════════════════════════════════════════════
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
+  const handled = useRef(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -16,20 +21,43 @@ export default function AuthCallback() {
       return;
     }
 
-    // Supabase handles the hash fragment automatically
-    // We just need to wait a tick for the session to be established
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate('/song'); // Send logged-in users to the Song portal
-      } else {
-        navigate('/');
-      }
-    };
+    // ── Primary: wait for onAuthStateChange ──
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (handled.current) return;
+      console.log('[AuthCallback] Event:', event);
 
-    // Small delay to let Supabase process the auth code
-    const timer = setTimeout(checkSession, 500);
-    return () => clearTimeout(timer);
+      if (event === 'SIGNED_IN' && session?.user) {
+        handled.current = true;
+        console.log('[AuthCallback] SIGNED_IN — routing to /song');
+        navigate('/song', { replace: true });
+      }
+    });
+
+    // ── Fallback: poll getSession for up to 6 seconds ──
+    let attempts = 0;
+    const maxAttempts = 12;
+    const poll = setInterval(async () => {
+      if (handled.current) return;
+      attempts++;
+
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        handled.current = true;
+        console.log('[AuthCallback] Fallback poll found session — routing to /song');
+        clearInterval(poll);
+        navigate('/song', { replace: true });
+      } else if (attempts >= maxAttempts) {
+        handled.current = true;
+        console.warn('[AuthCallback] No session after 6s — routing to /');
+        clearInterval(poll);
+        navigate('/', { replace: true });
+      }
+    }, 500);
+
+    return () => {
+      listener.subscription.unsubscribe();
+      clearInterval(poll);
+    };
   }, [navigate]);
 
   return (
