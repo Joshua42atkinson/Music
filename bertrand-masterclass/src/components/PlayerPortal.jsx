@@ -109,14 +109,16 @@ export default function PlayerPortal() {
     catch { return 'Student'; }
   })();
 
-  // Load submissions + workload status
+  // Load submissions: local (IndexedDB) + cloud (Supabase video_submissions)
   useEffect(() => {
     const load = async () => {
       let recs = [];
+      // 1. Local recordings
       try {
         recs = await db.recordings.orderBy('timestamp').reverse().toArray();
       } catch (e) { console.warn('[PlayerPortal] No recordings table:', e); }
 
+      // 2. Legacy fallback
       if (recs.length === 0) {
         try {
           const legacy = JSON.parse(localStorage.getItem('voixvive_submissions') || '[]');
@@ -130,6 +132,31 @@ export default function PlayerPortal() {
           }));
         } catch (e) { console.warn('[PlayerPortal] Legacy submissions parse error:', e); }
       }
+
+      // 3. Cloud submissions from Google Drive (cross-device)
+      try {
+        const { getUserSubmissions } = await import('../lib/driveService.js');
+        if (user?.id) {
+          const cloudSubs = await getUserSubmissions(user.id);
+          const cloudRecs = cloudSubs.map(s => ({
+            id: s.drive_file_id,
+            exerciseName: s.file_name,
+            timestamp: s.created_at,
+            duration: 0, // Drive doesn't store duration
+            reviewed: s.reviewed,
+            feedback: s.mentor_notes,
+            webViewLink: s.web_view_link,
+            isCloud: true,
+            fretId: s.fret_id,
+            emotionalState: s.emotional_state,
+          }));
+          // Merge: local + cloud, dedupe by drive_file_id
+          const localIds = new Set(recs.map(r => r.id));
+          recs = [...recs, ...cloudRecs.filter(c => !localIds.has(c.id))];
+          recs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+      } catch (e) { console.warn('[PlayerPortal] Cloud submissions load failed:', e); }
+
       setSubmissions(recs);
 
       try {

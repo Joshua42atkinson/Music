@@ -50,7 +50,11 @@ export default function AuthCallback() {
             // Clean the hash from URL
             window.history.replaceState(null, '', window.location.pathname + window.location.search);
             setStatus('Signed in!');
-            setTimeout(() => navigate('/song', { replace: true }), 300);
+            // Redirect back to where the user came from, or default to /song
+            const returnTo = localStorage.getItem('voixvive_auth_return_to');
+            localStorage.removeItem('voixvive_auth_return_to');
+            const dest = returnTo && returnTo !== '/auth/callback' ? returnTo : '/song';
+            setTimeout(() => navigate(dest, { replace: true }), 300);
             return;
           }
         } catch (e) {
@@ -69,7 +73,10 @@ export default function AuthCallback() {
           if (exchangeErr) throw exchangeErr;
           if (data.session?.user) {
             setStatus('Signed in!');
-            setTimeout(() => navigate('/song', { replace: true }), 300);
+            const returnTo = localStorage.getItem('voixvive_auth_return_to');
+            localStorage.removeItem('voixvive_auth_return_to');
+            const dest = returnTo && returnTo !== '/auth/callback' ? returnTo : '/song';
+            setTimeout(() => navigate(dest, { replace: true }), 300);
             return;
           }
         } catch (e) {
@@ -85,7 +92,10 @@ export default function AuthCallback() {
         const { data } = await supabase.auth.getSession();
         if (data.session?.user) {
           setStatus('Signed in!');
-          setTimeout(() => navigate('/song', { replace: true }), 300);
+          const returnTo = localStorage.getItem('voixvive_auth_return_to');
+          localStorage.removeItem('voixvive_auth_return_to');
+          const dest = returnTo && returnTo !== '/auth/callback' ? returnTo : '/song';
+          setTimeout(() => navigate(dest, { replace: true }), 300);
           return;
         }
       } catch (e) {

@@ -612,6 +612,20 @@ export default function LandingScreen() {
           >
             Bertrand Laurence
           </a>
+          <br />
+          <a
+            href="/mentor"
+            style={{
+              color: 'rgba(201,169,110,0.25)',
+              textDecoration: 'none',
+              fontSize: '0.55rem',
+              transition: 'color 0.3s',
+            }}
+            onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.5)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.25)'}
+          >
+            Mentor Portal →
+          </a>
         </p>
       </motion.div>
 

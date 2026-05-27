@@ -35,6 +35,11 @@ export function useAuth() {
 
   const signInWithGoogle = useCallback(async () => {
     if (!supabase) throw new Error('Supabase not configured');
+    // Save where the user was so we can redirect back after auth
+    const returnTo = window.location.pathname + window.location.search;
+    if (returnTo !== '/auth/callback') {
+      localStorage.setItem('voixvive_auth_return_to', returnTo);
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
