@@ -3,11 +3,14 @@
 // Placed in navigation bars across all pages
 // ═══════════════════════════════════════════════════════════
 
+import { useState } from 'react';
 import { LogIn, LogOut, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 
 export default function AuthButton({ compact = false }) {
   const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const [lastError, setLastError] = useState(null);
 
   if (loading) {
     return (
@@ -86,19 +89,30 @@ export default function AuthButton({ compact = false }) {
   }
 
   // Not logged in — show login button
+  const isSupabaseReady = !!supabase;
+
   const handleSignIn = async () => {
+    setLastError(null);
+    if (!isSupabaseReady) {
+      setLastError('Supabase not configured — check env vars');
+      return;
+    }
     try {
       console.log('[AuthButton] Starting Google sign-in...');
       await signInWithGoogle();
     } catch (err) {
+      const msg = err?.message || err?.error_description || String(err);
       console.error('[AuthButton] Sign-in failed:', err);
-      alert('Sign-in failed. Check browser console for details.');
+      setLastError(msg);
     }
   };
 
   return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
     <button
       onClick={handleSignIn}
+      disabled={!isSupabaseReady}
+      title={!isSupabaseReady ? 'Supabase offline — env vars missing' : 'Sign in with Google'}
       style={{
         padding: '6px 14px',
         borderRadius: 8,
@@ -121,7 +135,20 @@ export default function AuthButton({ compact = false }) {
       }}
     >
       <LogIn size={14} />
-      {compact ? 'In' : 'Sign In'}
+      {compact ? 'In' : isSupabaseReady ? 'Sign In' : 'Offline'}
     </button>
+    {lastError && !compact && (
+      <span style={{
+        fontSize: '0.6rem',
+        color: '#ef4444',
+        fontFamily: "'JetBrains Mono', monospace",
+        maxWidth: 180,
+        textAlign: 'right',
+        lineHeight: 1.3,
+      }}>
+        {lastError}
+      </span>
+    )}
+    </div>
   );
 }
