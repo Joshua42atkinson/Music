@@ -121,17 +121,16 @@ export default function AuthCallback() {
       tryUrlParams();
     };
 
-    // ── Strategy 5: Manual URL param parsing ──
+    // ── Strategy 5: Manual URL hash parsing (PKCE code or implicit token) ──
     const tryUrlParams = async () => {
       if (handled.current) return;
       setStatus(4);
       const url = new URL(window.location.href);
       const code = url.searchParams.get('code');
-      const accessToken = url.hash.match(/access_token=([^&]+)/)?.[1];
 
-      console.log('[AuthCallback] URL code:', !!code, 'access_token:', !!accessToken);
-
+      // PKCE flow: exchange code for session
       if (code) {
+        console.log('[AuthCallback] Found PKCE code, exchanging...');
         try {
           const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeErr) throw exchangeErr;
@@ -141,6 +140,38 @@ export default function AuthCallback() {
           }
         } catch (e) {
           console.warn('[AuthCallback] Code exchange failed:', e);
+        }
+      }
+
+      // Implicit flow: parse hash fragment manually
+      // Supabase detectSessionInUrl is unreliable with implicit flow (#455)
+      const hash = url.hash;
+      console.log('[AuthCallback] Checking hash for implicit tokens...');
+      if (hash && hash.includes('access_token=')) {
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        const expiresAt = params.get('expires_at');
+        const tokenType = params.get('token_type') || 'bearer';
+
+        console.log('[AuthCallback] Hash tokens found — access:', !!accessToken, 'refresh:', !!refreshToken);
+
+        if (accessToken) {
+          try {
+            const { data, error: setErr } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+            if (setErr) throw setErr;
+            if (data.session?.user) {
+              // Clean hash from URL so it doesn't re-trigger
+              window.history.replaceState(null, '', window.location.pathname + window.location.search);
+              routeToSong('manual hash setSession');
+              return;
+            }
+          } catch (e) {
+            console.warn('[AuthCallback] setSession failed:', e);
+          }
         }
       }
 
