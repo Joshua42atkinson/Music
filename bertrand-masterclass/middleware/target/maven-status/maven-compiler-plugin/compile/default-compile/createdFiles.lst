@@ -1,0 +1,11 @@
+com/voixvive/middleware/SupabaseTelemetry$2.class
+com/voixvive/middleware/TroubadourClientEndpoint$SessionPair.class
+com/voixvive/middleware/TroubadourClientEndpoint.class
+com/voixvive/middleware/ParalinguisticInterceptor.class
+com/voixvive/middleware/JwtValidator.class
+com/voixvive/middleware/SupabaseTelemetry$3.class
+com/voixvive/middleware/StepAudioClient.class
+com/voixvive/middleware/SupabaseTelemetry$1.class
+com/voixvive/middleware/TroubadourServer.class
+com/voixvive/middleware/StepAudioClient$StepAudioListener.class
+com/voixvive/middleware/SupabaseTelemetry.class
