@@ -179,7 +179,23 @@ export function generateSlides(fret) {
     image: SLIDE_IMAGES[`${fret.id}-title`] || null
   });
 
-  // 2. Yin Philosophy slides — split into paragraphs
+  // 2. Pythagorean Legacy slide — mathematical origin of the interval
+  if (fret.pythagoreanLegacy) {
+    const pl = fret.pythagoreanLegacy;
+    slides.push({
+      ...base,
+      id: `${fret.id}-pythagorean`,
+      type: 'pythagorean-legacy',
+      label: { en: '◈ PYTHAGOREAN LEGACY', fr: '◈ HÉRITAGE PYTHAGORICIEN' },
+      title: { en: 'The Mathematics of Sound', fr: 'Les Mathématiques du Son' },
+      hook: pl.hook,
+      ratio: pl.ratio,
+      cents: pl.cents,
+      image: SLIDE_IMAGES[`${fret.id}-pythagorean`] || null
+    });
+  }
+
+  // 3. Yin Philosophy slides — split into paragraphs
   const rawPhilosophy = typeof fret.yin.philosophy === 'object' 
     ? fret.yin.philosophy
     : { en: fret.yin.philosophy, fr: fret.yin.philosophy };
@@ -204,7 +220,7 @@ export function generateSlides(fret) {
     });
   }
 
-  // 3. Yin Quote slide
+  // 4. Yin Quote slide
   if (fret.yin.quote) {
     slides.push({
       ...base,
@@ -218,7 +234,7 @@ export function generateSlides(fret) {
     });
   }
 
-  // 4. Yin Concept slides (one per concept)
+  // 5. Yin Concept slides (one per concept)
   if (fret.yin.concepts?.length) {
     fret.yin.concepts.forEach((concept, i) => {
       slides.push({
@@ -233,7 +249,7 @@ export function generateSlides(fret) {
     });
   }
 
-  // 5. Yin Meditation slide
+  // 6. Yin Meditation slide
   if (fret.yin.meditation) {
     slides.push({
       ...base,
@@ -269,7 +285,7 @@ export function generateSlides(fret) {
     });
   }
 
-  // 6. Yang Instruction intro
+  // 7. Yang Instruction intro
   slides.push({
     ...base,
     id: `${fret.id}-yang-intro`,
@@ -280,7 +296,7 @@ export function generateSlides(fret) {
     image: SLIDE_IMAGES[`${fret.id}-yang-intro`] || null
   });
 
-  // 7. Yang Exercise slides (one per exercise)
+  // 8. Yang Exercise slides (one per exercise)
   if (fret.yang.exercises?.length) {
     fret.yang.exercises.forEach((exercise, i) => {
       slides.push({
@@ -295,7 +311,7 @@ export function generateSlides(fret) {
     });
   }
 
-  // 8. Fretboard focus slide
+  // 9. Fretboard focus slide
   if (fret.yang.fretboardFocus && fret.yang.exercises?.length > 0) {
     const ff = fret.yang.fretboardFocus;
     slides.push({
@@ -313,7 +329,7 @@ export function generateSlides(fret) {
     });
   }
 
-  // 9. Chapter end slide
+  // 10. Chapter end slide
   slides.push({
     ...base,
     id: `${fret.id}-end`,

@@ -572,6 +572,27 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize }) {
         </>
       );
 
+    case 'pythagorean-legacy':
+      return (
+        <>
+          <p className="sv-label" style={{ color: '#c9a96e' }}>{localize(slide.label)}</p>
+          <h2 className="sv-title" style={{ fontSize: 'clamp(1.3rem, 5vw, 1.8rem)' }}>{localize(slide.title)}</h2>
+          <div className="sv-body"><p style={{ fontStyle: 'italic', opacity: 0.85 }}>{localize(slide.hook)}</p></div>
+          <div style={{ display: 'flex', gap: 12, marginTop: 24, justifyContent: 'center' }}>
+            <div style={{
+              padding: '10px 18px', borderRadius: 10,
+              background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)',
+              fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', color: '#c9a96e'
+            }}>Ratio: {slide.ratio}</div>
+            <div style={{
+              padding: '10px 18px', borderRadius: 10,
+              background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)',
+              fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', color: '#c9a96e'
+            }}>{slide.cents} cents</div>
+          </div>
+        </>
+      );
+
     case 'yin-philosophy':
       return (
         <>
