@@ -4,6 +4,10 @@ const DAAS_API_BASE = typeof window !== 'undefined'
   ? `http://${window.location.hostname}:8080/api`
   : 'http://localhost:8080/api';
 
+const LMSTUDIO_API_BASE = typeof window !== 'undefined'
+  ? `http://${window.location.hostname}:1234/v1`
+  : 'http://localhost:1234/v1';
+
 // Helper: Exponential Backoff Fetch
 const fetchWithRetry = async (url, options = {}, retries = 3, backoff = 1000) => {
   for (let i = 0; i < retries; i++) {
@@ -24,9 +28,11 @@ const fetchWithRetry = async (url, options = {}, retries = 3, backoff = 1000) =>
 
 export function useBackendBridge() {
   const [isDaaSConnected, setIsDaaSConnected] = useState(false);
+  const [isLMStudioConnected, setIsLMStudioConnected] = useState(false);
   const [activeBackend, setActiveBackend] = useState(null);
   const [availableBackends, setAvailableBackends] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [lmStudioModel, setLmStudioModel] = useState(null);
 
   // 1. Load Inference Router status
   const loadInferenceStatus = useCallback(async () => {
@@ -57,6 +63,30 @@ export function useBackendBridge() {
     }
     return false;
   }, [loadInferenceStatus]);
+
+  // 2b. Check LM Studio on port 1234
+  const checkLMStudio = useCallback(async () => {
+    try {
+      const resp = await fetch(`${LMSTUDIO_API_BASE}/models`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const hasModel = data.data && data.data.length > 0;
+        setIsLMStudioConnected(hasModel);
+        if (hasModel) {
+          setLmStudioModel(data.data[0]);
+          setActiveBackend('lmstudio');
+        }
+        return hasModel ? { connected: true, model: data.data[0] } : { connected: false };
+      }
+    } catch (e) {
+      setIsLMStudioConnected(false);
+      setLmStudioModel(null);
+    }
+    return { connected: false };
+  }, []);
 
   // 3. Switch active LLM backend
   const switchBackend = async (name) => {
@@ -107,26 +137,60 @@ export function useBackendBridge() {
   };
 
   // 5. LLM Socratic Completions Proxy
-  const askBertrand = async (messages) => {
+  const askBertrand = async (messages, options = {}) => {
+    // Try LM Studio first if connected
+    if (isLMStudioConnected) {
+      try {
+        const payload = {
+          model: 'loaded',
+          messages: [
+            {
+              role: 'system',
+              content: "You are Bertrand Laurence, a Somatic Mystic guitar instructor. You teach using Bertrand's Somatic Method: ©PLING!, ©SHEARL, ©FHEAL. You help students build fretboard visualization and neurological muscle memory. Respond with slow, contemplation-rich Socratic wisdom, focusing on somatic sensation (body, relaxation) and visualization rather than dry music theory. Never provide overwhelming chord grids; help them discover shapes in their mind."
+            },
+            ...messages
+          ],
+          temperature: options.temperature ?? 0.7,
+          max_tokens: options.max_tokens ?? 4096,
+          top_p: options.top_p ?? 0.9,
+          top_k: options.top_k ?? 40,
+          n_ctx: options.maxContext || 32768,
+          n_gpu_layers: options.gpuLayers || 999,
+          stream: options.stream ?? false,
+        };
+
+        const resp = await fetch(`${LMSTUDIO_API_BASE}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (resp.ok) {
+          return await resp.json();
+        }
+      } catch (e) {
+        console.error('LM Studio query failed:', e);
+      }
+    }
+
+    // Fall back to DaaS server
     if (!isDaaSConnected) {
-      // Fallback message if DaaS isn't running
       return {
         choices: [{
           message: {
             role: 'assistant',
-            content: "I am currently running in offline preview mode. Start the Voix Vive DaaS Desktop App to connect to my local LLM for real-time Socratic guitar instruction."
+            content: "I am currently running in offline preview mode. Start LM Studio (port 1234) or the Voix Vive DaaS Desktop App (port 8080) to connect to my local LLM for real-time Socratic guitar instruction."
           }
         }]
       };
     }
 
     try {
-      // Send formatting/Socratic temperature rules to LLM
       const payload = {
-        model: "active", // server proxies to whatever model is currently active
+        model: 'active',
         messages: [
           {
-            role: "system",
+            role: 'system',
             content: "You are Bertrand Laurence, a Somatic Mystic guitar instructor. You teach using Bertrand's Somatic Method: ©PLING!, ©SHEARL, ©FHEAL. You help students build fretboard visualization and neurological muscle memory. Respond with slow, contemplation-rich Socratic wisdom, focusing on somatic sensation (body, relaxation) and visualization rather than dry music theory. Never provide overwhelming chord grids; help them discover shapes in their mind."
           },
           ...messages
@@ -151,7 +215,7 @@ export function useBackendBridge() {
       choices: [{
         message: {
           role: 'assistant',
-          content: "I ran into a connection issue with the local AI. Please verify that your local LM Studio or Ollama model server is running and active."
+          content: "I ran into a connection issue with the local AI. Please verify that your local LM Studio (port 1234) or DaaS server (port 8080) is running and active."
         }
       }]
     };
@@ -280,9 +344,11 @@ export function useBackendBridge() {
 
   return {
     isDaaSConnected,
+    isLMStudioConnected,
     activeBackend,
     availableBackends,
     loading,
+    lmStudioModel,
     switchBackend,
     detectBackends,
     askBertrand,
@@ -295,5 +361,6 @@ export function useBackendBridge() {
     earnFlorins,
     spendFlorins,
     refreshConnection: checkConnection,
+    checkLMStudio,
   };
 }

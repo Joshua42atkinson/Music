@@ -4,34 +4,44 @@ import { useLocale } from '../../hooks/useLocale';
 import {
   getBardTitle, getXpForNextLevel, CORE_STATS, computeStatValue,
   INTERVAL_BADGES, MASTERY_LEVELS, getIntervalMastery,
-  CHANNEL_ATTUNEMENTS, computeAttunement,
+  TROUBADOUR_TYPES, computeTroubadourProfile,
 } from '../../data/playbookData';
 
-// ═══════════════════════════════════════════════════════════
-// CHARACTER SHEET — D&D-style stat block
-// Bard Level, title, 5 core stats, XP bar, streak, florins.
-// Styled like a dark parchment character sheet.
-// ═══════════════════════════════════════════════════════════
+// ╔══ VOIX VIVE ════════════════════════════════════════════════════╗
+// ║ FILE    : CharacterSheet.jsx                                    ║
+// ║ P · Perspective  : Student identity — shows who the student    ║
+// ║                    is becoming through their practice journey   ║
+// ║ E · Engineering  : Renders Bard Level, stats, interval badges, ║
+// ║                    and Troubadour Type profile from traction    ║
+// ║ A · Aesthetic    : Dark parchment, gold accents, esoteric bard ║
+// ║ R · Research     : docs/03_TROUBADOUR.md §Four Troubadour Types║
+// ║ L · Layout       : Used by: PlaybookShell                      ║
+// ║                    Uses: playbookData, useScaffolding, useLocale║
+// ╠═════════════════════════════════════════════════════════════════╣
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                      ║
+// ║ IP      : No Florins, no Great Game stats, no Trinity Channels  ║
+// ║ RULES   : Troubadour Types are the identity system — not CAGED ║
+// ║ FIX AT  : playbookData.js → computeTroubadourProfile           ║
+// ╚═════════════════════════════════════════════════════════════════╝
 
 export default function CharacterSheet() {
   const { traction, bardLevel, practiceMinutes, streak, breathingSessions } = useScaffolding();
-  const { isFrench } = useLocale();
-  const lang = isFrench ? 'fr' : 'en';
+  const { locale, t } = useLocale();
+  const lang = locale;
 
   const title = getBardTitle(bardLevel, lang);
   const xpCurrent = traction.xp || 0;
   const xpNext = getXpForNextLevel(bardLevel);
   const xpProgress = xpNext > 0 ? Math.min(1, xpCurrent / xpNext) : 1;
-  const florins = traction.florins || 0;
   const completedFrets = Object.values(traction.frets || {}).filter(f => (f.traction || 0) >= 60).length;
 
   // Badge system — interval mastery from Adventure
   const intervalMastery = useMemo(() => getIntervalMastery(), []);
-  const attunement = useMemo(() => computeAttunement(traction), [traction]);
+  const profile = useMemo(() => computeTroubadourProfile(traction), [traction]);
 
   const studentName = (() => {
-    try { return localStorage.getItem('active_student_profile') || (isFrench ? 'Aventurier' : 'Adventurer'); }
-    catch { return isFrench ? 'Aventurier' : 'Adventurer'; }
+    try { return localStorage.getItem('active_student_profile') || t('adventurer'); }
+    catch { return t('adventurer'); }
   })();
 
   return (
@@ -65,34 +75,29 @@ export default function CharacterSheet() {
         <div style={styles.quickStat}>
           <span style={styles.quickIcon}>🔥</span>
           <span style={styles.quickValue}>{streak}</span>
-          <span style={styles.quickLabel}>{isFrench ? 'Série' : 'Streak'}</span>
+          <span style={styles.quickLabel}>{t('streakLabel')}</span>
         </div>
         <div style={styles.quickStat}>
           <span style={styles.quickIcon}>⏱️</span>
           <span style={styles.quickValue}>{practiceMinutes}</span>
-          <span style={styles.quickLabel}>{isFrench ? 'Min' : 'Min'}</span>
+          <span style={styles.quickLabel}>{t('minLabel')}</span>
         </div>
         <div style={styles.quickStat}>
           <span style={styles.quickIcon}>🫁</span>
           <span style={styles.quickValue}>{breathingSessions}</span>
-          <span style={styles.quickLabel}>{isFrench ? 'Souffles' : 'Breaths'}</span>
-        </div>
-        <div style={styles.quickStat}>
-          <span style={styles.quickIcon}>⚜️</span>
-          <span style={styles.quickValue}>{florins}</span>
-          <span style={styles.quickLabel}>{isFrench ? 'Florins' : 'Florins'}</span>
+          <span style={styles.quickLabel}>{t('breathsLabel')}</span>
         </div>
         <div style={styles.quickStat}>
           <span style={styles.quickIcon}>🏔️</span>
           <span style={styles.quickValue}>{completedFrets}/12</span>
-          <span style={styles.quickLabel}>{isFrench ? 'Quêtes' : 'Quests'}</span>
+          <span style={styles.quickLabel}>{t('questsLabel')}</span>
         </div>
       </div>
 
       {/* Stat Block — 5 Core Abilities */}
       <div style={styles.statBlock}>
         <h3 style={styles.statBlockTitle}>
-          {isFrench ? '── COMPÉTENCES ──' : '── ABILITIES ──'}
+          {t('abilities')}
         </h3>
         <div style={styles.statsGrid}>
           {CORE_STATS.map(stat => {
@@ -115,7 +120,7 @@ export default function CharacterSheet() {
       {/* Interval Mastery Badges */}
       <div style={styles.statBlock}>
         <h3 style={styles.statBlockTitle}>
-          {isFrench ? '── MAÎTRISE DES INTERVALLES ──' : '── INTERVAL MASTERY ──'}
+          {t('intervalMastery')}
         </h3>
         <div style={styles.badgeGrid}>
           {INTERVAL_BADGES.map(badge => {
@@ -153,24 +158,26 @@ export default function CharacterSheet() {
         </div>
       </div>
 
-      {/* Channel Attunement — Trinity's Four Channels */}
+      {/* Troubadour Type — Four Archetypes */}
       <div style={styles.statBlock}>
         <h3 style={styles.statBlockTitle}>
-          {isFrench ? '── ACCORD DES CANAUX ──' : '── CHANNEL ATTUNEMENT ──'}
+          {lang === 'fr' ? 'Type de Troubadour' : 'Troubadour Type'}
         </h3>
-        <p style={styles.emergentClass}>
-          {attunement.emergentClass[lang]}
-        </p>
+        {profile.dominantType && (
+          <p style={styles.emergentClass}>
+            {profile.dominantType.icon} {profile.dominantType.name[lang]}
+          </p>
+        )}
         <div style={styles.attunementGrid}>
-          {CHANNEL_ATTUNEMENTS.map(ch => {
-            const val = attunement[ch.id] || 0;
+          {TROUBADOUR_TYPES.map(type => {
+            const val = profile[type.id] || 0;
             return (
-              <div key={ch.id} style={styles.attunementRow}>
-                <span style={{ ...styles.attunementIcon }}>{ch.icon}</span>
+              <div key={type.id} style={styles.attunementRow}>
+                <span style={styles.attunementIcon}>{type.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={styles.attunementLabelRow}>
-                    <span style={{ ...styles.attunementLabel, color: ch.color }}>
-                      {ch.channel[lang]}
+                    <span style={{ ...styles.attunementLabel, color: type.color }}>
+                      {type.name[lang]}
                     </span>
                     <span style={styles.attunementPct}>{Math.round(val * 100)}%</span>
                   </div>
@@ -178,8 +185,8 @@ export default function CharacterSheet() {
                     <div style={{
                       ...styles.attunementFill,
                       width: `${val * 100}%`,
-                      background: ch.color,
-                      boxShadow: `0 0 8px ${ch.color}40`,
+                      background: type.color,
+                      boxShadow: `0 0 8px ${type.color}40`,
                     }} />
                   </div>
                 </div>

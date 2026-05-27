@@ -1,8 +1,17 @@
-// ═══════════════════════════════════════════════════════════
-// TRACTION STORE — LocalStorage-backed progress system
-// Tracks per-chapter mastery, somatic readiness, and overall Bard Level
-// Implements the Autopoietic Scaffolding Fade system
-// ═══════════════════════════════════════════════════════════
+// ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
+// ║ FILE    : tractionStore.js                                   ║
+// ║ WHAT    : Read/write student progress in localStorage        ║
+// ║ WHY     : Fast sync state — components read this on render   ║
+// ║ WHO     : No UI — called by providers, game, and textbook    ║
+// ║ OWNS    : bardLevel, totalTraction, streak, per-fret flags   ║
+// ║ NEEDS   : Nothing — no imports, pure localStorage functions  ║
+// ║ RULES   : bardLevel must always derive from totalTraction    ║
+// ║           Never remove yinCompleted or yangCompleted flags   ║
+// ║           “traction” = guitar practice only, not Great Game  ║
+// ║ FIX AT  : Check localStorage key 'bard_traction' in DevTools ║
+// ║           then localDatabase.js if IndexedDB backup is stale ║
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                   ║
+// ╚═══════════════════════════════════════════════════════════════╝
 
 const STORAGE_KEY = 'bard_traction';
 

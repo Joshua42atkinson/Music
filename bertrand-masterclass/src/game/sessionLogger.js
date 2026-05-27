@@ -1,8 +1,18 @@
-// ═══════════════════════════════════════════════════════════
-// PIECE 8: sessionLogger
-// Persists Vertiscale session data to tractionStore + Dexie.
-// Computes phase unlock eligibility after each session.
-// ═══════════════════════════════════════════════════════════
+// ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
+// ║ FILE    : sessionLogger.js                                   ║
+// ║ WHAT    : Translates completed game rounds into traction      ║
+// ║ WHY     : Wire 1 — game scores must feed Bard Level growth   ║
+// ║ WHO     : No UI — called silently after every game session   ║
+// ║ OWNS    : phase unlock eligibility logic, session write       ║
+// ║ NEEDS   : tractionStore.updateFretTraction, localDatabase.db  ║
+// ║          scoreCalculator.computePhaseUnlock                  ║
+// ║ RULES   : Always write to BOTH localStorage AND IndexedDB    ║
+// ║           Phase 3 (FHEAL) must never store or compute score  ║
+// ║           No Florins, no SQLite, no Great Game economy        ║
+// ║ FIX AT  : VertiscaleEngine.handleSessionComplete → here      ║
+// ║           → tractionStore.js → localDatabase.js             ║
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                   ║
+// ╚═══════════════════════════════════════════════════════════════╝
 
 import { loadTraction, updateFretTraction } from '../data/tractionStore';
 import { db } from '../data/localDatabase';

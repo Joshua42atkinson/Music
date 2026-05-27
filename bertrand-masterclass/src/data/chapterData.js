@@ -527,8 +527,8 @@ const frets = [
     yin: {
       title: { en: 'The Art of the True Move', fr: 'L\'Art du Geste Vrai' },
       philosophy: {
-        en: 'The Perfect 5th is resolution, power, clarity. The Supreme Ordeal is confronting your fear of mistakes.',
-        fr: "La quinte parfaite est résolution, puissance, clarté. L'épreuve suprême consiste à affronter votre peur de l'erreur."
+        en: 'The Perfect 5th is resolution, power, clarity. The Supreme Ordeal is confronting your fear of mistakes.\n\nThe storm does not break because you are ready. It breaks because it must. Every power chord ever played was born from the collision of fear and will — the moment the guitarist stops asking permission and takes the stage inside their own body. The Perfect 5th is not merely an interval; it is a declaration. Resolution is not the absence of tension; it is the decision to stand inside it and transform it into sound.',
+        fr: "La quinte parfaite est résolution, puissance, clarté. L'épreuve suprême consiste à affronter votre peur de l'erreur.\n\nL'orage n'éclate pas parce que vous êtes prêt. Il éclate parce qu'il le faut. Chaque power chord jamais joué est né de la collision entre la peur et la volonté — le moment où le guitariste cesse de demander la permission et prend possession de la scène à l'intérieur de son propre corps. La quinte parfaite n'est pas simplement un intervalle ; c'est une déclaration. La résolution n'est pas l'absence de tension ; c'est la décision de se tenir au milieu d'elle et de la transformer en son."
       },
       quote: {
         text: { en: 'The master has failed more times than the beginner has tried.', fr: 'Le maître a échoué plus de fois que le débutant n\'a essayé.' },
@@ -567,6 +567,15 @@ const frets = [
             { en: 'Slide up 1 fret at a time', fr: 'Glissez d\'une frette à la fois vers le haut' },
             { en: 'Breathe at each fret', fr: 'Respirez à chaque frette' }
           ]
+        },
+        {
+          name: { en: 'The Resolution Breath', fr: 'La Respiration de Résolution' },
+          steps: [
+            { en: 'Play a Tritone (dissonant)', fr: 'Jouez un triton (dissonant)' },
+            { en: 'Hold it for 4 slow breaths', fr: 'Maintenez-le pendant 4 respirations lentes' },
+            { en: 'Resolve to the Perfect 5th', fr: 'Résolvez vers la quinte parfaite' },
+            { en: 'Feel the tension dissolve', fr: 'Ressentez la tension se dissoudre' }
+          ]
         }
       ],
       fretboardFocus: { startFret: 0, endFret: 8, strings: [1, 2, 3, 4, 5, 6], pattern: 'power-chord' }
@@ -596,8 +605,8 @@ const frets = [
     yin: {
       title: { en: 'Effortless Mastery', fr: 'La Maîtrise Sans Effort' },
       philosophy: {
-        en: 'The Minor 6th is bittersweet beauty. This is not about playing harder or faster. It is about playing with the absolute minimum necessary force.',
-        fr: "La sixte mineure est une beauté douce-amère. Il ne s'agit pas de jouer plus fort ou plus vite. Il s'agit de jouer avec le minimum absolu de force nécessaire."
+        en: 'The Minor 6th is bittersweet beauty. This is not about playing harder or faster. It is about playing with the absolute minimum necessary force.\n\nEffortlessness is not the absence of effort — it is the disappearance of struggle. The master does not try less; she has refined her trying into something invisible, like a swan gliding while its legs work furiously beneath the surface. Your fingers already know the way. Your breath already knows the rhythm. The only thing left to remove is your doubt.',
+        fr: "La sixte mineure est une beauté douce-amère. Il ne s'agit pas de jouer plus fort ou plus vite. Il s'agit de jouer avec le minimum absolu de force nécessaire.\n\nL'absence d'effort n'est pas l'absence d'effort — c'est la disparition de la lutte. Le maître n'essaie pas moins ; il a affiné son effort en quelque chose d'invisible, comme un cygne qui glisse pendant que ses pattes s'activent furieusement sous la surface. Vos doigts connaissent déjà le chemin. Votre souffle connaît déjà le rythme. La seule chose qu'il reste à enlever est votre doute."
       },
       quote: {
         text: { en: 'Mastery is not about adding, but about removing.', fr: 'La maîtrise ne consiste pas à ajouter, mais à enlever.' },
@@ -632,6 +641,15 @@ const frets = [
             { en: 'Release until buzzing', fr: 'Relâchez jusqu\'au grésillement' },
             { en: 'Add tiny amount of pressure', fr: 'Ajoutez une quantité infime de pression' }
           ]
+        },
+        {
+          name: { en: 'The Weightless Note', fr: 'La Note Sans Poids' },
+          steps: [
+            { en: 'Fret any note with full pressure', fr: 'Frettez n\'importe quelle note avec pleine pression' },
+            { en: 'Release slowly until it buzzes', fr: 'Relâchez lentement jusqu\'au grésillement' },
+            { en: 'Add back the smallest amount', fr: 'Ajoutez la quantité minimale' },
+            { en: 'Play 10 notes at this threshold', fr: 'Jouez 10 notes à ce seuil' }
+          ]
         }
       ],
       fretboardFocus: { startFret: 0, endFret: 9, strings: [1, 2, 3, 4, 5, 6], pattern: 'economy-picking' }
@@ -661,8 +679,8 @@ const frets = [
     yin: {
       title: { en: 'The Story Behind the Sound', fr: 'L\'Histoire Derrière le Son' },
       philosophy: {
-        en: 'The Major 6th evokes nostalgia. Music without story is just organized noise. Every performance needs emotional intention.',
-        fr: "La sixte majeure évoque la nostalgie. La musique sans histoire n'est que du bruit organisé. Chaque performance a besoin d'une intention émotionnelle."
+        en: 'The Major 6th evokes nostalgia. Music without story is just organized noise. Every performance needs emotional intention.\n\nNostalgia is not weakness — it is the evidence that you have lived. The Major 6th carries the weight of memory: a room, a face, a moment you thought you had forgotten. When you play with that memory in your hands, the notes become messengers. The audience does not hear your technique; they feel your history. This is the resurrection: not raising the dead, but raising what is true.',
+        fr: "La sixte majeure évoque la nostalgie. La musique sans histoire n'est que du bruit organisé. Chaque performance a besoin d'une intention émotionnelle.\n\nLa nostalgie n'est pas une faiblesse — c'est la preuve que vous avez vécu. La sixte majeure porte le poids de la mémoire : une pièce, un visage, un moment que vous pensiez avoir oublié. Quand vous jouez avec ce souvenir dans les mains, les notes deviennent des messagères. Le public n'entend pas votre technique ; il ressent votre histoire. C'est la résurrection : non pas ressusciter les morts, mais ressusciter ce qui est vrai."
       },
       quote: {
         text: { en: 'Where words fail, music speaks.', fr: 'Là où les mots échouent, la musique parle.' },
@@ -697,6 +715,15 @@ const frets = [
             { en: 'Dedicate melody to them', fr: 'Dédiez-leur une mélodie' },
             { en: 'Notice touch/tempo changes', fr: 'Observez les changements de toucher/tempo' }
           ]
+        },
+        {
+          name: { en: 'The Three Faces', fr: 'Les Trois Visages' },
+          steps: [
+            { en: 'Choose 3 emotions: grief, anger, joy', fr: 'Choisissez 3 émotions : chagrin, colère, joie' },
+            { en: 'Play the same 4 notes for each', fr: 'Jouez les mêmes 4 notes pour chacune' },
+            { en: 'Change only touch and tempo', fr: 'Changez seulement le toucher et le tempo' },
+            { en: 'Record and listen back', fr: 'Enregistrez et écoutez' }
+          ]
         }
       ],
       fretboardFocus: { startFret: 0, endFret: 10, strings: [1, 2, 3, 4, 5, 6], pattern: 'chord-progression' }
@@ -726,8 +753,8 @@ const frets = [
     yin: {
       title: { en: 'The Social Forge', fr: 'La Forge Sociale' },
       philosophy: {
-        en: 'The Minor 7th is the penultimate tension. The audience is not your enemy — it is a mirror reflecting your emotional truth.',
-        fr: "La septième mineure est l'avant-dernière tension. Le public n'est pas votre ennemi — c'est un miroir reflétant votre vérité émotionnelle."
+        en: 'The Minor 7th is the penultimate tension. The audience is not your enemy — it is a mirror reflecting your emotional truth.\n\nThe mirror does not lie, but it also does not judge. When you step before an audience, you are not facing a wall of eyes — you are facing a thousand versions of yourself, each one hoping you will be honest. The Minor 7th is the final tension because it is the threshold between hiding and revealing. Cross it, and you stop performing. You start being.',
+        fr: "La septième mineure est l'avant-dernière tension. Le public n'est pas votre ennemi — c'est un miroir reflétant votre vérité émotionnelle.\n\nLe miroir ne ment pas, mais il ne juge pas non plus. Quand vous vous tenez devant un public, vous ne faites pas face à un mur de regards — vous faites face à mille versions de vous-même, chacune espérant que vous serez honnête. La septième mineure est la tension finale parce qu'elle est le seuil entre se cacher et se révéler. Franchissez-le, et vous cessez de jouer. Vous commencez à être."
       },
       quote: {
         text: { en: 'Stage fright is the ego\'s last stand.', fr: 'Le trac est le dernier baroud d\'honneur de l\'ego.' },
@@ -762,6 +789,15 @@ const frets = [
             { en: 'Turn on TV midway', fr: 'Allumez la télévision au milieu du jeu' },
             { en: 'Do not stop playing', fr: 'Ne vous arrêtez sous aucun prétexte' }
           ]
+        },
+        {
+          name: { en: 'The Unstoppable Song', fr: 'La Chanson Inarrêtable' },
+          steps: [
+            { en: 'Choose one song, 2 minutes', fr: 'Choisissez une chanson, 2 minutes' },
+            { en: 'Play without stopping', fr: 'Jouez sans vous arrêter' },
+            { en: 'If you make a mistake, breathe and continue', fr: 'Si vous faites une erreur, respirez et continuez' },
+            { en: 'Bow at the end', fr: 'Saluez à la fin' }
+          ]
         }
       ],
       fretboardFocus: { startFret: 0, endFret: 11, strings: [1, 2, 3, 4, 5, 6], pattern: 'full-scale' }
@@ -791,8 +827,8 @@ const frets = [
     yin: {
       title: { en: 'Metaphysical Surrender', fr: 'L\'Abandon Métaphysique' },
       philosophy: {
-        en: 'The Octave is the same note you started with — but vibrating at twice the frequency. You no longer play the guitar; the guitar plays through you.',
-        fr: "L'octave est la même note que celle par laquelle vous avez commencé — mais vibrant à une fréquence double. Vous ne jouez plus de la guitare ; la guitare joue à travers vous."
+        en: 'The Octave is the same note you started with — but vibrating at twice the frequency. You no longer play the guitar; the guitar plays through you.\n\nThe octave is the spiral, not the circle. You return to the root, but the root has grown. What was once a single note is now a universe — twelve frets of experience, twelve stages of becoming. The guitar does not play through you because you have mastered it. It plays through you because you have finally stopped trying to control the music and started serving it.',
+        fr: "L'octave est la même note que celle par laquelle vous avez commencé — mais vibrant à une fréquence double. Vous ne jouez plus de la guitare ; la guitare joue à travers vous.\n\nL'octave est la spirale, non pas le cercle. Vous revenez à la racine, mais la racine a grandi. Ce qui n'était qu'une note unique est désormais un univers — douze frettes d'expérience, douze étapes de devenir. La guitare ne joue pas à travers vous parce que vous l'avez maîtrisée. Elle joue à travers vous parce que vous avez finalement cessé d'essayer de contrôler la musique et avez commencé à la servir."
       },
       quote: {
         text: { en: 'It does not shoot; It shoots.', fr: 'Ça ne tire pas ; Ça tire.' },
@@ -819,7 +855,17 @@ const frets = [
         en: 'No exercises. No rules. No fretboard map. Just you, the guitar, and the sound.',
         fr: 'Aucun exercice. Aucune règle. Aucune carte de touche. Juste vous, la guitare et le son.'
       },
-      exercises: [],
+      exercises: [
+        {
+          name: { en: 'The Infinite Loop', fr: 'La Boucle Infinie' },
+          steps: [
+            { en: 'Set a timer for 5 minutes', fr: 'Réglez un minuteur pour 5 minutes' },
+            { en: 'Play without scales or chords', fr: 'Jouez sans gammes ni accords' },
+            { en: 'Let your fingers lead', fr: 'Laissez vos doigts guider' },
+            { en: 'When the timer ends, play one more note', fr: 'Quand le minuteur sonne, jouez une note de plus' }
+          ]
+        }
+      ],
       fretboardFocus: { startFret: 0, endFret: 12, strings: [1, 2, 3, 4, 5, 6], pattern: 'full-chromatic' }
     }
   }

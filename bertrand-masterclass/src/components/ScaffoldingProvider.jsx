@@ -1,3 +1,19 @@
+// ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
+// ║ FILE    : ScaffoldingProvider.jsx                            ║
+// ║ WHAT    : Global React context — student progress in memory  ║
+// ║ WHY     : Every tool, game, and AI panel needs to know the   ║
+// ║           student's Bard Level, streak, and fret state       ║
+// ║ WHO     : Invisible — wraps entire app, used by all screens  ║
+// ║ OWNS    : traction state, updateTraction, scaffoldingLevel   ║
+// ║ NEEDS   : tractionStore.loadTraction/saveTraction            ║
+// ║          localDatabase.saveProgress/getProgress             ║
+// ║ RULES   : updateTraction is the ONLY way to mutate state     ║
+// ║           Always persist to localStorage on every update     ║
+// ║           No Great Game stats. No XP/Florin economy.         ║
+// ║ FIX AT  : useScaffolding() returning stale? → check here    ║
+// ║           → tractionStore.saveTraction → localStorage key   ║
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                   ║
+// ╚═══════════════════════════════════════════════════════════════╝
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loadTraction, saveTraction, getScaffoldingLevel } from '../data/tractionStore';

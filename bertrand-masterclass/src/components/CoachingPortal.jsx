@@ -73,7 +73,7 @@ const SIGNATURE_PACKAGES = [
 ];
 
 export default function CoachingPortal({ onClose }) {
-  const { isFrench, locale } = useLocale();
+  const { locale, t } = useLocale();
   const [activeTab, setActiveTab] = useState('packages'); // packages | screening | client-db
 
   // Candidate Screening States
@@ -150,17 +150,17 @@ export default function CoachingPortal({ onClose }) {
         <div>
           <span className="text-[10px] font-mono text-cf-gold uppercase tracking-widest flex items-center gap-1.5">
             <ShieldCheck size={12} className="text-cf-gold animate-pulse" />
-            {isFrench ? 'COURS DE GUITARE & PORTAIL INTÉGRÉ' : 'BERTRAND LAURENCE PRIVATE GUITAR HUB'}
+            {t('coachingHubLabel')}
           </span>
           <h2 className="text-xl font-bold font-mono tracking-wide text-white uppercase mt-0.5">
-            {isFrench ? 'Cours de Guitare & Coaching Privé' : 'Guitar Coaching & Practice Intake'}
+            {t('coachingHubTitle')}
           </h2>
         </div>
         <button
           onClick={onClose}
           className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-mono uppercase tracking-wider text-cf-slate hover:bg-white/10 hover:text-white transition-all"
         >
-          {isFrench ? '← Retour au Hub' : '← Back to Hub'}
+          {t('backToHub')}
         </button>
       </div>
 
@@ -178,7 +178,7 @@ export default function CoachingPortal({ onClose }) {
             }`}
           >
             <Compass size={14} />
-            {isFrench ? 'Forfaits de Coaching' : 'Coaching Packages'}
+            {t('coachingPackagesTab')}
           </button>
           <button
             onClick={() => setActiveTab('screening')}
@@ -189,7 +189,7 @@ export default function CoachingPortal({ onClose }) {
             }`}
           >
             <UserCheck size={14} />
-            {isFrench ? "Formulaire d'Intake" : 'Lesson Intake Form'}
+            {t('intakeFormTab')}
           </button>
           <button
             onClick={() => setActiveTab('client-db')}
@@ -200,7 +200,7 @@ export default function CoachingPortal({ onClose }) {
             }`}
           >
             <BarChart3 size={14} />
-            {isFrench ? 'Suivi de Pratique' : 'Student Telemetry'}
+            {t('studentTelemetryTab')}
           </button>
         </div>
 
@@ -220,13 +220,10 @@ export default function CoachingPortal({ onClose }) {
               >
                 <div>
                   <h3 className="text-2xl font-bold font-mono tracking-wider text-cf-gold uppercase">
-                    {isFrench ? 'FORFAITS DE COACHING DE GUITARE' : 'PRIVATE GUITAR COACHING PACKAGES'}
+                    {t('coachingPackagesTitle')}
                   </h3>
                   <p className="text-sm text-cf-slate leading-relaxed mt-2">
-                    {isFrench
-                      ? 'Des formules de coaching sur mesure associant la pédagogie unique de Bertrand, l\'analyse de justesse en temps réel et des outils ludiques de suivi.'
-                      : 'Highly interactive personal coaching packages blending Bertrand\'s unique techniques, real-time pitch feedback, and fun practice tracking tools.'
-                    }
+                    {t('coachingPackagesDesc')}
                   </p>
                 </div>
 
@@ -266,7 +263,7 @@ export default function CoachingPortal({ onClose }) {
                         onClick={() => setActiveTab('screening')}
                         className="w-full py-3 bg-cf-gold text-neutral-900 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 hover:bg-[#ebd4aa] hover:shadow-[0_0_15px_rgba(201,169,110,0.3)] transition-all"
                       >
-                        {isFrench ? 'Planifier une session' : 'Book Intake Session'}
+                        {t('bookIntakeSession')}
                         <ArrowRight size={14} />
                       </button>
                     </div>
@@ -286,13 +283,10 @@ export default function CoachingPortal({ onClose }) {
               >
                 <div>
                   <h3 className="text-xl font-bold font-mono tracking-wider text-cf-gold uppercase">
-                    {isFrench ? "FORMULAIRE D'INTAKE DE GUITARE" : 'GUITAR COACHING INTAKE FORM'}
+                    {t('intakeFormTitle')}
                   </h3>
                   <p className="text-xs text-cf-slate leading-relaxed mt-1">
-                    {isFrench
-                      ? "Ce formulaire permet à Bertrand de personnaliser vos routines d'exercice. Vous pouvez optionnellement évaluer votre niveau de concentration."
-                      : 'This intake form helps Bertrand customize your practice routines. You can optionally scan your focus baseline using the webcam tool below.'
-                    }
+                    {t('intakeFormDesc')}
                   </p>
                 </div>
 
@@ -305,13 +299,10 @@ export default function CoachingPortal({ onClose }) {
                   >
                     <Award size={48} className="text-cf-gold mx-auto animate-bounce" />
                     <h4 className="text-lg font-bold font-mono text-white uppercase">
-                      {isFrench ? "Formulaire d'Intake Transmis" : 'Intake Form Submitted'}
+                      {t('intakeSubmitted')}
                     </h4>
                     <p className="text-xs text-cf-slate max-w-md mx-auto leading-relaxed">
-                      {isFrench
-                        ? "Vos informations ont été enregistrées localement. Bertrand vous contactera très rapidement pour planifier votre premier cours."
-                        : 'Your intake details have been logged in Bertrand\'s local SQLite database. He will review your profile and contact you for scheduling shortly.'
-                      }
+                      {t('intakeSubmittedDesc')}
                     </p>
                     <div className="bg-black/50 rounded-xl p-4 text-left border border-white/5 font-mono text-[10px] space-y-1.5">
                       <div className="text-cf-gold uppercase tracking-wider border-b border-white/10 pb-1 mb-1">Student Practice Intake Profile:</div>
@@ -325,7 +316,7 @@ export default function CoachingPortal({ onClose }) {
                   <form onSubmit={submitApplication} className="space-y-4">
                     <div className="space-y-1">
                       <label className="text-[10px] font-mono text-cf-slate uppercase tracking-wider block">
-                        {isFrench ? 'Votre Nom' : 'Your Full Name'}
+                        {t('yourFullName')}
                       </label>
                       <input
                         type="text" required
@@ -337,13 +328,13 @@ export default function CoachingPortal({ onClose }) {
 
                     <div className="space-y-1">
                       <label className="text-[10px] font-mono text-cf-slate uppercase tracking-wider block">
-                        {isFrench ? 'Vos Objectifs (Styles de Guitare, Morceaux préférés)' : 'Your Practice Goals (Guitar styles, favorite songs)'}
+                        {t('practiceGoals')}
                       </label>
                       <textarea
                         required rows={3}
                         value={candidateVision} onChange={e => setCandidateVision(e.target.value)}
                         className="w-full bg-[#100e0b] border border-white/10 rounded-xl px-4 py-3 text-xs font-mono text-white focus:border-cf-gold focus:outline-none transition-all resize-none"
-                        placeholder={isFrench ? "Ex. Apprendre le chord melody, enchaîner mes accords sans fatigue..." : "Ex. Master chord transitions, learn fingerstyle, release neck strain..."}
+                        placeholder={t('practiceGoalsPlaceholder')}
                       />
                     </div>
 
@@ -357,7 +348,7 @@ export default function CoachingPortal({ onClose }) {
                             : 'bg-white/5 border-white/10 text-white/50'
                         }`}
                       >
-                        🥋 {isFrench ? 'Tension Épaules' : 'Shoulder Tension'}
+                        🥋 {t('shoulderTension')}
                       </button>
                       <button
                         type="button"
@@ -368,7 +359,7 @@ export default function CoachingPortal({ onClose }) {
                             : 'bg-white/5 border-white/10 text-white/50'
                         }`}
                       >
-                        👄 {isFrench ? 'Tension Gorge / Voix' : 'Vocal strain'}
+                        👄 {t('vocalStrain')}
                       </button>
                       <button
                         type="button"
@@ -379,7 +370,7 @@ export default function CoachingPortal({ onClose }) {
                             : 'bg-white/5 border-white/10 text-white/50'
                         }`}
                       >
-                        🌬️ {isFrench ? 'Fatigue Pouce / Main' : 'Hand / Thumb Fatigue'}
+                        🌬️ {t('thumbFatigue')}
                       </button>
                     </div>
 
@@ -388,13 +379,10 @@ export default function CoachingPortal({ onClose }) {
                       <div>
                         <h4 className="text-xs font-bold text-cf-gold font-mono uppercase tracking-wider flex items-center gap-1.5">
                           <Activity size={14} className="text-cf-gold" />
-                          {isFrench ? 'ÉVALUER MON NIVEAU DE CONCENTRATION (15S OPTE)' : 'OPTIONAL 15S PERFORMANCE FOCUS SCAN'}
+                          {t('focusScanTitle')}
                         </h4>
                         <p className="text-[10px] text-cf-slate leading-relaxed mt-1">
-                          {isFrench 
-                            ? "Activez la caméra ci-dessous pour capturer votre rythme cardiaque et calculer votre indice de focus de départ."
-                            : "Run the webcam rPPG validator to establish your practice focus index before submitting."
-                          }
+                          {t('focusScanDesc')}
                         </p>
                       </div>
 
@@ -408,7 +396,7 @@ export default function CoachingPortal({ onClose }) {
                           onClick={triggerOnboardingScan}
                           className="px-4 py-2.5 bg-cf-gold text-neutral-900 font-mono font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-[#ebd4aa] disabled:bg-neutral-800 disabled:text-neutral-500 transition-all flex items-center gap-1.5"
                         >
-                          {isScanning ? (isFrench ? 'Analyse...' : 'Scanning...') : (isFrench ? 'Lancer le Scan rPPG' : 'Trigger Focus rPPG')}
+                          {isScanning ? t('scanning') : t('triggerFocusScan')}
                         </button>
                         
                         {isScanning && (
@@ -426,7 +414,7 @@ export default function CoachingPortal({ onClose }) {
                           <div className="text-[10px] font-mono text-cf-gold border border-cf-gold/20 bg-cf-gold/5 px-3 py-1.5 rounded-lg flex items-center gap-2">
                             <CheckCircle size={10} className="text-cf-gold" />
                             <span>
-                              {isFrench ? 'Étalonné avec succès' : 'Successfully calibrated'} · HRV: {scanBiometrics.hrv} ms
+                              {t('calibrated')} · HRV: {scanBiometrics.hrv} ms
                             </span>
                           </div>
                         )}
@@ -438,7 +426,7 @@ export default function CoachingPortal({ onClose }) {
                       className="w-full py-4 bg-cf-gold text-neutral-900 rounded-xl text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#ebd4aa] hover:shadow-[0_0_20px_rgba(201,169,110,0.3)] transition-all flex items-center justify-center gap-2"
                     >
                       <Send size={14} />
-                      {isFrench ? 'Déposer sa Candidature Somatique' : 'Submit Somatic Candidate Profile'}
+                      {t('submitProfile')}
                     </button>
                   </form>
                 )}
@@ -456,13 +444,10 @@ export default function CoachingPortal({ onClose }) {
               >
                 <div>
                   <h3 className="text-xl font-bold font-mono tracking-wider text-cf-gold uppercase">
-                    {isFrench ? 'TABLEAU DE BORD DE PRATIQUE DES ÉLÈVES' : 'STUDENT PRACTICE & TELEMETRY PROGRESS'}
+                    {t('telemetryTitle')}
                   </h3>
                   <p className="text-xs text-cf-slate leading-relaxed mt-1">
-                    {isFrench
-                      ? 'Visualisez les sessions de pratique, la stabilité de la justesse et les statistiques de concentration des élèves.'
-                      : 'Review practice sessions, pitch stability improvements, and focus statistics over the course of the lessons.'
-                    }
+                    {t('telemetryDesc')}
                   </p>
                 </div>
 
@@ -505,13 +490,10 @@ export default function CoachingPortal({ onClose }) {
                 <div className="bg-[#100e0b] border border-cf-gold/15 p-6 rounded-2xl relative overflow-hidden flex flex-col justify-center items-center h-48 text-center">
                   <BarChart3 size={32} className="text-cf-gold/40 animate-pulse mb-3" />
                   <h4 className="text-xs font-bold text-white uppercase font-mono tracking-wider">
-                    {isFrench ? 'Visualisation de Tendance Physiologique' : 'Autonomic Flow Chronological Trends'}
+                    {t('autonomicTrendsTitle')}
                   </h4>
                   <p className="text-[10px] text-cf-slate max-w-sm mt-1 leading-relaxed">
-                    {isFrench
-                      ? 'Affiche l\'évolution de l\'Index de Flow Somatique par rapport aux exercices d\'Occitanie.'
-                      : 'Plots progressive somatic flow index metrics relative to castle performance templates.'
-                    }
+                    {t('autonomicTrendsDesc')}
                   </p>
                 </div>
               </motion.div>

@@ -75,6 +75,28 @@ export const PAYMENT_METHODS = [
 // ── Service Definitions ──
 export const SERVICES = [
   {
+    id: 'troubadour-tip',
+    name: 'Support the Troubadour',
+    subtitle: 'Pay what you want · No obligation',
+    description: 'The curriculum, the AI coach, and all twelve tools are free — always. If this work has helped you, consider a tip. Like a street performer, Bertrand shares his art first and trusts the audience.',
+    icon: '☕',
+    duration: 'Instant',
+    delivery: 'Ko-fi or any payment method below',
+    color: '#c9a96e',
+    pricing: [
+      { label: 'Small Tip', price: 5, unit: 'one-time', stripeLink: 'https://buy.stripe.com/mock_tip_5' },
+      { label: 'Generous Tip', price: 15, unit: 'one-time', stripeLink: 'https://buy.stripe.com/mock_tip_15' },
+      { label: 'Patron', price: 50, unit: 'one-time', stripeLink: 'https://buy.stripe.com/mock_tip_50' },
+    ],
+    features: [
+      'All curriculum content remains free forever',
+      'Troubadour AI coach remains free forever',
+      'All 12 digital tools remain free forever',
+      'Tips directly support Bertrand\'s teaching',
+      'No account or login required to learn',
+    ],
+  },
+  {
     id: 'private-lesson',
     name: 'Private Guitar Lesson',
     subtitle: 'Live 1-on-1 via Zoom',
@@ -187,24 +209,24 @@ export const SERVICES = [
   },
   {
     id: 'membership',
-    name: 'Inner Circle Membership',
-    subtitle: 'Community + Coaching Perks',
-    description: 'Monthly live group Q&A with me, priority async review queue, downloadable practice materials, and community access. The textbook is always free — this is for students who want direct access to my ongoing guidance.',
+    name: 'The Troubadour\'s Circle',
+    subtitle: 'Community · Mentorship · Connection',
+    description: 'The curriculum is free. The AI is free. The tools are free. This is for students who want the human connection — direct access to Bertrand\'s ongoing guidance, a community of fellow learners, and the accountability that comes from being seen.',
     icon: '⭐',
     duration: 'Monthly recurring',
-    delivery: 'Zoom Group Q&A + Priority Access',
+    delivery: 'Zoom Group Q&A + Community + Priority Access',
     color: '#d4a84b',
     pricing: [
       { label: 'Monthly', price: 25, unit: 'month', stripeLink: 'https://buy.stripe.com/mock_membership_monthly_25', recurring: true },
       { label: 'Annual', price: 199, unit: 'year', stripeLink: 'https://buy.stripe.com/mock_membership_annual_199', recurring: true, badge: 'Save 34%', perUnit: 16.58 },
     ],
     features: [
-      'Monthly live group Q&A with me (Zoom)',
+      'Monthly live group Q&A with Bertrand (Zoom)',
       'Priority queue for async video reviews',
+      'Community of fellow learners — share recordings, ask questions',
       'Downloadable practice materials (Vertiscales, chord maps, TABs)',
-      'Community forum access',
-      'Early access to new content and workshops',
-      'Discounts on private lessons and workshops',
+      'Early access to new workshops and content',
+      'Discounts on private lessons',
     ],
   },
 

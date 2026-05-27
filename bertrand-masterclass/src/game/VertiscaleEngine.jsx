@@ -12,7 +12,7 @@ import { computeVertiscale, NOTE_NAMES, STRING_TUNING, midiToFreq, VERTISCALE_PA
 import NeckMenu from '../components/NeckMenu';
 import AdventurePlayer from './AdventurePlayer';
 import Glossary from '../components/Glossary';
-import { getVertiscaleProgress } from './sessionLogger';
+import { getVertiscaleProgress, logVertiscaleSession } from './sessionLogger';
 import BiometricSanctum from '../components/BiometricSanctum';
 import { useBackendBridge } from '../hooks/useBackendBridge';
 import { db } from '../data/localDatabase';
@@ -35,6 +35,7 @@ import { useLocale } from '../hooks/useLocale';
 
 const ENGINE_STATES = {
   MENU:      'menu',      // Key/root selection
+  BE_STEP:   'be_step',   // BE > DO > HAVE — breath intention before Phase 1
   PHASE1:    'phase1',    // SHEARL Flash rounds
   PHASE2:    'phase2',    // PLING! Orbs
   PHASE3:    'phase3',    // FHEAL summary
@@ -46,11 +47,12 @@ const ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 
 
 function VertiscaleEngine({ onClose }) {
   const navigate = useNavigate();
-  const { isFrench } = useLocale();
+  const { locale, t } = useLocale();
+
   // ── Global state ──
   const [engineState, setEngineState] = useState(ENGINE_STATES.MENU);
   const [rootNote, setRootNote]       = useState('E');
-  const [gameMode, setGameMode]       = useState('flash'); // 'flash' | 'imagine'
+  const [gameMode, setGameMode]       = useState('flash');
   const [scaleType, setScaleType]     = useState('minor pentatonic'); // tonalName from vertiscalePatterns
   const [difficulty, setDifficulty]   = useState('beginner'); // 'beginner' | 'standard' | 'challenge'
   const [round, setRound]            = useState(0);
@@ -75,7 +77,7 @@ function VertiscaleEngine({ onClose }) {
   const currentStage = Math.floor(round / 2) + 1;
 
   // ── Biometric and Backend states ──
-  const { insertLog, earnFlorins } = useBackendBridge();
+  useBackendBridge(); // DaaS connection maintained for desktop app sync
   const [activeBiometrics, setActiveBiometrics] = useState(null);
   const [biometricsHistory, setBiometricsHistory] = useState([]);
   const [centsDeviations, setCentsDeviations] = useState([]);
@@ -98,50 +100,25 @@ function VertiscaleEngine({ onClose }) {
 
     const deviations = centsDeviations.length > 0 ? centsDeviations : [0];
 
-    // Log to Dexie (vertiscaleSessions store)
+    // ── Log session to tractionStore + Dexie via sessionLogger ──
+    const phase = engineState === ENGINE_STATES.PHASE1 ? 1 : 2;
     try {
-      await db.vertiscaleSessions.add({
-        phase: engineState === ENGINE_STATES.PHASE1 ? 1 : 2,
+      await logVertiscaleSession({
+        phase,
         patternId: scaleType,
-        timestamp: new Date().toISOString(),
-        successful: avgScore >= 0.7,
-        hrv: avgHrv,
-        stressLevel: avgStress,
-        flowIndex: avgFlow,
-        centsDeviations: JSON.stringify(deviations),
+        rounds: logs || scores.map(composite => ({
+          composite,
+          breakdown: { placement: composite, breath: 1 - avgStress, pitch: composite },
+        })),
       });
-      console.log('Session logged to IndexedDB successfully!');
     } catch (e) {
-      console.warn('IndexedDB vertiscale logging failed:', e);
-    }
-
-    // Log to SQLite via Backend Bridge
-    const activeStudent = localStorage.getItem('active_student_profile') || 'Jean-Luc';
-    try {
-      await insertLog({
-        id: `vs-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        chapter: currentStage,
-        notes: `Vertiscale performance (${scaleType}) with cardiac coherence. HRV: ${avgHrv}ms, Stress: ${avgStress.toFixed(2)}, Flow: ${avgFlow.toFixed(2)}.`,
-        score: avgScore,
-        recording_path: null,
-        student_name: activeStudent,
-      });
-      console.log('Session logged to SQLite successfully for', activeStudent);
-      
-      const florinEarned = Math.round(avgScore * 40);
-      if (florinEarned > 0) {
-        await earnFlorins(activeStudent, florinEarned);
-        console.log(`🪙 Student earned ${florinEarned} Florins for voice training score!`);
-      }
-    } catch (e) {
-      console.warn('SQLite vertiscale logging failed:', e);
+      console.warn('[VertiscaleEngine] sessionLogger failed:', e);
     }
 
     setRoundScores(scores);
     if (logs) setSessionLog(logs);
     setEngineState(ENGINE_STATES.PHASE3);
-  }, [engineState, scaleType, biometricsHistory, centsDeviations, activeBiometrics, currentStage, insertLog, earnFlorins]);
+  }, [engineState, scaleType, biometricsHistory, centsDeviations, activeBiometrics]);
 
   // ── Pitch detector ──
   const {
@@ -204,19 +181,26 @@ function VertiscaleEngine({ onClose }) {
 
   const startPhase = useCallback((phase, mode) => {
     if (mode) setGameMode(mode);
-    setEngineState(phase);
     setRound(0);
     setRoundScores([]);
     setSessionLog([]);
     setPlayerTaps([]);
     setBreathSamples([]);
+    // Route Phase 1 through the BE_STEP breath screen first
     if (phase === ENGINE_STATES.PHASE1) {
-      const useMode = mode || gameMode;
-      if (useMode === 'imagine') {
-        setTimeout(() => startHoldRound(), 500);
-      } else {
-        setTimeout(() => startFlash(), 500);
-      }
+      setEngineState(ENGINE_STATES.BE_STEP);
+    } else {
+      setEngineState(phase);
+    }
+  }, [gameMode]);
+
+  const proceedFromBeStep = useCallback(() => {
+    setEngineState(ENGINE_STATES.PHASE1);
+    const useMode = gameMode;
+    if (useMode === 'imagine') {
+      setTimeout(() => startHoldRound(), 500);
+    } else {
+      setTimeout(() => startFlash(), 500);
     }
   }, [startFlash, startHoldRound, gameMode]);
 
@@ -301,7 +285,7 @@ function VertiscaleEngine({ onClose }) {
       paddingRight: 'env(safe-area-inset-right)',
     }}>
       {/* ── Top Bar ── */}
-      {engineState !== ENGINE_STATES.MENU && engineState !== ENGINE_STATES.ADVENTURE && (
+      {engineState !== ENGINE_STATES.MENU && engineState !== ENGINE_STATES.ADVENTURE && engineState !== ENGINE_STATES.BE_STEP && (
         <div style={{ flexShrink: 0, zIndex: 10 }}>
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -318,7 +302,7 @@ function VertiscaleEngine({ onClose }) {
                 fontFamily: 'JetBrains Mono, monospace',
                 display: 'flex', alignItems: 'center', gap: 6,
                 marginLeft: '52px',
-              }}>{isFrench ? '← Quitter' : '← Exit'}</button>
+              }}>{t('ve_exit')}</button>
             ) : (
               <button onClick={() => navigate('/')} style={{
                 background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
@@ -327,7 +311,7 @@ function VertiscaleEngine({ onClose }) {
                 fontFamily: 'JetBrains Mono, monospace',
                 display: 'flex', alignItems: 'center', gap: 6,
                 marginLeft: '52px',
-              }}>{isFrench ? '← Accueil' : '← Home'}</button>
+              }}>{t('ve_home')}</button>
             )}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -418,14 +402,14 @@ function VertiscaleEngine({ onClose }) {
                 <p style={{
                   fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
                   letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase',
-                }}>{gameMode === 'imagine' ? (isFrench ? '🪁 IMAGINATION' : '🪁 IMAGINE') : '⚡ FLASH'} · {isFrench ? 'ÉTAPE' : 'STAGE'} {currentStage}/4 · {isFrench ? `Vertiscale de ${rootNote}` : `${rootNote} Vertiscale`}</p>
+                }}>{gameMode === 'imagine' ? (locale === 'fr' ? '🪁 IMAGINATION' : '🪁 IMAGINE') : '⚡ FLASH'} · {t('ve_stage')} {currentStage}/4 · {locale === 'fr' ? `Vertiscale de ${rootNote}` : `${rootNote} Vertiscale`}</p>
                 <p style={{ fontSize: '1rem', color: '#8090a8', marginTop: 8, lineHeight: 1.6 }}>
                   {gameMode === 'imagine'
                     ? (flashState === FLASH_STATES.REVEAL 
-                        ? (isFrench ? 'Étudiez les points dorés ci-dessous — ils indiquent l’emplacement des notes sur le manche.' : 'Study the gold dots below — they show where the notes are on the fretboard.')
+                        ? t('ve_studyGoldDots')
                         : flashState === FLASH_STATES.HOLD 
                           ? (() => {
-                              const holdCues = isFrench ? [
+                              const holdCues = locale === 'fr' ? [
                                 'Maintenez vos pressions et respirez calmement.',
                                 'Suivez la forme des yeux — observez la géométrie.',
                                 'Fermez les yeux un instant — voyez-vous encore le motif ?',
@@ -443,14 +427,14 @@ function VertiscaleEngine({ onClose }) {
                               const idx = round % holdCues.length;
                               return holdCues[idx];
                             })()
-                          : (isFrench ? 'Vérification de la précision de votre placement...' : 'Checking your placement accuracy...'))
+                          : t('ve_checkingAccuracy'))
                     : (flashState === FLASH_STATES.REVEAL
-                        ? (isFrench ? `Étudiez le motif ! Vous avez quelques secondes avant qu'il ne disparaisse.` : `Study the pattern! You have a few seconds before it disappears.`)
+                        ? t('ve_studyPattern')
                         : flashState === FLASH_STATES.DARK
-                          ? (isFrench ? 'Le motif vient de disparaître — préparez-vous à tapoter !' : 'The pattern just vanished — get ready to tap!')
+                          ? t('ve_patternVanished')
                           : flashState === FLASH_STATES.TAP
-                            ? (isFrench ? 'Tapez où se trouvaient les notes — faites confiance à votre imagination !' : 'Tap where the notes were — trust your imagination!')
-                            : isFrench 
+                            ? t('ve_tapNotes')
+                            : locale === 'fr' 
                               ? (currentStage === 1 ? `Manche ${round+1} : Concentrez-vous sur les 2 cordes du bas. Un motif va clignoter — absorbez-le !` :
                                  currentStage === 2 ? `Manche ${round+1} : Maintenant avec 3 cordes. Le motif s'agrandit !` :
                                  currentStage === 3 ? `Manche ${round+1} : 4 cordes maintenant — attention au décalage de la corde de Si !` :
@@ -469,26 +453,17 @@ function VertiscaleEngine({ onClose }) {
                   borderRadius: 12, padding: '14px 18px', marginBottom: 14, lineHeight: 1.7,
                 }}>
                   <p style={{ fontSize: '0.85rem', color: '#c9a96e', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
-                    {isFrench ? '🎯 COMMENT JOUER' : '🎯 HOW TO PLAY'}
+                    {t('ve_howToPlay')}
                   </p>
                   <p style={{ fontSize: '1rem', color: '#d0d8e0', marginBottom: 6 }}>
                     {gameMode === 'imagine'
-                      ? (isFrench 
-                          ? '➀ Étudiez les points dorés sur la touche ci-dessous — ils indiquent les notes de la gamme. ➁ Tapotez les mêmes positions pour les verrouiller. ➂ Maintenez votre position et respirez calmement jusqu’à la fin du chronomètre.'
-                          : '➀ Study the gold dots on the fretboard below — they show notes in the scale. ➁ Tap the same positions to lock them in. ➂ Hold your placement and breathe steadily until the timer completes.')
-                      : (isFrench
-                          ? '➀ Les points dorés clignotent sur la touche — étudiez leurs positions ! ➁ Le motif va disparaître. ➂ Tapotez de mémoire où se trouvaient les notes. ➃ Vert = correct, Rouge = faux, Orange = manqué.'
-                          : '➀ Gold dots will flash on the fretboard — study their positions! ➁ The pattern will disappear. ➂ Tap where the notes were — trust your imagination. ➃ Green = correct, Red = wrong, Orange = you missed it.')}
+                      ? t('ve_howToPlayImagine')
+                      : t('ve_howToPlayFlash')}
                   </p>
                 </div>
               )}
 
-              {/* Timer bar — flash mode shows countdown, imagine mode shows hold progress */}
-              {flashState === FLASH_STATES.TAP && (
-                <div style={{ height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2, marginBottom: 12, overflow: 'hidden' }}>
-                  <motion.div initial={{ width: '100%' }} animate={{ width: `${tapProgressPct * 100}%` }} style={{ height: '100%', background: '#c9a96e', borderRadius: 2 }} />
-                </div>
-              )}
+              {/* Hold progress — imagine mode only. TAP has no timer (student-paced). */}
               {flashState === FLASH_STATES.HOLD && (
                 <div style={{ height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2, marginBottom: 12, overflow: 'hidden' }}>
                   <motion.div animate={{ width: `${holdProgressPct * 100}%` }} style={{ height: '100%', background: 'linear-gradient(90deg, #2ed573, #c9a96e)', borderRadius: 2, transition: 'width 100ms linear' }} />
@@ -536,8 +511,8 @@ function VertiscaleEngine({ onClose }) {
                   }}
                 >
                   {flashState === FLASH_STATES.HOLD 
-                    ? (isFrench ? `🫁 Relâcher (${playerTaps.length} placés)` : `🫁 Release (${playerTaps.length} placed)`)
-                    : (isFrench ? `✓ Soumettre (${playerTaps.length} taps)` : `✓ Submit (${playerTaps.length} taps)`)}
+                    ? (locale === 'fr' ? `🫁 Relâcher (${playerTaps.length} placés)` : `🫁 Release (${playerTaps.length} placed)`)
+                    : (locale === 'fr' ? `✓ Soumettre (${playerTaps.length} taps)` : `✓ Submit (${playerTaps.length} taps)`)}
                 </motion.button>
               )}
 
@@ -548,7 +523,7 @@ function VertiscaleEngine({ onClose }) {
                     {Math.round(roundScores[roundScores.length - 1] * 100)}%
                   </p>
                   <p style={{ fontSize: '0.9rem', color: '#5a6a80' }}>
-                    {isFrench ? 'Préparation de la manche suivante...' : 'Preparing next round...'}
+                    {t('ve_preparingRound')}
                   </p>
                 </div>
               )}
@@ -558,6 +533,16 @@ function VertiscaleEngine({ onClose }) {
                 <BreathIndicator breathState={breathState} volume={volume} />
               )}
             </motion.div>
+          )}
+
+          {engineState === ENGINE_STATES.BE_STEP && (
+            <BeStepScreen
+              key="be_step"
+              gameMode={gameMode}
+              rootNote={rootNote}
+              onReady={proceedFromBeStep}
+              onBack={() => setEngineState(ENGINE_STATES.MENU)}
+            />
           )}
 
           {engineState === ENGINE_STATES.PHASE2 && (
@@ -613,12 +598,12 @@ function VertiscaleEngine({ onClose }) {
 // ═══════════════════════════════════════════════════════════
 
 function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isListening, onStartMic, onClose, difficulty, setDifficulty, scaleType, setScaleType }) {
-  const { isFrench } = useLocale();
+  const { locale, t } = useLocale();
   const mappedRoots = ROOT_NOTES.map((note, idx) => ({
     id: note,
     fret: idx + 1,
-    title: isFrench ? `Vertiscale de ${note}` : `${note} Vertiscale`,
-    subtitle: isFrench ? 'Entraîner les motifs verticaux' : 'Train vertical scale patterns',
+    title: locale === 'fr' ? `Vertiscale de ${note}` : `${note} Vertiscale`,
+    subtitle: t('ve_menuVertiscaleSubtitle'),
     symbol: note,
     color: '#c9a96e',
   }));
@@ -637,25 +622,17 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
           letterSpacing: '0.1em', color: '#c9a96e', textTransform: 'uppercase',
           display: 'flex', alignItems: 'center', gap: 8,
         }}>
-          <span>❓</span> {isFrench ? 'Qu’est-ce qu’une Vertiscale ?' : 'What is a Vertiscale?'} <span style={{ marginLeft: 'auto', opacity: 0.5 }}>▼</span>
+          <span>❓</span> {t('ve_whatIsVertiscale')} <span style={{ marginLeft: 'auto', opacity: 0.5 }}>▼</span>
         </summary>
         <div style={{ padding: '0 18px 16px', lineHeight: 1.8 }}>
           <p style={{ fontSize: '1rem', color: '#d0d8e0', marginBottom: 10 }}>
-            {isFrench ? (
-              <>Une <strong style={{ color: '#c9a96e' }}>vertiscale</strong> est une forme de gamme verticale sur le manche de guitare. Au lieu de jouer une gamme horizontalement (de gauche à droite sur les frettes), vous la jouez verticalement (sur les cordes dans la même zone de frettes).</>
-            ) : (
-              <>A <strong style={{ color: '#c9a96e' }}>vertiscale</strong> is a vertical scale shape on the guitar neck. Instead of playing a scale horizontally (across frets left to right), you play it vertically (across strings on the same fret area).</>
-            )}
+            {t('ve_vertiscaleDesc1')}
           </p>
           <p style={{ fontSize: '1rem', color: '#d0d8e0', marginBottom: 10 }}>
-            {isFrench ? (
-              <>Cela vous apprend à <strong style={{ color: '#c9a96e' }}>voir les motifs dans toutes les directions</strong> — le fondement de la maîtrise du manche. Chaque exercice ci-dessous entraîne un aspect différent de cette compétence.</>
-            ) : (
-              <>This teaches you to <strong style={{ color: '#c9a96e' }}>see patterns in all directions</strong> — the foundation of fretboard mastery. Each exercise below trains a different aspect of this skill.</>
-            )}
+            {t('ve_vertiscaleDesc2')}
           </p>
           <p style={{ fontSize: '0.9rem', color: '#8090a8', fontStyle: 'italic' }}>
-            {isFrench ? "Ne vous inquiétez pas si vous débutez — le jeu commence simplement (seulement 2 cordes) et en ajoute progressivement d'autres." : "Don't worry if you're new — the game starts simple (just 2 strings) and gradually adds more."}
+            {t('ve_vertiscaleDesc3')}
           </p>
         </div>
       </details>
@@ -667,7 +644,7 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
         background: 'rgba(46,213,115,0.04)', borderRadius: 8,
         border: '1px solid rgba(46,213,115,0.08)',
       }}>
-        {(isFrench ? ['🛡️ Pas de score de vitesse', '🚫 Pas de classements', '✓ Les erreurs sont OK', '🔒 Pratique privée'] : ['🛡️ No speed scoring', '🚫 No leaderboards', '✓ Mistakes are OK', '🔒 Your practice is private']).map(item => (
+        {(locale === 'fr' ? ['🛡️ Pas de score de vitesse', '🚫 Pas de classements', '✓ Les erreurs sont OK', '🔒 Pratique privée'] : ['🛡️ No speed scoring', '🚫 No leaderboards', '✓ Mistakes are OK', '🔒 Your practice is private']).map(item => (
           <span key={item} style={{
             fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem',
             color: '#5a8a68', letterSpacing: '0.03em',
@@ -685,11 +662,11 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
           color: '#5a6a80', letterSpacing: '0.1em', textTransform: 'uppercase',
           margin: '0 8px 0 0', display: 'flex', alignItems: 'center',
-        }}>{isFrench ? 'VITESSE :' : 'SPEED:'}</p>
+        }}>{t('ve_speed')}</p>
         {[
-          { key: 'beginner', label: isFrench ? '🐢 Lent' : '🐢 Slow', desc: isFrench ? 'Le motif reste 3,5s' : 'Pattern stays 3.5s' },
-          { key: 'standard', label: isFrench ? '🚶 Moyen' : '🚶 Medium', desc: isFrench ? 'Le motif reste 2,5s' : 'Pattern stays 2.5s' },
-          { key: 'challenge', label: isFrench ? '⚡ Rapide' : '⚡ Fast', desc: isFrench ? 'Le motif reste 1,5s' : 'Pattern stays 1.5s' },
+          { key: 'beginner', label: t('ve_slow'), desc: t('ve_slowDesc') },
+          { key: 'standard', label: t('ve_medium'), desc: t('ve_mediumDesc') },
+          { key: 'challenge', label: t('ve_fast'), desc: t('ve_fastDesc') },
         ].map(d => (
           <button key={d.key} onClick={() => setDifficulty(d.key)} title={d.desc} style={{
             padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
@@ -713,14 +690,14 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
           color: '#5a6a80', letterSpacing: '0.1em', textTransform: 'uppercase',
           margin: '0 8px 0 0', display: 'flex', alignItems: 'center', width: '100%',
           justifyContent: 'center', marginBottom: 4,
-        }}>{isFrench ? 'TYPE DE GAMME :' : 'SCALE TYPE:'}</p>
+        }}>{t('ve_scaleType')}</p>
         {[
-          { key: 'minor pentatonic', label: isFrench ? '♪ Pentatonique' : '♪ Pentatonic' },
-          { key: 'major', label: isFrench ? '♫ Majeure' : '♫ Major' },
-          { key: 'minor', label: isFrench ? '♭ Mineure' : '♭ Minor' },
-          { key: 'dorian', label: isFrench ? '♮ Dorien' : '♮ Dorian' },
-          { key: 'mixolydian', label: isFrench ? '♯ Mixolydien' : '♯ Mixolydian' },
-          { key: 'minor blues', label: isFrench ? '🎷 Blues' : '🎷 Blues' },
+          { key: 'minor pentatonic', label: t('ve_pentatonic') },
+          { key: 'major', label: t('ve_major') },
+          { key: 'minor', label: t('ve_minor') },
+          { key: 'dorian', label: t('ve_dorian') },
+          { key: 'mixolydian', label: t('ve_mixolydian') },
+          { key: 'minor blues', label: t('ve_blues') },
         ].map(s => (
           <button key={s.key} onClick={() => setScaleType(s.key)} style={{
             padding: '5px 10px', borderRadius: 6, cursor: 'pointer',
@@ -741,78 +718,68 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
             color: '#2ed573', cursor: 'pointer',
             fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
             letterSpacing: '0.05em'
-          }}>{isFrench ? '🎤 Activer le microphone (optionnel)' : '🎤 Enable Microphone (optional)'}</button>
+          }}>{t('ve_enableMic')}</button>
         ) : (
-          <p style={{ fontSize: '0.9rem', color: '#2ed573' }}>{isFrench ? '🎤 Micro actif — suivi respiratoire activé' : '🎤 Mic active — breath tracking enabled'}</p>
+          <p style={{ fontSize: '0.9rem', color: '#2ed573' }}>{t('ve_micActive')}</p>
         )}
         {micError && <p style={{ fontSize: '0.9rem', color: '#e74c3c', marginTop: 8 }}>{micError}</p>}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 400, margin: '0 auto' }}>
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '0 0 2px' }}>
-          {isFrench ? 'LE MANCHE INTÉRIEUR' : 'THE INNER FRETBOARD'}
+          {t('ve_innerFretboard')}
         </p>
         <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>
-          {isFrench ? 'Entraînez votre mémoire visuelle de l’emplacement des notes sur le manche' : 'Train your visual memory of where notes live on the guitar neck'}
+          {t('ve_innerFretboardDesc')}
         </p>
         <PhaseButton
-          label={isFrench ? '⚡ FLASH · Rappel Rapide' : '⚡ FLASH · Quick Recall'}
-          desc={isFrench 
-            ? "Un motif de notes clignote sur la touche. Étudiez-le attentivement — puis il disparaît ! Tapotez de mémoire pour recréer l'emplacement des notes."
-            : "A pattern of notes flashes on the fretboard. Study it carefully — then it disappears! Tap from your imagination to recreate where the notes were."}
+          label={t('ve_flashLabel')}
+          desc={t('ve_flashDesc')}
           unlocked={phaseUnlock.phase1Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE1, 'flash')}
         />
         <PhaseButton
-          label={isFrench ? '🫁 IMAGINE · Maintien Soutenu' : '🫁 IMAGINE · Sustained Hold'}
-          desc={isFrench
-            ? "Le motif reste visible pendant que vous tapotez. Concentrez-vous sur la précision et une respiration stable."
-            : "The pattern stays visible while you place your taps. Focus on accuracy and steady breathing. The longer you hold, the deeper the learning."}
+          label={t('ve_imagineLabel')}
+          desc={t('ve_imagineDesc')}
           unlocked={phaseUnlock.phase1Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE1, 'imagine')}
         />
 
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '16px 0 2px' }}>
-          {isFrench ? 'L’OREILLE INTÉRIEURE' : 'THE INNER EAR'}
+          {t('ve_innerEar')}
         </p>
         <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>
-          {isFrench ? 'Développez votre capacité à entendre et à faire correspondre les hauteurs' : 'Develop your ability to hear and match pitches'}
+          {t('ve_innerEarDesc')}
         </p>
         <PhaseButton
-          label={isFrench ? '🎵 AUDIATION · Orbes Pling!' : '🎵 AUDIATE · Pling! Orbs'}
-          desc={isFrench
-            ? "Une note descend sur l'écran. Essayez d'abord de l'entendre dans votre esprit, puis chantez-la dans le micro."
-            : "A note descends the screen. Try to hear it in your mind first, then sing it into the microphone. The app checks if you matched the pitch."}
+          label={t('ve_audiateLabel')}
+          desc={t('ve_audiateDesc')}
           unlocked={phaseUnlock.phase2Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE2)}
         />
 
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '16px 0 2px' }}>
-          {isFrench ? 'LA VOIX INTÉRIEURE' : 'THE INNER VOICE'}
+          {t('ve_innerVoice')}
         </p>
         <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>
-          {isFrench ? 'Réfléchissez à ce que révèlent vos séances de pratique' : 'Reflect on what your practice sessions reveal'}
+          {t('ve_innerVoiceDesc')}
         </p>
         <PhaseButton
-          label={isFrench ? '📝 RÉFLEXION · Journal de Session' : '📝 REFLECT · Session Journal'}
-          desc={isFrench
-            ? "Passez en revue les performances de votre session. Voyez où vous avez été précis et notez ce que vous avez remarqué."
-            : "Review your session performance. See where you were accurate, where you struggled, and journal about what you noticed."}
+          label={t('ve_reflectLabel')}
+          desc={t('ve_reflectDesc')}
           unlocked={phaseUnlock.phase3Unlocked}
           onClick={() => onStart(ENGINE_STATES.PHASE3)}
         />
 
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', margin: '16px 0 2px' }}>
-          {isFrench ? 'L’HISTOIRE VIVANTE' : 'THE LIVING STORY'}
+          {t('ve_livingStory')}
         </p>
         <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '0 0 8px', lineHeight: 1.6 }}>
-          {isFrench ? 'Apprenez à travers un récit historique immersif' : 'Learn through an immersive historical narrative'}
+          {t('ve_livingStoryDesc')}
         </p>
         <PhaseButton
-          label={isFrench ? '🏰 AVENTURE · Le Troubadour' : '🏰 ADVENTURE · The Troubadour'}
-          desc={isFrench
-            ? "Incarnez un troubadour médiéval. Aux moments clés, vous devez faire correspondre une note pour déverrouiller la suite."
-            : "Play through a historical story as a medieval troubadour. At key moments, you must match a musical pitch to unlock the next chapter."}
+          label={t('ve_adventureLabel')}
+          desc={t('ve_adventureDesc')}
           unlocked={true}
           onClick={() => onStart(ENGINE_STATES.ADVENTURE)}
         />
@@ -833,8 +800,8 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
         activeId={rootNote}
         onItemClick={(id) => setRootNote(id === rootNote ? null : id)}
         renderContent={renderContent}
-        headerTitle={isFrench ? "Vertiscale" : "Vertiscale"}
-        headerSubtitle={isFrench ? "Entraînez l'imagination. Les doigts suivent." : "Train the imagination. The fingers follow."}
+        headerTitle={t('ve_menuTitle')}
+        headerSubtitle={t('ve_menuSubtitle')}
         showBackButton={!onClose} // Only show Home button if not embedded
       >
         {onClose && (
@@ -844,7 +811,7 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
               color: '#8090a8', borderRadius: 8, fontSize: '0.8rem',
               cursor: 'pointer', padding: '8px 14px',
               fontFamily: 'JetBrains Mono, monospace',
-            }}>{isFrench ? 'Fermer' : 'Close'}</button>
+            }}>{t('ve_close')}</button>
           </div>
         )}
       </NeckMenu>
@@ -852,14 +819,133 @@ function MenuScreen({ rootNote, setRootNote, phaseUnlock, onStart, micError, isL
   );
 }
 
+// ── BE Step Screen — BE > DO > HAVE breath intention ──
+function BeStepScreen({ gameMode, rootNote, onReady, onBack }) {
+  const { locale } = useLocale();
+  const modeLabel = gameMode === 'imagine'
+    ? (locale === 'fr' ? 'IMAGINATION' : 'IMAGINATION')
+    : (locale === 'fr' ? 'FLASH' : 'FLASH');
+
+  const breathCues = locale === 'fr' ? [
+    'Posez une main sur votre poitrine.',
+    'Inspirez lentement par le nez...',
+    'Expirez par la bouche.',
+    'Vous êtes déjà musicien.',
+  ] : [
+    'Place one hand on your chest.',
+    'Breathe in slowly through the nose...',
+    'Breathe out through the mouth.',
+    'You are already a musician.',
+  ];
+
+  const [cueIdx, setCueIdx] = React.useState(0);
+  const [ready, setReady] = React.useState(false);
+
+  React.useEffect(() => {
+    if (ready) return;
+    const t = setInterval(() => {
+      setCueIdx(prev => {
+        if (prev >= breathCues.length - 1) { clearInterval(t); setReady(true); return prev; }
+        return prev + 1;
+      });
+    }, 2200);
+    return () => clearInterval(t);
+  }, [ready, breathCues.length]);
+
+  return (
+    <motion.div
+      key="be_step"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: '70vh', gap: 28, padding: '40px 24px',
+        textAlign: 'center',
+      }}
+    >
+      <p style={{
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+        letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
+      }}>
+        {locale === 'fr' ? `AVANT · ${modeLabel} · Vertiscale de ${rootNote}` : `BEFORE · ${modeLabel} · ${rootNote} Vertiscale`}
+      </p>
+
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={cueIdx}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.6 }}
+          style={{
+            fontFamily: 'Cormorant Garamond, EB Garamond, serif',
+            fontSize: '1.6rem', fontWeight: 300,
+            color: '#e8edf2', lineHeight: 1.6, maxWidth: 320,
+          }}
+        >
+          {breathCues[cueIdx]}
+        </motion.p>
+      </AnimatePresence>
+
+      {/* Breathing pulse ring */}
+      <motion.div
+        animate={{ scale: [1, 1.12, 1], opacity: [0.4, 0.8, 0.4] }}
+        transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }}
+        style={{
+          width: 80, height: 80, borderRadius: '50%',
+          border: '1px solid rgba(201,169,110,0.4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.7, 0.3] }}
+          transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+          style={{
+            width: 48, height: 48, borderRadius: '50%',
+            background: 'rgba(201,169,110,0.15)',
+            border: '1px solid rgba(201,169,110,0.25)',
+          }}
+        />
+      </motion.div>
+
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: ready ? 1 : 0 }}
+        onClick={ready ? onReady : undefined}
+        style={{
+          padding: '16px 40px', borderRadius: 8,
+          background: ready ? 'rgba(201,169,110,0.12)' : 'transparent',
+          border: `1px solid ${ready ? 'rgba(201,169,110,0.4)' : 'transparent'}`,
+          color: '#c9a96e', cursor: ready ? 'pointer' : 'default',
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
+          letterSpacing: '0.1em', textTransform: 'uppercase',
+          transition: 'all 0.5s ease',
+        }}
+      >
+        {locale === 'fr' ? "Je suis prêt" : "I'm ready"}
+      </motion.button>
+
+      <button onClick={onBack} style={{
+        background: 'none', border: 'none', color: '#5a6a80',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem',
+        cursor: 'pointer', letterSpacing: '0.08em',
+      }}>
+        {locale === 'fr' ? '← Retour' : '← Back'}
+      </button>
+    </motion.div>
+  );
+}
+
 // ── Phase 2 Screen — PLING! Orbs (with Audiation Pause) ──
 function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListening, audioCtxRef, onSessionLog, onComplete, onBack }) {
-  const { isFrench } = useLocale();
+  const { locale, t } = useLocale();
   const [orbActive, setOrbActive] = React.useState(false);
   const [orbScores, setOrbScores] = React.useState([]);
   const [currentTarget, setCurrentTarget] = React.useState(null);
   const [gateState, setGateState] = React.useState('waiting');
   const [audiatePhase, setAudiatePhase] = React.useState(null); // null | { note }
+  const [hitCelebration, setHitCelebration] = React.useState(null); // null | { noteName }
 
   // Transform pattern array into orbSequence format for OrbEngine
   const orbSequence = React.useMemo(() => {
@@ -894,18 +980,74 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
         <p style={{
           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
           letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase',
-        }}>{isFrench ? `🎵 L’OREILLE INTÉRIEURE · Vertiscale de ${rootNote}` : `🎵 THE INNER EAR · ${rootNote} Vertiscale`}</p>
+        }}>{locale === 'fr' ? `🎵 L’OREILLE INTÉRIEURE · Vertiscale de ${rootNote}` : `🎵 THE INNER EAR · ${rootNote} Vertiscale`}</p>
         <p style={{ fontSize: '1rem', color: '#8090a8', marginTop: 8, lineHeight: 1.6 }}>
-          {isFrench ? (
+          {locale === 'fr' ? (
             <>Les notes descendent sur l'écran. Quand une note atteint la <span style={{ color: '#9b7acc' }}>ligne violette</span>, <strong>imaginez le son dans votre esprit</strong> — ne chantez pas encore. Quand elle traverse la <span style={{ color: '#c9a96e' }}>ligne dorée</span>, chantez dans le micro. Tapez sur l'orbe quand vous êtes prêt.</>
           ) : (
             <>Notes descend the screen. When a note hits the <span style={{ color: '#9b7acc' }}>purple line</span>, <strong>imagine the sound in your mind</strong> — don't sing yet. When it crosses the <span style={{ color: '#c9a96e' }}>gold line</span>, sing it into your mic. Tap the orb when you're ready.</>
           )}
         </p>
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80', marginTop: 8 }}>
-          {isFrench ? `${orbScores.length}/${orbSequence.length} notes complétées` : `${orbScores.length}/${orbSequence.length} notes completed`}
+          {locale === 'fr' ? `${orbScores.length}/${orbSequence.length} notes complétées` : `${orbScores.length}/${orbSequence.length} notes completed`}
         </p>
       </div>
+
+      {/* SING NOW pulse — at gate-open, explicit vocal cue (Bertrand's PLING! protocol) */}
+      <AnimatePresence>
+        {gateState === 'open' && !audiatePhase && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.25 }}
+            style={{
+              textAlign: 'center', padding: '12px 20px', borderRadius: 10,
+              background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.35)',
+              marginBottom: 4,
+            }}
+          >
+            <p style={{
+              fontFamily: 'Cormorant Garamond, EB Garamond, serif',
+              fontSize: '1.8rem', fontWeight: 300,
+              color: '#c9a96e', margin: 0, letterSpacing: '0.05em',
+            }}>
+              {locale === 'fr' ? 'Chantez.' : 'Sing it.'}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Somatic hit celebration — note name + grounding cue */}
+      <AnimatePresence>
+        {hitCelebration && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              textAlign: 'center', padding: '10px 20px', borderRadius: 10,
+              background: 'rgba(46,213,115,0.08)', border: '1px solid rgba(46,213,115,0.25)',
+              marginBottom: 4,
+            }}
+          >
+            <p style={{
+              fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem',
+              color: '#2ed573', margin: 0, letterSpacing: '0.12em',
+            }}>
+              {hitCelebration.noteName || '✓'}
+            </p>
+            <p style={{
+              fontFamily: 'Cormorant Garamond, EB Garamond, serif',
+              fontSize: '0.95rem', fontStyle: 'italic',
+              color: '#7aaa88', margin: '4px 0 0', letterSpacing: '0.03em',
+            }}>
+              {locale === 'fr' ? 'Sentez où elle vit.' : 'Feel where it lives.'}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Audiation status indicator */}
       {audiatePhase && (
@@ -920,9 +1062,9 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
           <p style={{
             fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
             letterSpacing: '0.12em', color: '#9b7acc', textTransform: 'uppercase', margin: 0,
-          }}>{isFrench ? `🧠 AUDIATION — ${audiatePhase.note?.name}` : `🧠 AUDIATING — ${audiatePhase.note?.name}`}</p>
+          }}>{locale === 'fr' ? `🧠 AUDIATION — ${audiatePhase.note?.name}` : `🧠 AUDIATING — ${audiatePhase.note?.name}`}</p>
           <p style={{ fontSize: '0.9rem', color: '#8090a8', margin: '4px 0 0', fontStyle: 'italic' }}>
-            {isFrench ? 'Entendez la note dans votre esprit. Ne chantez pas encore…' : "Hear the note in your mind. Don't sing yet…"}
+            {t('ve_hearInMind')}
           </p>
         </motion.div>
       )}
@@ -960,6 +1102,11 @@ function Phase2Screen({ pattern, rootNote, pitch, noteInfo, breathState, isListe
           });
           setOrbScores(prev => [...prev, score]);
           onSessionLog({ phase: 2, ...score, orbId });
+          // Somatic hit celebration — Bertrand's 3rd Ear protocol: celebrate the connection
+          if (result.correct) {
+            setHitCelebration({ noteName: result.noteName || currentTarget?.name });
+            setTimeout(() => setHitCelebration(null), 1800);
+          }
           setGateState('waiting');
           setCurrentTarget(null);
           setAudiatePhase(null);
@@ -1152,7 +1299,7 @@ function SomaticProgressionChart({ sessions }) {
 }
 
 function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakEligible, onClose, onRestart }) {
-  const { isFrench } = useLocale();
+  const { locale, t } = useLocale();
   const [journal, setJournal] = React.useState('');
   const [pastSessions, setPastSessions] = React.useState([]);
 
@@ -1174,7 +1321,7 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
     const avgPlacement = sessionLog.reduce((sum, l) => sum + (l.breakdown?.placement || 0), 0) / Math.max(1, sessionLog.length);
     const avgBreath = sessionLog.reduce((sum, l) => sum + (l.breakdown?.breath || 0), 0) / Math.max(1, sessionLog.length);
     
-    if (isFrench) {
+    if (locale === 'fr') {
       if (avgPlacement < 0.4) return { text: 'Sentez le bois sous vos doigts. Où réside la tension ?', focus: 'placement' };
       if (avgBreath < 0.3) return { text: 'Suivez le souffle. La musique vit dans l’expiration.', focus: 'breath' };
       if (avgScore > 0.8) return { text: 'Vous trouvez votre voix. Quelle histoire racontent vos mains ?', focus: 'maîtrise' };
@@ -1202,13 +1349,13 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
 
       <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase' }}>
-        {isFrench ? 'LA VOIX INTÉRIEURE' : 'THE INNER VOICE'}
+        {t('ve_innerVoice')}
       </p>
 
       <h2 style={{
         fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem',
         fontWeight: 300, color: '#e8edf2',
-      }}>{isFrench ? 'Session Terminée' : 'Session Complete'}</h2>
+      }}>{t('ve_summaryTitle')}</h2>
 
       {/* Score ring */}
       <div style={{
@@ -1227,16 +1374,16 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
           <span style={{
             fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem',
             color: '#5a6a80', letterSpacing: '0.1em',
-          }}>{isFrench ? 'SCORE MOYEN' : 'AVG SCORE'}</span>
+          }}>{t('ve_avgScore')}</span>
         </div>
       </div>
 
       {/* Stats grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', maxWidth: 300 }}>
-        <StatCard label={isFrench ? "Tonique" : "Root"} value={rootNote} />
-        <StatCard label={isFrench ? "Manches" : "Rounds"} value={roundScores.length} />
-        <StatCard label={isFrench ? "Meilleur" : "Best"} value={`${Math.round(Math.max(...(roundScores.length ? roundScores : [0])) * 100)}%`} />
-        <StatCard label={isFrench ? "Série" : "Streak"} value={streakEligible ? (isFrench ? '✓ Oui' : '✓ Yes') : (isFrench ? 'Pas encore' : 'Not yet')} />
+        <StatCard label={t('ve_statRoot')} value={rootNote} />
+        <StatCard label={t('ve_statRounds')} value={roundScores.length} />
+        <StatCard label={t('ve_statBest')} value={`${Math.round(Math.max(...(roundScores.length ? roundScores : [0])) * 100)}%`} />
+        <StatCard label={t('ve_statStreak')} value={streakEligible ? t('ve_streakYes') : t('ve_streakNo')} />
       </div>
 
       {/* Somatic Progression Chart */}
@@ -1246,7 +1393,7 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
       {roundScores.length > 0 && (
         <div style={{ width: '100%', maxWidth: 300 }}>
           <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80', letterSpacing: '0.1em', marginBottom: 8 }}>
-            {isFrench ? 'HISTORIQUE DES MANCHES' : 'ROUND HISTORY'}
+            {t('ve_roundHistory')}
           </p>
           <div style={{ display: 'flex', gap: 4 }}>
             {roundScores.map((s, i) => (
@@ -1276,14 +1423,14 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
       {/* Journal textarea */}
       <div style={{ width: '100%', maxWidth: 320 }}>
         <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', letterSpacing: '0.1em', color: '#c9a96e', marginBottom: 12, textAlign: 'center', textTransform: 'uppercase' }}>
-          {isFrench ? 'RÉFLEXION D’INTÉGRATION' : 'FHEAL REFLECTION'}
+          {t('ve_fhealReflection')}
         </p>
         <div style={{ position: 'relative' }}>
           <textarea
             className="fheal-textarea"
             value={journal}
             onChange={(e) => setJournal(e.target.value)}
-            placeholder={isFrench ? "Qu’est-ce que vos mains ont mémorisé que votre esprit a oublié ?\nOù s’est situé l’écart entre l’imagination et la réalité ?\nQu’est-ce qui vous a surpris ?" : "What did your hands remember that your mind forgot?\nWhere was the gap between imagination and reality?\nWhat surprised you?"}
+            placeholder={t('ve_fhealPlaceholder')}
             style={{
               width: '100%', minHeight: 120, padding: 16, borderRadius: 12,
               background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)',
@@ -1313,13 +1460,13 @@ function SummaryScreen({ roundScores, sessionLog, rootNote, avgScore, streakElig
           flex: 1, padding: '16px', borderRadius: 8,
           background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.3)',
           color: '#c9a96e', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
-        }}>{isFrench ? '↻ Encore' : '↻ Again'}</button>
+        }}>{t('ve_again')}</button>
         {onClose && (
           <button onClick={() => { saveJournal(); onClose(); }} style={{
             flex: 1, padding: '16px', borderRadius: 8,
             background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
             color: '#8090a8', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
-          }}>{isFrench ? 'Terminé' : 'Done'}</button>
+          }}>{t('ve_done')}</button>
         )}
       </div>
     </motion.div>

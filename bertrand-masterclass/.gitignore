@@ -1,2 +1,10 @@
 .vercel
 .env*.local
+node_modules
+dist
+training
+.git
+*.log
+.DS_Store
+coverage
+.vite

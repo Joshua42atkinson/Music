@@ -80,8 +80,8 @@ const FEATURES = {
 };
 
 export default function HelpMenu({ onClose }) {
-  const { isFrench } = useLocale();
-  const features = FEATURES[isFrench ? 'fr' : 'en'];
+  const { locale } = useLocale();
+  const features = FEATURES[locale === 'fr' ? 'fr' : 'en'];
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
@@ -91,7 +91,7 @@ export default function HelpMenu({ onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-cf-gold/10">
           <h2 className="text-2xl font-serif text-cf-gold">
-            {isFrench ? 'Guide de l\'Application' : 'App Guide'}
+            {locale === 'fr' ? "Guide de l'Application" : 'App Guide'}
           </h2>
           <button
             onClick={onClose}
@@ -126,9 +126,7 @@ export default function HelpMenu({ onClose }) {
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-cf-gold/10 text-center">
             <p className="text-xs text-cf-slate/60 font-mono">
-              {isFrench 
-                ? 'Voix Vive — La Voix Vivante' 
-                : 'Voix Vive — The Living Voice'}
+              {locale === 'fr' ? 'Voix Vive — La Voix Vivante' : 'Voix Vive — The Living Voice'}
             </p>
           </div>
         </div>

@@ -29,7 +29,8 @@ const PROTOCOL_COLORS = {
 };
 
 /* ── Single tool card ── */
-const FretToolCard = ({ tool, onClick, isFrench }) => {
+const FretToolCard = ({ tool, onClick }) => {
+  const { t } = useLocale();
   const isAvailable = tool.status === 'available';
   const colors = PROTOCOL_COLORS[tool.protocol] || PROTOCOL_COLORS['SHEARL'];
   const hasInlay = FRET_INLAY_POSITIONS.has(tool.id);
@@ -60,7 +61,7 @@ const FretToolCard = ({ tool, onClick, isFrench }) => {
             border: `1px solid ${isAvailable ? colors.border : 'rgba(255,255,255,0.08)'}`,
           }}
         >
-          {isFrench ? 'Frette' : 'Fret'} {tool.id}
+          {t('fret')} {tool.id}
         </span>
         {hasInlay && (
           <div
@@ -118,7 +119,7 @@ const FretToolCard = ({ tool, onClick, isFrench }) => {
           className="absolute top-2 right-2 text-[8px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded"
           style={{ color: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          {isFrench ? 'Bientôt' : 'Soon'}
+          {t('soon')}
         </div>
       )}
     </motion.div>
@@ -142,7 +143,9 @@ const ProtocolLegend = () => (
 );
 
 /* ── Guitar neck nut bar ── */
-const NeckNut = ({ isFrench }) => (
+const NeckNut = () => {
+  const { t } = useLocale();
+  return (
   <div className="relative mb-1 mx-2">
     <div
       className="h-2 rounded-sm w-full"
@@ -152,16 +155,17 @@ const NeckNut = ({ isFrench }) => (
       }}
     />
     <p className="text-[9px] font-mono tracking-widest text-center mt-1" style={{ color: 'rgba(201,169,110,0.4)' }}>
-      {isFrench ? '── LES 12 OUTILS ── UN PAR FRETTE ──' : '── THE 12 TOOLS ── ONE PER FRET ──'}
+      {t('the12Tools')}
     </p>
   </div>
-);
+  );
+};
 
 /* ══════════════════════════════════════════
    MAIN COMPONENT
 ══════════════════════════════════════════ */
 const DigitalBinder = () => {
-  const { locale, isFrench } = useLocale();
+  const { locale, t } = useLocale();
   const [activeToolId, setActiveToolId] = useState(null);
   
   const {
@@ -318,7 +322,7 @@ const DigitalBinder = () => {
             </div>
             <div>
               <p className="text-xs font-mono tracking-widest uppercase mb-2" style={{ color: colors.text }}>
-                {isFrench ? 'Frette' : 'Fret'} {activeTool.id} · {isFrench ? 'À Venir' : 'Coming Soon'}
+                {t('fret')} {activeTool.id} · {t('comingSoon')}
               </p>
               <h3 className="text-2xl font-cormorant font-bold text-white mb-3">{activeTool.name}</h3>
               <p className="text-sm text-white/50 leading-relaxed max-w-xs">{activeTool.telemetry}</p>
@@ -341,8 +345,8 @@ const DigitalBinder = () => {
       activeId={activeToolId}
       onItemClick={handleToolClick}
       renderContent={renderToolContent}
-      headerTitle={isFrench ? "L'Atelier du Troubadour" : "Troubadour's Workshop"}
-      headerSubtitle={isFrench ? 'Vos 12 outils de pratique — un par frette.' : 'Your 12 practice tools — one per fret.'}
+      headerTitle={t('troubadoursWorkshop')}
+      headerSubtitle={t('practiceToolsSubtitle')}
       showBackButton={true}
     >
       {/* ── PRACTICE LOG ── */}
@@ -355,11 +359,11 @@ const DigitalBinder = () => {
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isDaaSConnected ? 'bg-green-500 animate-pulse' : 'bg-white/20'}`} />
               <h3 className="text-sm font-mono tracking-wider uppercase text-white/80">
-                {isFrench ? 'Service de Bureau (DaaS)' : 'Desktop Service (DaaS)'}
+                {t('desktopService')}
               </h3>
             </div>
             <span className="text-[10px] font-mono text-cf-gold px-2 py-0.5 bg-cf-gold/10 rounded-full border border-cf-gold/20">
-              {isDaaSConnected ? (isFrench ? '🎙️ souverain local' : '🎙️ sovereign local-first') : (isFrench ? '💤 aperçu hors-ligne' : '💤 offline preview')}
+              {isDaaSConnected ? t('sovereignLocal') : t('offlinePreview')}
             </span>
           </div>
           
@@ -368,7 +372,7 @@ const DigitalBinder = () => {
               <div className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10">
                 <div>
                   <p className="text-[10px] font-mono text-white/40 uppercase">
-                    {isFrench ? "Cerveau d'IA Local Actif" : 'Active Local AI Brain'}
+                    {t('activeLocalAiBrain')}
                   </p>
                   <p className="text-sm font-bold text-white mt-0.5">
                     {activeBackend && typeof activeBackend === 'object' ? activeBackend.name : (activeBackend || 'Detecting...')}
@@ -379,7 +383,7 @@ const DigitalBinder = () => {
                   disabled={loading}
                   className="px-3 py-1.5 rounded-lg bg-cf-gold/20 hover:bg-cf-gold/30 text-cf-gold border border-cf-gold/30 text-xs font-mono tracking-wider transition-all disabled:opacity-50"
                 >
-                  {loading ? (isFrench ? 'Recherche...' : 'Probing...') : (isFrench ? '🔄 Redétecter' : '🔄 Redetect')}
+                  {loading ? t('probing') : t('redetect')}
                 </button>
               </div>
 
@@ -406,7 +410,7 @@ const DigitalBinder = () => {
             </div>
           ) : (
             <p className="text-xs text-white/40 leading-relaxed">
-              {isFrench ? (
+              {locale === 'fr' ? (
                 "Fonctionne en mode aperçu. Lancez l'application de bureau Voix Vive Masterclass pour débloquer le stockage local SQLite, la détection des modèles IA locaux (LM Studio / Ollama), et la synchronisation DaaS complète."
               ) : (
                 "Running in preview mode. Launch the Voix Vive Masterclass Desktop App on your computer to unlock SQLite local storage, auto-detected local AI models (LM Studio / Ollama), and full DaaS sync."
@@ -426,8 +430,8 @@ const DigitalBinder = () => {
           {/* Active Assignment */}
           <div>
             <div className="flex justify-between items-end mb-4 px-2">
-              <h2 className="text-lg font-bold">{isFrench ? 'Devoirs Actifs' : 'Active Assignments'}</h2>
-              <span className="text-xs text-cf-sage">{isFrench ? '1 Requis' : '1 Due'}</span>
+              <h2 className="text-lg font-bold">{t('activeAssignments')}</h2>
+              <span className="text-xs text-cf-sage">{t('oneDue')}</span>
             </div>
             <div className="bg-cf-deep border border-cf-border rounded-2xl p-5 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-3 opacity-10">
@@ -435,23 +439,19 @@ const DigitalBinder = () => {
               </div>
               <div className="relative z-10">
                 <span className="inline-block px-2 py-1 rounded bg-cf-sage/20 text-cf-sage text-[10px] font-mono tracking-widest mb-3 uppercase">
-                  {isFrench ? 'Pour Jeudi' : 'Due Thursday'}
+                  {t('dueThursday')}
                 </span>
                 <h3 className="text-lg font-bold text-white mb-2">
-                  {isFrench ? 'Enregistrer le Protocole PLING!' : 'Record PLING! Protocol'}
+                  {t('recordPling')}
                 </h3>
                 <p className="text-sm text-cf-whisper mb-6">
-                  {isFrench ? (
-                    "Enregistrez un clip audio de 2 minutes de vous-même chantant l'intervalle de tierce mineure et le trouvant sur la corde de La."
-                  ) : (
-                    "Record a 2-minute audio clip of yourself singing the minor 3rd interval and finding it on the A string."
-                  )}
+                  {t('recordPlingDesc')}
                 </p>
                 <button
                   onClick={() => setShowRecorder(true)}
                   className="w-full py-3 rounded-xl bg-cf-sage text-cf-deep font-bold text-sm flex items-center justify-center gap-2 hover:bg-white transition-colors"
                 >
-                  <Video size={18} /> {isFrench ? 'Enregistrer & Soumettre' : 'Record & Submit'}
+                  <Video size={18} /> {t('recordAndSubmit')}
                 </button>
               </div>
             </div>
@@ -461,7 +461,7 @@ const DigitalBinder = () => {
           {submissions.length > 0 && (
             <div>
               <h2 className="text-sm font-mono tracking-widest text-white/40 uppercase mb-4 px-2">
-                {isFrench ? 'Mes Soumissions' : 'My Submissions'}
+                {t('mySubmissions')}
               </h2>
               <div className="space-y-2">
                 {submissions.slice(0, 5).map((sub) => (
@@ -478,7 +478,7 @@ const DigitalBinder = () => {
                       <h4 className="text-sm font-bold truncate">{sub.exerciseName}</h4>
                       <p className="text-xs text-white/50">
                         {sub.mediaType === 'video' ? '📹' : '🎙️'} {formatTime(sub.duration)} ·{' '}
-                        {new Date(sub.timestamp).toLocaleDateString(isFrench ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
+                        {new Date(sub.timestamp).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
                       </p>
                     </div>
                     <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded ${
@@ -486,7 +486,7 @@ const DigitalBinder = () => {
                       sub.status === 'sent'     ? 'bg-blue-500/20 text-blue-400' :
                                                   'bg-yellow-500/20 text-yellow-400'
                     }`}>
-                      {sub.status === 'reviewed' ? (isFrench ? 'Corrigé' : 'Reviewed') : sub.status === 'sent' ? (isFrench ? 'Envoyé' : 'Sent') : (isFrench ? 'En Attente' : 'Queued')}
+                      {sub.status === 'reviewed' ? t('reviewed') : sub.status === 'sent' ? t('sent') : t('queued')}
                     </span>
                   </div>
                 ))}
@@ -497,9 +497,9 @@ const DigitalBinder = () => {
           {/* Pre-Practice Checklist */}
           <div>
             <div className="flex justify-between items-end mb-4 px-2">
-              <h2 className="text-lg font-bold">{isFrench ? 'Rituel de Pré-Pratique' : 'Pre-Practice Ritual'}</h2>
+              <h2 className="text-lg font-bold">{t('prePracticeRitual')}</h2>
               <button onClick={resetDaily} className="text-xs text-cf-gold hover:underline">
-                {isFrench ? 'Réinitialiser' : 'Reset Daily'}
+                {t('resetDaily')}
               </button>
             </div>
             <div className="space-y-2">
@@ -529,7 +529,7 @@ const DigitalBinder = () => {
           {/* Bertrand's Feedback */}
           <div>
             <h2 className="text-sm font-mono tracking-widest text-white/40 uppercase mb-4 px-2">
-              {isFrench ? 'Retours de Bertrand' : "Bertrand's Feedback"}
+              {t('bertrandsFeedback')}
             </h2>
             <div className="p-4 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3 mb-3">
@@ -537,16 +537,12 @@ const DigitalBinder = () => {
                   <img src="/assets/bertrand_profile.jpg" alt="Bertrand" className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold">{isFrench ? 'Soumission de Cartographie CAGED' : 'CAGED Map Submission'}</h4>
-                  <p className="text-xs text-white/50">{isFrench ? '12 Mai 2026' : 'May 12, 2026'}</p>
+                  <h4 className="text-sm font-bold">{t('cagedSubmission')}</h4>
+                  <p className="text-xs text-white/50">{t('feedbackDate')}</p>
                 </div>
               </div>
               <p className="text-sm text-cf-ink-bright italic border-l-2 border-cf-gold/50 pl-3">
-                {isFrench ? (
-                  '"Votre transition de la forme C à la forme A est beaucoup plus fluide. Continuez à surveiller la position de votre pouce gauche."'
-                ) : (
-                  '"Your transition from the C-shape to the A-shape is much smoother. Keep watching that left thumb."'
-                )}
+                {t('feedbackQuote')}
               </p>
             </div>
           </div>

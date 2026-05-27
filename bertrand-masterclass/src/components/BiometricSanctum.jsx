@@ -20,7 +20,7 @@ const PRESETS = {
 };
 
 export default function BiometricSanctum({ onBiometricsChange }) {
-  const { isFrench } = useLocale();
+  const { locale, t } = useLocale();
   const canvasRef = useRef(null);
   const [preset, setPreset] = useState('flow');
   const { hr, hrv, alpha, beta, theta } = PRESETS[preset];
@@ -100,9 +100,9 @@ export default function BiometricSanctum({ onBiometricsChange }) {
   }, [hr, alpha, beta, theta]);
 
   const presetLabels = {
-    flow: isFrench ? '🌌 Zone Flow' : '🌌 Flow Zone',
-    tension: isFrench ? '⚡ Tension' : '⚡ Tension Spike',
-    rest: isFrench ? '🧘 Sommeil' : '🧘 Somatic Rest',
+    flow: t('flowZone'),
+    tension: t('tensionSpike'),
+    rest: t('somaticRest'),
   };
 
   return (
@@ -114,10 +114,10 @@ export default function BiometricSanctum({ onBiometricsChange }) {
         <div>
           <h3 className="text-sm font-bold font-mono tracking-wider text-white flex items-center gap-2">
             <Sparkles size={16} className="text-cf-gold animate-pulse" />
-            {isFrench ? 'SANCTUAIRE SOMATIQUE' : 'SOMATIC FLOW SANCTUM'}
+            {t('somaticSanctum')}
           </h3>
           <p className="text-[10px] text-cf-slate uppercase tracking-wider font-mono">
-            {isFrench ? 'Simulateur de focus et tonus vagal' : 'Simulated focus & vagal tone calibration'}
+            {t('somaticSanctumSub')}
           </p>
         </div>
         <span className="text-[8px] font-mono px-2 py-0.5 rounded-full bg-cf-gold/20 text-cf-gold border border-cf-gold/30 uppercase tracking-widest">
@@ -136,7 +136,7 @@ export default function BiometricSanctum({ onBiometricsChange }) {
         </div>
         <div className="absolute bottom-2 right-3 text-right">
           <span className="text-[8px] font-mono text-cf-slate block uppercase tracking-wider">
-            {isFrench ? 'Index Flow' : 'Flow Index'}
+            {t('flowIndex')}
           </span>
           <span className={`text-xl font-bold font-mono tracking-tighter ${
             flowIndex > 3.0 ? 'text-cf-gold' : flowIndex > 1.5 ? 'text-cf-sage' : 'text-white/40'
@@ -169,7 +169,7 @@ export default function BiometricSanctum({ onBiometricsChange }) {
 
       {/* Future scope note */}
       <p className="text-[9px] text-white/20 font-mono text-center mt-3 uppercase tracking-wider">
-        {isFrench ? 'Mode simulation · BLE et rPPG bientôt disponibles' : 'Simulation mode · BLE & rPPG hardware coming soon'}
+        {t('simulationMode')}
       </p>
     </div>
   );

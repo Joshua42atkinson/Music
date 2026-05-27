@@ -8,6 +8,8 @@ import PlingTrainer from './PlingTrainer';
 import { TOOLS_CATALOG } from '../data/toolsData';
 import { saveSlidePosition, getSlidePosition } from '../data/localDatabase';
 import { useLocale } from '../hooks/useLocale';
+import { useScaffolding } from './ScaffoldingProvider';
+import { updateFretTraction, getFretState } from '../data/tractionStore';
 
 // ═══════════════════════════════════════════════════════════
 // SLIDE VIEWER — Phone-native swipeable chapter reader
@@ -27,7 +29,8 @@ const slideVariants = {
 };
 
 const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
-  const { locale, isFrench } = useLocale();
+  const { locale, t } = useLocale();
+  const { updateTraction } = useScaffolding();
 
   const localize = useCallback((val) => {
     if (!val) return '';
@@ -71,9 +74,16 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     if (idx < 0 || idx >= slides.length) return;
     setDirection(dir);
     setCurrentIdx(idx);
-    // Persist position so student can resume where they left off
     saveSlidePosition(fretId, idx);
-  }, [slides, fretId]);
+    // Wire 3: mark yinCompleted when student reaches the last slide
+    if (idx === slides.length - 1) {
+      updateTraction(prev => {
+        const fretState = getFretState(prev, fretId);
+        if (fretState.yinCompleted) return prev; // already marked
+        return updateFretTraction(prev, fretId, { yinCompleted: true });
+      });
+    }
+  }, [slides, fretId, updateTraction]);
 
   const handleNext = () => goTo(currentIdx + 1, 1);
   const handlePrev = () => goTo(currentIdx - 1, -1);
@@ -176,16 +186,16 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           box-shadow: 0 0 8px currentColor;
         }
         .sv-slide-area { flex: 1; position: relative; overflow: hidden; }
-        .sv-slide { position: absolute; inset: 0; display: flex; flex-direction: column; cursor: grab; }
+        .sv-slide { position: absolute; inset: 0; display: flex; flex-direction: column; cursor: grab; overflow-y: auto; }
         .sv-slide:active { cursor: grabbing; }
         .sv-image-zone {
-          flex-shrink: 0; height: 38vh; min-height: 200px; max-height: 340px;
+          flex-shrink: 0; height: auto; min-height: 200px; max-height: 45vh;
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
         }
         .sv-image-zone img {
-          width: 100%; height: 100%; object-fit: cover; opacity: 0.9;
-          transition: opacity 1.5s ease-in-out;
+          width: 100%; height: auto; max-height: 45vh; object-fit: cover; opacity: 0.9;
+          transition: opacity 1.5s ease-in-out; display: block;
         }
         .sv-image-gradient {
           position: absolute; inset: 0;
@@ -200,8 +210,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           background: linear-gradient(transparent, #030306);
         }
         .sv-text-zone {
-          flex: 1; overflow-y: auto; padding: 28px 24px 120px;
-          -webkit-overflow-scrolling: touch;
+          padding: 28px 24px 120px;
           background: rgba(6,6,12,0.8);
           backdrop-filter: blur(16px) saturate(1.2);
           -webkit-backdrop-filter: blur(16px) saturate(1.2);
@@ -391,24 +400,27 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
 
         /* ── Landscape ── */
         @media (orientation: landscape) and (max-height: 500px) {
-          .sv-slide { flex-direction: row; }
+          .sv-slide { flex-direction: row; overflow-y: hidden; }
           .sv-image-zone {
-            height: auto; min-height: auto; max-height: none;
+            height: auto; max-height: none;
             width: 40%; flex-shrink: 0;
+          }
+          .sv-image-zone img {
+            height: auto; min-height: 100%;
           }
           .sv-image-overlay {
             height: auto; width: 40px;
             top: 0; left: auto; right: 0; bottom: 0;
             background: linear-gradient(to left, #030306, transparent);
           }
-          .sv-text-zone { padding: 20px 20px 80px; }
+          .sv-text-zone { padding: 20px 20px 80px; overflow-y: auto; }
         }
       `}</style>
 
       {/* ── Top Bar ── */}
       <div className="sv-topbar">
-        <button className="sv-back" onClick={onBack}>{isFrench ? '← Retour' : '← Back'}</button>
-        <span className="sv-chapter-label">{isFrench ? 'Ch.' : 'Ch.'}{fret.id} · {localize(fret.title)}</span>
+        <button className="sv-back" onClick={onBack}>{t('back')}</button>
+        <span className="sv-chapter-label">Ch.{fret.id} · {localize(fret.title)}</span>
         <span className="sv-page-num">{currentIdx + 1}/{slides.length}</span>
       </div>
 
@@ -441,7 +453,12 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
             {/* Image Zone */}
             <div className="sv-image-zone">
               {slide.image ? (
-                <img src={slide.image} alt="" draggable={false} />
+                <img
+                  src={slide.image}
+                  alt=""
+                  draggable={false}
+                  onError={(e) => console.error('Slide image failed:', slide.id, e.target.src.slice(0, 100))}
+                />
               ) : (
                 <div className="sv-image-gradient" style={{
                   background: `radial-gradient(ellipse at 50% 40%, ${slide.accent}20 0%, ${slide.accent}08 40%, #030306 100%)`
@@ -459,7 +476,6 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
                 onOpenFretboard={openFretboard}
                 onNextFret={goNextFret}
                 localize={localize}
-                isFrench={isFrench}
               />
             </div>
           </motion.div>
@@ -490,7 +506,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
                   transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
                   style={{ display: 'inline-block' }}
                 >
-                  {isFrench ? '← Balayez pour lire →' : '← Swipe to read →'}
+                  {t('swipeToRead')}
                 </motion.span>
               </div>
             </motion.div>
@@ -505,7 +521,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           <button
             className={`sv-fret-toggle ${fretboardOpen ? 'active' : ''}`}
             onClick={() => fretboardOpen ? setFretboardOpen(false) : openFretboard()}
-            title={isFrench ? 'Ouvrir la touche' : 'Open Fretboard'}
+            title={t('openFretboard')}
           >
             🎸
           </button>
@@ -542,7 +558,8 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
 
 // ── Slide Content Renderer ──
 
-function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }) {
+function SlideContent({ slide, onOpenFretboard, onNextFret, localize }) {
+  const { t } = useLocale();
   switch (slide.type) {
     case 'title':
       return (
@@ -587,7 +604,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
           <p className="sv-label" style={{ color: '#7b6aaa', textAlign: 'center' }}>{localize(slide.label)}</p>
           <p className="sv-meditation-prompt">{localize(slide.body)}</p>
-          {slide.duration && <p className="sv-duration">⏱ {slide.duration} {isFrench ? 'secondes' : 'seconds'}</p>}
+          {slide.duration && <p className="sv-duration">⏱ {slide.duration} {t('seconds')}</p>}
         </div>
       );
 
@@ -608,14 +625,14 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
           
           <div className="mb-6 p-4 rounded-xl bg-[#0abde3]/10 border border-[#0abde3]/30">
             <h3 className="font-bold text-[#0abde3] text-sm mb-2 font-mono uppercase tracking-wider">
-              {isFrench ? 'Comment fonctionne la musique' : 'How Music Works'}
+              {t('howMusicWorks')}
             </h3>
             <p className="sv-body text-sm">{localize(slide.musicGrammar)}</p>
           </div>
           
           <div className="mb-6 p-4 rounded-xl bg-cf-gold/10 border border-cf-gold/30">
             <h3 className="font-bold text-cf-gold text-sm mb-2 font-mono uppercase tracking-wider">
-              {isFrench ? 'Comment fonctionne la guitare' : 'How Guitar Works'}
+              {t('howGuitarWorks')}
             </h3>
             <p className="sv-body text-sm">{localize(slide.guitarGrammar)}</p>
           </div>
@@ -663,7 +680,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
                     }
                   }}
                 >
-                  {activeTool.status === 'available' ? (isFrench ? 'Lancer l\'Outil' : 'Launch Tool') : (isFrench ? 'À Venir' : 'Coming Soon')}
+                  {activeTool.status === 'available' ? t('launchTool') : t('comingSoon')}
                 </button>
               </div>
             );
@@ -672,7 +689,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
           {/* Inline fretboard access from exercises */}
           <button className="sv-fretboard-fab" onClick={onOpenFretboard}>
             <span className="sv-fretboard-fab-icon">🎸</span>
-            <span className="sv-fretboard-fab-text">{isFrench ? 'Pratiquer sur la touche' : 'Practice on Fretboard'}</span>
+            <span className="sv-fretboard-fab-text">{t('practiceOnFretboard')}</span>
             <span className="sv-fretboard-fab-arrow">↑</span>
           </button>
         </>
@@ -688,7 +705,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
           <button className="sv-fretboard-fab" onClick={onOpenFretboard}>
             <span className="sv-fretboard-fab-icon">🎸</span>
             <span className="sv-fretboard-fab-text">
-              {isFrench ? 'Ouvrir la touche — Frettes' : 'Open Fretboard — Frets'} {slide.fretboardFocus?.startFret}–{slide.fretboardFocus?.endFret}
+              {t('openFretboardFrets')} {slide.fretboardFocus?.startFret}–{slide.fretboardFocus?.endFret}
             </span>
             <span className="sv-fretboard-fab-arrow">↑</span>
           </button>
@@ -703,7 +720,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
           <p className="sv-end-body">{localize(slide.body)}</p>
           {slide.fretId < 12 && (
             <button className="sv-next-btn" onClick={onNextFret}>
-              {isFrench ? 'Frette Suivante →' : 'Next Fret →'}
+              {t('nextFret')}
             </button>
           )}
         </div>
@@ -778,7 +795,7 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
 
           {/* References panel — expandable */}
           {slide.references?.length > 0 && (
-            <ReferencesPanel references={slide.references} isFrench={isFrench} />
+            <ReferencesPanel references={slide.references} />
           )}
         </div>
       );
@@ -789,7 +806,8 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize, isFrench }
 }
 
 // ── References Panel — Expandable citations ──
-function ReferencesPanel({ references, isFrench }) {
+function ReferencesPanel({ references }) {
+  const { t } = useLocale();
   const [open, setOpen] = useState(false);
   return (
     <div style={{ marginTop: '0.5rem' }}>
@@ -809,7 +827,7 @@ function ReferencesPanel({ references, isFrench }) {
       >
         <span style={{ fontSize: '1rem' }}>📚</span>
         <span style={{ flex: 1 }}>
-          {open ? (isFrench ? 'MASQUER' : 'HIDE') : (isFrench ? 'VOIR' : 'VIEW')} {isFrench ? 'LES RÉFÉRENCES' : 'REFERENCES'} ({references.length})
+          {open ? t('hideReferences') : t('viewReferences')} {t('references')} ({references.length})
         </span>
         <span style={{ opacity: 0.5 }}>{open ? '▲' : '▼'}</span>
       </button>

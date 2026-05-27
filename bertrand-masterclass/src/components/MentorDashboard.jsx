@@ -11,7 +11,7 @@ import { useLocale } from '../hooks/useLocale';
 const DAAS_API_BASE = 'http://localhost:8080/api';
 
 export default function MentorDashboard({ onClose }) {
-  const { locale, toggleLocale, t, somatic, isFrench } = useLocale();
+  const { locale, toggleLocale, t, somatic } = useLocale();
 
   const [submissions, setSubmissions] = useState([]);
   const [selectedSub, setSelectedSub] = useState(null);
@@ -120,13 +120,13 @@ export default function MentorDashboard({ onClose }) {
   // Somatic Stamps
   const injectMacro = (metaphor) => {
     const stamps = {
-      pling: isFrench
+      pling: locale === 'fr'
         ? `\n\n🎸 Métaphore du ${somatic('PLING')} : 'Assurez-vous d'écouter la résonance absolue du PLING—ressentez la note résonner pleinement sans aucune crispation somatique.'`
         : `\n\n🎸 ${somatic('PLING')} Metaphor: 'Ensure you listen for the absolute PLING! resonance—feel the note ring out fully with zero somatic grip.'`,
-      shearl: isFrench
+      shearl: locale === 'fr'
         ? `\n\n🕊️ Métaphore du ${somatic('SHEARL')} : 'Appliquez le glissement du CISAILLEMENT ici—laissez vos doigts glisser horizontalement comme une plume, en contournant les frettes sans friction du manche.'`
         : `\n\n🕊️ ${somatic('SHEARL')} Metaphor: 'Apply the SHEARL glide here—let your fingers glide horizontally like a feather, bypassing frets without neck friction.'`,
-      fheal: isFrench
+      fheal: locale === 'fr'
         ? `\n\n🕯️ Métaphore de la ${somatic('FHEAL')} : 'Essayez la récupération de la GUÉRISON—relâchez votre épaule gauche, laissez la main respirer et laissez votre mémoire musculaire s'exprimer.'`
         : `\n\n🕯️ ${somatic('FHEAL')} Metaphor: 'Try the FHEAL recovery—drop your left shoulder down, let the hand breathe, and allow your muscle memory to speak.'`
     };
@@ -218,7 +218,7 @@ export default function MentorDashboard({ onClose }) {
             className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono text-white/80 transition-all flex items-center gap-1.5"
           >
             <Globe size={12} className="text-cf-gold" />
-            {isFrench ? '🇺🇸 English' : '🇫🇷 Français'}
+            {locale === 'fr' ? '🇺🇸 English' : '🇫🇷 Français'}
           </button>
 
           <span className="text-[10px] font-mono text-cf-gold px-2 py-0.5 bg-cf-gold/15 rounded-full border border-cf-gold/30 flex items-center gap-1.5">
@@ -233,7 +233,7 @@ export default function MentorDashboard({ onClose }) {
         {/* Left Sidebar: Submissions list */}
         <div className="md-sidebar p-4 space-y-4">
           <h2 className="text-xs font-mono uppercase tracking-wider text-white/50 px-2 flex items-center gap-2">
-            <FolderOpen size={12} /> {isFrench ? 'Sessions Éleves' : 'Student Submissions'}
+            <FolderOpen size={12} /> {t('studentSubmissions')}
           </h2>
 
           <div className="space-y-2">
@@ -304,13 +304,10 @@ export default function MentorDashboard({ onClose }) {
                       <div className="flex justify-between items-start gap-4 mb-4">
                         <div>
                           <h4 className="text-sm font-bold text-white mb-1 flex items-center gap-1.5">
-                            <Sparkles size={14} className="text-cf-gold animate-pulse" /> {isFrench ? "Pupitre d'IA Socratique" : "Socratic Preprocessing Desk"}
+                            <Sparkles size={14} className="text-cf-gold animate-pulse" /> {t('socraticPreprocessingDesk')}
                           </h4>
                           <p className="text-xs text-white/40">
-                            {isFrench 
-                              ? "Déclenche FFmpeg, extrait l'analyse acoustique Pythagore et génère des propositions socratiques."
-                              : "Spawn FFmpeg and run pitch auto-correlation + Gemma Socratic prompt drafting."
-                            }
+                            {t('socraticDeskDesc')}
                           </p>
                         </div>
                         <button
@@ -318,13 +315,13 @@ export default function MentorDashboard({ onClose }) {
                           disabled={evaluating}
                           className="px-4 py-2.5 rounded-xl md-btn-eval font-bold text-xs font-mono tracking-wider flex items-center gap-2 transition-all disabled:opacity-50"
                         >
-                          {evaluating ? (isFrench ? '🔄 Traitement...' : '🔄 Preprocessing...') : t('triggerSocratic')}
+                          {evaluating ? t('preprocessing') : t('triggerSocratic')}
                         </button>
                       </div>
 
                       {selectedSub.transcript && (
                         <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                          <h5 className="text-[10px] font-mono uppercase text-white/50 mb-1">{isFrench ? "Difficulté exprimée par l'élève" : "Student Verbal struggle"}</h5>
+                          <h5 className="text-[10px] font-mono uppercase text-white/50 mb-1">{t('studentVerbalStruggle')}</h5>
                           <p className="text-xs text-white/80 italic">"{selectedSub.transcript}"</p>
                         </div>
                       )}
@@ -407,10 +404,7 @@ export default function MentorDashboard({ onClose }) {
                 <span className="text-5xl mb-4">🔮</span>
                 <h3 className="text-lg font-bold text-white mb-2">{t('mentorTitle')}</h3>
                 <p className="text-xs text-white/40 max-w-sm leading-relaxed">
-                  {isFrench 
-                    ? "Sélectionnez une vidéo de pratique à gauche pour analyser la justesse, exécuter le diagnostic Socratique local et rédiger un retour d'expérience."
-                    : "Select a student's practice video from the left column to extract pitch metrics, run local AI Socratic analysis, and build subscription-free feedback."
-                  }
+                  {t('selectVideo')}
                 </p>
               </div>
             )}

@@ -55,8 +55,8 @@ const FretboardSheet = ({
   fret,
   fretboardFocus,
 }) => {
-  const { isFrench } = useLocale();
-  const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
+  const { locale } = useLocale();
+  const localize = (val) => (val && typeof val === 'object' ? (val[locale] || val['en']) : val);
   const [sheetState, setSheetState] = useState('peek');
   const dragControls = useDragControls();
   const sheetRef = useRef(null);

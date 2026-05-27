@@ -10,8 +10,8 @@ import { JOURNAL_PROMPTS, JOURNAL_MOODS } from '../../data/playbookData';
 // ═══════════════════════════════════════════════════════════
 
 export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
-  const { isFrench } = useLocale();
-  const lang = isFrench ? 'fr' : 'en';
+  const { locale, t } = useLocale();
+  const lang = locale;
   const [mood, setMood] = useState(null);
   const [text, setText] = useState('');
   const [saved, setSaved] = useState(false);
@@ -49,17 +49,17 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
         <div style={styles.header}>
           <span style={styles.headerIcon}>📓</span>
           <h3 style={styles.headerTitle}>
-            {isFrench ? 'Réflexion de Session' : 'Session Reflection'}
+            {t('sessionReflection')}
           </h3>
           <p style={styles.headerSub}>
-            {isFrench ? 'Frette' : 'Fret'} {fretId}
+            {t('questFret')} {fretId}
           </p>
         </div>
 
         {/* Mood selector */}
         <div style={styles.moodSection}>
           <p style={styles.moodLabel}>
-            {isFrench ? 'Comment vous sentez-vous ?' : 'How are you feeling?'}
+            {t('howAreYouFeeling')}
           </p>
           <div style={styles.moodRow}>
             {JOURNAL_MOODS.map(m => (
@@ -91,7 +91,7 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={isFrench ? 'Vos pensées...' : 'Your thoughts...'}
+          placeholder={t('yourThoughts')}
           rows={5}
           style={styles.textarea}
         />
@@ -99,7 +99,7 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
         {/* Actions */}
         <div style={styles.actions}>
           <button onClick={onClose} style={styles.skipBtn}>
-            {isFrench ? 'Passer' : 'Skip'}
+            {t('skipBtn')}
           </button>
           <button onClick={handleSave} style={{
             ...styles.saveBtn,
@@ -107,10 +107,7 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
             borderColor: saved ? 'rgba(122,170,136,0.4)' : 'rgba(201,169,110,0.3)',
             color: saved ? '#7aaa88' : '#c9a96e',
           }}>
-            {saved
-              ? (isFrench ? '✓ Sauvegardé !' : '✓ Saved!')
-              : (isFrench ? '📝 Sauvegarder' : '📝 Save Reflection')
-            }
+            {saved ? t('savedReflection') : t('saveReflection')}
           </button>
         </div>
       </div>
@@ -120,7 +117,7 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
 
 // ── Journal Feed — shows all past entries ──
 export function JournalFeed() {
-  const { isFrench } = useLocale();
+  const { locale, t } = useLocale();
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
@@ -146,9 +143,7 @@ export function JournalFeed() {
           fontStyle: 'italic',
           color: 'rgba(255,255,255,0.4)',
         }}>
-          {isFrench
-            ? 'Votre journal est vide. Terminez une session d\'outil pour écrire votre première réflexion.'
-            : 'Your journal is empty. Complete a tool session to write your first reflection.'}
+          {t('emptyJournal')}
         </p>
       </div>
     );
@@ -165,7 +160,7 @@ export function JournalFeed() {
         textAlign: 'center',
         marginBottom: '20px',
       }}>
-        {isFrench ? '── JOURNAL ──' : '── JOURNAL ──'}
+        {t('journalTitle')}
       </h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -184,7 +179,7 @@ export function JournalFeed() {
                   fontSize: '0.6rem',
                   color: 'rgba(255,255,255,0.35)',
                 }}>
-                  {isFrench ? 'Frette' : 'Fret'} {entry.fretId} · {new Date(entry.timestamp).toLocaleDateString(isFrench ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
+                  {t('questFret')} {entry.fretId} · {new Date(entry.timestamp).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
                 </span>
                 {m && <span style={{ fontSize: '0.9rem' }}>{m.emoji}</span>}
               </div>

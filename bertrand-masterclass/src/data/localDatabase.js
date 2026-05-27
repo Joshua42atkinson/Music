@@ -1,3 +1,18 @@
+// ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
+// ║ FILE    : localDatabase.js                                   ║
+// ║ WHAT    : Durable IndexedDB backup — 10 tables via Dexie.js  ║
+// ║ WHY     : localStorage clears on browser data reset; this    ║
+// ║           survives. It is the offline-first safety net.       ║
+// ║ WHO     : No UI — written to by game, textbook, profile flow ║
+// ║ OWNS    : vertiscaleSessions, studentProfile, journal, outbox ║
+// ║ NEEDS   : Dexie (npm) — no other dependencies               ║
+// ║ RULES   : Never delete tables between schema versions — add  ║
+// ║           only. studentProfile uses id=1 until Supabase auth  ║
+// ║           Never block the UI waiting on an async db call      ║
+// ║ FIX AT  : Open DevTools → Application → IndexedDB → voix_vive║
+// ║           If missing: check Dexie version / schema mismatch   ║
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                   ║
+// ╚═══════════════════════════════════════════════════════════════╝
 import Dexie from 'dexie';
 
 // ═══════════════════════════════════════════════════════════
@@ -49,6 +64,12 @@ db.version(3).stores({
 
   // Cached AI narration (quest intros, level-up text, session summaries)
   aiNarration: '++id, type, contextKey, timestamp',
+});
+
+// v4: Player Portal — async video recordings for mentor review
+db.version(4).stores({
+  // Student video submissions (async assessor)
+  recordings: '++id, exerciseName, timestamp, duration, blobUrl, reviewed, feedback',
 });
 
 // ─────────────────────────────────────────────────────────────

@@ -551,23 +551,59 @@ export default function StudioPage() {
             <span key={i} className="studio-style-tag">{style}</span>
           ))}
         </motion.div>
+
+        {/* Free curriculum banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          style={{
+            marginTop: 24,
+            padding: '14px 20px',
+            borderRadius: 12,
+            background: 'rgba(122,170,136,0.06)',
+            border: '1px solid rgba(122,170,136,0.2)',
+            maxWidth: 440,
+            margin: '24px auto 0',
+          }}
+        >
+          <p style={{
+            fontFamily: "'EB Garamond', serif",
+            fontStyle: 'italic',
+            fontSize: '0.95rem',
+            color: '#7aaa88',
+            margin: '0 0 6px',
+          }}>
+            The 12-chapter curriculum, the Troubadour AI coach, and all tools are free.
+          </p>
+          <p style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.55rem',
+            color: 'rgba(122,170,136,0.5)',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            margin: 0,
+          }}>
+            No login · No paywall · Start playing now
+          </p>
+        </motion.div>
       </section>
 
       {/* ═══ TRIAL CTA ═══ */}
       <section className="studio-section" style={{ paddingTop: 0 }}>
         <div className="cta-banner">
-          <h3>🎸 First Lesson — Special Rate</h3>
+          <h3>🎸 Ready for the Next Step?</h3>
           <p>"Give you everything in bites... just enough to bring you to that next step."</p>
           <button className="cta-button" onClick={() => handlePayment(null)}>
-            Book Trial Lesson — $45
+            Book a Trial Lesson — $45
           </button>
         </div>
       </section>
 
       {/* ═══ SERVICES ═══ */}
       <section className="studio-section">
-        <h2 className="studio-section-title">Services & Pricing</h2>
-        <p className="studio-section-subtitle">Choose what works for your schedule and learning style</p>
+        <h2 className="studio-section-title">Support & Mentorship</h2>
+        <p className="studio-section-subtitle">The curriculum is free. Deep work with Bertrand is a human investment.</p>
 
         {SERVICES.map(service => {
           const isExpanded = expandedService === service.id;

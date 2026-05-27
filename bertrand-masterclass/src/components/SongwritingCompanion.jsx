@@ -39,9 +39,12 @@ function buildCurriculumContext(tractionFrets, lang) {
 }
 
 export default function SongwritingCompanion() {
-  const { isFrench } = useLocale();
-  const { isDaaSConnected, askBertrand } = useBackendBridge();
+  const { locale, t } = useLocale();
+  const { isDaaSConnected, isLMStudioConnected, lmStudioModel, askBertrand } = useBackendBridge();
   const { traction, practiceMinutes, streak, breathingSessions, bardLevel } = useScaffolding();
+  
+  // LM Studio takes priority over DaaS for AI features
+  const aiConnected = isLMStudioConnected || isDaaSConnected;
 
   const [selectedMood, setSelectedMood] = useState('reflective');
   const [customTheme, setCustomTheme] = useState('');
@@ -84,7 +87,7 @@ export default function SongwritingCompanion() {
       : 0;
 
     // Build curriculum context from actual chapterData
-    const curriculumSummary = buildCurriculumContext(traction.frets || {}, isFrench ? 'fr' : 'en');
+    const curriculumSummary = buildCurriculumContext(traction.frets || {}, locale);
 
     const context = [
       `The student is at Bard Level ${bardLevel}.`,
@@ -111,17 +114,17 @@ INSTRUCTIONS:
 - Reference specific chapters and Hero's Journey stages from the curriculum above. For example, if the student mastered "The Ordeal" (Fret 7, Tritone), weave that into the lyrics.
 - After the lyrics, add a brief "Journey Note" section explaining which frets/chapters inspired each section of the song.
 - Never use generic placeholder lyrics.
-${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}`
+${locale === 'fr' ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}`
       },
       {
         role: 'user',
         content: `Here is my practice journey so far: ${context}\n\nPlease write me a ${mood?.en || 'reflective'} song inspired by my musical growth. ${customTheme ? `Theme: "${customTheme}"` : 'Choose a theme that connects to the chapters I have worked through.'}`
       }
     ];
-  }, [selectedMood, customTheme, traction, bardLevel, practiceMinutes, streak, breathingSessions, isFrench]);
+  }, [selectedMood, customTheme, traction, bardLevel, practiceMinutes, streak, breathingSessions, locale]);
 
   const handleGenerate = async () => {
-    if (!isDaaSConnected) return;
+    if (!aiConnected) return;
     setIsGenerating(true);
     setEditableLyrics('');
     setSongTitle('');
@@ -129,16 +132,21 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
 
     try {
       const messages = buildPrompt();
-      const response = await askBertrand(messages);
+      const response = await askBertrand(messages, {
+        max_tokens: 2048,
+        temperature: 0.8,
+        maxContext: 32768,
+        gpuLayers: 999,
+      });
       const content = response?.choices?.[0]?.message?.content || '';
       setEditableLyrics(content);
 
       // Auto-generate a title from the first line or chorus
       const firstLine = content.split('\n').find(l => l.trim() && !l.startsWith('['));
-      setSongTitle(firstLine?.trim()?.slice(0, 50) || (isFrench ? 'Sans Titre' : 'Untitled'));
+      setSongTitle(firstLine?.trim()?.slice(0, 50) || t('untitled'));
     } catch (e) {
       console.error('[Quill] Generation failed:', e);
-      setEditableLyrics(isFrench ? '⚠️ Erreur de génération. Vérifiez la connexion DaaS.' : '⚠️ Generation error. Check DaaS connection.');
+      setEditableLyrics(t('generationError'));
     }
     setIsGenerating(false);
   };
@@ -147,7 +155,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
     if (!editableLyrics.trim()) return;
     try {
       await db.songs.add({
-        title: songTitle || (isFrench ? 'Sans Titre' : 'Untitled'),
+        title: songTitle || t('untitled'),
         lyrics: editableLyrics,
         mood: selectedMood,
         theme: customTheme,
@@ -200,18 +208,18 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
           fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem',
           fontWeight: 600, margin: '0 0 4px',
         }}>
-          {isFrench ? "Plume du Troubadour" : "Troubadour's Quill"}
+          {t('troubadourQuill')}
         </h2>
         <p style={{
           fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)',
           fontFamily: "'JetBrains Mono', monospace",
         }}>
-          {isFrench ? 'Écriture de chansons alimentée par votre journal' : 'Songwriting powered by your journal'}
+          {t('songwritingPoweredBy')}
         </p>
       </div>
 
       {/* Offline fallback */}
-      {!isDaaSConnected && (
+      {!aiConnected && (
         <div style={{
           padding: '20px', borderRadius: '12px', textAlign: 'center',
           background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
@@ -219,11 +227,24 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
         }}>
           <Sparkles size={20} style={{ color: 'rgba(201,169,110,0.5)', marginBottom: '8px' }} />
           <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-            {isFrench
-              ? "Connectez l'application de bureau Voix Vive pour débloquer l'écriture de chansons IA. La Plume utilise votre LLM local pour générer des paroles personnalisées."
-              : "Connect the Voix Vive Desktop App to unlock AI songwriting. The Quill uses your local LLM to generate personalized lyrics from your practice data."
-            }
+            {t('connectForSongwriting')}
           </p>
+          <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginTop: '8px' }}>
+            LM Studio (port 1234) or DaaS Server (port 8080)
+          </p>
+        </div>
+      )}
+
+      {/* LM Studio connected indicator */}
+      {isLMStudioConnected && lmStudioModel && (
+        <div style={{
+          padding: '12px 16px', borderRadius: '10px', marginBottom: '16px',
+          background: 'rgba(122, 170, 136, 0.1)', border: '1px solid rgba(122, 170, 136, 0.2)',
+          display: 'flex', alignItems: 'center', gap: '8px',
+        }}>
+          <span style={{ fontSize: '0.75rem', color: '#7aaa88' }}>
+            ⚡ Powered by {lmStudioModel.id?.split('/').pop() || 'LM Studio'}
+          </span>
         </div>
       )}
 
@@ -234,7 +255,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
           color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em', textTransform: 'uppercase',
           display: 'block', marginBottom: '8px',
         }}>
-          {isFrench ? 'Humeur' : 'Mood'}
+          {t('mood')}
         </label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {SONG_MOODS.map(mood => (
@@ -249,7 +270,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
                 cursor: 'pointer', transition: 'all 0.2s ease',
               }}
             >
-              {mood.emoji} {isFrench ? mood.fr : mood.en}
+              {mood.emoji} {locale === 'fr' ? mood.fr : mood.en}
             </button>
           ))}
         </div>
@@ -262,13 +283,13 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
           color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em', textTransform: 'uppercase',
           display: 'block', marginBottom: '8px',
         }}>
-          {isFrench ? 'Thème (optionnel)' : 'Theme (optional)'}
+          {t('themeOptional')}
         </label>
         <input
           type="text"
           value={customTheme}
           onChange={(e) => setCustomTheme(e.target.value)}
-          placeholder={isFrench ? 'Ex: ma première chanson, les étoiles, le voyage...' : 'e.g. my first song, the stars, the journey...'}
+          placeholder={t('themePlaceholder')}
           style={{
             width: '100%', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem',
             background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
@@ -285,22 +306,22 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
         fontFamily: "'JetBrains Mono', monospace",
       }}>
         <BookOpen size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-        {isFrench ? 'Contexte: ' : 'Context: '}
-        Bard Lv.{bardLevel} · {practiceMinutes}{isFrench ? ' min' : ' min'} · {streak} {isFrench ? 'jours' : 'day streak'} · {breathingSessions} {isFrench ? 'respirations' : 'breaths'}
+        {t('context')}
+        Bard Lv.{bardLevel} · {practiceMinutes}{t('min')} · {streak}{t('daySuffix')} · {breathingSessions} {t('breaths')}
       </div>
 
       {/* Generate Button */}
       <button
         onClick={handleGenerate}
-        disabled={!isDaaSConnected || isGenerating}
+        disabled={!aiConnected || isGenerating}
         style={{
           width: '100%', padding: '14px', borderRadius: '12px', fontSize: '0.9rem',
-          fontWeight: 600, cursor: isDaaSConnected ? 'pointer' : 'not-allowed',
-          background: isDaaSConnected
+          fontWeight: 600, cursor: aiConnected ? 'pointer' : 'not-allowed',
+          background: aiConnected
             ? 'linear-gradient(135deg, rgba(123,106,170,0.3) 0%, rgba(123,106,170,0.1) 100%)'
             : 'rgba(255,255,255,0.03)',
-          border: `1px solid ${isDaaSConnected ? 'rgba(123,106,170,0.4)' : 'rgba(255,255,255,0.08)'}`,
-          color: isDaaSConnected ? '#b09cd8' : 'rgba(255,255,255,0.2)',
+          border: `1px solid ${aiConnected ? 'rgba(123,106,170,0.4)' : 'rgba(255,255,255,0.08)'}`,
+          color: aiConnected ? '#b09cd8' : 'rgba(255,255,255,0.2)',
           transition: 'all 0.3s ease', marginBottom: '20px',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
         }}
@@ -308,12 +329,12 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
         {isGenerating ? (
           <>
             <span style={{ animation: 'loadBreath 2s ease-in-out infinite' }}>✍️</span>
-            {isFrench ? 'Le Troubadour compose...' : 'The Troubadour is composing...'}
+            {t('composing')}
           </>
         ) : (
           <>
             <Feather size={18} />
-            {isFrench ? 'Invoquer la Plume' : 'Invoke the Quill'}
+            {t('invokeQuill')}
           </>
         )}
       </button>
@@ -326,7 +347,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
             color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em', textTransform: 'uppercase',
             display: 'block', marginBottom: '8px',
           }}>
-            {isFrench ? 'Titre' : 'Title'}
+            {t('songTitle')}
           </label>
           <input
             type="text"
@@ -345,7 +366,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
             color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em', textTransform: 'uppercase',
             display: 'block', marginBottom: '8px',
           }}>
-            {isFrench ? 'Paroles (modifiables)' : 'Lyrics (editable)'}
+            {t('lyricsEditable')}
           </label>
           <textarea
             value={editableLyrics}
@@ -374,8 +395,8 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
           >
             <Save size={16} />
             {saveConfirm
-              ? (isFrench ? '✓ Sauvegardé dans le Recueil !' : '✓ Saved to Songbook!')
-              : (isFrench ? 'Sauvegarder dans le Recueil' : 'Save to Songbook')
+              ? t('savedToSongbook')
+              : t('saveToSongbook')
             }
           </button>
         </div>
@@ -396,7 +417,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
             }}
           >
             <BookOpen size={14} />
-            {isFrench ? `Recueil de Chansons (${savedSongs.length})` : `Songbook (${savedSongs.length})`}
+            {locale === 'fr' ? `Recueil de Chansons (${savedSongs.length})` : `Songbook (${savedSongs.length})`}
             {showSongbook ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
 
@@ -442,7 +463,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
                     fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', margin: '0 0 8px',
                     fontFamily: "'JetBrains Mono', monospace",
                   }}>
-                    {new Date(song.timestamp).toLocaleDateString(isFrench ? 'fr-FR' : 'en-US', {
+                    {new Date(song.timestamp).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
                       year: 'numeric', month: 'short', day: 'numeric',
                     })} · Bard Lv.{song.bardLevel || '?'} · {SONG_MOODS.find(m => m.id === song.mood)?.emoji || '🎵'}
                   </p>
@@ -468,7 +489,7 @@ ${isFrench ? '- Write the lyrics in French.' : '- Write the lyrics in English.'}
                       cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace",
                     }}
                   >
-                    {isFrench ? '✏️ Reprendre' : '✏️ Resume Editing'}
+                    {t('resumeEditing')}
                   </button>
                 </div>
               ))}

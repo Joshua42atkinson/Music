@@ -160,6 +160,18 @@ export default function PracticeRecorder({ onClose, exerciseName = 'Practice Rec
         timestamp: submission.timestamp,
         size: blobRef.current.size,
       });
+
+      // Also save metadata to recordings table (PlayerPortal source of truth)
+      await db.recordings.add({
+        exerciseName,
+        timestamp: submission.timestamp,
+        duration,
+        blobUrl: null, // blob is in outbox; future: create ObjectURL here
+        reviewed: false,
+        feedback: null,
+        mediaType,
+        size: blobRef.current.size,
+      });
     } catch (err) {
       console.warn('IndexedDB save failed, falling back to metadata only:', err);
     }

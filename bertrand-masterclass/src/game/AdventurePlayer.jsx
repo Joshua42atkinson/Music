@@ -9,7 +9,7 @@ import {
 import usePitchDetector from '../hooks/usePitchDetector';
 import PitchGateUI from './PitchGateUI';
 import { playReferenceTone } from '../audio/audioEngine';
-import Tavern3DVisualizer from '../components/Tavern3DVisualizer';
+// Tavern3DVisualizer archived → _archive/vr_future/ (Android XR moonshot, revenue gate $5k/mo)
 
 import { useLocale } from '../hooks/useLocale';
 
@@ -278,13 +278,11 @@ function AdventurePlayer({ onClose }) {
                     }}
                   />
                 )}
-                <Tavern3DVisualizer
-                  pitch={pitch}
-                  cents={noteInfo?.cents || 0}
-                  volume={volume}
-                  gateState={gateState}
-                  atmosphere={scene.atmosphere}
-                />
+                {/* Scene atmosphere placeholder — VR tavern scene is a future moonshot */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `radial-gradient(ellipse at 50% 80%, ${scene.atmosphere === 'warm' ? 'rgba(201,120,60,0.18)' : scene.atmosphere === 'mystical' ? 'rgba(100,60,180,0.18)' : 'rgba(40,80,120,0.18)'} 0%, transparent 70%)`,
+                }} />
                 {/* Gradient overlay */}
                 <div style={{
                   position: 'absolute', inset: 0,

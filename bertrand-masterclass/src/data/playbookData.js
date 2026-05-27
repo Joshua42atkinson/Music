@@ -370,40 +370,66 @@ export const INTERVAL_BADGES = [
   },
 ];
 
-// ── Channel Attunements (from Trinity's Four Channels) ──
-// Maps Voix Vive practice domains to Trinity's Mind/Heart/Body/Action
-export const CHANNEL_ATTUNEMENTS = [
+// ── Four Troubadour Types ──
+// Student archetypes rooted in Bertrand's three protocols.
+// Replaces former "Four Channels" (Trinity ID — archived).
+// See: docs/03_TROUBADOUR.md for full spec.
+export const TROUBADOUR_TYPES = [
   {
-    id: 'mind',
-    channel: { en: 'Mind — The Sage',     fr: 'Esprit — Le Sage' },
-    question: { en: 'What does this mean?', fr: 'Que signifie ceci ?' },
-    color: '#4a9e6e',
-    icon: '🟢',
-    sources: ['slides', 'intervals'], // slide viewing + interval study
-  },
-  {
-    id: 'heart',
-    channel: { en: 'Heart — The Bard',     fr: 'Cœur — Le Barde' },
-    question: { en: 'Where is the love here?', fr: 'Où est l\'amour ici ?' },
+    id: 'storyteller',
+    name: { en: 'The Storyteller', fr: 'Le Conteur' },
+    protocol: '©FHEAL',
+    description: {
+      en: 'You learn through narrative, lyric, and emotional resonance. Music tells your inner story.',
+      fr: 'Vous apprenez par la narration, la lyrique et la résonance émotionnelle. La musique raconte votre histoire intérieure.',
+    },
+    question: { en: 'What feeling wants to be expressed right now?', fr: 'Quel sentiment veut s\'exprimer maintenant ?' },
+    troubadourVoice: 'poetic metaphor, story arcs, feeling-first',
     color: '#d4783c',
-    icon: '🟠',
-    sources: ['songwriting', 'journal'], // creative expression
+    icon: '�',
+    sources: ['songwriting', 'journal', 'adventure'],
   },
   {
-    id: 'body',
-    channel: { en: 'Body — The Healer',    fr: 'Corps — Le Guérisseur' },
-    question: { en: 'What is my body telling me?', fr: 'Que dit mon corps ?' },
+    id: 'craftsman',
+    name: { en: 'The Craftsman', fr: 'L\'Artisan' },
+    protocol: '©SHEARL',
+    description: {
+      en: 'You learn through your hands, your body, and careful repetition. Mastery lives in the fingers.',
+      fr: 'Vous apprenez par vos mains, votre corps et la répétition soigneuse. La maîtrise vit dans les doigts.',
+    },
+    question: { en: 'What does my body already know that my mind hasn\'t caught up to yet?', fr: 'Que sait déjà mon corps que mon esprit n\'a pas encore compris ?' },
+    troubadourVoice: 'concrete steps, body awareness, slow practice',
     color: '#4a7eb5',
-    icon: '🔵',
-    sources: ['breathing', 'pitch'], // somatic + pitch work
+    icon: '�',
+    sources: ['breathing', 'fretboard', 'vertiscale'],
   },
   {
-    id: 'action',
-    channel: { en: 'Action — The Builder', fr: 'Action — Le Bâtisseur' },
-    question: { en: 'How do I make this real?', fr: 'Comment rendre cela réel ?' },
+    id: 'ear',
+    name: { en: 'The Ear', fr: 'L\'Oreille' },
+    protocol: '©PLING!',
+    description: {
+      en: 'You learn by listening first — hearing the note before finding it. The inner ear leads the way.',
+      fr: 'Vous apprenez en écoutant d\'abord — entendant la note avant de la trouver. L\'oreille intérieure montre la voie.',
+    },
+    question: { en: 'Can I hear this note before I play it?', fr: 'Puis-je entendre cette note avant de la jouer ?' },
+    troubadourVoice: 'singing prompts, inner hearing, sound-first',
+    color: '#4a9e6e',
+    icon: '�',
+    sources: ['pitch', 'intervals', 'pling'],
+  },
+  {
+    id: 'seeker',
+    name: { en: 'The Seeker', fr: 'Le Chercheur' },
+    protocol: 'All three',
+    description: {
+      en: 'You learn by asking why. Theory, pattern, and meaning draw you deeper into the mystery of music.',
+      fr: 'Vous apprenez en demandant pourquoi. La théorie, le motif et le sens vous attirent plus profondément dans le mystère de la musique.',
+    },
+    question: { en: 'Why does this interval feel the way it does?', fr: 'Pourquoi cet intervalle procure-t-il cette sensation ?' },
+    troubadourVoice: 'Socratic questions, connections, why-framing',
     color: '#c4a43c',
-    icon: '🟡',
-    sources: ['fretboard', 'recording'], // instrument mastery
+    icon: '�',
+    sources: ['slides', 'intervals', 'glossary'],
   },
 ];
 
@@ -454,41 +480,47 @@ export function getIntervalMastery() {
   return badges;
 }
 
-// ── Compute channel attunement from traction data ──
-// Returns { mind: 0-1, heart: 0-1, body: 0-1, action: 0-1 }
-export function computeAttunement(traction) {
-  const bump = 0.05; // Trinity uses 0.05 per engagement
+// ── computeTroubadourProfile ──
+// Derives a student's dominant Troubadour Type from their practice traction.
+// Maps to Four Troubadour Types (docs/03_TROUBADOUR.md) — NOT Trinity IP.
+//
+// storyteller → ©FHEAL dominant  (journal, songwriting, adventure)
+// craftsman   → ©SHEARL dominant (breathing, fretboard, vertiscale)
+// ear         → ©PLING! dominant (pitch, intervals, pling trainer)
+// seeker      → all three        (slides, theory study, glossary)
+export function computeTroubadourProfile(traction) {
   const clamp = (v) => Math.min(1.0, Math.max(0.0, v));
+  const bump = 0.05;
 
-  // Mind: slides viewed, intervals explored
-  const slidesViewed = Object.values(traction.frets || {})
-    .reduce((sum, f) => sum + (f.traction || 0), 0) / 100;
-  const mind = clamp(slidesViewed * bump * 4);
+  // Storyteller: expressive / ©FHEAL practices
+  const expressive = (traction.journalEntries || 0) + (traction.songsWritten || 0) + (traction.adventureSessions || 0);
+  const storyteller = clamp(expressive * bump * 2);
 
-  // Heart: songs written, journal entries
-  const creative = (traction.songsWritten || 0) + (traction.journalEntries || 0);
-  const heart = clamp(creative * bump * 2);
+  // Craftsman: kinesthetic / ©SHEARL practices
+  const kinesthetic = (traction.breathingSessions || 0) + (traction.rhythmSessions || 0) + (traction.recordingsSent || 0);
+  const craftsman = clamp(kinesthetic * bump * 2);
 
-  // Body: breathing sessions, pitch accuracy
-  const somatic = (traction.breathingSessions || 0) + (traction.pitchSessions || 0);
-  const body = clamp(somatic * bump * 2);
+  // Ear: audiation / ©PLING! practices
+  const audiation = (traction.pitchSessions || 0) + (traction.plingSessions || 0);
+  const ear = clamp(audiation * bump * 2);
 
-  // Action: fretboard practice, recordings submitted
-  const practice = (traction.rhythmSessions || 0) + (traction.recordingsSent || 0);
-  const action = clamp(practice * bump * 2);
+  // Seeker: theoretical / all-protocols practices
+  const theoretical = Object.values(traction.frets || {})
+    .reduce((sum, f) => sum + (f.yinCompleted ? 1 : 0), 0) / 12;
+  const seeker = clamp(theoretical);
 
-  // Derive emergent class (same as Trinity's update_class)
+  // Derive dominant type
   const scores = [
-    { val: mind,   label: { en: 'The Oracle',     fr: "L'Oracle" } },
-    { val: heart,  label: { en: 'The Bard',       fr: 'Le Barde' } },
-    { val: body,   label: { en: 'The Cultivator',  fr: 'Le Cultivateur' } },
-    { val: action, label: { en: 'The Templar',     fr: 'Le Templier' } },
+    { id: 'storyteller', val: storyteller },
+    { id: 'craftsman',   val: craftsman },
+    { id: 'ear',         val: ear },
+    { id: 'seeker',      val: seeker },
   ];
   const dominant = scores.reduce((a, b) => a.val >= b.val ? a : b);
-  const totalEngagement = mind + heart + body + action;
-  const emergentClass = totalEngagement < 0.1
-    ? { en: 'Newcomer', fr: 'Nouveau Venu' }
-    : dominant.label;
+  const totalEngagement = storyteller + craftsman + ear + seeker;
+  const dominantType = totalEngagement < 0.05
+    ? TROUBADOUR_TYPES.find(t => t.id === 'seeker') // newcomers default to Seeker
+    : TROUBADOUR_TYPES.find(t => t.id === dominant.id);
 
-  return { mind, heart, body, action, emergentClass };
+  return { storyteller, craftsman, ear, seeker, dominantType };
 }

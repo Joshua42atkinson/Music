@@ -19,8 +19,8 @@ const NeckMenu = ({
   children
 }) => {
   const navigate = useNavigate();
-  const { isFrench } = useLocale();
-  const localize = (val) => (val && typeof val === 'object' ? (isFrench ? val.fr : val.en) : val);
+  const { locale } = useLocale();
+  const localize = (val) => (val && typeof val === 'object' ? (val[locale] || val['en']) : val);
 
   return (
     <div className="neck-container">

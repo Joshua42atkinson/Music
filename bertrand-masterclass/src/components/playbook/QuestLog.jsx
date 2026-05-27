@@ -22,8 +22,8 @@ const PROTOCOL_COLORS = {
 
 export default function QuestLog({ onOpenSlides }) {
   const { traction } = useScaffolding();
-  const { isFrench } = useLocale();
-  const lang = isFrench ? 'fr' : 'en';
+  const { locale, t } = useLocale();
+  const lang = locale;
   const [expandedId, setExpandedId] = useState(null);
   const [journalCounts, setJournalCounts] = useState({});
 
@@ -45,7 +45,7 @@ export default function QuestLog({ onOpenSlides }) {
   return (
     <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
       <h3 style={styles.sectionTitle}>
-        {isFrench ? '── JOURNAL DE QUÊTE ──' : '── QUEST LOG ──'}
+        {t('questLog')}
       </h3>
 
       {/* Timeline */}
@@ -99,7 +99,7 @@ export default function QuestLog({ onOpenSlides }) {
                   <span style={styles.questIcon}>{statusIcon}</span>
                   <div style={{ flex: 1 }}>
                     <p style={{ ...styles.questFretLabel, color: protocolColor }}>
-                      {isFrench ? 'Frette' : 'Fret'} {quest.fretId} · {tool?.phase || ''}
+                      {t('questFret')} {quest.fretId} · {tool?.phase || ''}
                     </p>
                     <h4 style={styles.questTitle}>{quest.quest[lang]}</h4>
                   </div>
@@ -120,15 +120,15 @@ export default function QuestLog({ onOpenSlides }) {
 
                     {/* Progress details */}
                     <div style={styles.detailRow}>
-                      <span style={styles.detailLabel}>{isFrench ? 'Diapositives' : 'Slides'}</span>
+                      <span style={styles.detailLabel}>{t('slidesLabel')}</span>
                       <span style={styles.detailValue}>{slidePos}/{slides.length}</span>
                     </div>
                     <div style={styles.detailRow}>
-                      <span style={styles.detailLabel}>{isFrench ? 'Maîtrise' : 'Mastery'}</span>
+                      <span style={styles.detailLabel}>{t('masteryLabel')}</span>
                       <span style={styles.detailValue}>{tractionPct}%</span>
                     </div>
                     <div style={styles.detailRow}>
-                      <span style={styles.detailLabel}>{isFrench ? 'Réflexions' : 'Reflections'}</span>
+                      <span style={styles.detailLabel}>{t('reflectionsLabel')}</span>
                       <span style={styles.detailValue}>{journals}</span>
                     </div>
 
@@ -144,8 +144,8 @@ export default function QuestLog({ onOpenSlides }) {
                         onClick={(e) => { e.stopPropagation(); onOpenSlides(quest.fretId); }}
                       >
                         {isCompleted
-                          ? (isFrench ? 'Revoir la Quête' : 'Review Quest')
-                          : (isFrench ? 'Continuer la Quête →' : 'Continue Quest →')
+                          ? t('reviewQuest')
+                          : t('continueQuest')
                         }
                       </button>
                     )}

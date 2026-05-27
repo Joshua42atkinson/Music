@@ -24,8 +24,8 @@ const TABS = [
 
 export default function PlaybookShell({ onOpenSlides, onBack }) {
   const [activeTab, setActiveTab] = useState('character');
-  const { isFrench } = useLocale();
-  const lang = isFrench ? 'fr' : 'en';
+  const { locale, t } = useLocale();
+  const lang = locale;
   const navigate = useNavigate();
   const backHandler = onBack || (() => navigate('/'));
 
@@ -40,10 +40,10 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
         <div style={{ width: '32px' }} /> {/* spacer for centering */}
         <div style={styles.headerCenter}>
           <h1 style={styles.title}>
-            {isFrench ? 'Le Grimoire du Troubadour' : "Troubadour's Playbook"}
+            {t('troubadourPlaybook')}
           </h1>
           <p style={styles.subtitle}>
-            {isFrench ? 'Guide du héros en 12 frettes' : '12-Fret Hero\'s Guide'}
+            {t('heroGuide')}
           </p>
         </div>
         <button style={styles.backBtn} onClick={backHandler} aria-label="Return to home">
