@@ -6,6 +6,7 @@ import { Circle } from 'lucide-react';
 import AuthButton from '../components/AuthButton';
 import CoachingPortal from '../components/CoachingPortal';
 import { useLocale } from '../hooks/useLocale';
+import { useAuth } from '../hooks/useAuth';
 
 // ═══════════════════════════════════════════════════════════
 // LANDING SCREEN — "The Trinity"
@@ -58,6 +59,7 @@ export default function LandingScreen() {
   const localize = (val) => (val && typeof val === 'object' ? (val[locale] || val['en']) : val);
 
   const [showCoaching, setShowCoaching] = useState(false);
+  const { user } = useAuth();
 
   return (
     <div className="landing-hub">
@@ -451,6 +453,37 @@ export default function LandingScreen() {
           🌐 {locale === 'fr' ? 'EN' : 'FR'}
         </button>
       </motion.div>
+
+      {/* ── Anonymous mode banner ── */}
+      {!user && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            padding: '8px 16px',
+            marginBottom: 12,
+            borderRadius: 8,
+            background: 'rgba(201,169,110,0.06)',
+            border: '1px solid rgba(201,169,110,0.12)',
+            color: 'rgba(201,169,110,0.7)',
+            fontSize: '0.7rem',
+            fontFamily: "'JetBrains Mono', monospace",
+            maxWidth: 400,
+            textAlign: 'center',
+            cursor: 'default',
+          }}
+        >
+          <span>💾</span>
+          <span>{locale === 'fr'
+            ? 'Connectez-vous pour sauvegarder votre progression sur tous vos appareils'
+            : 'Sign in to save your progress across all your devices'}</span>
+        </motion.div>
+      )}
 
       {/* ── Three Portal Cards ── */}
       <div className="portals-grid">

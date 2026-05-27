@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   avatar_url TEXT,
   bio TEXT,
   instrument TEXT DEFAULT 'guitar',
+  traction_data JSONB DEFAULT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -131,8 +132,10 @@ CREATE TABLE IF NOT EXISTS public.journal_entries (
   student_profile_id UUID REFERENCES public.student_profiles(id) ON DELETE CASCADE,
   title TEXT,
   body TEXT,
+  prompt TEXT,
   fret_id INTEGER CHECK (fret_id BETWEEN 1 AND 12),
   mood TEXT,
+  entry_type TEXT DEFAULT 'text',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

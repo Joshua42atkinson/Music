@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocale } from '../../hooks/useLocale';
+import { useAuth } from '../../hooks/useAuth';
 import { db } from '../../data/localDatabase';
+import { supabase } from '../../lib/supabase';
 import { JOURNAL_PROMPTS, JOURNAL_MOODS } from '../../data/playbookData';
 
 // ═══════════════════════════════════════════════════════════
@@ -11,6 +13,7 @@ import { JOURNAL_PROMPTS, JOURNAL_MOODS } from '../../data/playbookData';
 
 export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
   const { locale, t } = useLocale();
+  const { user } = useAuth();
   const lang = locale;
   const [mood, setMood] = useState(null);
   const [text, setText] = useState('');
@@ -25,15 +28,37 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
 
   const handleSave = async () => {
     if (!text.trim() && !mood) { onClose?.(); return; }
+    const entry = {
+      fretId,
+      toolId,
+      timestamp: new Date().toISOString(),
+      mood: mood || 'neutral',
+      prompt,
+      text: text.trim(),
+    };
     try {
-      await db.journal.add({
-        fretId,
-        toolId,
-        timestamp: new Date().toISOString(),
-        mood: mood || 'neutral',
-        prompt,
-        text: text.trim(),
-      });
+      // 1. Always save to IndexedDB (local, fast, works offline)
+      await db.journal.add(entry);
+
+      // 2. If logged in, also save to Supabase cloud
+      if (user && supabase) {
+        try {
+          const { error } = await supabase.from('journal_entries').insert({
+            user_id: user.id,
+            fret_id: fretId,
+            entry_type: 'text',
+            body: text.trim(),
+            mood: mood || 'neutral',
+            prompt,
+            created_at: entry.timestamp,
+          });
+          if (error) throw error;
+          console.log('[JournalEntry] Synced to Supabase cloud');
+        } catch (cloudErr) {
+          console.warn('[JournalEntry] Cloud sync failed (saved locally):', cloudErr);
+        }
+      }
+
       setSaved(true);
       setTimeout(() => { onSave?.(); onClose?.(); }, 1200);
     } catch (e) {
@@ -118,17 +143,40 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
 // ── Journal Feed — shows all past entries ──
 export function JournalFeed() {
   const { locale, t } = useLocale();
+  const { user } = useAuth();
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const all = await db.journal.orderBy('timestamp').reverse().toArray();
+        let all = [];
+        if (user && supabase) {
+          // Logged in — fetch from Supabase
+          const { data, error } = await supabase
+            .from('journal_entries')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          if (!error && data) {
+            all = data.map(row => ({
+              id: row.id,
+              fretId: row.fret_id,
+              timestamp: row.created_at,
+              mood: row.mood || 'neutral',
+              prompt: row.prompt || row.title,
+              text: row.body || row.content,
+            }));
+          }
+        }
+        // Fallback / supplement with IndexedDB
+        if (all.length === 0) {
+          all = await db.journal.orderBy('timestamp').reverse().toArray();
+        }
         setEntries(all);
       } catch { /* IndexedDB may not be available */ }
     };
     load();
-  }, []);
+  }, [user]);
 
   const moodMap = {};
   JOURNAL_MOODS.forEach(m => { moodMap[m.id] = m; });

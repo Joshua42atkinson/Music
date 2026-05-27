@@ -1,7 +1,7 @@
 # 🎸 VOIX VIVE — Master Context & Business Platform
 
 > **Purpose:** Load this file into a new AI session to instantly recover full project context.  
-> **Last Updated:** 2026-05-27 (Supabase wired, Vercel live, Google OAuth configured, Phase 1 active)  
+> **Last Updated:** 2026-05-27 (Google Auth LIVE on voix-vive.com, DAG Funnel designed, Phase 1 active)  
 > **Project Root:** `/home/joshua/Workflow/Other/Bertrand-Masterclass/Music/bertrand-masterclass/`  
 > **Dev Server:** `npm run dev` → localhost:5173  
 > **Git Remote:** https://github.com/joshua42atkinson/Music.git  

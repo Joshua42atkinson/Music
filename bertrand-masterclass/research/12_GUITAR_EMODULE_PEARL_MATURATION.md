@@ -2,11 +2,11 @@
 ## Voix Vive — Unified Interactive Learning Architecture
 ### *All Tools. All Games. All Paths. One Module.*
 
-> **Version:** 1.3 — Google OAuth Configured + System Review (2026-05-27)
+> **Version:** 1.4 — Google Auth LIVE, DAG Funnel Design Phase (2026-05-27)
 > **Author:** Joshua Atkinson (Platform Architect)
 > **SME:** Bertrand Laurence
-> **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth
-> **Status:** Phase 1 Active — Login system live, database deployed, production stable. Ready for student testing.
+> **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth + DAG eModule
+> **Status:** Phase 1 Active — Login system fully working on live site. Moving to login-aware progress + journaling.
 
 ---
 
@@ -479,9 +479,12 @@ function speak(text, rate = 0.85) {
 - [x] **Google Auth** — OAuth 2.0 credentials created in Google Cloud Console; Client ID + Secret pasted into Supabase Auth → Providers
 - [x] **Login/logout UI** — AuthButton component + useAuth hook built; placed in LandingScreen header and ready for all nav bars
 - [x] **Auth callback page** — `/auth/callback` route handles OAuth redirect, routes to `/song`
-- [ ] **Login test** — Verify Google sign-in works on live site (`www.voix-vive.com`)
+- [x] **Login test** — Google sign-in works on `www.voix-vive.com` ✅ (2026-05-27)
+  - Fix: `detectSessionInUrl: false` + manual hash parsing in AuthCallback
+  - Fix: Full `sb_publishable_*` prefix required in VITE_SUPABASE_ANON_KEY
+  - Fix: AuthCallback now has 3 clean cases (implicit hash, PKCE code, existing session)
 - [ ] **Data migration** — Local → cloud on first login (preserves existing data)
-- [ ] **ScaffoldingProvider sync** — Read from Supabase when logged in, localStorage when not
+- [x] **ScaffoldingProvider sync** — Cloud when logged in, localStorage when not ✅ (wired)
 - [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation
 - [ ] **No-AI fallback** — Static prompt library when LM Studio is offline
 

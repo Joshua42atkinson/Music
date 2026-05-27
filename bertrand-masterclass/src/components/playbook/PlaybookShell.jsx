@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import CharacterSheet from './CharacterSheet';
 import QuestLog from './QuestLog';
 import { JournalFeed } from './JournalEntry';
+import VideoRecorder from './VideoRecorder';
 import SongwritingCompanion from '../SongwritingCompanion';
 import { ArrowLeft } from 'lucide-react';
 import { useLocale } from '../../hooks/useLocale';
@@ -108,7 +109,12 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
             {activeTab === 'character' && <CharacterSheet />}
             {activeTab === 'quests' && <QuestLog onOpenSlides={handleOpenSlides} />}
             {activeTab === 'songbook' && <SongwritingCompanion />}
-            {activeTab === 'journal' && <JournalFeed />}
+            {activeTab === 'journal' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <VideoRecorder />
+                <JournalFeed />
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
