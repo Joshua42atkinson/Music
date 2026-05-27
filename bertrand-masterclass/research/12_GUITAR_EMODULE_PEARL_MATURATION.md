@@ -2,11 +2,11 @@
 ## Voix Vive — Unified Interactive Learning Architecture
 ### *All Tools. All Games. All Paths. One Module.*
 
-> **Version:** 1.1 — Stabilization In Progress (2026-05-27)
+> **Version:** 1.2 — Supabase Wired + Vercel Live (2026-05-27)
 > **Author:** Joshua Atkinson (Platform Architect)
 > **SME:** Bertrand Laurence
 > **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth
-> **Status:** Phase 0 (Stabilization) — build passes, routes added, docs updated. Navigation standardization in progress.
+> **Status:** Phase 0/1 Bridge — Stabilization complete. Supabase project live, schema deployed, Vercel deployed to `www.voix-vive.com`. Google OAuth pending.
 
 ---
 
@@ -464,15 +464,19 @@ function speak(text, rate = 0.85) {
 - [x] **StudioPage navigation** — Back button + Voix Vive wordmark home
 - [x] **Standardize navigation** — Back + home added to GuitarWorkbench, OrientationHub, PlaybookShell, VertiscaleEngine, AdventurePlayer
 - [x] **Fix PlayerPortal** — Pricing cards removed, clean CTA to `/studio`
-- [ ] **Browser test all routes** — `/game`, `/adventure`, `/player`, `/guitar`, `/playbook`
-- [ ] **Link everything** — Every page links to every other page. No orphans.
+- [x] **Browser test all routes** — `/game`, `/adventure`, `/player`, `/guitar`, `/playbook`, `/song`, `/studio`
+- [x] **Remove distracting homepage photo** — Floating Bertrand avatar removed from LandingScreen
+- [x] **Add Pythagorean Legacy to all 12 frets** — chapterData.js now has `pythagoreanLegacy` with ratio, cents, bilingual hook
+- [x] **Pythagorean Legacy slide in deck** — slideGenerator.js + SlideViewer.jsx render mathematical origin card after title
 
-### Phase 1: Persistence (Next — After Phase 0 gate)
+### Phase 1: Persistence (IN PROGRESS — May 27, 2026)
 
-**Prerequisites from you:** Supabase project + Google OAuth credentials
+**Prerequisites DONE:** ✅ Supabase project created (`fmaaihxhfgmqdmtmckmc`), schema deployed, Vercel env vars set.
 
-- [ ] **Supabase setup** — Create project, run schema migrations
-- [ ] **Google Auth** — OAuth credentials, login/logout UI
+- [x] **Supabase setup** — Project created, schema.sql deployed, RLS policies active
+- [x] **Vercel deploy** — Live at `www.voix-vive.com` + `bertrand-masterclass.vercel.app`
+- [ ] **Google Auth** — OAuth credentials pending (Supabase dashboard → Auth → Providers)
+- [ ] **Login/logout UI** — Header button when auth is ready
 - [ ] **Data migration** — Local → cloud on first login (preserves existing data)
 - [ ] **ScaffoldingProvider sync** — Read from Supabase when logged in, localStorage when not
 - [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation
@@ -507,13 +511,13 @@ function speak(text, rate = 0.85) {
 - [ ] **Timeline view** — Submissions + journal + practice sessions in one feed
 - [ ] **CAGED TCG Shop** — Browse cards, checkout (Phase 5)
 
-### Phase 5: Vercel + PWA (After Digital Mirror)
+### Phase 5: Vercel + PWA (FAST-TRACKED — May 27, 2026)
 
-**Prerequisites from you:** Connect repo in Vercel dashboard, set `voix-vive.com` domain
+**Prerequisites DONE:** ✅ Repo connected, `www.voix-vive.com` domain active, env vars configured.
 
+- [x] **Production deploy** — Live at `www.voix-vive.com`
 - [ ] **PWA manifest** — Installable, offline cache
 - [ ] **Service worker** — Offline mode for core features
-- [ ] **Production deploy** — Live at voix-vive.com
 
 ### Phase 6: Android (Moonshot — Revenue Gate: $2,500/mo)
 
