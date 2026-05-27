@@ -2,11 +2,11 @@
 ## Voix Vive — Unified Interactive Learning Architecture
 ### *All Tools. All Games. All Paths. One Module.*
 
-> **Version:** 1.2 — Supabase Wired + Vercel Live (2026-05-27)
+> **Version:** 1.3 — Google OAuth Configured + System Review (2026-05-27)
 > **Author:** Joshua Atkinson (Platform Architect)
 > **SME:** Bertrand Laurence
 > **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth
-> **Status:** Phase 0/1 Bridge — Stabilization complete. Supabase project live, schema deployed, Vercel deployed to `www.voix-vive.com`. Google OAuth pending.
+> **Status:** Phase 1 Active — Login system live, database deployed, production stable. Ready for student testing.
 
 ---
 
@@ -476,9 +476,10 @@ function speak(text, rate = 0.85) {
 
 - [x] **Supabase setup** — Project created, schema.sql deployed, RLS policies active
 - [x] **Vercel deploy** — Live at `www.voix-vive.com` + `bertrand-masterclass.vercel.app`
-- [ ] **Google Auth** — OAuth credentials pending (Supabase dashboard → Auth → Providers)
+- [x] **Google Auth** — OAuth 2.0 credentials created in Google Cloud Console; Client ID + Secret pasted into Supabase Auth → Providers
 - [x] **Login/logout UI** — AuthButton component + useAuth hook built; placed in LandingScreen header and ready for all nav bars
 - [x] **Auth callback page** — `/auth/callback` route handles OAuth redirect, routes to `/song`
+- [ ] **Login test** — Verify Google sign-in works on live site (`www.voix-vive.com`)
 - [ ] **Data migration** — Local → cloud on first login (preserves existing data)
 - [ ] **ScaffoldingProvider sync** — Read from Supabase when logged in, localStorage when not
 - [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation
@@ -592,6 +593,76 @@ Every fret is a stage of becoming. Every tool is a question the student asks the
 
 ---
 
+---
+
+## Appendix B: Legal & IP Framework
+
+### Ownership Structure (As Agreed)
+
+| Layer | Owner | What It Is | Can License? |
+|-------|-------|-----------|--------------|
+| **Business / Studio** | Bertrand Laurence | `voix-vive.com` domain, student relationships, coaching revenue, lesson content | No — his personal asset |
+| **Platform Code** | Joshua Atkinson | React/Vite app, Supabase schema, game engines, AI integration | Yes — framework can be licensed to other instructors |
+| **Methodology** | Joshua Atkinson | ADDIECRAPEYE, PEARL, 12-Fret Monomyth mapping, Troubadour persona design | Yes — documented for academic and commercial use |
+| **Curriculum Content** | Bertrand Laurence | Lesson text, exercises, philosophical framing, musical examples | No — his artistic IP |
+
+### What Is NOT Documented (Action Required)
+
+- ❌ **No written contract** between Joshua and Bertrand
+- ❌ **No explicit license grant** for the platform code
+- ❌ **No revenue-sharing agreement** for future licensing
+- ❌ **No GDPR compliance statement** for EU students
+- ❌ **No terms of service** governing student data use
+
+### Recommended Next Steps (Non-Legal-Advice)
+
+1. **Simple email agreement** between you and Bertrand:
+   - "I gift the website code and infrastructure to your teaching business. I retain ownership of the ADDIECRAPEYE framework and platform architecture for potential future licensing. You retain all revenue from student coaching and lessons."
+2. **Add to `/privacy` page:**
+   - Where data is stored (Supabase, US servers)
+   - What data is collected (name, email, progress, submissions)
+   - Student rights (access, deletion)
+3. **Add to `/terms` page:**
+   - Platform is free for learning
+   - Coaching is paid separately through Bertrand
+   - No medical/physical therapy claims
+
+### The Nonprofit Question (Deferred)
+
+**Status:** Discussed but not pursued. Rationale: two-person operation, no grant funding yet, simple hosting costs covered by hobby tier. Revisit if:
+- 3+ instructors want to use the platform
+- Google for Education or arts foundation grant becomes available
+- Revenue exceeds $2,500/mo and tax structure matters
+
+---
+
+## Appendix C: Bertrand's Checklist
+
+### What Bertrand Needs to Do
+
+- [ ] **Test the live site** — `www.voix-vive.com` on his phone and computer
+- [ ] **Try signing in with Google** — verify login flow works end-to-end
+- [ ] **Browse a chapter** — e.g., Fret 1 (The Root Note), swipe through slides
+- [ ] **Check the Chromatic Monomyth chart** — `/monomyth`, see if the 12-fret grid resonates
+- [ ] **Review his color/shape associations** — "For each of the 12 chromatic notes, what color and shape do you feel?"
+- [ ] **Record a short welcome video** — 30–60 seconds for the landing page
+- [ ] **Set his coaching prices** — Update `/studio` page with actual rates
+- [ ] **Provide a bio + photo** — For the mentor section of the platform
+
+### What We Need from Bertrand for Phase 2
+
+- [ ] **Preference: `/mentor` dashboard or integrated?** — Does he want a separate page to see all students, or notifications within his existing tools?
+- [ ] **Submission review workflow** — How does he want to receive and respond to student videos?
+- [ ] **Async coaching pricing** — Per submission? Monthly subscription? Bundled?
+
+### What We Need from Bertrand for the Brand
+
+- [ ] **Color/shape mapping for 12 notes** — This unlocks: Chromatic Monomyth visual upgrades, TCG card art, personalized student avatars
+- [ ] **Voice memo for Troubadour** — Record "Welcome, troubadour..." so the AI can clone his voice (Phase 3)
+- [ ] **Favorite songs for each fret** — Real examples he uses in lessons, to replace placeholder content in Timeless Song slides
+
+---
+
 ## Appendix A: The 12-Fret Tool Map (Sacred)
 
 | Fret | Tone | Stage | Tool | Protocol | Game Phase |
@@ -611,4 +682,4 @@ Every fret is a stage of becoming. Every tool is a question the student asks the
 
 ---
 
-*Document written 2026-05-27. Next review: after Supabase integration and route fixes.*
+*Document written 2026-05-27. Last reviewed 2026-05-27. Next review: after login testing and ScaffoldingProvider sync.*
