@@ -529,6 +529,59 @@ export default function LandingScreen() {
         </p>
       </motion.div>
 
+      {/* ── Creator Footer ── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        style={{
+          textAlign: 'center',
+          marginTop: 48,
+          marginBottom: 24,
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+        }}
+      >
+        <p style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.6rem',
+          color: 'rgba(201,169,110,0.25)',
+          letterSpacing: '0.15em',
+          lineHeight: 1.8,
+        }}>
+          Platform by{' '}
+          <a
+            href="https://LDTAtkinson.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'rgba(201,169,110,0.4)',
+              textDecoration: 'none',
+              transition: 'color 0.3s',
+            }}
+            onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.7)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.4)'}
+          >
+            Joshua Atkinson
+          </a>
+          <br />
+          Pedagogy by{' '}
+          <a
+            href="https://bertrandguitarstudio.duetpartner.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'rgba(201,169,110,0.4)',
+              textDecoration: 'none',
+              transition: 'color 0.3s',
+            }}
+            onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.7)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.4)'}
+          >
+            Bertrand Laurence
+          </a>
+        </p>
+      </motion.div>
+
       {/* Somatic Practice Portal Modal Overlay */}
       <AnimatePresence>
         {showCoaching && (
