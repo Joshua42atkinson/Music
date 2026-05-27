@@ -81,33 +81,6 @@ function formatDuration(seconds) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// SERVICE CARD (for Mentor Services section)
-// ═══════════════════════════════════════════════════════════
-function ServiceCard({ title, price, duration, icon, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: '14px 16px', borderRadius: 10, textAlign: 'left',
-        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
-        cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column', gap: 6,
-      }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(201,169,110,0.25)'; e.currentTarget.style.background = 'rgba(201,169,110,0.05)'; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.5)' }}>
-        {icon}
-      </div>
-      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.95rem', color: '#f0e6d2' }}>{title}</div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.9rem', color: '#c9a96e', fontWeight: 600 }}>{price}</span>
-        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)' }}>{duration}</span>
-      </div>
-    </button>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════
 export default function PlayerPortal() {
@@ -487,7 +460,7 @@ export default function PlayerPortal() {
 
       {/* ── MENTOR SERVICES ── */}
       <div style={{ padding: '20px 16px 40px', maxWidth: 640, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <Heart size={16} style={{ color: '#c9a96e' }} />
           <h2 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', color: '#f0e6d2' }}>
             {t('mentorServices') || 'Mentor Services'}
@@ -495,43 +468,13 @@ export default function PlayerPortal() {
         </div>
         <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: 16 }}>
           {locale === 'fr'
-            ? "Bertrand offre des leçons privées, des critiques vidéo et un accompagnement. Réservez directement ou visitez le studio pour les tarifs complets."
-            : "Bertrand offers private lessons, video critiques, and mentorship. Book directly or visit the studio for full pricing."}
+            ? "Bertrand offre des leçons privées, des critiques vidéo et un accompagnement. Visitez le studio pour les tarifs complets."
+            : "Bertrand offers private lessons, video critiques, and mentorship. Visit the studio for full pricing."}
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <ServiceCard
-            title={locale === 'fr' ? 'Leçon Privée' : 'Private Lesson'}
-            price="$65"
-            duration="1 hour"
-            icon={<Calendar size={16} />}
-            onClick={() => navigate('/studio')}
-          />
-          <ServiceCard
-            title={locale === 'fr' ? 'Critique Vidéo' : 'Video Critique'}
-            price="$35"
-            duration="15-min review"
-            icon={<Film size={16} />}
-            onClick={() => navigate('/studio')}
-          />
-          <ServiceCard
-            title={locale === 'fr' ? 'Mini Critique' : 'Mini Critique'}
-            price="$15"
-            duration="5-min reply"
-            icon={<Video size={16} />}
-            onClick={() => navigate('/studio')}
-          />
-          <ServiceCard
-            title={locale === 'fr' ? 'Question Rapide' : 'Quick Question'}
-            price="$5"
-            duration="Text reply"
-            icon={<MessageSquare size={16} />}
-            onClick={() => navigate('/studio')}
-          />
-        </div>
         <button
           onClick={() => navigate('/studio')}
           style={{
-            width: '100%', marginTop: 16, padding: '14px 24px', borderRadius: 10,
+            width: '100%', padding: '14px 24px', borderRadius: 10,
             background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)',
             color: '#c9a96e', cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace",
             fontSize: '0.85rem', letterSpacing: '0.1em', textTransform: 'uppercase',

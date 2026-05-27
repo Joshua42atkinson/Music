@@ -11,6 +11,8 @@ import PitchGateUI from './PitchGateUI';
 import { playReferenceTone } from '../audio/audioEngine';
 // Tavern3DVisualizer archived → _archive/vr_future/ (Android XR moonshot, revenue gate $5k/mo)
 
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
@@ -41,6 +43,7 @@ const ACT_LABELS = {
 };
 
 function AdventurePlayer({ onClose }) {
+  const navigate = useNavigate();
   const { locale, t } = useLocale();
 
   const localize = useCallback((val) => {
@@ -230,18 +233,33 @@ function AdventurePlayer({ onClose }) {
         background: 'rgba(8,8,14,0.95)', borderBottom: `1px solid ${atmo.accent}20`,
         zIndex: 10, flexShrink: 0,
       }}>
-        <button onClick={onClose} style={{
-          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-          color: '#8090a8', borderRadius: 8, fontSize: '1rem', cursor: 'pointer',
-          padding: '8px 14px', fontFamily: 'JetBrains Mono, monospace',
-        }}>{t('exit')}</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => navigate(-1)} style={{
+            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+            color: '#8090a8', borderRadius: 8, fontSize: '0.85rem', cursor: 'pointer',
+            padding: '8px 12px', fontFamily: 'JetBrains Mono, monospace',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}><ArrowLeft size={14} /> {t('back')}</button>
+          <button onClick={onClose} style={{
+            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+            color: '#8090a8', borderRadius: 8, fontSize: '1rem', cursor: 'pointer',
+            padding: '8px 14px', fontFamily: 'JetBrains Mono, monospace',
+          }}>{t('exit')}</button>
+        </div>
         <span style={{
           fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
           letterSpacing: '0.15em', textTransform: 'uppercase', color: atmo.accent,
         }}>{localize(ACT_LABELS[scene.act]) || 'ADVENTURE'}</span>
-        <span style={{
-          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80',
-        }}>🔥 {session.streak}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => navigate('/')} style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          }} aria-label="Home">
+            <img src="/assets/wordmark.png" alt="Voix Vive" style={{ height: 20, opacity: 0.7 }} draggable={false} />
+          </button>
+          <span style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem', color: '#5a6a80',
+          }}>🔥 {session.streak}</span>
+        </div>
       </div>
 
       {/* Main Content */}

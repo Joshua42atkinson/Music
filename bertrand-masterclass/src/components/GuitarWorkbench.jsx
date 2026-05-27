@@ -20,7 +20,7 @@ import {
 import {
   Wind, Timer, Music, Feather, Grid3x3, BookOpen, Mic, Activity, Zap,
   Video, Layers, Play, X, Sparkles, ChevronDown, ChevronUp,
-  HelpCircle, Heart, Brain, Ear, Compass,
+  HelpCircle, Heart, Brain, Ear, Compass, ArrowLeft,
 } from 'lucide-react';
 
 // ── Tool components ──
@@ -202,6 +202,9 @@ export default function GuitarWorkbench() {
           <p style={styles.headerSub}>Your practice companion</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => navigate(-1)} style={styles.backBtn} aria-label="Back">
+            <ArrowLeft size={20} style={{ color: '#c9a96e' }} />
+          </button>
           <button onClick={handleHelpClick} style={styles.helpBtn} aria-label="Ask the Troubadour">
             <HelpCircle size={20} style={{ color: '#c9a96e' }} />
           </button>

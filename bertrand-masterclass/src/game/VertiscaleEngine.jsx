@@ -16,6 +16,7 @@ import { getVertiscaleProgress, logVertiscaleSession } from './sessionLogger';
 import BiometricSanctum from '../components/BiometricSanctum';
 import { useBackendBridge } from '../hooks/useBackendBridge';
 import { db } from '../data/localDatabase';
+import { ArrowLeft } from 'lucide-react';
 import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
@@ -294,25 +295,32 @@ function VertiscaleEngine({ onClose }) {
             background: 'rgba(8,8,14,0.9)',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
           }}>
-            {onClose ? (
-              <button onClick={onClose} style={{
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: '52px' }}>
+              <button onClick={() => navigate(-1)} style={{
                 background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
                 color: '#8090a8', borderRadius: 8, fontSize: '0.9rem',
                 cursor: 'pointer', padding: '10px 16px',
                 fontFamily: 'JetBrains Mono, monospace',
                 display: 'flex', alignItems: 'center', gap: 6,
-                marginLeft: '52px',
-              }}>{t('ve_exit')}</button>
-            ) : (
-              <button onClick={() => navigate('/')} style={{
-                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-                color: '#8090a8', borderRadius: 8, fontSize: '0.9rem',
-                cursor: 'pointer', padding: '10px 16px',
-                fontFamily: 'JetBrains Mono, monospace',
-                display: 'flex', alignItems: 'center', gap: 6,
-                marginLeft: '52px',
-              }}>{t('ve_home')}</button>
-            )}
+              }}><ArrowLeft size={16} /> {t('ve_back')}</button>
+              {onClose ? (
+                <button onClick={onClose} style={{
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+                  color: '#8090a8', borderRadius: 8, fontSize: '0.9rem',
+                  cursor: 'pointer', padding: '10px 16px',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>{t('ve_exit')}</button>
+              ) : (
+                <button onClick={() => navigate('/')} style={{
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+                  color: '#8090a8', borderRadius: 8, fontSize: '0.9rem',
+                  cursor: 'pointer', padding: '10px 16px',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>{t('ve_home')}</button>
+              )}
+            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{

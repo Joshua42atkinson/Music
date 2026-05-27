@@ -6,6 +6,7 @@ import CharacterSheet from './CharacterSheet';
 import QuestLog from './QuestLog';
 import { JournalFeed } from './JournalEntry';
 import SongwritingCompanion from '../SongwritingCompanion';
+import { ArrowLeft } from 'lucide-react';
 import { useLocale } from '../../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
@@ -37,7 +38,27 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
     <div style={styles.shell}>
       {/* Header */}
       <div style={styles.header}>
-        <div style={{ width: '32px' }} /> {/* spacer for centering */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.75rem',
+            color: '#c9a96e',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            background: 'none',
+            border: 'none',
+            padding: '8px 0',
+          }}
+          aria-label="Back"
+        >
+          <ArrowLeft size={14} />
+          Back
+        </button>
         <div style={styles.headerCenter}>
           <h1 style={styles.title}>
             {t('troubadourPlaybook')}

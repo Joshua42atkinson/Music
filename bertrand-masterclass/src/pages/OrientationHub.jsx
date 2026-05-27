@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import frets from '../data/chapterData';
 import SlideViewer from '../components/SlideViewer';
 import NeckMenu from '../components/NeckMenu';
 import SongwritingCompanion from '../components/SongwritingCompanion';
 import { generateSlides } from '../data/slideGenerator';
 import { getChapterProgress } from '../data/localDatabase';
-import { Guitar, X } from 'lucide-react';
+import { Guitar, X, ArrowLeft } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -42,6 +43,7 @@ const DOUBLE_DOT_FRETS = [12];
 const OrientationHub = () => {
   const [activeFret, setActiveFret] = useState(null);
   const [showQuill, setShowQuill] = useState(false);
+  const navigate = useNavigate();
 
   if (activeFret) {
     return (
@@ -69,6 +71,41 @@ const OrientationHub = () => {
 
   return (
     <>
+      {/* ── Navigation Bar ── */}
+      <nav style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0,
+        zIndex: 500,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '12px 16px',
+        paddingTop: 'max(12px, env(safe-area-inset-top))',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.75rem',
+            color: '#c9a96e',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            background: 'rgba(201,169,110,0.06)',
+            border: '1px solid rgba(201,169,110,0.15)',
+            borderRadius: 8,
+            padding: '8px 12px',
+          }}
+          aria-label="Back"
+        >
+          <ArrowLeft size={14} />
+          Back
+        </button>
+      </nav>
+
       <NeckMenu
         items={mappedFrets}
         activeId={null} // We use SlideViewer instead of inline content
