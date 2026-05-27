@@ -27,6 +27,14 @@ const frets = [
         fr: "Sur la guitare, la racine peut être déplacée n'importe où. Contrairement à un piano où le « Do central » est fixe, la guitare est un instrument transpositeur par rapport à son accordage. Les cordes à vide ne sont que des notes pré-frettées à la frette 0."
       }
     },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'Pythagoras began with the fundamental: a string vibrating as one whole. The 1:1 ratio is the mathematical origin of all harmony.',
+        fr: "Pythagore a commencé par le fondamental : une corde vibrante comme un tout. Le ratio 1:1 est l'origine mathématique de toute harmonie."
+      },
+      ratio: '1:1',
+      cents: 0
+    },
     yin: {
       title: { en: 'The Grip of Tension', fr: "L'Emprise de la Tension" },
       philosophy: {
@@ -107,6 +115,14 @@ const frets = [
         fr: "Sur la guitare, une frette égale un demi-ton (une seconde mineure). Cet absolu géométrique signifie que toute forme d'accord déplacée d'une frette vers le haut est élevée d'exactement un demi-ton."
       }
     },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The limma (256:243) — the smallest step in Pythagorean tuning. The first friction: not a clean ratio, but the necessary gap between whole numbers.',
+        fr: "Le limma (256:243) — le plus petit intervalle dans l'accordage pythagoricien. La première friction : pas un ratio propre, mais le nécessaire écart entre les nombres entiers."
+      },
+      ratio: '256:243',
+      cents: 90.22
+    },
     yin: {
       title: { en: 'The Observer Within', fr: "L'Observateur Intérieur" },
       philosophy: {
@@ -176,6 +192,14 @@ const frets = [
         en: 'A whole step is two frets. Visually seeing whole steps and half steps on a single string is crucial to understanding scale architecture linearly before vertically.',
         fr: "Un ton entier correspond à deux frettes. Visualiser les tons et les demi-tons sur une seule corde est crucial pour comprendre la structure des gammes de façon linéaire avant de l'aborder verticalement."
       }
+    },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The epogdoon (9:8) — the major tone that builds the diatonic scale from simple ratios. Two of these make a ditone; twelve make an octave.',
+        fr: "L'épogdoon (9:8) — le ton majeur qui construit la gamme diatonique à partir de ratios simples. Deux de ceux-ci forment un ditone ; douze forment une octave."
+      },
+      ratio: '9:8',
+      cents: 203.91
     },
     yin: {
       title: { en: 'Silencing the Critic', fr: 'Faire Taire le Critique' },
@@ -247,6 +271,14 @@ const frets = [
         fr: "La tierce mineure s'étend sur trois frettes sur une seule corde, ou en diagonale décalée sur deux cordes adjacentes (selon l'intervalle d'accordage des cordes)."
       }
     },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The semiditone (32:27) — three semitones born from dividing the perfect 5th (3:2) by the major tone (9:8). Melancholy from mathematics.',
+        fr: "Le semiditone (32:27) — trois demi-tons nés de la division de la quinte parfaite (3:2) par le ton majeur (9:8). La mélancolie vient des mathématiques."
+      },
+      ratio: '32:27',
+      cents: 294.13
+    },
     yin: {
       title: { en: 'Trust and Obey', fr: 'Confiance et Obéissance' },
       philosophy: {
@@ -315,6 +347,14 @@ const frets = [
         en: 'Due to Standard Tuning (E-A-D-G-B-E), the guitar is tuned in Perfect 4ths EXCEPT between the G and B strings, which is a Major 3rd. This specific "warp" is what allows for ergonomic chord shapes.',
         fr: "En raison de l'accordage standard (Mi-La-Ré-Sol-Si-Mi), la guitare est accordée en quartes parfaites SAUF entre les cordes de Sol et Si, qui forment une tierce majeure. Cette « distorsion » spécifique permet des formes d'accords ergonomiques."
       }
+    },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The ditone (81:64) — two major tones (9:8 × 9:8). The bright interval that defines major chords, yet slightly wider than the pure 5:4 of just intonation.',
+        fr: "Le ditone (81:64) — deux tons majeurs (9:8 × 9:8). L'intervalle brillant qui définit les accords majeurs, légèrement plus large que le pur 5:4 de l'intonation juste."
+      },
+      ratio: '81:64',
+      cents: 407.82
     },
     yin: {
       title: { en: 'The Universal Geometry', fr: 'La Géométrie Universelle' },
@@ -386,6 +426,14 @@ const frets = [
         fr: "La guitare est fondamentalement un instrument quartal (accordé en quartes). Monter verticalement (à travers les cordes) d'une corde sur la même frette produit une quarte parfaite (sauf pour la transition Sol-Si)."
       }
     },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The sesquitertium (4:3) — the heart of guitar tuning. Pythagoras called it the most beautiful ratio: divide a string by four, play three parts.',
+        fr: "Le sesquitertium (4:3) — le cœur de l'accordage de la guitare. Pythagore l'appelait le plus beau ratio : divisez une corde par quatre, jouez trois parties."
+      },
+      ratio: '4:3',
+      cents: 498.04
+    },
     yin: {
       title: { en: 'The SHEARL Protocol', fr: 'Le Protocole SHEARL' },
       philosophy: {
@@ -455,6 +503,14 @@ const frets = [
         fr: "Parce qu'il divise l'octave, la forme du triton est hautement symétrique sur la touche. Il est facilement identifiable comme une diagonale enjambant deux cordes adjacentes."
       }
     },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The augmented 4th (729:512) — the exact midpoint of the octave. The "Devil in Music" was born from the tension between pure mathematics and harmonic closure.',
+        fr: "La quarte augmentée (729:512) — le point médian exact de l'octave. Le « Diable dans la Musique » est né de la tension entre les mathématiques pures et la fermeture harmonique."
+      },
+      ratio: '729:512',
+      cents: 611.73
+    },
     yin: {
       title: { en: 'The Third Ear', fr: 'La Troisième Oreille' },
       philosophy: {
@@ -523,6 +579,14 @@ const frets = [
         en: 'On the lower strings, the Perfect 5th is the classic "Power Chord" shape (Root + two frets up on the next string). This shape is a physical anchor for modern guitar playing.',
         fr: "Sur les cordes graves, la quinte parfaite est la forme classique du « Power Chord » (Racine + deux frettes plus haut sur la corde suivante). Cette forme est une ancre physique pour le jeu de guitare moderne."
       }
+    },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The sesquialterum (3:2) — Pythagoras\'s foundational discovery. Stack twelve of these and you almost return home: the gap is the Pythagorean comma.',
+        fr: "Le sesquialterum (3:2) — la découverte fondamentale de Pythagore. Empilez douze de ces intervalles et vous revenez presque à la maison : l'écart est le comma pythagoricien."
+      },
+      ratio: '3:2',
+      cents: 701.96
     },
     yin: {
       title: { en: 'The Art of the True Move', fr: 'L\'Art du Geste Vrai' },
@@ -602,6 +666,14 @@ const frets = [
         fr: "Les renversements d'intervalles signifient que vous pouvez trouver une sixte mineure soit en montant de 8 frettes, soit en descendant d'une tierce majeure (4 frettes) et en montant d'une octave. La guitare permet cette manipulation spatiale."
       }
     },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The inverted major 3rd (128:81) — eight semitones that reveal the mirror symmetry hidden in the circle of fifths. What ascends must descend.',
+        fr: "La tierce majeure renversée (128:81) — huit demi-tons qui révèlent la symétrie miroir cachée dans le cercle des quintes. Ce qui monte doit descendre."
+      },
+      ratio: '128:81',
+      cents: 792.18
+    },
     yin: {
       title: { en: 'Effortless Mastery', fr: 'La Maîtrise Sans Effort' },
       philosophy: {
@@ -675,6 +747,14 @@ const frets = [
         en: 'Major 6th chords (Root, 3rd, 5th, 6th) are staples in jazz, swing, and country guitar. They function as stable "home" chords but with added color compared to a plain major triad.',
         fr: "Les accords de sixte majeure (Racine, Tierce, Quinte, Sixte) sont des incontournables de la guitare jazz, swing et country. Ils font office d'accords stables mais avec une couleur supplémentaire par rapport à la triade majeure simple."
       }
+    },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The inverted minor 3rd (27:16) — nine semitones from stacking fifths. The expansive interval of the overtone series, carrying the weight of memory.',
+        fr: "La tierce mineure renversée (27:16) — neuf demi-tons par empilement de quintes. L'intervalle expansif de la série des harmoniques, portant le poids de la mémoire."
+      },
+      ratio: '27:16',
+      cents: 905.87
     },
     yin: {
       title: { en: 'The Story Behind the Sound', fr: 'L\'Histoire Derrière le Son' },
@@ -750,6 +830,14 @@ const frets = [
         fr: "Visuellement, une septième mineure se situe un ton (2 frettes) en DESSOUS de l'octave. Cela la rend extrêmement facile à localiser en trouvant simplement l'octave et en reculant."
       }
     },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The inverted major 2nd (16:9) — ten semitones that create the bluesy tension of dominant 7th chords. The penultimate step before the octave\'s return.',
+        fr: "Le ton majeur renversé (16:9) — dix demi-tons qui créent la tension bluesy des accords de 7ème de dominante. L'avant-dernier pas avant le retour de l'octave."
+      },
+      ratio: '16:9',
+      cents: 996.09
+    },
     yin: {
       title: { en: 'The Social Forge', fr: 'La Forge Sociale' },
       philosophy: {
@@ -823,6 +911,14 @@ const frets = [
         en: 'Fret 12 on the guitar is the physical midpoint of the string. Every note and shape that existed between Fret 0 and Fret 11 perfectly repeats itself from Fret 12 onwards.',
         fr: "La frette 12 de la guitare est le milieu physique de la corde. Chaque note et chaque forme qui existait entre les frettes 0 et 11 se répète parfaitement à partir de la frette 12."
       }
+    },
+    pythagoreanLegacy: {
+      hook: {
+        en: 'The octave (2:1) closes the cycle — but twelve fifths overshoot by the Pythagorean comma. Perfection is not a destination; it is the journey itself.',
+        fr: "L'octave (2:1) ferme le cycle — mais douze quintes dépassent le comma pythagoricien. La perfection n'est pas une destination ; c'est le voyage lui-même."
+      },
+      ratio: '2:1',
+      cents: 1200
     },
     yin: {
       title: { en: 'Metaphysical Surrender', fr: 'L\'Abandon Métaphysique' },
