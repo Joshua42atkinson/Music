@@ -25,6 +25,12 @@ export default function AuthCallback() {
     const handleAuth = async () => {
       const url = new URL(window.location.href);
       const hash = url.hash;
+      console.log('[AuthCallback] URL:', window.location.href);
+      console.log('[AuthCallback] Hash:', hash);
+      console.log('[AuthCallback] Search:', window.location.search);
+      console.log('[AuthCallback] Code:', url.searchParams.get('code'));
+      console.log('[AuthCallback] Error:', url.searchParams.get('error'));
+      console.log('[AuthCallback] Error desc:', url.searchParams.get('error_description'));
 
       // ── CASE 1: Implicit flow (#access_token in hash) ──
       if (hash && hash.includes('access_token=')) {
@@ -100,6 +106,15 @@ export default function AuthCallback() {
         }
       } catch (e) {
         console.warn('[AuthCallback] getSession error:', e);
+      }
+
+      // ── CASE 4: OAuth returned an error ──
+      const oauthError = url.searchParams.get('error');
+      const oauthErrorDesc = url.searchParams.get('error_description');
+      if (oauthError) {
+        console.error('[AuthCallback] OAuth error from provider:', oauthError, oauthErrorDesc);
+        setError(`OAuth error: ${oauthError}${oauthErrorDesc ? ' — ' + oauthErrorDesc : ''}`);
+        return;
       }
 
       // ── Nothing worked ──

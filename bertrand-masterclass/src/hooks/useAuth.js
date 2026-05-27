@@ -40,18 +40,30 @@ export function useAuth() {
     if (returnTo !== '/auth/callback') {
       localStorage.setItem('voixvive_auth_return_to', returnTo);
     }
-    const { error } = await supabase.auth.signInWithOAuth({
+    const redirectTo = `${window.location.origin}/auth/callback`;
+    console.log('[useAuth] Starting OAuth...');
+    console.log('[useAuth] redirectTo:', redirectTo);
+    console.log('[useAuth] origin:', window.location.origin);
+    console.log('[useAuth] href:', window.location.href);
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: 'drive.file', // Request Google Drive access for video storage
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent', // Force re-consent to get refresh token + drive scope
-        },
+        redirectTo,
+        scopes: 'openid email profile',
+        skipBrowserRedirect: false,
       },
     });
-    if (error) throw error;
+
+    if (error) {
+      console.error('[useAuth] signInWithOAuth error:', error);
+      throw error;
+    }
+
+    // Log the generated OAuth URL for debugging
+    if (data?.url) {
+      console.log('[useAuth] Generated OAuth URL:', data.url);
+    }
   }, []);
 
   const signOut = useCallback(async () => {

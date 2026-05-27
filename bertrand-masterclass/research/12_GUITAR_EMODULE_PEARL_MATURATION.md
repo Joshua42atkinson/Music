@@ -2,11 +2,11 @@
 ## Voix Vive — Unified Interactive Learning Architecture
 ### *All Tools. All Games. All Paths. One Module.*
 
-> **Version:** 1.6 — Mentor Dashboard + Structured Practice + Testing (2026-05-27)
+> **Version:** 1.7 — Login Fix + StepAudio Pivot + TCG Removed (2026-05-27)
 > **Author:** Joshua Atkinson (Platform Architect)
 > **SME:** Bertrand Laurence
 > **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth + DAG eModule
-> **Status:** Phase 1 ✅ Complete. Phase 2 ✅ Core Complete (Drive, Calendar, Scheduling, Mentor Dashboard, Structured Practice). Remaining: text-back UI, calendar booking UI, mentor response recording.
+> **Status:** Phase 1 ✅ Complete. Phase 2 ✅ Core Complete. Phase 3 🔄 In Progress (StepAudio local inference pivot). Current blockers: Google OAuth `drive.file` scope needs Google Cloud Console config (10 min, deferred post-meeting).
 > **Template Mode:** voix-vive.com is now a reusable platform architecture for multiple instructors.
 
 ---
@@ -480,9 +480,11 @@ function speak(text, rate = 0.85) {
 - [x] **Google Auth** — OAuth 2.0 credentials created in Google Cloud Console; Client ID + Secret pasted into Supabase Auth → Providers
 - [x] **Login/logout UI** — AuthButton component + useAuth hook built; placed in LandingScreen header
 - [x] **Auth callback page** — `/auth/callback` route handles OAuth redirect, routes to `/song`
-- [x] **Login test** — Google sign-in works on `www.voix-vive.com` ✅ (2026-05-27)
+- [x] **Login test** — Google sign-in works (basic `openid email profile` scope) ✅ (2026-05-27)
   - Fix: `detectSessionInUrl: false` + manual hash parsing in AuthCallback
   - Fix: Full `sb_publishable_*` prefix required in VITE_SUPABASE_ANON_KEY
+  - Fix: Removed `drive.file` scope from initial auth (was causing `invalid_scope` error)
+  - Deferred: Re-enable `drive.file` after Google Cloud Console OAuth consent screen setup
 - [x] **Anonymous mode banner** — "Sign in to save progress" shown on LandingScreen when not logged in
 - [x] **ScaffoldingProvider sync** — Cloud when logged in, localStorage when not (wired + tested)
 - [x] **Journal system** — Text entries sync to Supabase when logged in, IndexedDB fallback when not
@@ -497,9 +499,10 @@ function speak(text, rate = 0.85) {
 
 **Architecture decision:** Videos stored in students' personal Google Drive (free, student-owned), shared with mentor. Supabase stores only metadata (file IDs, share status, review state). This keeps Supabase free tier viable forever.
 
-**Prerequisites DONE:** ✅ `drive.file` scope added to auth flow, mentor email in env, `video_submissions` + `drive_config` tables in schema.
+**Blocker:** `drive.file` scope removed from auth flow to fix login. Re-enabling requires Google Cloud Console OAuth consent screen setup (10 min task, deferred post-Bertrand meeting).
+**Prerequisites DONE:** ✅ Mentor email in env, `video_submissions` + `drive_config` tables in schema. `drive.file` scope code ready to re-enable.
 
-- [x] **Google Drive OAuth** — Supabase auth requests `drive.file` scope + offline access ✅
+- [x] **Google Drive OAuth code** — `drive.file` scope built + offline access ✅ (disabled pending Google Cloud Console setup)
 - [x] **Student Drive folder** — Auto-create `Voix Vive Submissions` folder on upload ✅
 - [x] **Auto-share with mentor** — Folder shared with `VITE_MENTOR_EMAIL` on creation ✅
 - [x] **Video upload to Drive** — `uploadVideo()` multipart upload via Drive API ✅
@@ -528,11 +531,12 @@ function speak(text, rate = 0.85) {
 - [ ] **Mentor switcher** — Joshua can test as instructor → switch to student → verify flow
 - [ ] **Stripe integration (deferred)** — When instructor wants paid coaching, Stripe Connect
 
-### Phase 3: Voice + AI — StepAudio 2.5 Realtime Integration (IN PROGRESS)
+### Phase 3: Voice + AI — StepAudio Local Inference (IN PROGRESS)
 
 **Research Report:** `research/STEPAUDIO_2.5_INTEGRATION_REPORT.md` (May 27, 2026)
-**Model:** StepAudio 2.5 Realtime — end-to-end multimodal voice AI (`wss://api.stepfun.com/v1/realtime`)
-**Architecture:** React frontend → Java WebSocket middleware → StepFun API (API key secured server-side)
+**Model:** Step-Audio-R1.1 (33B, 55GB+) — downloading to `/home/joshua/trinity-models/vllm/Step-Audio-R1.1/`
+**Architecture:** React frontend → Java WebSocket middleware → Local vLLM-OMNI server (port 9999) on GMKtek EVO X2
+**Pivot:** Moved from cloud API ($0/query principle) to local inference. vLLM-OMNI repo at `/home/joshua/trinity-models/vllm-omni/`. ROCm gfx1151 container exists but lacks omni extensions — needs rebuild or source compile.
 
 **Frontend (React/Vite) — Phases 1-2 DONE:**
 - [x] **AudioStreamingService interface** — `@/lib/audioStreamingService.js` ✅
@@ -546,11 +550,11 @@ function speak(text, rate = 0.85) {
 - [ ] **Waveform visualizer** — Canvas-based amplitude visualization during AI speech
 
 **Middleware (Java — Phases 3-5):**
-- [ ] **Jakarta WebSocket server** — `@ServerEndpoint("/ws/troubadour")` on port 8081
-- [ ] **Supabase JWT auth** — Validate student token on connection open
-- [ ] **StepFun outbound client** — `wss://api.stepfun.com/v1/realtime` with Bearer token
-- [ ] **Bidirectional relay** — Forward binary audio + JSON events both directions
-- [ ] **Paralinguistic interceptor** — Parse `paralinguistic.event` server events, write to Supabase
+- [x] **Jakarta WebSocket server** — `TroubadourServer.java` on port 8081 ✅
+- [x] **Supabase JWT auth** — `JwtValidator.java` validates student token on connect ✅
+- [ ] **Local vLLM outbound client** — Adapt `StepAudioClient.java` from WebSocket to HTTP (vLLM-OMNI OpenAI-compatible API)
+- [ ] **Bidirectional relay** — Forward base64 audio + JSON events both directions
+- [ ] **Paralinguistic interceptor** — `ParalinguisticInterceptor.java` parses emotion events, writes to Supabase ✅ (class exists, untested)
 
 **Schema (DONE):**
 - [x] **`troubadour_audio_sessions`** — session lifecycle, persona, fret_id, duration ✅
@@ -569,13 +573,12 @@ function speak(text, rate = 0.85) {
 
 ### Phase 4: Digital Mirror (IN PROGRESS — May 27, 2026)
 
-**Prerequisites from you:** CAGED TCG report, clarification on posture analysis (ML vs heuristics)
+**Prerequisites:** Clarification on posture analysis (ML vs heuristics) — deferred until Phase 4 active development.
 
 - [x] **Video journaling** — VideoRecorder component in Playbook Journal tab ✅
 - [x] **Reflection prompts** — JournalEntry with mood + curated prompts per fret ✅
 - [ ] **Self-review** — Playback with metronome overlay
 - [ ] **Timeline view** — Submissions + journal + practice sessions in one feed (needs Drive integration first)
-- [ ] **CAGED TCG Shop** — Browse cards, checkout (Phase 5, deferred)
 
 ### Phase 5: Vercel + PWA (FAST-TRACKED — May 27, 2026)
 
@@ -713,7 +716,7 @@ Every fret is a stage of becoming. Every tool is a question the student asks the
 
 - [x] **Test the live site** — `www.voix-vive.com` on his phone and computer ✅
 - [x] **Try signing in with Google** — verify login flow works end-to-end ✅
-- [ ] **Re-authenticate with Google Drive scope** — Sign out, sign in again to grant Drive permission
+- [ ] **Re-authenticate with Google Drive scope** — Deferred: needs Google Cloud Console OAuth consent screen setup first
 - [ ] **Test video upload** — Record a practice video, confirm it lands in his Google Drive `Voix Vive Submissions` folder
 - [ ] **Test structured practice session** — Try the 15-minute guided session on his phone
 - [ ] **Visit `/mentor`** — Check the mentor dashboard, confirm submissions appear
@@ -732,7 +735,7 @@ Every fret is a stage of becoming. Every tool is a question the student asks the
 
 ### What We Need from Bertrand for the Brand
 
-- [ ] **Color/shape mapping for 12 notes** — This unlocks: Chromatic Monomyth visual upgrades, TCG card art, personalized student avatars
+- [ ] **Color/shape mapping for 12 notes** — This unlocks: Chromatic Monomyth visual upgrades, personalized student avatars
 - [ ] **Voice memo for Troubadour** — Record "Welcome, troubadour..." so the AI can clone his voice (Phase 3)
 - [ ] **Favorite songs for each fret** — Real examples he uses in lessons, to replace placeholder content in Timeless Song slides
 
