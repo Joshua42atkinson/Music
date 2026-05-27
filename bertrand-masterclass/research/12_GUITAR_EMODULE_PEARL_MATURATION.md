@@ -2,11 +2,11 @@
 ## Voix Vive — Unified Interactive Learning Architecture
 ### *All Tools. All Games. All Paths. One Module.*
 
-> **Version:** 1.0 — Post-Unification Architecture (2026-05-27)
+> **Version:** 1.1 — Stabilization In Progress (2026-05-27)
 > **Author:** Joshua Atkinson (Platform Architect)
 > **SME:** Bertrand Laurence
 > **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth
-> **Status:** Blueprint — implement before next content push
+> **Status:** Phase 0 (Stabilization) — build passes, routes added, docs updated. Navigation standardization in progress.
 
 ---
 
@@ -17,10 +17,10 @@
 - `/playbook` → Troubadour's Playbook (Character, Quests, Songbook, Journal)
 - `/player` → PlayerPortal (video submissions, mentor connection)
 - `/studio` → StudioPage (pricing, mentorship services)
-- `/game` → Vertiscale Engine (buried, no route — **INACCESSIBLE**)
-- `/adventure` → AdventurePlayer (buried inside game — **INACCESSIBLE**)
+- `/game` → Vertiscale Engine (✅ routed, needs browser testing)
+- `/adventure` → AdventurePlayer (✅ routed, needs browser testing)
 
-**What broke:** The `/player` portal replaced `MentorTools`, which means Bertrand's pricing, Digital Binder, and mentor dashboard are no longer visible to students who land on `/player`. The Vertiscale Engine — arguably the crown jewel of the platform — has no route. The Adventure (ear-training CYOA) is trapped inside the game engine.
+**What broke:** The `/player` portal replaced `MentorTools`, which means Bertrand's pricing, Digital Binder, and mentor dashboard are no longer visible to students who land on `/player`. ~~The Vertiscale Engine has no route.~~ ✅ FIXED 2026-05-27: `/game` and `/adventure` routes added. ~~The Adventure is trapped inside the game engine.~~ ✅ FIXED: AdventurePlayer is now standalone at `/adventure`.
 
 **What we need:** One unified **Guitar eModule** that makes ALL content accessible through intentional navigation, preserves the pedagogical flow, and provides a "no AI" fallback path for every feature.
 
@@ -141,16 +141,32 @@ Voix Vive > Guitar > [Current Section] > [Current Tool/Fret]
 
 ## IV. ROUTING FIXES — What To Change Now
 
-### Current Broken State
+### Current State (Updated 2026-05-27)
 
 | Route | Current | Should Be | Action |
 |-------|---------|-----------|--------|
 | `/guitar` | GuitarWorkbench | Workbench (keep) | ✅ OK |
-| `/game` | **NOT ROUTED** | VertiscaleEngine | 🔧 ADD ROUTE |
-| `/adventure` | **NOT ROUTED** | AdventurePlayer | 🔧 ADD ROUTE |
-| `/player` | PlayerPortal only | PlayerPortal + Studio content | 🔧 MERGE |
+| `/game` | VertiscaleEngine | VertiscaleEngine | ✅ ROUTED — needs browser test |
+| `/adventure` | AdventurePlayer | AdventurePlayer | ✅ ROUTED — needs browser test |
+| `/player` | PlayerPortal only | PlayerPortal + Studio content | 🔧 MERGE (Phase 1) |
 | `/playbook` | PlaybookShell | PlaybookShell | ✅ OK |
-| `/studio` | StudioPage | StudioPage | ✅ OK |
+| `/studio` | StudioPage | StudioPage | ✅ OK — back button added |
+
+### Navigation Standardization (Phase 0 — In Progress)
+
+Every page must have a back button and Voix Vive wordmark home button:
+
+| Page | Back | Home | Status |
+|------|------|------|--------|
+| StudioPage | ✅ | ✅ | Done |
+| PrivacyPolicy | ✅ | — | Done |
+| TermsOfService | ✅ | — | Done |
+| PlayerPortal | — | ✅ | Done |
+| GuitarWorkbench | ❌ | ❌ | Pending |
+| OrientationHub | ❌ | ❌ | Pending |
+| PlaybookShell | ❌ | ❌ | Pending |
+| VertiscaleEngine | ❌ | ❌ | Pending |
+| AdventurePlayer | ❌ | ❌ | Pending |
 
 ### Proposed New Routes
 
@@ -438,38 +454,80 @@ function speak(text, rate = 0.85) {
 
 ## VIII. IMPLEMENTATION CHECKLIST
 
-### Immediate (Before GitHub Push)
+### Phase 0: Stabilization (Current — May 27, 2026)
 
-- [ ] **Route the Vertiscale Engine** — Add `/game` and `/guitar/game` routes
-- [ ] **Route the Adventure** — Add `/adventure` and `/guitar/adventure` routes  
-- [ ] **Fix PlayerPortal** — Add StudioPage pricing/mentorship content to `/player`
+- [x] **Route the Vertiscale Engine** — `/game` added
+- [x] **Route the Adventure** — `/adventure` added
+- [x] **Build passes** — `npm run build` with zero errors
+- [x] **Lint clean** — All three files fixed
+- [x] **Troubadour widget** — Rename complete, purple theme, guitar icon, AI chat at bottom
+- [x] **StudioPage navigation** — Back button + Voix Vive wordmark home
+- [ ] **Standardize navigation** — Add back + home to GuitarWorkbench, OrientationHub, PlaybookShell, VertiscaleEngine, AdventurePlayer
+- [ ] **Browser test all routes** — `/game`, `/adventure`, `/player`, `/guitar`, `/playbook`
+- [ ] **Fix PlayerPortal** — Remove pricing cards, link to `/studio`
 - [ ] **Link everything** — Every page links to every other page. No orphans.
-- [ ] **Build passes** — `npm run build` with zero errors
-- [ ] **Troubadour widget** — Rename complete, purple theme, guitar icon, AI chat at bottom
 
-### Short-term (Next 2 Weeks)
+### Phase 1: Persistence (Next — After Phase 0 gate)
 
-- [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation
-- [ ] **Integrate Playbook into Workbench** — Tab or sidebar, not separate route
-- [ ] **No-AI fallback** — Static prompt library when LM Studio is offline
-- [ ] **Voice TTS** — AI responses speak aloud
+**Prerequisites from you:** Supabase project + Google OAuth credentials
+
 - [ ] **Supabase setup** — Create project, run schema migrations
 - [ ] **Google Auth** — OAuth credentials, login/logout UI
+- [ ] **Data migration** — Local → cloud on first login (preserves existing data)
+- [ ] **ScaffoldingProvider sync** — Read from Supabase when logged in, localStorage when not
+- [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation
+- [ ] **No-AI fallback** — Static prompt library when LM Studio is offline
 
-### Medium-term (Next Month)
+### Phase 2: Mentor Connect (After Persistence)
 
-- [ ] **Data migration** — Local → cloud on first login
-- [ ] **Mentor dashboard** — Bertrand sees all student progress
-- [ ] **Voice STT** — Speech-to-text in chat
-- [ ] **Adventure standalone** — Separate from Vertiscale, accessible as "Story Mode"
-- [ ] **Progressive Web App** — Offline mode, installable
+**Prerequisites from you:** Bertrand's preference on `/mentor` vs integrated dashboard
 
-### Long-term (Vision)
+- [ ] **Mentor dashboard** — Bertrand sees all student progress, submission queue, feedback
+- [ ] **Notification system** — Student sees "Reviewed" badge when feedback is ready
+- [ ] **PlayerPortal merge** — Remove pricing, add submission status + mentor link
+
+### Phase 3: Voice + AI (After Mentor Connect)
+
+**Prerequisites from you:** LM Studio installed, model loaded, server address confirmed
+
+- [ ] **Voice TTS** — AI responses auto-speak aloud
+- [ ] **Voice STT** — Speech-to-text in chat input
+- [ ] **AI context injection** — Troubadour can pull Song pages into chat
+- [ ] **AI tool control** — Troubadour can set ambient music, metronome via voice
+- [ ] **AI prompt engineering** — DAG-based reflection prompts
+- [ ] **Adventure standalone** — Already routed, enhance with AI narration
+
+### Phase 4: Digital Mirror (After Voice AI)
+
+**Prerequisites from you:** CAGED TCG report, clarification on posture analysis (ML vs heuristics)
+
+- [ ] **Video journaling** — Low-def self-recording in PlayerPortal
+- [ ] **Self-review** — Playback with metronome overlay
+- [ ] **Reflection prompts** — After every session: "What did you notice about your breath?"
+- [ ] **Timeline view** — Submissions + journal + practice sessions in one feed
+- [ ] **CAGED TCG Shop** — Browse cards, checkout (Phase 5)
+
+### Phase 5: Vercel + PWA (After Digital Mirror)
+
+**Prerequisites from you:** Connect repo in Vercel dashboard, set `voix-vive.com` domain
+
+- [ ] **PWA manifest** — Installable, offline cache
+- [ ] **Service worker** — Offline mode for core features
+- [ ] **Production deploy** — Live at voix-vive.com
+
+### Phase 6: Android (Moonshot — Revenue Gate: $2,500/mo)
+
+**Prerequisites from you:** Open Android Studio (when I say so), choose Tauri vs Capacitor
+
+- [ ] **Tauri mobile build** — Native Android app
+- [ ] **Hardware integration** — Mic, haptics, local SQLite sync
+- [ ] **Offline-first** — Full functionality without network
+
+### Phase 7: Beyond (Vision)
 
 - [ ] **Full voice conversation** — Real-time voice AI
 - [ ] **Android XR** — Mixed reality Vertiscale
 - [ ] **Multi-instructor** — Platform scales beyond Bertrand
-- [ ] **Paid ear-training game** — Separate TCG-based module (user's separate project)
 
 ---
 
