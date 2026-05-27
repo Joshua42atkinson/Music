@@ -497,23 +497,25 @@ function speak(text, rate = 0.85) {
 
 **Architecture decision:** Videos stored in students' personal Google Drive (free, student-owned), shared with mentor. Supabase stores only metadata (file IDs, share status, review state). This keeps Supabase free tier viable forever.
 
-**Prerequisites:** Google Drive API credentials, mentor email (joshua42atkinson@gmail.com for now, transfer to bertlarrymusic@gmail.com later)
+**Prerequisites DONE:** ✅ `drive.file` scope added to auth flow, mentor email in env, `video_submissions` + `drive_config` tables in schema.
 
-- [ ] **Google Drive OAuth** — Extend Supabase auth to request `drive.file` scope for file creation
-- [ ] **Student Drive folder** — Auto-create `Voix Vive / Submissions` folder on first login
-- [ ] **Auto-share with mentor** — Folder shared with mentor email on creation
-- [ ] **Video upload to Drive** — Replace Supabase Storage with Google Drive API upload
-- [ ] **Video metadata in Supabase** — Store `drive_file_id`, `drive_folder_id`, `shared_with`, `reviewed`
-- [ ] **Mentor review link** — Generate direct Google Drive viewer link for Bertrand
+- [x] **Google Drive OAuth** — Supabase auth requests `drive.file` scope + offline access ✅
+- [x] **Student Drive folder** — Auto-create `Voix Vive Submissions` folder on upload ✅
+- [x] **Auto-share with mentor** — Folder shared with `VITE_MENTOR_EMAIL` on creation ✅
+- [x] **Video upload to Drive** — `uploadVideo()` multipart upload via Drive API ✅
+- [x] **Video metadata in Supabase** — `video_submissions` table: `drive_file_id`, `drive_folder_id`, `web_view_link`, `reviewed` ✅
+- [x] **Mentor review link** — `web_view_link` stored per submission, `getMentorSubmissions()` query ✅
+- [x] **Drive template system** — `drive_config` table schema ready for multi-instructor reuse ✅
 - [ ] **Bertrand response recording** — Screen recorder overlay for mentor to record video responses
-- [ ] **Structured Practice Recorder** — 15-min guided session in `/player`
-  - [ ] Breathing Gate (2 min) — animated breath circle
-  - [ ] Warm-up (3 min) — metronome + fretboard prompt
-  - [ ] Practice Session (8 min) — auto-loop with on-screen guidance
-  - [ ] Free Play (1 min) — blank screen, just play
-  - [ ] Emotional State Capture (30s) — voice memo: "What are you feeling?"
-  - [ ] Review prompt — "Your video is saved. Bertrand will review within 48 hours."
-- [ ] **Drive template system** — `drive_config` table: `mentor_email`, `folder_template_id`, `share_template` for reuse across instructors
+- [x] **Google Calendar integration** — `calendarService.js` reads mentor free/busy, generates 30-min slots ✅
+- [x] **Async review queue** — `schedulingService.js` with workload guard + text-back fallback ($5) ✅
+- [x] **Structured Practice Recorder** — 15-min guided session in `/player` ✅
+  - [x] Breathing Gate (2 min) — animated breath circle with prompts
+  - [x] Warm-up (3 min) — fretboard prompts (open A → fret 2, 3, 5)
+  - [x] Practice Session (8 min) — auto-rotating on-screen guidance
+  - [x] Free Play (1 min) — blank screen, just play
+  - [x] Emotional State Capture (30s) — text input: "What are you feeling?"
+  - [x] Auto-save to Google Drive with emotional state metadata
 
 ### Phase 2b: Template Architecture (May 27, 2026)
 

@@ -249,3 +249,59 @@ ALTER TABLE public.drive_config ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view active drive configs"
   ON public.drive_config FOR SELECT
   USING (active = TRUE);
+
+-- ═══════════════════════════════════════════════════════════
+-- MENTOR AVAILABILITY (Async review scheduling)
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS public.mentor_availability (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  instructor_email TEXT NOT NULL,
+  slot_start TIMESTAMPTZ NOT NULL,
+  slot_end TIMESTAMPTZ NOT NULL,
+  is_booked BOOLEAN DEFAULT FALSE,
+  booked_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  submission_id UUID REFERENCES public.video_submissions(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.mentor_availability ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can view mentor availability"
+  ON public.mentor_availability FOR SELECT
+  USING (is_booked = FALSE);
+
+CREATE POLICY "Users can book their own slots"
+  ON public.mentor_availability FOR UPDATE
+  USING (auth.uid() = booked_by OR is_booked = FALSE);
+
+-- ═══════════════════════════════════════════════════════════
+-- TEXT-BACK REQUESTS ($5 quick text response)
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS public.text_back_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  question TEXT NOT NULL,
+  status TEXT DEFAULT 'pending', -- pending | answered | refunded
+  price_cents INTEGER DEFAULT 500,
+  mentor_response TEXT,
+  responded_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.text_back_requests ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own text-back requests"
+  ON public.text_back_requests FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can create own text-back requests"
+  ON public.text_back_requests FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Admin can view all text-back requests"
+  ON public.text_back_requests FOR SELECT
+  USING (auth.uid() IN (
+    SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
+  ));

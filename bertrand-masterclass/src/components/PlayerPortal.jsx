@@ -16,10 +16,11 @@ import { useScaffolding } from './ScaffoldingProvider';
 import { db } from '../data/localDatabase';
 import { loadTraction } from '../data/tractionStore';
 import PracticeRecorder from './PracticeRecorder';
+import StructuredPracticeRecorder from './StructuredPracticeRecorder';
 import {
   Video, Play, Clock, CheckCircle, Circle, Send, BookOpen,
   Mic, Music, Heart, Calendar, ArrowLeft, Film, MessageSquare,
-  Feather, AlertCircle,
+  Feather, AlertCircle, Wind,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════
@@ -90,6 +91,7 @@ export default function PlayerPortal() {
   const lang = locale;
 
   const [showRecorder, setShowRecorder] = useState(false);
+  const [showStructuredRecorder, setShowStructuredRecorder] = useState(false);
   const [submissions, setSubmissions] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
   const [activeTab, setActiveTab] = useState('submissions'); // submissions | library | timeline
@@ -135,7 +137,7 @@ export default function PlayerPortal() {
       } catch (e) { console.warn('[PlayerPortal] No journal:', e); }
     };
     load();
-  }, [showRecorder]);
+  }, [showRecorder, showStructuredRecorder]);
 
   // Build unified timeline
   const timeline = useMemo(() => {
@@ -176,6 +178,17 @@ export default function PlayerPortal() {
         const recs = await db.recordings.orderBy('timestamp').reverse().toArray();
         setSubmissions(recs);
       } catch (e) { console.warn('[PlayerPortal] Reload recordings error:', e); }
+    };
+    load();
+  }, []);
+
+  const handleStructuredSaved = useCallback(() => {
+    setShowStructuredRecorder(false);
+    const load = async () => {
+      try {
+        const recs = await db.recordings.orderBy('timestamp').reverse().toArray();
+        setSubmissions(recs);
+      } catch (e) { console.warn('[PlayerPortal] Reload error:', e); }
     };
     load();
   }, []);
@@ -241,6 +254,30 @@ export default function PlayerPortal() {
           </p>
           <button onClick={() => setShowRecorder(true)} style={styles.heroBtn}>
             <Mic size={16} /> Start Recording
+          </button>
+        </div>
+
+        {/* ── STRUCTURED GUIDED SESSION ── */}
+        <div style={{ ...styles.heroCard, borderColor: 'rgba(122,170,136,0.2)', background: 'rgba(122,170,136,0.04)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <div style={{ ...styles.heroIcon, background: 'rgba(122,170,136,0.1)', borderColor: 'rgba(122,170,136,0.25)' }}>
+              <Wind size={24} style={{ color: '#7aaa88' }} />
+            </div>
+            <div>
+              <h2 style={{ ...styles.heroTitle, color: '#7aaa88' }}>Guided 15-Minute Session</h2>
+              <p style={styles.heroSubtitle}>Breathing → Warm-up → Practice → Reflection</p>
+            </div>
+          </div>
+          <p style={styles.heroDesc}>
+            {lang === 'fr'
+              ? "Une session structurée : respiration, échauffement, pratique, jeu libre, et capture émotionnelle."
+              : "A structured session: breathing, warm-up, practice, free play, and emotional capture."}
+          </p>
+          <button
+            onClick={() => setShowStructuredRecorder(true)}
+            style={{ ...styles.heroBtn, background: 'rgba(122,170,136,0.15)', color: '#7aaa88', borderColor: 'rgba(122,170,136,0.3)' }}
+          >
+            <Wind size={16} /> Start Guided Session
           </button>
         </div>
 
@@ -432,6 +469,14 @@ export default function PlayerPortal() {
         <PracticeRecorder
           onClose={handleRecordingSaved}
           exerciseName="Async Submission for Bertrand"
+        />
+      )}
+
+      {/* ── STRUCTURED PRACTICE RECORDER MODAL ── */}
+      {showStructuredRecorder && (
+        <StructuredPracticeRecorder
+          onClose={handleStructuredSaved}
+          fretId={completedFrets.length > 0 ? completedFrets[completedFrets.length - 1] : 1}
         />
       )}
 
