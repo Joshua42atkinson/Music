@@ -86,9 +86,19 @@ export default function AuthButton({ compact = false }) {
   }
 
   // Not logged in — show login button
+  const handleSignIn = async () => {
+    try {
+      console.log('[AuthButton] Starting Google sign-in...');
+      await signInWithGoogle();
+    } catch (err) {
+      console.error('[AuthButton] Sign-in failed:', err);
+      alert('Sign-in failed. Check browser console for details.');
+    }
+  };
+
   return (
     <button
-      onClick={signInWithGoogle}
+      onClick={handleSignIn}
       style={{
         padding: '6px 14px',
         borderRadius: 8,
