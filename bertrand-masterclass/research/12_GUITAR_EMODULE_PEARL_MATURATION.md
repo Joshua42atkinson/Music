@@ -152,7 +152,7 @@ Voix Vive > Guitar > [Current Section] > [Current Tool/Fret]
 | `/playbook` | PlaybookShell | PlaybookShell | ✅ OK |
 | `/studio` | StudioPage | StudioPage | ✅ OK — back button added |
 
-### Navigation Standardization (Phase 0 — In Progress)
+### Navigation Standardization (Phase 0 — Done)
 
 Every page must have a back button and Voix Vive wordmark home button:
 
@@ -162,11 +162,11 @@ Every page must have a back button and Voix Vive wordmark home button:
 | PrivacyPolicy | ✅ | — | Done |
 | TermsOfService | ✅ | — | Done |
 | PlayerPortal | — | ✅ | Done |
-| GuitarWorkbench | ❌ | ❌ | Pending |
-| OrientationHub | ❌ | ❌ | Pending |
-| PlaybookShell | ❌ | ❌ | Pending |
-| VertiscaleEngine | ❌ | ❌ | Pending |
-| AdventurePlayer | ❌ | ❌ | Pending |
+| GuitarWorkbench | ✅ | ✅ | Done |
+| OrientationHub | ✅ | ✅ | Done |
+| PlaybookShell | ✅ | ✅ | Done |
+| VertiscaleEngine | ✅ | ✅ | Done |
+| AdventurePlayer | ✅ | ✅ | Done |
 
 ### Proposed New Routes
 
@@ -462,9 +462,9 @@ function speak(text, rate = 0.85) {
 - [x] **Lint clean** — All three files fixed
 - [x] **Troubadour widget** — Rename complete, purple theme, guitar icon, AI chat at bottom
 - [x] **StudioPage navigation** — Back button + Voix Vive wordmark home
-- [ ] **Standardize navigation** — Add back + home to GuitarWorkbench, OrientationHub, PlaybookShell, VertiscaleEngine, AdventurePlayer
+- [x] **Standardize navigation** — Back + home added to GuitarWorkbench, OrientationHub, PlaybookShell, VertiscaleEngine, AdventurePlayer
+- [x] **Fix PlayerPortal** — Pricing cards removed, clean CTA to `/studio`
 - [ ] **Browser test all routes** — `/game`, `/adventure`, `/player`, `/guitar`, `/playbook`
-- [ ] **Fix PlayerPortal** — Remove pricing cards, link to `/studio`
 - [ ] **Link everything** — Every page links to every other page. No orphans.
 
 ### Phase 1: Persistence (Next — After Phase 0 gate)
