@@ -16,7 +16,7 @@ if (supabaseUrl && supabaseAnonKey) {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: true,
+      detectSessionInUrl: false, // We handle this manually in AuthCallback
     },
   });
   console.log('[Supabase] Client initialized');

@@ -2,216 +2,104 @@
 // AUTH CALLBACK — Handles OAuth redirect from Supabase
 // Route: /auth/callback
 //
-// STRATEGY (in order):
-// 1. Immediate getSession() — session may already be in localStorage
-// 2. onAuthStateChange listener — catches Supabase processing the URL
-// 3. Aggressive polling — retries every 300ms for 15s
-// 4. getUser() fallback — sometimes more reliable than getSession()
-// 5. Manual URL parsing — if code= param exists, force exchange
-// 6. Page reload — if session was stored but we missed it, reload once
-//
-// NEVER silently redirect home on failure — show error instead.
+// Supabase detectSessionInUrl is DISABLED in supabase.js.
+// This component is now the ONLY place that processes auth tokens.
+// No polling, no race conditions — just parse hash, set session, route.
 // ═══════════════════════════════════════════════════════════
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
-const STRATEGIES = [
-  'Checking existing session...',
-  'Waiting for auth event...',
-  'Polling for session...',
-  'Trying user lookup...',
-  'Checking URL params...',
-  'Reloading to recover...',
-];
-
 export default function AuthCallback() {
   const navigate = useNavigate();
-  const handled = useRef(false);
-  const [status, setStatus] = useState(0);
+  const [status, setStatus] = useState('Verifying...');
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!supabase) {
-      setError('Supabase not configured on this deployment');
+      setError('Supabase not configured');
       return;
     }
 
-    const routeToSong = (source) => {
-      if (handled.current) return;
-      handled.current = true;
-      console.log('[AuthCallback] Success via:', source);
-      navigate('/song', { replace: true });
-    };
+    const handleAuth = async () => {
+      const url = new URL(window.location.href);
+      const hash = url.hash;
 
-    // ── Strategy 1: Immediate getSession ──
-    const checkImmediate = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (data.session?.user) {
-          routeToSong('immediate getSession');
-          return true;
-        }
-      } catch (e) {
-        console.warn('[AuthCallback] getSession error:', e);
-      }
-      return false;
-    };
+      // ── CASE 1: Implicit flow (#access_token in hash) ──
+      if (hash && hash.includes('access_token=')) {
+        setStatus('Processing tokens...');
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
 
-    // ── Strategy 2: onAuthStateChange listener ──
-    let listener = null;
-    const setupListener = () => {
-      const { data } = supabase.auth.onAuthStateChange((event, session) => {
-        console.log('[AuthCallback] Event:', event);
-        if (event === 'SIGNED_IN' && session?.user) {
-          routeToSong('onAuthStateChange SIGNED_IN');
+        if (!accessToken) {
+          setError('No access token found in URL');
+          return;
         }
-        if (event === 'INITIAL_SESSION' && session?.user) {
-          routeToSong('onAuthStateChange INITIAL_SESSION');
-        }
-      });
-      listener = data.subscription;
-    };
-
-    // ── Strategy 3: Aggressive polling ──
-    let pollInterval = null;
-    const startPolling = () => {
-      let attempts = 0;
-      const maxAttempts = 50; // 50 × 300ms = 15 seconds
-      pollInterval = setInterval(async () => {
-        if (handled.current) return;
-        attempts++;
-        setStatus(2);
 
         try {
-          const { data } = await supabase.auth.getSession();
+          const { data, error: setErr } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || '',
+          });
+
+          if (setErr) throw setErr;
+
           if (data.session?.user) {
-            routeToSong('poll getSession');
-            clearInterval(pollInterval);
+            // Clean the hash from URL
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            setStatus('Signed in!');
+            setTimeout(() => navigate('/song', { replace: true }), 300);
             return;
           }
         } catch (e) {
-          console.warn('[AuthCallback] Poll error:', e);
-        }
-
-        if (attempts >= maxAttempts) {
-          clearInterval(pollInterval);
-          // Move to next strategy
-          tryGetUser();
-        }
-      }, 300);
-    };
-
-    // ── Strategy 4: getUser() fallback ──
-    const tryGetUser = async () => {
-      if (handled.current) return;
-      setStatus(3);
-      try {
-        const { data, error: userErr } = await supabase.auth.getUser();
-        if (userErr) throw userErr;
-        if (data.user) {
-          routeToSong('getUser');
+          console.error('[AuthCallback] setSession failed:', e);
+          setError(`Token processing failed: ${e.message || e}`);
           return;
         }
-      } catch (e) {
-        console.warn('[AuthCallback] getUser failed:', e);
       }
-      // Move to next strategy
-      tryUrlParams();
-    };
 
-    // ── Strategy 5: Manual URL hash parsing (PKCE code or implicit token) ──
-    const tryUrlParams = async () => {
-      if (handled.current) return;
-      setStatus(4);
-      const url = new URL(window.location.href);
+      // ── CASE 2: PKCE flow (?code= query param) ──
       const code = url.searchParams.get('code');
-
-      // PKCE flow: exchange code for session
       if (code) {
-        console.log('[AuthCallback] Found PKCE code, exchanging...');
+        setStatus('Exchanging code...');
         try {
           const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeErr) throw exchangeErr;
           if (data.session?.user) {
-            routeToSong('exchangeCodeForSession');
+            setStatus('Signed in!');
+            setTimeout(() => navigate('/song', { replace: true }), 300);
             return;
           }
         } catch (e) {
-          console.warn('[AuthCallback] Code exchange failed:', e);
+          console.error('[AuthCallback] Code exchange failed:', e);
+          setError(`Code exchange failed: ${e.message || e}`);
+          return;
         }
       }
 
-      // Implicit flow: parse hash fragment manually
-      // Supabase detectSessionInUrl is unreliable with implicit flow (#455)
-      const hash = url.hash;
-      console.log('[AuthCallback] Checking hash for implicit tokens...');
-      if (hash && hash.includes('access_token=')) {
-        const params = new URLSearchParams(hash.substring(1));
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        const expiresAt = params.get('expires_at');
-        const tokenType = params.get('token_type') || 'bearer';
-
-        console.log('[AuthCallback] Hash tokens found — access:', !!accessToken, 'refresh:', !!refreshToken);
-
-        if (accessToken) {
-          try {
-            const { data, error: setErr } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken || '',
-            });
-            if (setErr) throw setErr;
-            if (data.session?.user) {
-              // Clean hash from URL so it doesn't re-trigger
-              window.history.replaceState(null, '', window.location.pathname + window.location.search);
-              routeToSong('manual hash setSession');
-              return;
-            }
-          } catch (e) {
-            console.warn('[AuthCallback] setSession failed:', e);
-          }
+      // ── CASE 3: Already have session (returning user) ──
+      setStatus('Checking session...');
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          setStatus('Signed in!');
+          setTimeout(() => navigate('/song', { replace: true }), 300);
+          return;
         }
+      } catch (e) {
+        console.warn('[AuthCallback] getSession error:', e);
       }
 
-      // Move to final strategy
-      tryReload();
+      // ── Nothing worked ──
+      setError('Could not sign in. No token or session found.');
     };
 
-    // ── Strategy 6: Page reload (session may be in localStorage) ──
-    const tryReload = () => {
-      if (handled.current) return;
-      const hasReloaded = sessionStorage.getItem('vv_auth_reload');
-      if (!hasReloaded) {
-        setStatus(5);
-        sessionStorage.setItem('vv_auth_reload', '1');
-        console.log('[AuthCallback] Reloading page to recover session...');
-        window.location.reload();
-      } else {
-        setError('Could not establish session. Please try signing in again.');
-      }
-    };
-
-    // ── Execute sequence ──
-    const run = async () => {
-      const found = await checkImmediate();
-      if (found) return;
-
-      setStatus(1);
-      setupListener();
-      startPolling();
-    };
-
-    run();
-
-    return () => {
-      listener?.unsubscribe();
-      clearInterval(pollInterval);
-    };
+    handleAuth();
   }, [navigate]);
 
-  // ── UI ──
+  // ── Error UI ──
   if (error) {
     return (
       <div style={{
@@ -226,9 +114,9 @@ export default function AuthCallback() {
         padding: 24,
       }}>
         <span style={{ fontSize: '2rem' }}>⚠️</span>
-        <p style={{ fontSize: '1rem', color: '#ef4444', textAlign: 'center' }}>{error}</p>
+        <p style={{ fontSize: '1rem', color: '#ef4444', textAlign: 'center', maxWidth: 400 }}>{error}</p>
         <button
-          onClick={() => { sessionStorage.removeItem('vv_auth_reload'); window.location.href = '/'; }}
+          onClick={() => { window.location.href = '/'; }}
           style={{
             padding: '10px 20px',
             borderRadius: 8,
@@ -245,6 +133,7 @@ export default function AuthCallback() {
     );
   }
 
+  // ── Loading UI ──
   return (
     <div style={{
       minHeight: '100svh',
@@ -262,10 +151,7 @@ export default function AuthCallback() {
         border: '1px solid rgba(201,169,110,0.3)',
         animation: 'loadBreath 3s ease-in-out infinite',
       }} />
-      <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{STRATEGIES[status] || 'Signing you in...'}</p>
-      <p style={{ fontSize: '0.6rem', opacity: 0.3, fontFamily: "'JetBrains Mono', monospace" }}>
-        Strategy {status + 1}/6
-      </p>
+      <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{status}</p>
       <style>{`
         @keyframes loadBreath {
           0%, 100% { opacity: 0.3; transform: scale(0.95); }
