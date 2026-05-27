@@ -102,6 +102,9 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
   const videoLiveRef = useRef(null);
   const videoPreviewRef = useRef(null);
   const blobRef = useRef(null);
+  const phaseTimeRef = useRef(0);
+  const totalTimeRef = useRef(TOTAL_DURATION);
+  const phaseIndexRef = useRef(0);
 
   const currentPhase = PHASES[currentPhaseIndex];
 
@@ -144,6 +147,9 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
       };
 
       recorder.start(1000);
+      phaseIndexRef.current = 0;
+      phaseTimeRef.current = PHASES[0].duration;
+      totalTimeRef.current = TOTAL_DURATION;
       setStage('recording-phase-0');
       setCurrentPhaseIndex(0);
       setPhaseTimeLeft(PHASES[0].duration);
@@ -155,40 +161,36 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
     }
   };
 
-  // ── Timer engine ──
+  // ── Timer engine (uses refs to avoid React state race conditions) ──
   useEffect(() => {
     if (!stage.startsWith('recording-phase')) return;
 
     timerRef.current = setInterval(() => {
-      setTotalTimeLeft(prev => {
-        if (prev <= 1) {
+      totalTimeRef.current -= 1;
+      phaseTimeRef.current -= 1;
+      setTotalTimeLeft(totalTimeRef.current);
+      setPhaseTimeLeft(phaseTimeRef.current);
+
+      if (totalTimeRef.current <= 0) {
+        clearInterval(timerRef.current);
+        finishSession();
+        return;
+      }
+
+      if (phaseTimeRef.current <= 0) {
+        const next = phaseIndexRef.current + 1;
+        if (next >= PHASES.length) {
           clearInterval(timerRef.current);
           finishSession();
-          return 0;
+          return;
         }
-        return prev - 1;
-      });
-
-      setPhaseTimeLeft(prev => {
-        if (prev <= 1) {
-          // Phase complete — advance
-          setCurrentPhaseIndex(idx => {
-            const next = idx + 1;
-            if (next >= PHASES.length) {
-              clearInterval(timerRef.current);
-              finishSession();
-              return idx;
-            }
-            // Set next phase timer
-            setTimeout(() => setPhaseTimeLeft(PHASES[next].duration), 0);
-            setPromptIndex(0);
-            setStage(`recording-phase-${next}`);
-            return next;
-          });
-          return 0;
-        }
-        return prev - 1;
-      });
+        phaseIndexRef.current = next;
+        phaseTimeRef.current = PHASES[next].duration;
+        setCurrentPhaseIndex(next);
+        setPhaseTimeLeft(PHASES[next].duration);
+        setPromptIndex(0);
+        setStage(`recording-phase-${next}`);
+      }
     }, 1000);
 
     return () => clearInterval(timerRef.current);

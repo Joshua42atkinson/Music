@@ -35,6 +35,7 @@ const VertiscaleEngine = React.lazy(() => import('./game/VertiscaleEngine'));
 const AdventurePlayer = React.lazy(() => import('./game/AdventurePlayer'));
 const AuthCallback = React.lazy(() => import('./pages/AuthCallback'));
 const ChromaticMonomyth = React.lazy(() => import('./components/ChromaticMonomyth'));
+const MentorDashboard = React.lazy(() => import('./pages/MentorDashboard'));
 
 // ── On-brand loading fallback ──
 function LoadingScreen() {
@@ -99,6 +100,7 @@ function AppContent() {
             <Route path="/adventure" element={<ErrorBoundary><AdventurePlayer /></ErrorBoundary>} />
             <Route path="/auth/callback" element={<ErrorBoundary><AuthCallback /></ErrorBoundary>} />
             <Route path="/monomyth" element={<ErrorBoundary><ChromaticMonomyth /></ErrorBoundary>} />
+            <Route path="/mentor" element={<ErrorBoundary><MentorDashboard /></ErrorBoundary>} />
           </Routes>
         </AnimatePresence>
       </Suspense>

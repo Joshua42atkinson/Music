@@ -17,6 +17,7 @@ import { db } from '../data/localDatabase';
 import { loadTraction } from '../data/tractionStore';
 import PracticeRecorder from './PracticeRecorder';
 import StructuredPracticeRecorder from './StructuredPracticeRecorder';
+import { checkSubmissionAvailability } from '../lib/schedulingService';
 import {
   Video, Play, Clock, CheckCircle, Circle, Send, BookOpen,
   Mic, Music, Heart, Calendar, ArrowLeft, Film, MessageSquare,
@@ -96,6 +97,7 @@ export default function PlayerPortal() {
   const [journalEntries, setJournalEntries] = useState([]);
   const [activeTab, setActiveTab] = useState('submissions'); // submissions | library | timeline
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [workload, setWorkload] = useState(null);
 
   const traction = loadTraction();
   const completedFrets = Object.entries(traction.frets || {})
@@ -107,7 +109,7 @@ export default function PlayerPortal() {
     catch { return 'Student'; }
   })();
 
-  // Load submissions from IndexedDB + localStorage fallback
+  // Load submissions + workload status
   useEffect(() => {
     const load = async () => {
       let recs = [];
@@ -115,7 +117,6 @@ export default function PlayerPortal() {
         recs = await db.recordings.orderBy('timestamp').reverse().toArray();
       } catch (e) { console.warn('[PlayerPortal] No recordings table:', e); }
 
-      // Fallback: read from localStorage legacy submissions
       if (recs.length === 0) {
         try {
           const legacy = JSON.parse(localStorage.getItem('voixvive_submissions') || '[]');
@@ -135,6 +136,12 @@ export default function PlayerPortal() {
         const entries = await db.journal.orderBy('timestamp').reverse().limit(20).toArray();
         setJournalEntries(entries);
       } catch (e) { console.warn('[PlayerPortal] No journal:', e); }
+
+      // Check mentor workload
+      try {
+        const wl = await checkSubmissionAvailability();
+        setWorkload(wl);
+      } catch (e) { console.warn('[PlayerPortal] Workload check failed:', e); }
     };
     load();
   }, [showRecorder, showStructuredRecorder]);
@@ -234,6 +241,30 @@ export default function PlayerPortal() {
           <span style={styles.profileLabel}>recordings</span>
         </div>
       </div>
+
+      {/* ── MENTOR WORKLOAD BANNER ── */}
+      {workload && (
+        <div style={{
+          padding: '10px 16px',
+          margin: '0 16px 12px',
+          borderRadius: 10,
+          background: workload.canSubmit ? 'rgba(122,170,136,0.06)' : 'rgba(232,85,85,0.06)',
+          border: `1px solid ${workload.canSubmit ? 'rgba(122,170,136,0.15)' : 'rgba(232,85,85,0.15)'}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+        }}>
+          <AlertCircle size={16} style={{ color: workload.canSubmit ? '#7aaa88' : '#cc5555', flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: '#e8dcc8' }}>{workload.message}</p>
+            {workload.alternative === 'text-back' && (
+              <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>
+                Or send a quick question for a $5 text response.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── RECORD FOR BERTRAND (Hero) ── */}
       <div style={styles.heroSection}>
