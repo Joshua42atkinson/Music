@@ -117,3 +117,78 @@ export async function saveProgress(userId, fretId, slideIndex, completed) {
   if (error) throw error;
   return data;
 }
+
+// ═══════════════════════════════════════════════════════════
+// TRACTION STATE HELPERS (ScaffoldingProvider cloud sync)
+// ═══════════════════════════════════════════════════════════
+
+export async function getTractionState(userId) {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('traction_data')
+    .eq('id', userId)
+    .single();
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Row not found
+    throw error;
+  }
+  return data?.traction_data || null;
+}
+
+export async function saveTractionState(userId, tractionData) {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert({
+      id: userId,
+      traction_data: tractionData,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'id' })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DATA MIGRATION — Local → Cloud on first login
+// ═══════════════════════════════════════════════════════════
+
+export async function migrateLocalToCloud(userId, localTraction) {
+  if (!supabase) return null;
+
+  // Check if user already has cloud data
+  const existing = await getTractionState(userId);
+  if (existing) {
+    console.log('[Supabase] Cloud traction already exists, skipping migration');
+    return existing;
+  }
+
+  // Upload local data
+  console.log('[Supabase] Migrating local traction to cloud...');
+  await saveTractionState(userId, localTraction);
+
+  // Also create a default student profile if none exists
+  const { data: studentProfile } = await supabase
+    .from('student_profiles')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (!studentProfile) {
+    await supabase.from('student_profiles').insert({
+      user_id: userId,
+      name: localTraction.name || 'Troubadour',
+      current_chapter: localTraction.bardLevel || 1,
+      bard_level: localTraction.bardLevel || 1,
+      xp: localTraction.totalTraction || 0,
+      florins: 0,
+      instrument: 'guitar',
+    });
+    console.log('[Supabase] Created default student profile');
+  }
+
+  console.log('[Supabase] Migration complete');
+  return localTraction;
+}

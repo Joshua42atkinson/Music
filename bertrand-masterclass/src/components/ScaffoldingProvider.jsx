@@ -18,6 +18,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loadTraction, saveTraction, getScaffoldingLevel } from '../data/tractionStore';
 import { saveProgress, getProgress } from '../data/localDatabase';
+import { getTractionState, saveTractionState, migrateLocalToCloud } from '../lib/supabase';
 
 // ═══════════════════════════════════════════════════════════
 // SCAFFOLDING PROVIDER
@@ -34,29 +35,99 @@ const ScaffoldingContext = createContext(null);
 
 export function ScaffoldingProvider({ children }) {
   const [traction, setTraction] = useState(loadTraction());
-  const [isHydrated, setIsHydrated] = useState(() => {
-    const localState = loadTraction();
-    const isEmptyState = !localState.lastPracticeDate && localState.bardLevel <= 1 && localState.practiceMinutes === 0;
-    return !isEmptyState;
-  });
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [userId, setUserId] = useState(null);
 
-  // ── On mount: hydrate from IndexedDB if localStorage is empty ──
-  // This restores progress after a browser data clear or private mode session.
+  // ── Listen for auth state changes (login / logout) ──
   useEffect(() => {
-    const localState = loadTraction();
-    const isEmptyState = !localState.lastPracticeDate && localState.bardLevel <= 1 && localState.practiceMinutes === 0;
+    let unsub = null;
 
-    if (isEmptyState) {
-      getProgress().then(idbState => {
-        if (idbState) {
-          // Restore from IndexedDB backup
-          saveTraction(idbState);
-          setTraction(idbState);
-          console.info('[VoixVive] Restored progress from IndexedDB backup.');
+    const setupAuthListener = async () => {
+      try {
+        const mod = await import('../lib/supabase');
+        const supabase = mod.default;
+        if (!supabase) return;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUserId(session.user.id);
         }
-        setIsHydrated(true);
-      });
-    }
+
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+          const newId = session?.user?.id || null;
+          setUserId(prev => {
+            if (prev !== newId) {
+              // Auth changed — we'll handle hydration in the next effect cycle
+              if (newId) {
+                console.log('[VoixVive] User logged in:', newId);
+              } else {
+                console.log('[VoixVive] User logged out');
+              }
+            }
+            return newId;
+          });
+        });
+        unsub = listener.subscription;
+      } catch {
+        // Supabase not configured — stay in offline mode
+      }
+    };
+
+    setupAuthListener();
+    return () => unsub?.unsubscribe();
+  }, []);
+
+  // ── On mount: hydrate from cloud (if logged in) or IndexedDB ──
+  useEffect(() => {
+    const hydrate = async () => {
+      const localState = loadTraction();
+      const isEmptyState = !localState.lastPracticeDate && localState.bardLevel <= 1 && localState.practiceMinutes === 0;
+
+      // Check if Supabase auth has a user
+      let sessionUserId = null;
+      try {
+        const { getSession } = await import('../lib/supabase');
+        const session = await getSession();
+        sessionUserId = session?.user?.id || null;
+      } catch {
+        sessionUserId = null;
+      }
+
+      if (sessionUserId) {
+        // Logged in — try cloud first
+        setUserId(sessionUserId);
+        try {
+          const cloudData = await getTractionState(sessionUserId);
+          if (cloudData) {
+            saveTraction(cloudData);
+            setTraction(cloudData);
+            console.info('[VoixVive] Restored progress from Supabase cloud.');
+          } else {
+            // First login — migrate local data to cloud
+            await migrateLocalToCloud(sessionUserId, localState);
+            console.info('[VoixVive] Migrated local progress to Supabase cloud.');
+          }
+        } catch (err) {
+          console.warn('[VoixVive] Supabase load failed, using localStorage:', err);
+        }
+      } else if (isEmptyState) {
+        // Not logged in, localStorage empty — try IndexedDB backup
+        try {
+          const idbState = await getProgress();
+          if (idbState) {
+            saveTraction(idbState);
+            setTraction(idbState);
+            console.info('[VoixVive] Restored progress from IndexedDB backup.');
+          }
+        } catch (err) {
+          console.warn('[VoixVive] IndexedDB restore failed:', err);
+        }
+      }
+
+      setIsHydrated(true);
+    };
+
+    hydrate();
   }, []);
 
   // ── Periodic re-sync from localStorage (multi-tab support) ──
@@ -74,12 +145,19 @@ export function ScaffoldingProvider({ children }) {
   const updateTraction = useCallback((updater) => {
     setTraction(prev => {
       const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
+      // Always save to localStorage (fast, sync, works offline)
       saveTraction(next);
       // Async durable backup to IndexedDB — non-blocking
       saveProgress(next).catch(() => {});
+      // If logged in, also save to Supabase cloud — non-blocking
+      if (userId) {
+        saveTractionState(userId, next).catch(err => {
+          console.warn('[VoixVive] Supabase save failed (will retry on next update):', err);
+        });
+      }
       return next;
     });
-  }, []);
+  }, [userId]);
 
   const scaffolding = getScaffoldingLevel(traction);
   const settings = traction.settings || {};
@@ -89,6 +167,7 @@ export function ScaffoldingProvider({ children }) {
     refreshTraction,
     updateTraction,
     isHydrated,
+    userId,
 
     // Scaffolding levels (1.0 = full aids, 0.0 = no aids)
     scaffolding,
@@ -120,6 +199,7 @@ export function useScaffolding() {
       refreshTraction: () => {},
       updateTraction: () => {},
       isHydrated: true,
+      userId: null,
       scaffolding: 1.0,
       showNoteLabels: true,
       showFretNumbers: true,
