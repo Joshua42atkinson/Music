@@ -1,83 +1,161 @@
 # VOIX VIVE — Architecture & Data Flow
 > **Reference for all technical decisions, data wiring, and file structure.**
-> Last Updated: 2026-05-25
+> Last Updated: 2026-05-27
+>
+> **This document is the source of truth. If code contradicts this doc, the doc is right.**
 
 ---
 
-## STATE ARCHITECTURE
+## COMPUTE DAG — Student, Cloud, Local
 
-Two layers of persistence, one context layer:
+This platform uses a **Directed Acyclic Graph** (DAG) for compute: data flows one direction, no cycles, each node owns its layer.
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ScaffoldingProvider (React Context)                │
-│  Exposes: bardLevel, practiceMinutes, streak,       │
-│           traction, fretsUnlocked, updateTraction   │
-│  Source: tractionStore.js (reads from localStorage) │
-└──────────────────┬──────────────────────────────────┘
-                   │ reads/writes
-       ┌───────────┴──────────────┐
-       │                          │
-┌──────▼──────────┐    ┌──────────▼──────────┐
-│ tractionStore.js │    │  localDatabase.js    │
-│ (localStorage)   │    │  (IndexedDB/Dexie)   │
-│ Fast, sync       │    │  Durable, async      │
-│ Lost on clear    │    │  Survives clear      │
-└─────────────────┘    └─────────────────────┘
+┌──────────────────────┐      ┌──────────────────────┐      ┌──────────────────────┐
+│   STUDENT HARDWARE   │      │    CLOUD (Free)      │      │   LOCAL (Bertrand)   │
+│    (Browser PWA)     │◄────►│    Supabase/Vercel   │◄────►│   Desktop DaaS      │
+│                      │      │                      │      │   (LM Studio + API)   │
+└──────────────────────┘      └──────────────────────┘      └──────────────────────┘
+         │                              │                              │
+    ┌────▼────┐                    ┌────▼────┐                    ┌────▼────┐
+    │  SOURCE │                    │  TRUTH  │                    │  BRAIN  │
+    │  (User) │                    │ (Sync)  │                    │  (AI)   │
+    └─────────┘                    └─────────┘                    └─────────┘
 ```
 
-**Rule:** `tractionStore` is the live state. `localDatabase` is the backup. Write to both. Never read from IndexedDB for render-critical state — it's async and slow.
+### Student (Browser) — Skin & Nerves
+- **UI rendering**: React + Vite (instant)
+- **Audio synthesis**: Web Audio API (<10ms latency)
+- **Mic input / pitch detection**: AudioWorklet (privacy + speed)
+- **Metronome**: AudioContext (no network jitter)
+- **Fretboard touch**: Canvas/CSS (<16fps)
+- **Offline cache**: IndexedDB/Dexie
+- **Compute budget**: ~200MB RAM, 1 CPU core
+
+### Cloud (Supabase Free Tier) — Spine
+- **User identity**: Google OAuth → `auth.users`
+- **Progress persistence**: `profiles` + `traction` tables
+- **Journal sync**: `journal_entries` (write phone, read tablet)
+- **Submission queue**: `submissions` (metadata only, not video blobs)
+- **Free limits**: 500MB DB, 2GB bandwidth, 50K MAU, 1GB storage
+- **Cost**: $0
+
+### Local (Bertrand's Desktop) — Brain
+- **LM Studio**: LLM inference at `localhost:1234`
+- **Video review storage**: 500GB+ local disk
+- **FFmpeg**: CPU-heavy processing
+- **Mentor dashboard**: See all students
+- **Reachability**: Cloudflare Tunnel (free) or Tailscale
+- **Cost**: $0 (uses existing hardware)
 
 ---
 
-## THE THREE WIRES (implemented 2026-05-25)
+## THE THREE WIRES (implemented 2026-05-27)
 
-### Wire 1 — Game → Traction
+### Wire 1 — Game → Traction → Cloud
 ```
 VertiscaleEngine.handleSessionComplete(scores, logs)
   → sessionLogger.logVertiscaleSession({ phase, patternId, rounds })
-    → tractionStore.updateFretTraction(fretId, delta)
+    → tractionStore.updateFretTraction(fretId, delta)           [local]
+    → supabase.from('vertiscale_sessions').insert(...)         [cloud]
       → ScaffoldingProvider re-renders with new bardLevel
 ```
-Files: `VertiscaleEngine.jsx` → `sessionLogger.js` → `tractionStore.js`
+Files: `VertiscaleEngine.jsx` → `sessionLogger.js` → `tractionStore.js` + Supabase
 
-### Wire 2 — Student Name → Troubadour
+### Wire 2 — Troubadour AI → Student
 ```
-ProfileModal.onCreate
-  → db.studentProfile.put({ id: 1, name, createdAt })   [IndexedDB]
-  → localStorage.setItem('active_student_profile', name) [sync]
-  → AmbientPlayer.buildSystemPrompt() reads name
-    → Troubadour addresses student personally
+Student types in Troubadour widget
+  → POST http://localhost:1234/v1/chat/completions (LM Studio)
+    → Response streamed back to widget
+      → Browser TTS reads aloud (optional)
+        → Student hears AI voice
 ```
-Files: `LandingScreen.jsx` → `localDatabase.js` → `AmbientPlayer.jsx`
+Files: `AmbientPlayer.jsx` → `useLMStudio.js` → LM Studio → `SpeechSynthesis`
 
-### Wire 3 — Textbook → Game Unlock
+### Wire 3 — Submission → Mentor Review
 ```
-SlideViewer.goTo(lastSlideIndex)
-  → tractionStore.updateFretTraction(fretId, { yinCompleted: true })
-    → ScaffoldingProvider.fretsUnlocked updates
-      → VertiscaleEngine phase gate reads yinCompleted
+PracticeRecorder.save(blob)
+  → db.recordings.add({ metadata })      [IndexedDB local]
+  → supabase.from('submissions').insert({ meta })  [cloud]
+    → Bertrand sees in MentorDashboard (reads cloud)
+      → Bertrand reviews video (local DaaS)
+        → Feedback written to cloud
+          → Student sees "Reviewed" status
 ```
-Files: `SlideViewer.jsx` → `tractionStore.js` → `VertiscaleEngine.jsx`
+Files: `PracticeRecorder.jsx` → `localDatabase.js` + Supabase → `MentorDashboard.jsx`
 
 ---
 
-## ROUTING TABLE
+## ROUTING TABLE (Current — 2026-05-27)
 
 ```
-/                → LandingScreen      (Three Portals)
+/                → LandingScreen      (Three Portals + Playbook)
 /song            → OrientationHub     (12-chapter selector → SlideViewer)
-/guitar          → VertiscaleEngine   (Fret 9 game — direct mount)
-/player          → MentorTools        (Practice tools shell)
-/studio          → StudioPage         (Business/marketing page)
-/playbook        → PlaybookShell      (Student identity — lazy loaded)
+/guitar          → GuitarWorkbench    (12 tools hub — NOT Vertiscale anymore)
+/game            → VertiscaleEngine   (Fret 9 game — now standalone route)
+/adventure       → AdventurePlayer    (Troubadour CYOA — now standalone route)
+/player          → PlayerPortal     (Submissions + video library + pricing)
+/playbook        → PlaybookShell    (Character, Quests, Songbook, Journal)
+/studio          → StudioPage         (Pricing, mentorship, gift certs)
+/summary         → CurriculumSummary  (12-fret progress overview)
+/ai-developer    → AIDeveloperChat    (Internal dev tool)
 /privacy         → PrivacyPolicy
 /terms           → TermsOfService
 ```
 
 All routes wrapped in `ErrorBoundary`. Heavy routes are `React.lazy()` loaded.
-`AmbientPlayer` renders globally (outside Routes) — always present.
+`AmbientPlayer` (renamed **Troubadour**) renders globally — always present.
 `ScaffoldingProvider` wraps the entire app.
+
+---
+
+## COMPONENT DEPENDENCY MAP (Current — 2026-05-27)
+
+```
+App.jsx
+  ├── ScaffoldingProvider       [wraps everything]
+  ├── Troubadour (AmbientPlayer)  [global — bottom-right floating widget]
+  │   ├── Music player
+  │   ├── Metronome
+  │   └── AI Chat (unified)
+  ├── LandingScreen
+  │   ├── CoachingPortal (modal)
+  │   └── ProfileModal (modal)
+  ├── OrientationHub (lazy)
+  │   ├── NeckMenu
+  │   └── SlideViewer
+  │       └── Glossary
+  ├── GuitarWorkbench (lazy)      [THE 12-TOOL HUB]
+  │   ├── BreathingGate (modal)
+  │   ├── PracticeTimer (modal)
+  │   ├── PitchRoom (modal)
+  │   ├── Metronome (modal)
+  │   ├── IntervalVisualizer (modal)
+  │   ├── FretboardExplorer (modal)
+  │   ├── PlingTrainer (modal)
+  │   ├── MicrotonalTracker (modal)
+  │   ├── AsyncAssessor (modal)
+  │   ├── MultiKeyHub (modal)
+  │   └── RhythmEngine (modal)
+  ├── VertiscaleEngine (lazy)    [/game — standalone]
+  │   ├── GameFretboard
+  │   ├── OrbEngine
+  │   ├── PitchGateUI
+  │   ├── BiometricSanctum
+  │   └── Glossary
+  ├── AdventurePlayer (lazy)       [/adventure — standalone]
+  ├── PlayerPortal (lazy)          [submissions + library + pricing]
+  │   ├── PracticeRecorder (modal)
+  │   └── ServiceCard (new)
+  ├── PlaybookShell (lazy)
+  │   ├── CharacterSheet
+  │   ├── QuestLog
+  │   ├── Songbook
+  │   └── JournalEntry
+  ├── StudioPage (lazy)
+  ├── CurriculumSummary (lazy)
+  └── AIDeveloperChat (lazy)
+```
 
 ---
 
@@ -120,50 +198,7 @@ Table: journal           — id, fretId, content, timestamp
 Table: studentProfile    — id (always 1), name, createdAt
 Table: questLog          — id, fretId, phase, completedAt
 Table: aiNarration       — id, fretId, text, timestamp
-```
-
----
-
-## COMPONENT DEPENDENCY MAP
-
-```
-App.jsx
-  ├── ScaffoldingProvider       [wraps everything]
-  ├── AmbientPlayer             [global — top-left always]
-  ├── LandingScreen
-  │   ├── CoachingPortal
-  │   ├── ProfileModal
-  │   └── AdventurePlayer (lazy)
-  ├── OrientationHub
-  │   ├── NeckMenu
-  │   └── SlideViewer
-  │       ├── FretboardSheet
-  │       └── PlingTrainer
-  ├── VertiscaleEngine (lazy)
-  │   ├── GameFretboard
-  │   ├── OrbEngine
-  │   ├── PitchGateUI
-  │   ├── AdventurePlayer
-  │   ├── NeckMenu
-  │   ├── BiometricSanctum
-  │   └── Glossary
-  ├── MentorTools
-  │   └── DigitalBinder
-  │       ├── BreathingGate
-  │       ├── PracticeTimer
-  │       ├── PitchRoom
-  │       ├── Metronome
-  │       ├── IntervalVisualizer
-  │       ├── FretboardExplorer
-  │       ├── PlingTrainer
-  │       ├── MicrotonalTracker
-  │       ├── CoachingPortal
-  │       ├── MultiKeyHub
-  │       └── RhythmEngine
-  └── PlaybookShell (lazy)
-      ├── CharacterSheet
-      ├── QuestLog
-      └── JournalEntry
+Table: recordings        — id, exerciseName, timestamp, duration, blobUrl, reviewed, feedback
 ```
 
 ---
@@ -191,7 +226,7 @@ grep -rn "Florin\|Four Channels\|Dojo\|Great Game\|Coal.*Steam\|Jean-Luc" src/
 # Should return zero results
 ```
 
-**Files with confirmed clean status (post 2026-05-25):**
+**Files with confirmed clean status (post 2026-05-27):**
 - `VertiscaleEngine.jsx` — Florins, Jean-Luc, earnFlorins removed
 - `playbookData.js` — Four Channels being replaced with Troubadour Types
 - `Tavern3DVisualizer.jsx` — archived to `_archive/vr_future/`
@@ -210,6 +245,54 @@ This is the Joshua-built DaaS desktop companion app.
 
 ---
 
+## NAVIGATION STANDARD
+
+Every page (except LandingScreen) must have:
+1. **Back button** — `navigate(-1)` or semantic back (e.g., `/playbook` from Songbook)
+2. **Voix Vive wordmark** — `navigate('/')`, links to LandingScreen
+3. Consistent styling: JetBrains Mono uppercase, `#c9a96e` color
+
+**Implemented:**
+- `PrivacyPolicy.jsx` — back button ✓
+- `TermsOfService.jsx` — back button ✓
+- `PlayerPortal.jsx` — wordmark home button ✓
+- `StudioPage.jsx` — back + wordmark buttons ✓ (added 2026-05-27)
+
+**Pending:**
+- `GuitarWorkbench.jsx` — needs standardized nav bar
+- `OrientationHub.jsx` — needs standardized nav bar
+- `PlaybookShell.jsx` — needs standardized nav bar
+- `VertiscaleEngine.jsx` — needs standardized nav bar
+
+---
+
+## PLAYER PORTAL VISION — "Digital Mirror Playground"
+
+The Player Portal is not a dashboard. It is a **mirror**.
+
+### Current State
+- Video submissions to Bertrand
+- Submission library with review status
+- Pricing cards (StudioPage overlap — to be removed)
+- Timeline of submissions + journal entries
+
+### Future State (post-persistence)
+- **Video journaling** — low-def self-recording for posture, timing, expression
+- **Body posture analysis** — reinforcement learning for ergonomic guitar position
+- **Metronome video** — visual beat reference overlaid on student video
+- **Background music** — ambient tracks from Troubadour for practice sessions
+- **AI integration** — Troubadour can pull Song pages into chat, set ambient music, control workbook tools via voice
+- **Reflection prompts** — after every practice session, AI asks: "What did you notice about your breath?"
+
+### DAG Flow
+```
+[Practice Session] → [Record Video] → [Self-Review] → [AI Analysis] → [Journal Prompt] → [Next Session]
+```
+
+No gamification. No scores. Just presence, reflection, and gentle guidance.
+
+---
+
 ## MOONSHOTS (do not build until revenue gates are met)
 
 | Feature | Gate | Notes |
@@ -218,3 +301,4 @@ This is the Joshua-built DaaS desktop companion app.
 | AI Bertrand Coach (fine-tuned Gemma 4) | $2,500/mo | Training data in `/training/` |
 | **VR Guitar Classroom** | **$5,000/mo** | **Bevy ECS + OpenXR + Tavern3D scenes** |
 | Roblox Music World | $5,000/mo | Social learning |
+| CAGED TCG Shop | Post-launch | Trading card game for music learning |

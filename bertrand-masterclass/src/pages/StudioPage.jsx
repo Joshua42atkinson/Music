@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Star, ExternalLink, Play, Gift, Users, Video, BookOpen, Mic, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronDown, ChevronUp, Star, ExternalLink, Play, Gift, Users, Video, BookOpen, Mic, MessageCircle, ArrowLeft } from 'lucide-react';
 import { SERVICES, PAYMENT_METHODS, CREDENTIALS, STYLES } from '../data/pricingData';
 import { TESTIMONIALS, FAQ } from '../data/testimonialData';
 
@@ -23,6 +24,7 @@ const SERVICE_ICONS = {
 };
 
 export default function StudioPage() {
+  const navigate = useNavigate();
   const [expandedService, setExpandedService] = useState(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [expandedFaq, setExpandedFaq] = useState(null);
@@ -47,6 +49,55 @@ export default function StudioPage() {
 
   return (
     <div className="studio-page relative">
+      {/* ── NAVIGATION BAR ── */}
+      <nav style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px 20px 0',
+        maxWidth: 640,
+        margin: '0 auto',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.75rem',
+            color: '#c9a96e',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            background: 'none',
+            border: 'none',
+            padding: '8px 0',
+          }}
+          aria-label="Back"
+        >
+          <ArrowLeft size={14} />
+          Back
+        </button>
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+          aria-label="Voix Vive Home"
+        >
+          <img
+            src="/assets/wordmark.png"
+            alt="Voix Vive"
+            style={{ height: 24, opacity: 0.8 }}
+            draggable={false}
+          />
+        </button>
+      </nav>
+
       <style>{`
         .studio-page {
           background: linear-gradient(180deg, #0d0d14 0%, #1a120b 30%, #0a0a14 100%);

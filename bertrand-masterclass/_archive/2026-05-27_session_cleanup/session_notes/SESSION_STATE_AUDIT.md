@@ -265,3 +265,29 @@ These are imported but may be conditionally rendered or buried:
 
 *Audit completed: 2026-05-27*
 *Auditor: Cascade (honest about what wasn't tested)*
+
+---
+
+## APPENDIX A — Post-Push Fixes (2026-05-27 Continuation)
+
+| # | Task | File(s) | Status | Tested? |
+|---|------|---------|--------|---------|
+| 13 | Fix LandingScreen lint errors (dead imports, dupes) | `LandingScreen.jsx` | ✅ Complete | Build |
+| 14 | Fix GuitarWorkbench lint errors | `GuitarWorkbench.jsx` | ✅ Complete | Build |
+| 15 | Fix PlayerPortal lint errors (useMemo, empty catches) | `PlayerPortal.jsx` | ✅ Complete | Build |
+| 16 | Build verification | All files | ✅ Complete | Build pass |
+| 17 | Add StudioPage navigation | `StudioPage.jsx` | ✅ Complete | Build |
+| 18 | Rewrite `02_ARCHITECTURE.md` | `docs/02_ARCHITECTURE.md` | ✅ Complete | N/A |
+| 19 | Document PlayerPortal vision | `docs/02_ARCHITECTURE.md` | ✅ Complete | N/A |
+| 20 | Document navigation standard | `docs/02_ARCHITECTURE.md` | ✅ Complete | N/A |
+
+**Build status:** ✅ `npm run build` passes (2.49s, no errors)
+**Lint status:** ✅ `npx eslint` clean on all three files
+**Push status:** ✅ `14aced3` on `main`
+
+**Outstanding (not this session):**
+- Browser testing of `/game`, `/adventure`, `/player`, `/guitar`
+- Standardized nav bars on GuitarWorkbench, OrientationHub, PlaybookShell, VertiscaleEngine
+- Supabase project setup + Google Auth
+- Cloudflare Tunnel for LM Studio
+- CAGED TCG shop design
