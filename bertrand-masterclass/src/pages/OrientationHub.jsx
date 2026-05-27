@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Home, BookOpen, Guitar, X } from 'lucide-react';
 import frets from '../data/chapterData';
 import SlideViewer from '../components/SlideViewer';
 import NeckMenu from '../components/NeckMenu';
 import SongwritingCompanion from '../components/SongwritingCompanion';
 import { generateSlides } from '../data/slideGenerator';
 import { getChapterProgress } from '../data/localDatabase';
-import { Guitar, X, ArrowLeft } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -104,6 +104,50 @@ const OrientationHub = () => {
           <ArrowLeft size={14} />
           Back
         </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => navigate('/monomyth')}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.65rem', color: '#c9a96e',
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              cursor: 'pointer',
+              background: 'rgba(201,169,110,0.06)',
+              border: '1px solid rgba(201,169,110,0.15)',
+              borderRadius: 8, padding: '8px 12px',
+              transition: 'all 0.3s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(201,169,110,0.12)';
+              e.currentTarget.style.borderColor = 'rgba(201,169,110,0.3)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(201,169,110,0.06)';
+              e.currentTarget.style.borderColor = 'rgba(201,169,110,0.15)';
+            }}
+            aria-label="Chromatic Monomyth"
+          >
+            <BookOpen size={14} />
+            Chart
+          </button>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36,
+              background: 'rgba(201,169,110,0.06)',
+              border: '1px solid rgba(201,169,110,0.15)',
+              borderRadius: 8,
+              color: '#c9a96e',
+              cursor: 'pointer',
+            }}
+            aria-label="Home"
+          >
+            <Home size={16} />
+          </button>
+        </div>
       </nav>
 
       <NeckMenu

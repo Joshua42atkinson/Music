@@ -33,6 +33,8 @@ const AIDeveloperChat = React.lazy(() => import('./components/AIDeveloperChat'))
 const CurriculumSummary = React.lazy(() => import('./components/CurriculumSummary'));
 const VertiscaleEngine = React.lazy(() => import('./game/VertiscaleEngine'));
 const AdventurePlayer = React.lazy(() => import('./game/AdventurePlayer'));
+const AuthCallback = React.lazy(() => import('./pages/AuthCallback'));
+const ChromaticMonomyth = React.lazy(() => import('./components/ChromaticMonomyth'));
 
 // ── On-brand loading fallback ──
 function LoadingScreen() {
@@ -95,6 +97,8 @@ function AppContent() {
             <Route path="/ai-developer" element={<ErrorBoundary><AIDeveloperChat /></ErrorBoundary>} />
             <Route path="/game" element={<ErrorBoundary><VertiscaleEngine /></ErrorBoundary>} />
             <Route path="/adventure" element={<ErrorBoundary><AdventurePlayer /></ErrorBoundary>} />
+            <Route path="/auth/callback" element={<ErrorBoundary><AuthCallback /></ErrorBoundary>} />
+            <Route path="/monomyth" element={<ErrorBoundary><ChromaticMonomyth /></ErrorBoundary>} />
           </Routes>
         </AnimatePresence>
       </Suspense>

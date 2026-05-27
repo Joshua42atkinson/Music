@@ -468,6 +468,7 @@ function speak(text, rate = 0.85) {
 - [x] **Remove distracting homepage photo** — Floating Bertrand avatar removed from LandingScreen
 - [x] **Add Pythagorean Legacy to all 12 frets** — chapterData.js now has `pythagoreanLegacy` with ratio, cents, bilingual hook
 - [x] **Pythagorean Legacy slide in deck** — slideGenerator.js + SlideViewer.jsx render mathematical origin card after title
+- [x] **Chromatic Monomyth reference chart** — `/monomyth` route with full 12-fret grid: interval, hero stage, ratio, cents; linked from OrientationHub nav
 
 ### Phase 1: Persistence (IN PROGRESS — May 27, 2026)
 
@@ -476,7 +477,8 @@ function speak(text, rate = 0.85) {
 - [x] **Supabase setup** — Project created, schema.sql deployed, RLS policies active
 - [x] **Vercel deploy** — Live at `www.voix-vive.com` + `bertrand-masterclass.vercel.app`
 - [ ] **Google Auth** — OAuth credentials pending (Supabase dashboard → Auth → Providers)
-- [ ] **Login/logout UI** — Header button when auth is ready
+- [x] **Login/logout UI** — AuthButton component + useAuth hook built; placed in LandingScreen header and ready for all nav bars
+- [x] **Auth callback page** — `/auth/callback` route handles OAuth redirect, routes to `/song`
 - [ ] **Data migration** — Local → cloud on first login (preserves existing data)
 - [ ] **ScaffoldingProvider sync** — Read from Supabase when logged in, localStorage when not
 - [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation

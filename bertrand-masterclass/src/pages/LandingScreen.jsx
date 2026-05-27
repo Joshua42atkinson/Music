@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Circle } from 'lucide-react';
+import AuthButton from '../components/AuthButton';
 import CoachingPortal from '../components/CoachingPortal';
 import { useLocale } from '../hooks/useLocale';
 
@@ -414,11 +415,13 @@ export default function LandingScreen() {
         {t('choosePortal')}
       </motion.p>
 
-      {/* ── Language Toggle (simplified) ── */}
+      {/* ── Language Toggle + Auth ── */}
       <motion.div
         style={{
           display: 'flex',
           justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: 10,
           marginBottom: '16px',
           position: 'relative',
           zIndex: 1,
@@ -427,6 +430,7 @@ export default function LandingScreen() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.6 }}
       >
+        <AuthButton />
         <button
           onClick={toggleLocale}
           style={{
