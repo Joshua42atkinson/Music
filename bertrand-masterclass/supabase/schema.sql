@@ -123,6 +123,43 @@ CREATE POLICY "Admin can view all submissions"
   ));
 
 -- ═══════════════════════════════════════════════════════════
+-- VIDEO SUBMISSIONS (Google Drive metadata index)
+-- Videos live in student Google Drive. Supabase stores only IDs.
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS public.video_submissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  drive_file_id TEXT NOT NULL,
+  drive_folder_id TEXT,
+  file_name TEXT,
+  web_view_link TEXT,
+  fret_id INTEGER CHECK (fret_id BETWEEN 1 AND 12),
+  entry_type TEXT DEFAULT 'practice',
+  emotional_state TEXT,
+  reviewed BOOLEAN DEFAULT FALSE,
+  mentor_notes TEXT,
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.video_submissions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own video submissions"
+  ON public.video_submissions FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can create own video submissions"
+  ON public.video_submissions FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Admin can view all video submissions"
+  ON public.video_submissions FOR SELECT
+  USING (auth.uid() IN (
+    SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
+  ));
+
+-- ═══════════════════════════════════════════════════════════
 -- JOURNAL ENTRIES
 -- ═══════════════════════════════════════════════════════════
 
@@ -186,3 +223,29 @@ CREATE INDEX IF NOT EXISTS idx_submissions_user
 
 CREATE INDEX IF NOT EXISTS idx_journal_user
   ON public.journal_entries(user_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_video_submissions_user
+  ON public.video_submissions(user_id, created_at DESC);
+
+-- ═══════════════════════════════════════════════════════════
+-- DRIVE CONFIG (Template architecture — reusable per instructor)
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS public.drive_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  instructor_email TEXT NOT NULL UNIQUE,
+  mentor_email TEXT NOT NULL,
+  folder_template_name TEXT DEFAULT 'Voix Vive Submissions',
+  folder_template_id TEXT,
+  share_role TEXT DEFAULT 'writer',
+  color_theme JSONB DEFAULT '{"primary": "#c9a96e", "secondary": "#7aaa88"}',
+  active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.drive_config ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can view active drive configs"
+  ON public.drive_config FOR SELECT
+  USING (active = TRUE);

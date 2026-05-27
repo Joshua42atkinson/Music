@@ -39,6 +39,11 @@ export function useAuth() {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        scopes: 'drive.file', // Request Google Drive access for video storage
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent', // Force re-consent to get refresh token + drive scope
+        },
       },
     });
     if (error) throw error;

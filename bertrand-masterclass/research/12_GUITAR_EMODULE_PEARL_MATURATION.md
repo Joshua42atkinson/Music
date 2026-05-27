@@ -2,11 +2,12 @@
 ## Voix Vive — Unified Interactive Learning Architecture
 ### *All Tools. All Games. All Paths. One Module.*
 
-> **Version:** 1.4 — Google Auth LIVE, DAG Funnel Design Phase (2026-05-27)
+> **Version:** 1.5 — Google Drive Integration + Template Architecture (2026-05-27)
 > **Author:** Joshua Atkinson (Platform Architect)
 > **SME:** Bertrand Laurence
 > **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth + DAG eModule
-> **Status:** Phase 1 Active — Login system fully working on live site. Moving to login-aware progress + journaling.
+> **Status:** Phase 1 Complete. Phase 2 (Mentor Connect via Google Drive) Active.
+> **Template Mode:** voix-vive.com is now a reusable platform architecture for multiple instructors.
 
 ---
 
@@ -470,52 +471,86 @@ function speak(text, rate = 0.85) {
 - [x] **Pythagorean Legacy slide in deck** — slideGenerator.js + SlideViewer.jsx render mathematical origin card after title
 - [x] **Chromatic Monomyth reference chart** — `/monomyth` route with full 12-fret grid: interval, hero stage, ratio, cents; linked from OrientationHub nav
 
-### Phase 1: Persistence (IN PROGRESS — May 27, 2026)
+### Phase 1: Persistence ✅ COMPLETE (May 27, 2026)
 
 **Prerequisites DONE:** ✅ Supabase project created (`fmaaihxhfgmqdmtmckmc`), schema deployed, Vercel env vars set.
 
 - [x] **Supabase setup** — Project created, schema.sql deployed, RLS policies active
 - [x] **Vercel deploy** — Live at `www.voix-vive.com` + `bertrand-masterclass.vercel.app`
 - [x] **Google Auth** — OAuth 2.0 credentials created in Google Cloud Console; Client ID + Secret pasted into Supabase Auth → Providers
-- [x] **Login/logout UI** — AuthButton component + useAuth hook built; placed in LandingScreen header and ready for all nav bars
+- [x] **Login/logout UI** — AuthButton component + useAuth hook built; placed in LandingScreen header
 - [x] **Auth callback page** — `/auth/callback` route handles OAuth redirect, routes to `/song`
 - [x] **Login test** — Google sign-in works on `www.voix-vive.com` ✅ (2026-05-27)
   - Fix: `detectSessionInUrl: false` + manual hash parsing in AuthCallback
   - Fix: Full `sb_publishable_*` prefix required in VITE_SUPABASE_ANON_KEY
-  - Fix: AuthCallback now has 3 clean cases (implicit hash, PKCE code, existing session)
+- [x] **Anonymous mode banner** — "Sign in to save progress" shown on LandingScreen when not logged in
+- [x] **ScaffoldingProvider sync** — Cloud when logged in, localStorage when not (wired + tested)
+- [x] **Journal system** — Text entries sync to Supabase when logged in, IndexedDB fallback when not
+- [x] **Video recorder** — Browser MediaRecorder + upload to Supabase Storage when logged in
+- [x] **JournalFeed** — Loads from Supabase when logged in, IndexedDB fallback
+- [x] **Schema updates** — `traction_data` JSONB in profiles, `entry_type` in journal_entries
 - [ ] **Data migration** — Local → cloud on first login (preserves existing data)
-- [x] **ScaffoldingProvider sync** — Cloud when logged in, localStorage when not ✅ (wired)
 - [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation
 - [ ] **No-AI fallback** — Static prompt library when LM Studio is offline
 
-### Phase 2: Mentor Connect (After Persistence)
+### Phase 2: Google Drive Mentor Connect (IN PROGRESS — May 27, 2026)
 
-**Prerequisites from you:** Bertrand's preference on `/mentor` vs integrated dashboard
+**Architecture decision:** Videos stored in students' personal Google Drive (free, student-owned), shared with mentor. Supabase stores only metadata (file IDs, share status, review state). This keeps Supabase free tier viable forever.
 
-- [ ] **Mentor dashboard** — Bertrand sees all student progress, submission queue, feedback
-- [ ] **Notification system** — Student sees "Reviewed" badge when feedback is ready
-- [ ] **PlayerPortal merge** — Remove pricing, add submission status + mentor link
+**Prerequisites:** Google Drive API credentials, mentor email (joshua42atkinson@gmail.com for now, transfer to bertlarrymusic@gmail.com later)
+
+- [ ] **Google Drive OAuth** — Extend Supabase auth to request `drive.file` scope for file creation
+- [ ] **Student Drive folder** — Auto-create `Voix Vive / Submissions` folder on first login
+- [ ] **Auto-share with mentor** — Folder shared with mentor email on creation
+- [ ] **Video upload to Drive** — Replace Supabase Storage with Google Drive API upload
+- [ ] **Video metadata in Supabase** — Store `drive_file_id`, `drive_folder_id`, `shared_with`, `reviewed`
+- [ ] **Mentor review link** — Generate direct Google Drive viewer link for Bertrand
+- [ ] **Bertrand response recording** — Screen recorder overlay for mentor to record video responses
+- [ ] **Structured Practice Recorder** — 15-min guided session in `/player`
+  - [ ] Breathing Gate (2 min) — animated breath circle
+  - [ ] Warm-up (3 min) — metronome + fretboard prompt
+  - [ ] Practice Session (8 min) — auto-loop with on-screen guidance
+  - [ ] Free Play (1 min) — blank screen, just play
+  - [ ] Emotional State Capture (30s) — voice memo: "What are you feeling?"
+  - [ ] Review prompt — "Your video is saved. Bertrand will review within 48 hours."
+- [ ] **Drive template system** — `drive_config` table: `mentor_email`, `folder_template_id`, `share_template` for reuse across instructors
+
+### Phase 2b: Template Architecture (May 27, 2026)
+
+**Goal:** Make voix-vive.com a reusable platform for any instructor.
+
+- [ ] **Instructor config** — `instructors` table: name, email, bio, drive_folder_template, color_theme
+- [ ] **White-label landing** — Instructor logo, colors, curriculum loaded from config
+- [ ] **Multi-tenant auth** — Students auth once, can join multiple instructor programs
+- [ ] **Curriculum import** — Instructors upload their 12-chapter structure as JSON
+- [ ] **Mentor switcher** — Joshua can test as instructor → switch to student → verify flow
+- [ ] **Stripe integration (deferred)** — When instructor wants paid coaching, Stripe Connect
 
 ### Phase 3: Voice + AI (After Mentor Connect)
 
-**Prerequisites from you:** LM Studio installed, model loaded, server address confirmed
+**Hardware:** Joshua has Pixel 10 Pro XL + Termux + PocketPal AI, GMKtek EVO X2 desktop + Unsloth for fine-tuning.
 
-- [ ] **Voice TTS** — AI responses auto-speak aloud
-- [ ] **Voice STT** — Speech-to-text in chat input
-- [ ] **AI context injection** — Troubadour can pull Song pages into chat
-- [ ] **AI tool control** — Troubadour can set ambient music, metronome via voice
+**Model pipeline:** StepAudio 2.5 Realtime (end-to-end voice, local inference via vLLM) OR Gemini Nano (on-device, Android)
+
+- [ ] **On-device AI research** — Test StepAudio 2.5 on GMKtek EVO X2
+- [ ] **Troubadour voice model** — Fine-tune with Bertrand's pedagogical voice (transcripts, voice memos)
+- [ ] **Voice TTS** — AI responses auto-speak aloud (browser TTS as fallback)
+- [ ] **Voice STT** — Speech-to-text in chat input (Web Speech API as fallback)
+- [ ] **Paralinguistic perception** — AI detects hesitation, excitement, tension in student voice
+- [ ] **AI context injection** — Troubadour pulls Song pages into chat
+- [ ] **AI tool control** — Troubadour sets ambient music, metronome via voice
 - [ ] **AI prompt engineering** — DAG-based reflection prompts
 - [ ] **Adventure standalone** — Already routed, enhance with AI narration
 
-### Phase 4: Digital Mirror (After Voice AI)
+### Phase 4: Digital Mirror (IN PROGRESS — May 27, 2026)
 
 **Prerequisites from you:** CAGED TCG report, clarification on posture analysis (ML vs heuristics)
 
-- [ ] **Video journaling** — Low-def self-recording in PlayerPortal
+- [x] **Video journaling** — VideoRecorder component in Playbook Journal tab ✅
+- [x] **Reflection prompts** — JournalEntry with mood + curated prompts per fret ✅
 - [ ] **Self-review** — Playback with metronome overlay
-- [ ] **Reflection prompts** — After every session: "What did you notice about your breath?"
-- [ ] **Timeline view** — Submissions + journal + practice sessions in one feed
-- [ ] **CAGED TCG Shop** — Browse cards, checkout (Phase 5)
+- [ ] **Timeline view** — Submissions + journal + practice sessions in one feed (needs Drive integration first)
+- [ ] **CAGED TCG Shop** — Browse cards, checkout (Phase 5, deferred)
 
 ### Phase 5: Vercel + PWA (FAST-TRACKED — May 27, 2026)
 
@@ -552,7 +587,11 @@ function speak(text, rate = 0.85) {
 | Playbook | `components/playbook/PlaybookShell.jsx` | `/playbook` | Character, Quests, Songbook, Journal |
 | Studio Page | `pages/StudioPage.jsx` | `/studio` | Pricing, services, downloads |
 | Troubadour Widget | `components/AmbientPlayer.jsx` | Global | AI chat + music + metronome |
-| Player Portal | `components/PlayerPortal.jsx` | `/player` | Submissions, library — **MISSING PRICING** |
+| Player Portal | `components/PlayerPortal.jsx` | `/player` | Submissions, library — needs Structured Practice Recorder |
+| Chromatic Monomyth | `pages/MonomythChart.jsx` | `/monomyth` | 12-fret reference grid |
+| Auth System | `hooks/useAuth.js` + `pages/AuthCallback.jsx` | `/auth/callback` | Google OAuth, login-aware progress |
+| Journal | `components/playbook/JournalEntry.jsx` | `/playbook` (Journal tab) | Text + mood + Supabase sync |
+| Video Recorder | `components/playbook/VideoRecorder.jsx` | `/playbook` (Journal tab) | Browser MediaRecorder + upload |
 
 ### ⚠️ Built But Unrouted
 

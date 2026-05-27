@@ -1,12 +1,13 @@
 // ═══════════════════════════════════════════════════════════
 // VIDEO RECORDER — Browser-based practice recording
 // Uses MediaRecorder API. Records from webcam/mic.
-// Uploads to Supabase Storage when logged in.
+// Uploads to STUDENT'S Google Drive (free, student-owned).
+// Supabase stores only metadata (file IDs, not bytes).
 // ═══════════════════════════════════════════════════════════
 
 import React, { useState, useRef, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { supabase } from '../../lib/supabase';
+import { uploadVideo, saveVideoMetadata } from '../../lib/driveService';
 
 export default function VideoRecorder({ fretId, onRecordingComplete }) {
   const { user } = useAuth();
@@ -51,11 +52,10 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
       setRecordedBlob(blob);
       setVideoUrl(URL.createObjectURL(blob));
       setStatus('recorded');
-      // Stop camera stream
       stream.getTracks().forEach(t => t.stop());
     };
 
-    recorder.start(1000); // Collect chunks every 1s
+    recorder.start(1000);
     setStatus('recording');
   }, []);
 
@@ -63,35 +63,39 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
     mediaRecorderRef.current?.stop();
   }, []);
 
-  const uploadToSupabase = useCallback(async () => {
+  const uploadToDrive = useCallback(async () => {
     if (!recordedBlob || !user) return;
     setStatus('uploading');
     setUploadError(null);
 
     try {
-      const fileName = `practice-${user.id}-${Date.now()}.webm`;
-      const { data, error } = await supabase.storage
-        .from('student-videos')
-        .upload(fileName, recordedBlob, {
-          contentType: 'video/webm',
-          upsert: false,
-        });
+      // 1. Upload to student's Google Drive
+      const driveData = await uploadVideo(recordedBlob, {
+        fretId,
+        entryType: 'practice',
+      });
 
-      if (error) throw error;
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('student-videos')
-        .getPublicUrl(fileName);
+      // 2. Save metadata to Supabase (tiny, stays free)
+      await saveVideoMetadata(user.id, driveData, {
+        fretId,
+        entryType: 'practice',
+      });
 
       setStatus('done');
-      onRecordingComplete?.(urlData.publicUrl, fileName);
+      onRecordingComplete?.(driveData.webViewLink, driveData.fileName);
     } catch (err) {
       console.error('[VideoRecorder] Upload failed:', err);
-      setUploadError(err.message || 'Upload failed');
+      const msg = err.message || '';
+      if (msg.includes('No Google Drive token')) {
+        setUploadError(
+          'Google Drive access needed. Please sign out and sign in again to grant permission.'
+        );
+      } else {
+        setUploadError(msg || 'Upload failed');
+      }
       setStatus('recorded');
     }
-  }, [recordedBlob, user, onRecordingComplete]);
+  }, [recordedBlob, user, fretId, onRecordingComplete]);
 
   const reset = useCallback(() => {
     setRecordedBlob(null);
@@ -120,6 +124,11 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
         >
           📹 {user ? 'Record Practice Video' : 'Sign in to record video'}
         </button>
+        {user && (
+          <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+            Saved to your Google Drive. Shared with mentor.
+          </p>
+        )}
       </div>
     );
   }
@@ -155,13 +164,13 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
       )}
 
       {status === 'recorded' && (
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
           <button onClick={reset} style={btnStyle('rgba(255,255,255,0.2)')}>
             ↺ Retake
           </button>
           {user ? (
-            <button onClick={uploadToSupabase} style={btnStyle('#7aaa88')}>
-              ⬆ Upload
+            <button onClick={uploadToDrive} style={btnStyle('#7aaa88')}>
+              ⬆ Save to Drive
             </button>
           ) : (
             <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', alignSelf: 'center' }}>
@@ -172,11 +181,16 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
       )}
 
       {status === 'uploading' && (
-        <p style={{ fontSize: '0.75rem', color: '#c9a96e' }}>Uploading...</p>
+        <p style={{ fontSize: '0.75rem', color: '#c9a96e' }}>Uploading to your Google Drive...</p>
       )}
 
       {status === 'done' && (
-        <p style={{ fontSize: '0.75rem', color: '#7aaa88' }}>✓ Video saved!</p>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '0.75rem', color: '#7aaa88' }}>✓ Saved to your Google Drive!</p>
+          <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
+            Your mentor can now review it.
+          </p>
+        </div>
       )}
 
       {uploadError && (
