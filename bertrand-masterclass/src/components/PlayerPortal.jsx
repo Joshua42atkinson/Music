@@ -9,7 +9,7 @@
 // ║           One primary action: "Record for Bertrand."           ║
 // ║           The Great Game: The Player is the one who observes. ║
 // ╚═════════════════════════════════════════════════════════════════╝
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '../hooks/useLocale';
 import { useScaffolding } from './ScaffoldingProvider';
@@ -119,13 +119,12 @@ export default function PlayerPortal() {
   const [showRecorder, setShowRecorder] = useState(false);
   const [submissions, setSubmissions] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
-  const [timeline, setTimeline] = useState([]);
   const [activeTab, setActiveTab] = useState('submissions'); // submissions | library | timeline
   const [selectedVideo, setSelectedVideo] = useState(null);
 
   const traction = loadTraction();
   const completedFrets = Object.entries(traction.frets || {})
-    .filter(([_, f]) => (f.traction || 0) >= 60)
+    .filter(([, f]) => (f.traction || 0) >= 60)
     .map(([id]) => parseInt(id));
 
   const studentName = (() => {
@@ -153,7 +152,7 @@ export default function PlayerPortal() {
             reviewed: s.status === 'reviewed',
             feedback: s.feedback || null,
           }));
-        } catch (e) {}
+        } catch (e) { console.warn('[PlayerPortal] Legacy submissions parse error:', e); }
       }
       setSubmissions(recs);
 
@@ -166,7 +165,7 @@ export default function PlayerPortal() {
   }, [showRecorder]);
 
   // Build unified timeline
-  useEffect(() => {
+  const timeline = useMemo(() => {
     const items = [];
 
     submissions.forEach(sub => {
@@ -193,7 +192,7 @@ export default function PlayerPortal() {
 
     // Sort newest first
     items.sort((a, b) => b.timestamp - a.timestamp);
-    setTimeline(items.slice(0, 30));
+    return items.slice(0, 30);
   }, [submissions, journalEntries]);
 
   const handleRecordingSaved = useCallback(() => {
@@ -203,7 +202,7 @@ export default function PlayerPortal() {
       try {
         const recs = await db.recordings.orderBy('timestamp').reverse().toArray();
         setSubmissions(recs);
-      } catch (e) {}
+      } catch (e) { console.warn('[PlayerPortal] Reload recordings error:', e); }
     };
     load();
   }, []);

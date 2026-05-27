@@ -13,9 +13,8 @@ import { useScaffolding } from './ScaffoldingProvider';
 import { useLocale } from '../hooks/useLocale';
 import { db } from '../data/localDatabase';
 import { TOOLS_CATALOG } from '../data/toolsData';
-import { loadTraction } from '../data/tractionStore';
 import {
-  getCurriculumPosition, getSuggestedTool, getPracticeContext, getInvitation,
+  getPracticeContext, getInvitation,
   CHAPTER_TOOL_MAP,
 } from '../data/workbenchData';
 import {
@@ -146,16 +145,15 @@ export default function GuitarWorkbench() {
   const navigate = useNavigate();
   const { locale, t } = useLocale();
   const lang = locale;
-  const { traction, bardLevel, practiceMinutes, streak } = useScaffolding();
+  const { bardLevel, practiceMinutes, streak } = useScaffolding();
   const [activeTool, setActiveTool] = useState(null);
   const [journalEntries, setJournalEntries] = useState([]);
   const [showAllTools, setShowAllTools] = useState(false);
   const [showQuill, setShowQuill] = useState(false);
-  const [practiceCtx, setPracticeCtx] = useState(null);
+  const [practiceCtx] = useState(() => getPracticeContext());
 
-  // Load practice context + journal
+  // Load journal
   useEffect(() => {
-    setPracticeCtx(getPracticeContext());
     const load = async () => {
       try {
         const entries = await db.journal.orderBy('timestamp').reverse().limit(5).toArray();

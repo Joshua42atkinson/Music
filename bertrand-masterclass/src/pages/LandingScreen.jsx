@@ -1,13 +1,9 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Circle, X } from 'lucide-react';
+import { Circle } from 'lucide-react';
 import CoachingPortal from '../components/CoachingPortal';
-import ProfileModal from '../components/ProfileModal';
-import StudioPage from './StudioPage';
-const AdventurePlayer = React.lazy(() => import('../game/AdventurePlayer'));
-import { useBackendBridge } from '../hooks/useBackendBridge';
 import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
@@ -57,78 +53,10 @@ const PORTALS = [
 
 export default function LandingScreen() {
   const navigate = useNavigate();
-  const [showCoaching, setShowCoaching] = useState(false);
   const { locale, toggleLocale, t } = useLocale();
   const localize = (val) => (val && typeof val === 'object' ? (val[locale] || val['en']) : val);
 
-  const {
-    getProfiles, upsertProfile
-  } = useBackendBridge();
-
-  const [profiles, setProfiles] = useState([]);
-  const [activeProfileName, setActiveProfileName] = useState(() => {
-    return localStorage.getItem('active_student_profile') || 'Jean-Luc';
-  });
-  const [isSyncingProfiles, setIsSyncingProfiles] = useState(true);
-
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [newProfileName, setNewProfileName] = useState('');
-  const [newProfileStyle, setNewProfileStyle] = useState('Acoustic');
-  const [newProfilePin, setNewProfilePin] = useState('');
-
-  // Adventure state
-  const [showAdventure, setShowAdventure] = useState(false);
-  const [showBertrandModal, setShowBertrandModal] = useState(false);
-
-  useEffect(() => {
-    const syncProfiles = async () => {
-      console.log('[LandingScreen] Starting profile sync...');
-      try {
-        let list = await getProfiles();
-
-        if (list.length === 0) {
-          console.log('[LandingScreen] No profiles found, creating defaults...');
-          const defaultProfiles = [
-            { id: 'jean-luc', name: 'Jean-Luc', current_chapter: 1, xp: 120, coaching_tier: 'premium', florins: 150 },
-            { id: 'clara-laurent', name: 'Dr. Clara Laurent', current_chapter: 3, xp: 350, coaching_tier: 'premium', florins: 420 },
-            { id: 'marcellus', name: 'Marcellus Henderson', current_chapter: 2, xp: 210, coaching_tier: 'free', florins: 80 }
-          ];
-          for (const p of defaultProfiles) {
-            await upsertProfile(p);
-          }
-          list = await getProfiles();
-        }
-        console.log('[LandingScreen] Profile sync complete, loaded', list.length, 'profiles');
-        setProfiles(list);
-      } catch (error) {
-        console.error('[LandingScreen] Profile sync failed:', error);
-        // Use local fallback profiles if backend fails
-        const fallbackProfiles = [
-          { id: 'jean-luc', name: 'Jean-Luc', current_chapter: 1, xp: 120, coaching_tier: 'premium', florins: 150 },
-          { id: 'clara-laurent', name: 'Dr. Clara Laurent', current_chapter: 3, xp: 350, coaching_tier: 'premium', florins: 420 },
-          { id: 'marcellus', name: 'Marcellus Henderson', current_chapter: 2, xp: 210, coaching_tier: 'free', florins: 80 }
-        ];
-        setProfiles(fallbackProfiles);
-      } finally {
-        setIsSyncingProfiles(false);
-      }
-    };
-
-    syncProfiles();
-  }, [getProfiles, upsertProfile]);
-
-  // Validate active profile exists in the list
-  useEffect(() => {
-    if (profiles.length > 0) {
-      const found = profiles.find(p => p.name === activeProfileName);
-      if (!found) {
-        console.log('[LandingScreen] Active profile not found, switching to first profile');
-        setActiveProfileName(profiles[0].name);
-        localStorage.setItem('active_student_profile', profiles[0].name);
-      }
-    }
-  }, [profiles, activeProfileName]);
-
+  const [showCoaching, setShowCoaching] = useState(false);
 
   return (
     <div className="landing-hub">
@@ -505,7 +433,6 @@ export default function LandingScreen() {
 
       {/* ── Bertrand Circle Icon ── */}
       <motion.button
-        onClick={() => setShowBertrandModal(true)}
         className="bertrand-circle-btn"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
