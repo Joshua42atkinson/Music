@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -637,7 +637,7 @@ export default function LandingScreen() {
           marginTop: 8,
           letterSpacing: '0.1em',
         }}>
-          {isFrench ? 'Cours particuliers · Mentorat · Ateliers' : 'Private lessons · Mentorship · Workshops'}
+          {locale === 'fr' ? 'Cours particuliers · Mentorat · Ateliers' : 'Private lessons · Mentorship · Workshops'}
         </p>
       </motion.div>
 
