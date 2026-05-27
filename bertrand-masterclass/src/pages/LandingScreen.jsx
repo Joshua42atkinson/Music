@@ -330,33 +330,6 @@ export default function LandingScreen() {
           white-space: nowrap;
         }
 
-.bertrand-circle-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid rgba(201,169,110,0.3);
-  background: rgba(201,169,110,0.05);
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.bertrand-circle-btn:hover {
-  border-color: rgba(201,169,110,0.6);
-  background: rgba(201,169,110,0.15);
-  transform: scale(1.05);
-}
-.bertrand-circle-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .bertrand-modal-overlay {
   position: fixed;
   inset: 0;
@@ -430,22 +403,6 @@ export default function LandingScreen() {
           draggable={false}
         />
       </motion.div>
-
-      {/* ── Bertrand Circle Icon ── */}
-      <motion.button
-        className="bertrand-circle-btn"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.6, duration: 0.6 }}
-        aria-label="About Bertrand Laurence"
-      >
-        <img
-          src="/assets/bertrand_profile.jpg"
-          alt="Bertrand Laurence"
-          className="bertrand-circle-img"
-          draggable={false}
-        />
-      </motion.button>
 
       {/* ── Trinity label ── */}
       <motion.p
