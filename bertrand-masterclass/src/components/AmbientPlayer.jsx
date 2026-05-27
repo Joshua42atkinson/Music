@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Volume2, VolumeX, SkipForward, Music, Minus, Plus, Square, HelpCircle, MessageSquare, Send, Wifi, WifiOff } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, SkipForward, Music, Minus, Plus, Square, HelpCircle, MessageSquare, Send, Wifi, WifiOff, Mic, MicOff } from 'lucide-react';
 import { Guitar } from 'lucide-react';
 import { getAudioContext, resumeAudio, playMetronomeClick } from '../audio/audioEngine';
 import { useLocale } from '../hooks/useLocale';
@@ -136,9 +136,24 @@ export default function AmbientPlayer() {
   const guideEndRef = useRef(null);
   const guideInputRef = useRef(null);
 
+  // Voice mode state (StepAudio 2.5 integration)
+  const [voiceConnected, setVoiceConnected] = useState(false);
+  const [voiceRecording, setVoiceRecording] = useState(false);
+  const [voicePlaying, setVoicePlaying] = useState(false);
+  const voiceServiceRef = useRef(null);
+
   useEffect(() => {
     guideEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [guideMessages]);
+
+  // Cleanup voice service on unmount
+  useEffect(() => {
+    return () => {
+      if (voiceServiceRef.current) {
+        voiceServiceRef.current.disconnect();
+      }
+    };
+  }, []);
 
   // Auto-focus chat input when opened with focusChat
   useEffect(() => {
@@ -209,7 +224,46 @@ ${nameGreeting}
       setGuideStreaming(false);
     }
   };
-  
+
+  // ── Voice mode toggle (StepAudio 2.5) ──
+  const toggleVoice = async () => {
+    const { getAudioStreamingService } = await import('../lib/audioStreamingService.js');
+    const svc = getAudioStreamingService();
+    voiceServiceRef.current = svc;
+
+    if (voiceRecording) {
+      svc.stopRecording();
+      setVoiceRecording(false);
+      return;
+    }
+
+    if (!voiceConnected) {
+      try {
+        await svc.connect();
+        svc.onConnectionChange = (connected) => setVoiceConnected(connected);
+        svc.onTextReceived = (text) => {
+          setGuideMessages(prev => [...prev, { role: 'assistant', content: text }]);
+        };
+        svc.onAudioReceived = () => { setVoicePlaying(true); };
+        svc.onParalinguistic = (evt) => {
+          console.log('[Troubadour] Paralinguistic:', evt.emotion, evt.confidence);
+          // Future: trigger pedagogical routing based on emotion
+        };
+        svc.onError = (err) => {
+          console.error('[Troubadour Voice] Error:', err);
+          setVoiceConnected(false);
+        };
+        setVoiceConnected(true);
+      } catch (err) {
+        console.warn('[Troubadour Voice] Connect failed:', err);
+        return;
+      }
+    }
+
+    await svc.startRecording();
+    setVoiceRecording(true);
+  };
+
   // Track if the player has ever been opened to stop the slow, elegant breathing glow
   const [hasClickedOnce, setHasClickedOnce] = useState(() => 
     localStorage.getItem('voix_vive_ambient_clicked') === '1'
@@ -557,9 +611,10 @@ ${nameGreeting}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <ServerLight connected={isLMStudioConnected} label="LM Studio" color="#a78bfa" />
                   <ServerLight connected={isDaaSConnected} label="DaaS" color="#7aaa88" />
+                  <ServerLight connected={voiceConnected} label="Voice" color="#cc5555" />
                 </div>
                 <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>
-                  {isLMStudioConnected || isDaaSConnected ? 'AI Ready' : 'AI Offline'}
+                  {isLMStudioConnected || isDaaSConnected || voiceConnected ? 'AI Ready' : 'AI Offline'}
                 </span>
               </div>
 
@@ -608,25 +663,45 @@ ${nameGreeting}
                     value={guideInput}
                     onChange={e => setGuideInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && sendGuideMessage()}
-                    placeholder={locale === 'fr' ? 'Votre question au Troubadour…' : 'Ask the Troubadour…'}
-                    disabled={guideStreaming}
+                    placeholder={voiceRecording
+                      ? (locale === 'fr' ? 'Écoute…' : 'Listening…')
+                      : (locale === 'fr' ? 'Votre question au Troubadour…' : 'Ask the Troubadour…')}
+                    disabled={guideStreaming || voiceRecording}
                     style={{
-                      flex: 1, background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      flex: 1, background: voiceRecording ? 'rgba(204,85,85,0.06)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${voiceRecording ? 'rgba(204,85,85,0.2)' : 'rgba(255,255,255,0.1)'}`,
                       borderRadius: 8, padding: '6px 10px',
-                      color: 'rgba(255,255,255,0.8)', fontSize: '0.72rem',
+                      color: voiceRecording ? 'rgba(204,85,85,0.6)' : 'rgba(255,255,255,0.8)',
+                      fontSize: '0.72rem',
                       fontFamily: 'JetBrains Mono, monospace',
                       outline: 'none',
                     }}
                   />
+                  {/* Mic button — voice mode */}
                   <button
-                    onClick={sendGuideMessage}
-                    disabled={guideStreaming || !guideInput.trim()}
+                    onClick={toggleVoice}
+                    title={voiceRecording ? 'Stop listening' : 'Speak to the Troubadour'}
                     style={{
                       width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                      background: guideStreaming || !guideInput.trim() ? 'rgba(255,255,255,0.05)' : 'rgba(139,92,246,0.2)',
+                      background: voiceRecording ? 'rgba(204,85,85,0.2)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${voiceRecording ? 'rgba(204,85,85,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                      color: voiceRecording ? '#cc5555' : 'rgba(255,255,255,0.4)',
+                      cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.2s',
+                      animation: voiceRecording ? 'pulseMic 1.5s ease-in-out infinite' : 'none',
+                    }}
+                  >
+                    {voiceRecording ? <Mic size={14} /> : <MicOff size={14} />}
+                  </button>
+                  <button
+                    onClick={sendGuideMessage}
+                    disabled={guideStreaming || !guideInput.trim() || voiceRecording}
+                    style={{
+                      width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                      background: guideStreaming || !guideInput.trim() || voiceRecording ? 'rgba(255,255,255,0.05)' : 'rgba(139,92,246,0.2)',
                       border: '1px solid rgba(139,92,246,0.3)',
-                      color: '#c4b5fd', cursor: guideStreaming || !guideInput.trim() ? 'default' : 'pointer',
+                      color: '#c4b5fd', cursor: guideStreaming || !guideInput.trim() || voiceRecording ? 'default' : 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'all 0.2s',
                     }}
@@ -667,6 +742,10 @@ ${nameGreeting}
         }
         .animate-pulse-purple {
           animation: pulsePurple 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        @keyframes pulseMic {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.1); }
         }
       `}</style>
 

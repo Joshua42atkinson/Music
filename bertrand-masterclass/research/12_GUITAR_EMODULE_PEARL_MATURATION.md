@@ -528,21 +528,44 @@ function speak(text, rate = 0.85) {
 - [ ] **Mentor switcher** — Joshua can test as instructor → switch to student → verify flow
 - [ ] **Stripe integration (deferred)** — When instructor wants paid coaching, Stripe Connect
 
-### Phase 3: Voice + AI (After Mentor Connect)
+### Phase 3: Voice + AI — StepAudio 2.5 Realtime Integration (IN PROGRESS)
 
-**Hardware:** Joshua has Pixel 10 Pro XL + Termux + PocketPal AI, GMKtek EVO X2 desktop + Unsloth for fine-tuning.
+**Research Report:** `research/STEPAUDIO_2.5_INTEGRATION_REPORT.md` (May 27, 2026)
+**Model:** StepAudio 2.5 Realtime — end-to-end multimodal voice AI (`wss://api.stepfun.com/v1/realtime`)
+**Architecture:** React frontend → Java WebSocket middleware → StepFun API (API key secured server-side)
 
-**Model pipeline:** StepAudio 2.5 Realtime (end-to-end voice, local inference via vLLM) OR Gemini Nano (on-device, Android)
+**Frontend (React/Vite) — Phases 1-2 DONE:**
+- [x] **AudioStreamingService interface** — `@/lib/audioStreamingService.js` ✅
+  - `connect()`, `startRecording()`, `stopRecording()`, `sendTextMessage()`, `disconnect()`
+  - Event callbacks: `onAudioReceived`, `onTextReceived`, `onParalinguistic`, `onConnectionChange`
+- [x] **Voice mode in Troubadour widget** — `@/components/AmbientPlayer.jsx` ✅
+  - Mic button next to chat input, pulsing red when recording
+  - Server status light for "Voice" connection
+  - Auto-connects to middleware on first mic press
+- [ ] **Audio playback pipeline** — `AudioContext.decodeAudioData()` + BufferSource (partial — scaffolded)
+- [ ] **Waveform visualizer** — Canvas-based amplitude visualization during AI speech
 
-- [ ] **On-device AI research** — Test StepAudio 2.5 on GMKtek EVO X2
-- [ ] **Troubadour voice model** — Fine-tune with Bertrand's pedagogical voice (transcripts, voice memos)
-- [ ] **Voice TTS** — AI responses auto-speak aloud (browser TTS as fallback)
-- [ ] **Voice STT** — Speech-to-text in chat input (Web Speech API as fallback)
-- [ ] **Paralinguistic perception** — AI detects hesitation, excitement, tension in student voice
-- [ ] **AI context injection** — Troubadour pulls Song pages into chat
-- [ ] **AI tool control** — Troubadour sets ambient music, metronome via voice
-- [ ] **AI prompt engineering** — DAG-based reflection prompts
-- [ ] **Adventure standalone** — Already routed, enhance with AI narration
+**Middleware (Java — Phases 3-5):**
+- [ ] **Jakarta WebSocket server** — `@ServerEndpoint("/ws/troubadour")` on port 8081
+- [ ] **Supabase JWT auth** — Validate student token on connection open
+- [ ] **StepFun outbound client** — `wss://api.stepfun.com/v1/realtime` with Bearer token
+- [ ] **Bidirectional relay** — Forward binary audio + JSON events both directions
+- [ ] **Paralinguistic interceptor** — Parse `paralinguistic.event` server events, write to Supabase
+
+**Schema (DONE):**
+- [x] **`troubadour_audio_sessions`** — session lifecycle, persona, fret_id, duration ✅
+- [x] **`paralinguistic_events`** — emotion, confidence, timestamp_offset, intervention_triggered ✅
+
+**Pedagogical Routing (Phase 7):**
+- [ ] **Fatigue detection** → Pause Vertiscale → Redirect to Breathing Gate or Journal
+- [ ] **Frustration detection** → Suggest easier fret, FHEAL free play, or rest
+- [ ] **Confidence spike** → Unlock next fret, offer challenge
+- [ ] **Bernard persona** — `/adventure` route with stable character via persona-specific RLHF
+
+**Legacy fallbacks preserved:**
+- LM Studio (port 1234) — local text AI when StepAudio offline
+- DaaS server (port 8080) — Joshua's Axum inference router
+- Static TROUBADOUR data — offline mode when all AI unavailable
 
 ### Phase 4: Digital Mirror (IN PROGRESS — May 27, 2026)
 

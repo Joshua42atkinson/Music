@@ -305,3 +305,55 @@ CREATE POLICY "Admin can view all text-back requests"
   USING (auth.uid() IN (
     SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
   ));
+
+-- ═══════════════════════════════════════════════════════════
+-- STEP AUDIO 2.5 — Realtime Voice AI Telemetry
+-- Audio sessions + paralinguistic emotion detection
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS public.troubadour_audio_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  fret_id INTEGER CHECK (fret_id BETWEEN 1 AND 12),
+  start_time TIMESTAMPTZ DEFAULT NOW(),
+  duration_seconds INTEGER,
+  session_summary TEXT,
+  persona_used TEXT DEFAULT 'troubadour', -- troubadour | bernard | bertrand
+  ended_by TEXT DEFAULT 'user', -- user | system | fatigue_detected | frustration_detected
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.paralinguistic_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id UUID REFERENCES public.troubadour_audio_sessions(id) ON DELETE CASCADE,
+  timestamp_offset INTEGER, -- seconds from session start
+  detected_emotion TEXT, -- frustration | fatigue | confidence | hesitation | excitement | calm
+  confidence_score FLOAT CHECK (confidence_score BETWEEN 0 AND 1),
+  intervention_triggered BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.troubadour_audio_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.paralinguistic_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own audio sessions"
+  ON public.troubadour_audio_sessions FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Service role can write audio sessions"
+  ON public.troubadour_audio_sessions FOR INSERT
+  WITH CHECK (true); -- Java middleware uses service role key
+
+CREATE POLICY "Users can read own paralinguistic events"
+  ON public.paralinguistic_events FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.troubadour_audio_sessions s
+      WHERE s.id = paralinguistic_events.session_id
+      AND s.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Service role can write paralinguistic events"
+  ON public.paralinguistic_events FOR INSERT
+  WITH CHECK (true); -- Java middleware uses service role key
