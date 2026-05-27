@@ -1,7 +1,7 @@
 # The DAG eModule Funnel
 ## Voix Vive — Directed Acyclic Graph Learning Architecture
 
-> **Version:** 1.0 — Auth-Aware Progress + Journaling (2026-05-27)
+> **Version:** 1.1 — Google Drive Mentor Connect + Structured Practice (2026-05-27)
 > **Author:** Joshua Atkinson
 > **SME:** Bertrand Laurence
 > **Framework:** ADDIECRAPEYE + DAG (Directed Acyclic Graph) Curriculum Funnel

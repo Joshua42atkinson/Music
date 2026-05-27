@@ -2,11 +2,11 @@
 ## Voix Vive — Unified Interactive Learning Architecture
 ### *All Tools. All Games. All Paths. One Module.*
 
-> **Version:** 1.5 — Google Drive Integration + Template Architecture (2026-05-27)
+> **Version:** 1.6 — Mentor Dashboard + Structured Practice + Testing (2026-05-27)
 > **Author:** Joshua Atkinson (Platform Architect)
 > **SME:** Bertrand Laurence
 > **Design Framework:** ADDIECRAPEYE + PEARL + 12-Fret Monomyth + DAG eModule
-> **Status:** Phase 1 Complete. Phase 2 (Mentor Connect via Google Drive) Active.
+> **Status:** Phase 1 ✅ Complete. Phase 2 ✅ Core Complete (Drive, Calendar, Scheduling, Mentor Dashboard, Structured Practice). Remaining: text-back UI, calendar booking UI, mentor response recording.
 > **Template Mode:** voix-vive.com is now a reusable platform architecture for multiple instructors.
 
 ---
@@ -589,20 +589,24 @@ function speak(text, rate = 0.85) {
 | Playbook | `components/playbook/PlaybookShell.jsx` | `/playbook` | Character, Quests, Songbook, Journal |
 | Studio Page | `pages/StudioPage.jsx` | `/studio` | Pricing, services, downloads |
 | Troubadour Widget | `components/AmbientPlayer.jsx` | Global | AI chat + music + metronome |
-| Player Portal | `components/PlayerPortal.jsx` | `/player` | Submissions, library — needs Structured Practice Recorder |
+| Player Portal | `components/PlayerPortal.jsx` | `/player` | Submissions, library, guided session |
 | Chromatic Monomyth | `pages/MonomythChart.jsx` | `/monomyth` | 12-fret reference grid |
 | Auth System | `hooks/useAuth.js` + `pages/AuthCallback.jsx` | `/auth/callback` | Google OAuth, login-aware progress |
 | Journal | `components/playbook/JournalEntry.jsx` | `/playbook` (Journal tab) | Text + mood + Supabase sync |
-| Video Recorder | `components/playbook/VideoRecorder.jsx` | `/playbook` (Journal tab) | Browser MediaRecorder + upload |
+| Video Recorder | `components/playbook/VideoRecorder.jsx` | `/playbook` (Journal tab) | Google Drive upload (not Storage) |
+| Structured Practice Recorder | `components/StructuredPracticeRecorder.jsx` | `/player` modal | 15-min guided session |
+| Mentor Dashboard | `pages/MentorDashboard.jsx` | `/mentor` | Review queue, workload bar |
+| Google Drive Service | `lib/driveService.js` | — | Upload, share, metadata index |
+| Calendar Service | `lib/calendarService.js` | — | Free/busy, slot generation, booking |
+| Scheduling Service | `lib/schedulingService.js` | — | Workload guard, text-back queue |
 
 ### ⚠️ Built But Unrouted
 
 | Feature | File | Status | Action |
 |---------|------|--------|--------|
-| Vertiscale Engine | `src/game/VertiscaleEngine.jsx` | Complete 3-phase game | **ADD ROUTE** |
-| Adventure Player | `src/game/AdventurePlayer.jsx` | Complete CYOA | **ADD ROUTE** |
-| Mentor Dashboard | `components/MentorDashboard.jsx` | Review submissions | **NEEDS INTEGRATION** |
 | Digital Binder | `components/DigitalBinder.jsx` | Tool catalog | **DEPRECATED?** — Playbook replaces it |
+| Text-Back UI | — | Service exists, no UI | Build form in PlayerPortal |
+| Calendar Booking UI | — | Service exists, no UI | Build slot picker in PlayerPortal |
 
 ### 📋 Design Documents (Source of Truth)
 
@@ -684,8 +688,12 @@ Every fret is a stage of becoming. Every tool is a question the student asks the
 
 ### What Bertrand Needs to Do
 
-- [ ] **Test the live site** — `www.voix-vive.com` on his phone and computer
-- [ ] **Try signing in with Google** — verify login flow works end-to-end
+- [x] **Test the live site** — `www.voix-vive.com` on his phone and computer ✅
+- [x] **Try signing in with Google** — verify login flow works end-to-end ✅
+- [ ] **Re-authenticate with Google Drive scope** — Sign out, sign in again to grant Drive permission
+- [ ] **Test video upload** — Record a practice video, confirm it lands in his Google Drive `Voix Vive Submissions` folder
+- [ ] **Test structured practice session** — Try the 15-minute guided session on his phone
+- [ ] **Visit `/mentor`** — Check the mentor dashboard, confirm submissions appear
 - [ ] **Browse a chapter** — e.g., Fret 1 (The Root Note), swipe through slides
 - [ ] **Check the Chromatic Monomyth chart** — `/monomyth`, see if the 12-fret grid resonates
 - [ ] **Review his color/shape associations** — "For each of the 12 chromatic notes, what color and shape do you feel?"
@@ -693,11 +701,11 @@ Every fret is a stage of becoming. Every tool is a question the student asks the
 - [ ] **Set his coaching prices** — Update `/studio` page with actual rates
 - [ ] **Provide a bio + photo** — For the mentor section of the platform
 
-### What We Need from Bertrand for Phase 2
+### What We Need from Bertrand for Phase 2 (COMPLETE)
 
-- [ ] **Preference: `/mentor` dashboard or integrated?** — Does he want a separate page to see all students, or notifications within his existing tools?
-- [ ] **Submission review workflow** — How does he want to receive and respond to student videos?
-- [ ] **Async coaching pricing** — Per submission? Monthly subscription? Bundled?
+- [x] **Preference: `/mentor` dashboard or integrated?** — `/mentor` page built. Bertrand navigates directly.
+- [x] **Submission review workflow** — Google Drive links in mentor dashboard. Bertrand clicks, reviews, types notes, marks reviewed.
+- [ ] **Async coaching pricing** — Per submission? Monthly subscription? Bundled? (Still need decision)
 
 ### What We Need from Bertrand for the Brand
 
