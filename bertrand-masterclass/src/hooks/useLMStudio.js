@@ -1,12 +1,14 @@
 import { useState, useCallback, useRef } from 'react';
 
 // ═══════════════════════════════════════════════════════════
-// useLMStudio — Direct LM Studio OpenAI-compatible API hook
-// Connects to LM Studio's local server (default: localhost:1234)
-// Optimized for Qwen Coder with full GPU offload
+// useLMStudio — Local AI API hook (OpenAI-compatible)
+// Primary: StepAudio R1.1 on localhost:9998 (production AI)
+// Fallback: LM Studio on localhost:1234 (dev/testing)
 // ═══════════════════════════════════════════════════════════
 
-const LMSTUDIO_DEFAULT_URL = 'http://localhost:1234/v1';
+const STEP_AUDIO_R1_URL = 'http://localhost:9998/v1';
+const LMSTUDIO_DEV_URL = 'http://localhost:1234/v1';
+const LMSTUDIO_DEFAULT_URL = STEP_AUDIO_R1_URL;
 
 export function useLMStudio() {
   const [isReady, setIsReady] = useState(false);

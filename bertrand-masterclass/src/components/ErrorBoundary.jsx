@@ -60,6 +60,27 @@ export default class ErrorBoundary extends React.Component {
           }}>
             Something unexpected happened. Take a breath — this is just a technical hiccup, not a wrong note.
           </p>
+
+          {/* DEBUG: Show actual error for bug reports */}
+          <pre style={{
+            background: 'rgba(255,50,50,0.08)',
+            border: '1px solid rgba(255,80,80,0.3)',
+            borderRadius: 8,
+            color: '#ff9999',
+            fontSize: '0.75rem',
+            fontFamily: "'JetBrains Mono', monospace",
+            maxWidth: '90vw',
+            width: 600,
+            maxHeight: 200,
+            overflow: 'auto',
+            padding: 12,
+            marginBottom: 24,
+            textAlign: 'left',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}>
+            {this.state.error?.toString?.() || 'Unknown error'}
+          </pre>
           <button
             onClick={() => {
               this.setState({ hasError: false, error: null });

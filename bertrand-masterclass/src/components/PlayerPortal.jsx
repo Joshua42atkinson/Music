@@ -17,6 +17,7 @@ import { db } from '../data/localDatabase';
 import { loadTraction } from '../data/tractionStore';
 import PracticeRecorder from './PracticeRecorder';
 import StructuredPracticeRecorder from './StructuredPracticeRecorder';
+import TroubadourLoom from './TroubadourLoom';
 import { checkSubmissionAvailability } from '../lib/schedulingService';
 import {
   Video, Play, Clock, CheckCircle, Circle, Send, BookOpen,
@@ -95,7 +96,7 @@ export default function PlayerPortal() {
   const [showStructuredRecorder, setShowStructuredRecorder] = useState(false);
   const [submissions, setSubmissions] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
-  const [activeTab, setActiveTab] = useState('submissions'); // submissions | library | timeline
+  const [activeTab, setActiveTab] = useState('loom'); // loom | submissions | library | timeline
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [workload, setWorkload] = useState(null);
 
@@ -353,10 +354,16 @@ export default function PlayerPortal() {
       {/* ── TABS ── */}
       <div style={styles.tabBar}>
         <button
+          onClick={() => setActiveTab('loom')}
+          style={{ ...styles.tabBtn, borderBottomColor: activeTab === 'loom' ? '#c9a96e' : 'transparent', color: activeTab === 'loom' ? '#c9a96e' : 'rgba(255,255,255,0.3)' }}
+        >
+          <Heart size={14} /> Your Loom
+        </button>
+        <button
           onClick={() => setActiveTab('submissions')}
           style={{ ...styles.tabBtn, borderBottomColor: activeTab === 'submissions' ? '#c9a96e' : 'transparent', color: activeTab === 'submissions' ? '#c9a96e' : 'rgba(255,255,255,0.3)' }}
         >
-          <Send size={14} /> Your Submissions
+          <Send size={14} /> Submissions
         </button>
         <button
           onClick={() => setActiveTab('library')}
@@ -374,6 +381,9 @@ export default function PlayerPortal() {
 
       {/* ── TAB CONTENT ── */}
       <div style={styles.tabContent}>
+        {/* LOOM */}
+        {activeTab === 'loom' && <TroubadourLoom />}
+
         {/* SUBMISSIONS */}
         {activeTab === 'submissions' && (
           <div>

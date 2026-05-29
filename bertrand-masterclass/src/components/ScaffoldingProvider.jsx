@@ -16,9 +16,11 @@
 // ╚═══════════════════════════════════════════════════════════════╝
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loadTraction, saveTraction, getScaffoldingLevel } from '../data/tractionStore';
+import { loadTraction, saveTraction, getScaffoldingLevel, getCurrentPhase, completeDAGPhase, attemptDAGPhase, setCurrentNode, completeNode, markDepthExplored, passSomaticGate } from '../data/tractionStore';
 import { saveProgress, getProgress } from '../data/localDatabase';
 import { getTractionState, saveTractionState, migrateLocalToCloud } from '../lib/supabase';
+import { getNodeById } from '../data/dag/dagNodes';
+import { getNextRecommendedNode } from '../data/dag/dagEdges';
 
 // ═══════════════════════════════════════════════════════════
 // SCAFFOLDING PROVIDER
@@ -162,6 +164,57 @@ export function ScaffoldingProvider({ children }) {
   const scaffolding = getScaffoldingLevel(traction);
   const settings = traction.settings || {};
 
+  // ── DAG Navigation Helpers ──
+  const currentNodeId = traction.currentNodeId || 'fret-1-class-be';
+  const currentNode = getNodeById(currentNodeId);
+  const currentFret = currentNode?.fret || 1;
+  const currentPhase = getCurrentPhase(traction, currentFret);
+  const completedNodes = traction.completedNodes || [];
+  const nextRecommended = getNextRecommendedNode(completedNodes, currentNode?.pillar || 'class');
+
+  const completePhase = useCallback((fretIdOrNodeId, phase) => {
+    // Accept either a numeric fretId or a nodeId string like 'fret-1-class-be'
+    let fretId = fretIdOrNodeId;
+    let nodeId = fretIdOrNodeId;
+    if (typeof fretIdOrNodeId === 'string' && fretIdOrNodeId.startsWith('fret-')) {
+      const match = fretIdOrNodeId.match(/fret-(\d+)/);
+      if (match) fretId = parseInt(match[1], 10);
+      nodeId = fretIdOrNodeId;
+    }
+    // Mark the DAG phase complete (fret state: beCompleted, mastery, traction sync)
+    let newState = completeDAGPhase(traction, fretId, phase);
+    // Also mark the node complete so prerequisites unlock for downstream nodes
+    if (typeof nodeId === 'string' && nodeId.startsWith('fret-')) {
+      newState = completeNode(newState, nodeId);
+    }
+    updateTraction(() => newState);
+  }, [traction, updateTraction]);
+
+  const advanceNode = useCallback((nodeId) => {
+    const newState = completeNode(traction, nodeId);
+    updateTraction(() => newState);
+  }, [traction, updateTraction]);
+
+  const navigateToNode = useCallback((nodeId) => {
+    const newState = setCurrentNode(traction, nodeId);
+    updateTraction(() => newState);
+  }, [traction, updateTraction]);
+
+  const markDepth = useCallback((fretId) => {
+    const newState = markDepthExplored(traction, fretId);
+    updateTraction(() => newState);
+  }, [traction, updateTraction]);
+
+  const passGate = useCallback((fretIdOrNodeId, phase) => {
+    let fretId = fretIdOrNodeId;
+    if (typeof fretIdOrNodeId === 'string' && fretIdOrNodeId.startsWith('fret-')) {
+      const match = fretIdOrNodeId.match(/fret-(\d+)/);
+      if (match) fretId = parseInt(match[1], 10);
+    }
+    const newState = passSomaticGate(traction, fretId, phase);
+    updateTraction(() => newState);
+  }, [traction, updateTraction]);
+
   const value = {
     traction,
     refreshTraction,
@@ -181,6 +234,19 @@ export function ScaffoldingProvider({ children }) {
     practiceMinutes: traction.practiceMinutes || 0,
     streak: traction.streak || 0,
     breathingSessions: traction.breathingSessions || 0,
+
+    // DAG Navigation (new)
+    currentNodeId,
+    currentNode,
+    currentFret,
+    currentPhase,
+    completedNodes,
+    nextRecommended,
+    completePhase,
+    advanceNode,
+    navigateToNode,
+    markDepth,
+    passGate,
   };
 
   return (
@@ -209,6 +275,18 @@ export function useScaffolding() {
       practiceMinutes: 0,
       streak: 0,
       breathingSessions: 0,
+      // DAG Navigation fallback
+      currentNodeId: 'fret-1-class-be',
+      currentNode: null,
+      currentFret: 1,
+      currentPhase: 'be',
+      completedNodes: [],
+      nextRecommended: 'fret-1-class-be',
+      completePhase: () => {},
+      advanceNode: () => {},
+      navigateToNode: () => {},
+      markDepth: () => {},
+      passGate: () => {},
     };
   }
   return ctx;

@@ -9,7 +9,7 @@ import { TOOLS_CATALOG } from '../data/toolsData';
 import { saveSlidePosition, getSlidePosition } from '../data/localDatabase';
 import { useLocale } from '../hooks/useLocale';
 import { useScaffolding } from './ScaffoldingProvider';
-import { updateFretTraction, getFretState } from '../data/tractionStore';
+import { updateFretTraction, getFretState, passSomaticGate, getDefaultFretState } from '../data/tractionStore';
 
 // ═══════════════════════════════════════════════════════════
 // SLIDE VIEWER — Phone-native swipeable chapter reader
@@ -75,12 +75,26 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     setDirection(dir);
     setCurrentIdx(idx);
     saveSlidePosition(fretId, idx);
-    // Wire 3: mark yinCompleted when student reaches the last slide
+    // Wire 3: mark yinCompleted + pass BE Somatic Gate when student reaches last slide
     if (idx === slides.length - 1) {
       updateTraction(prev => {
         const fretState = getFretState(prev, fretId);
         if (fretState.yinCompleted) return prev; // already marked
-        return updateFretTraction(prev, fretId, { yinCompleted: true });
+        // Single merged state update (avoid triple-save from calling helpers)
+        const merged = {
+          ...prev,
+          frets: {
+            ...prev.frets,
+            [fretId]: {
+              ...getDefaultFretState(fretId),
+              ...prev.frets[fretId],
+              yinCompleted: true,
+              beGatePassed: true,
+              lastAccessed: new Date().toISOString(),
+            }
+          }
+        };
+        return merged;
       });
     }
   }, [slides, fretId, updateTraction]);
@@ -735,16 +749,12 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize }) {
 
     case 'fret-end':
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', textAlign: 'center' }}>
-          <div className="sv-end-icon">{slide.icon}</div>
-          <h2 className="sv-end-title">{localize(slide.title)}</h2>
-          <p className="sv-end-body">{localize(slide.body)}</p>
-          {slide.fretId < 12 && (
-            <button className="sv-next-btn" onClick={onNextFret}>
-              {t('nextFret')}
-            </button>
-          )}
-        </div>
+        <FretEndSlide
+          slide={slide}
+          onNextFret={onNextFret}
+          localize={localize}
+          t={t}
+        />
       );
 
     case 'timeless-song':
@@ -824,6 +834,80 @@ function SlideContent({ slide, onOpenFretboard, onNextFret, localize }) {
     default:
       return <p className="sv-body">{localize(slide.body)}</p>;
   }
+}
+
+// ── Fret End Slide with Mark Complete ──
+function FretEndSlide({ slide, onNextFret, localize, t }) {
+  const { completePhase, traction } = useScaffolding();
+  const [marked, setMarked] = useState(false);
+  const fretId = slide.fretId;
+  // Map legacy fret to DAG class-BE node
+  const nodeId = `fret-${fretId}-class-be`;
+  // Check if this fret's BE phase is already completed in traction
+  const fretState = traction?.frets?.[fretId];
+  const alreadyCompleted = !!fretState?.beCompleted;
+  const beGatePassed = !!fretState?.beGatePassed;
+
+  const handleMarkComplete = useCallback(() => {
+    // Mark DAG phase complete
+    completePhase(nodeId, 'be');
+    setMarked(true);
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+  }, [completePhase, nodeId]);
+
+  const isAlreadyCompleted = alreadyCompleted || marked;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', textAlign: 'center' }}>
+      <div className="sv-end-icon">{slide.icon}</div>
+      <h2 className="sv-end-title">{localize(slide.title)}</h2>
+      <p className="sv-end-body">{localize(slide.body)}</p>
+
+      {/* Somatic Gate status */}
+      {!beGatePassed && !isAlreadyCompleted && (
+        <p style={{
+          fontSize: '0.8rem',
+          color: 'rgba(255,255,255,0.4)',
+          marginBottom: 12,
+          fontFamily: "'JetBrains Mono', monospace",
+          letterSpacing: '0.05em',
+        }}>
+          🔒 Read all slides to unlock
+        </p>
+      )}
+
+      {/* Mark Complete button — the bridge from legacy slides to DAG */}
+      <button
+        className="sv-next-btn"
+        onClick={handleMarkComplete}
+        disabled={isAlreadyCompleted || !beGatePassed}
+        style={{
+          background: isAlreadyCompleted
+            ? 'rgba(52,211,153,0.15)'
+            : beGatePassed
+              ? 'rgba(201,169,110,0.12)'
+              : 'rgba(255,255,255,0.03)',
+          borderColor: isAlreadyCompleted
+            ? 'rgba(52,211,153,0.4)'
+            : beGatePassed
+              ? 'rgba(201,169,110,0.35)'
+              : 'rgba(255,255,255,0.08)',
+          color: isAlreadyCompleted ? '#34d399' : beGatePassed ? '#c9a96e' : 'rgba(255,255,255,0.2)',
+          marginBottom: 12,
+          cursor: beGatePassed && !isAlreadyCompleted ? 'pointer' : 'default',
+        }}
+      >
+        {isAlreadyCompleted ? '✓ BE Phase Complete' : beGatePassed ? 'Mark BE Phase Complete' : '🔒 Gate Locked'}
+      </button>
+
+      {slide.fretId < 12 && (
+        <button className="sv-next-btn" onClick={onNextFret}>
+          {t('nextFret')}
+        </button>
+      )}
+    </div>
+  );
 }
 
 // ── References Panel — Expandable citations ──

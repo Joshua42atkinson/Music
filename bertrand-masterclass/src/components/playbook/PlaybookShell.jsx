@@ -7,6 +7,7 @@ import QuestLog from './QuestLog';
 import { JournalFeed } from './JournalEntry';
 import VideoRecorder from './VideoRecorder';
 import SongwritingCompanion from '../SongwritingCompanion';
+import BEWorkbook from './BEWorkbook';
 import { ArrowLeft } from 'lucide-react';
 import { useLocale } from '../../hooks/useLocale';
 
@@ -20,6 +21,7 @@ import { useLocale } from '../../hooks/useLocale';
 const TABS = [
   { id: 'character', icon: '⚔️', en: 'Character', fr: 'Personnage' },
   { id: 'quests',    icon: '🗺️', en: 'Quests',    fr: 'Quêtes' },
+  { id: 'workbook',  icon: '📖', en: 'Workbook',  fr: 'Cahier' },
   { id: 'songbook',  icon: '✍️', en: 'Songbook',  fr: 'Recueil' },
   { id: 'journal',   icon: '📓', en: 'Journal',   fr: 'Journal' },
 ];
@@ -108,6 +110,7 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
           >
             {activeTab === 'character' && <CharacterSheet />}
             {activeTab === 'quests' && <QuestLog onOpenSlides={handleOpenSlides} />}
+            {activeTab === 'workbook' && <BEWorkbook />}
             {activeTab === 'songbook' && <SongwritingCompanion />}
             {activeTab === 'journal' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>

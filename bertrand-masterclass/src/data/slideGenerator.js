@@ -35,6 +35,7 @@ const SLIDE_IMAGES = {
   '1-yang-intro': '/assets/slides/ch1/yang-intro.png',
   '1-exercise-0': '/assets/slides/ch1/exercise-0.png',
   '1-exercise-1': '/assets/slides/ch1/exercise-1.png',
+  '1-exercise-2': '/assets/slides/ch1/exercise-2.png',
   '1-fretboard':  '/assets/slides/ch1/fretboard.png',
   '1-end':        '/assets/slides/ch1/end.png',
 
@@ -45,6 +46,7 @@ const SLIDE_IMAGES = {
   '2-meditation': '/assets/slides/ch2/meditation.png',
   '2-yang-intro': '/assets/slides/ch2/yang-intro.png',
   '2-exercise-0': '/assets/slides/ch2/exercise-0.png',
+  '2-exercise-1': '/assets/slides/ch2/exercise-1.png',
   '2-fretboard':  '/assets/slides/ch2/fretboard.png',
   '2-end':        '/assets/slides/ch2/end.png',
 
@@ -52,8 +54,10 @@ const SLIDE_IMAGES = {
   '3-title':      '/assets/slides/ch3/title.png',
   '3-yin-0':      '/assets/slides/ch3/yin-0.png',
   '3-meditation': '/assets/slides/ch3/meditation.png',
+  '3-quote':      '/assets/slides/ch3/quote.png',
   '3-yang-intro': '/assets/slides/ch3/yang-intro.png',
   '3-exercise-0': '/assets/slides/ch3/exercise-0.png',
+  '3-exercise-1': '/assets/slides/ch3/exercise-1.png',
   '3-fretboard':  '/assets/slides/ch3/fretboard.png',
   '3-end':        '/assets/slides/ch3/end.png',
 
@@ -64,6 +68,7 @@ const SLIDE_IMAGES = {
   '4-meditation': '/assets/slides/ch4/meditation.png',
   '4-yang-intro': '/assets/slides/ch4/yang-intro.png',
   '4-exercise-0': '/assets/slides/ch4/exercise-0.png',
+  '4-exercise-1': '/assets/slides/ch4/exercise-1.png',
   '4-fretboard':  '/assets/slides/ch4/fretboard.png',
   '4-end':        '/assets/slides/ch4/end.png',
 
@@ -74,6 +79,7 @@ const SLIDE_IMAGES = {
   '5-meditation': '/assets/slides/ch5/meditation.png',
   '5-yang-intro': '/assets/slides/ch5/yang-intro.png',
   '5-exercise-0': '/assets/slides/ch5/exercise-0.png',
+  '5-exercise-1': '/assets/slides/ch5/exercise-1.png',
   '5-fretboard':  '/assets/slides/ch5/fretboard.png',
   '5-end':        '/assets/slides/ch5/end.png',
 
@@ -84,6 +90,7 @@ const SLIDE_IMAGES = {
   '6-meditation': '/assets/slides/ch6/meditation.png',
   '6-yang-intro': '/assets/slides/ch6/yang-intro.png',
   '6-exercise-0': '/assets/slides/ch6/exercise-0.png',
+  '6-exercise-1': '/assets/slides/ch6/exercise-1.png',
   '6-fretboard':  '/assets/slides/ch6/fretboard.png',
   '6-end':        '/assets/slides/ch6/end.png',
 
@@ -94,6 +101,7 @@ const SLIDE_IMAGES = {
   '7-meditation': '/assets/slides/ch7/meditation.png',
   '7-yang-intro': '/assets/slides/ch7/yang-intro.png',
   '7-exercise-0': '/assets/slides/ch7/exercise-0.png',
+  '7-exercise-1': '/assets/slides/ch7/exercise-1.png',
   '7-fretboard':  '/assets/slides/ch7/fretboard.png',
   '7-end':        '/assets/slides/ch7/end.png',
 
@@ -106,6 +114,7 @@ const SLIDE_IMAGES = {
   '8-yang-intro': '/assets/slides/ch8/yang-intro.png',
   '8-exercise-0': '/assets/slides/ch8/exercise-0.png',
   '8-exercise-1': '/assets/slides/ch8/exercise-1.png',
+  '8-yang-power': '/assets/slides/ch8/yang-power.png',
   '8-fretboard':  '/assets/slides/ch8/fretboard.png',
   '8-end':        '/assets/slides/ch8/end.png',
 
@@ -118,6 +127,7 @@ const SLIDE_IMAGES = {
   '9-yang-intro': '/assets/slides/ch9/yang-intro.png',
   '9-exercise-0': '/assets/slides/ch9/exercise-0.png',
   '9-exercise-1': '/assets/slides/ch9/exercise-1.png',
+  '9-yang-kinesthesis': '/assets/slides/ch9/yang-kinesthesis.png',
   '9-fretboard':  '/assets/slides/ch9/fretboard.png',
   '9-end':        '/assets/slides/ch9/end.png',
 
@@ -130,6 +140,7 @@ const SLIDE_IMAGES = {
   '10-yang-intro': '/assets/slides/ch10/yang-intro.png',
   '10-exercise-0': '/assets/slides/ch10/exercise-0.png',
   '10-exercise-1': '/assets/slides/ch10/exercise-1.png',
+  '10-yang-emotion': '/assets/slides/ch10/yang-emotion.png',
   '10-fretboard':  '/assets/slides/ch10/fretboard.png',
   '10-end':        '/assets/slides/ch10/end.png',
 
@@ -142,6 +153,7 @@ const SLIDE_IMAGES = {
   '11-yang-intro': '/assets/slides/ch11/yang-intro.png',
   '11-exercise-0': '/assets/slides/ch11/exercise-0.png',
   '11-exercise-1': '/assets/slides/ch11/exercise-1.png',
+  '11-yang-stage': '/assets/slides/ch11/yang-stage.png',
   '11-fretboard':  '/assets/slides/ch11/fretboard.png',
   '11-end':        '/assets/slides/ch11/end.png',
 
@@ -153,6 +165,8 @@ const SLIDE_IMAGES = {
   '12-meditation': '/assets/slides/ch12/meditation.png',
   '12-yang-intro': '/assets/slides/ch12/yang-intro.png',
   '12-exercise-0': '/assets/slides/ch12/exercise-0.png',
+  '12-exercise-1': '/assets/slides/ch12/exercise-1.png',
+  '12-yang-flow':  '/assets/slides/ch12/yang-flow.png',
   '12-fretboard':  '/assets/slides/ch12/fretboard.png',
   '12-end':        '/assets/slides/ch12/end.png',
 };

@@ -4,7 +4,13 @@ const DAAS_API_BASE = typeof window !== 'undefined'
   ? `http://${window.location.hostname}:8080/api`
   : 'http://localhost:8080/api';
 
-const LMSTUDIO_API_BASE = typeof window !== 'undefined'
+// Production AI: StepAudio R1.1 (localhost:9998)
+// Dev fallback: LM Studio (localhost:1234) with Nemotron
+const LOCAL_AI_API_BASE = typeof window !== 'undefined'
+  ? `http://${window.location.hostname}:9998/v1`
+  : 'http://localhost:9998/v1';
+
+const LMSTUDIO_DEV_API_BASE = typeof window !== 'undefined'
   ? `http://${window.location.hostname}:1234/v1`
   : 'http://localhost:1234/v1';
 
@@ -64,10 +70,31 @@ export function useBackendBridge() {
     return false;
   }, [loadInferenceStatus]);
 
-  // 2b. Check LM Studio on port 1234
+  // 2b. Check Local AI (StepAudio R1.1 on :9998, fallback to LM Studio on :1234 for dev)
   const checkLMStudio = useCallback(async () => {
+    // Try StepAudio R1.1 (production AI) first
     try {
-      const resp = await fetch(`${LMSTUDIO_API_BASE}/models`, {
+      const resp = await fetch(`${LOCAL_AI_API_BASE}/models`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const hasModel = data.data && data.data.length > 0;
+        setIsLMStudioConnected(hasModel);
+        if (hasModel) {
+          setLmStudioModel(data.data[0]);
+          setActiveBackend('stepaudio-r1');
+        }
+        return hasModel ? { connected: true, model: data.data[0], backend: 'stepaudio-r1' } : { connected: false };
+      }
+    } catch (e) {
+      // StepAudio not running, try LM Studio (dev fallback)
+    }
+
+    // Fallback: LM Studio on port 1234 (dev only, Nemotron)
+    try {
+      const resp = await fetch(`${LMSTUDIO_DEV_API_BASE}/models`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -79,7 +106,7 @@ export function useBackendBridge() {
           setLmStudioModel(data.data[0]);
           setActiveBackend('lmstudio');
         }
-        return hasModel ? { connected: true, model: data.data[0] } : { connected: false };
+        return hasModel ? { connected: true, model: data.data[0], backend: 'lmstudio' } : { connected: false };
       }
     } catch (e) {
       setIsLMStudioConnected(false);
@@ -159,7 +186,7 @@ export function useBackendBridge() {
           stream: options.stream ?? false,
         };
 
-        const resp = await fetch(`${LMSTUDIO_API_BASE}/chat/completions`, {
+        const resp = await fetch(`${LOCAL_AI_API_BASE}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -169,7 +196,7 @@ export function useBackendBridge() {
           return await resp.json();
         }
       } catch (e) {
-        console.error('LM Studio query failed:', e);
+        console.error('StepAudio R1.1 query failed:', e);
       }
     }
 
@@ -179,7 +206,7 @@ export function useBackendBridge() {
         choices: [{
           message: {
             role: 'assistant',
-            content: "I am currently running in offline preview mode. Start LM Studio (port 1234) or the Voix Vive DaaS Desktop App (port 8080) to connect to my local LLM for real-time Socratic guitar instruction."
+            content: "I am currently running in offline preview mode. Start your local AI (StepAudio R1.1 on port 9998, or LM Studio on port 1234 for dev) or the Voix Vive DaaS Desktop App (port 8080) to connect to my local LLM for real-time Socratic guitar instruction."
           }
         }]
       };
@@ -215,7 +242,7 @@ export function useBackendBridge() {
       choices: [{
         message: {
           role: 'assistant',
-          content: "I ran into a connection issue with the local AI. Please verify that your local LM Studio (port 1234) or DaaS server (port 8080) is running and active."
+          content: "I ran into a connection issue with the local AI. Please verify that StepAudio R1.1 (port 9998), LM Studio (port 1234 for dev), or the DaaS server (port 8080) is running and active."
         }
       }]
     };

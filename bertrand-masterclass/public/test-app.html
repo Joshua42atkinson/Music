@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>App Test</title><style>body{font-family:monospace;padding:20px;background:#0a0a0f;color:#c9a96e;}</style></head>
+<body>
+<h1>App Bootstrap Test</h1>
+<div id="out">Loading React...</div>
+<script type="module">
+async function test() {
+  try {
+    const React = await import('/src/main.jsx');
+    document.getElementById('out').innerHTML += '<p style="color:#34d399">Module loaded OK</p>';
+  } catch(e) {
+    document.getElementById('out').innerHTML = `<p style="color:#ff4e50">BOOT ERROR: ${e.message}</p><pre style="color:#8090a8;font-size:12px">${e.stack}</pre>`;
+  }
+}
+test();
+</script>
+</body>
+</html>
