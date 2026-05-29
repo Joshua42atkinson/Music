@@ -1,0 +1,100 @@
+{
+  "_styleGuide": {
+    "prefix": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm amber accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly,",
+    "negative": "text, words, letters, typography, watermark, logo, signature, bright colors, cartoon, anime, 3D render, oversaturated, blurry, low quality, deformed hands, extra fingers",
+    "aspect": "16:9",
+    "width": 1344,
+    "height": 768,
+    "steps": 35,
+    "cfg": 4.0,
+    "seed": -1
+  },
+  "slides": [
+    {
+      "id": "1-title",
+      "path": "public/assets/slides/ch1/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm amber accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, ancient Greek blacksmith forge at dawn, a single hammer striking an anvil sends golden sparks into the air, the first light of morning catching the dust motes, a lone figure stands in silhouette watching the sparks, the birth of a discovery, warm red and gold tones, unison as a single pure note hovering in the air like a sphere of light",
+      "emotion": "Grounded, stable, open"
+    },
+    {
+      "id": "1-yin-0",
+      "path": "public/assets/slides/ch1/yin-tension.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm amber accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a human figure made of tension — shoulders hunched, neck rigid, hands gripping an invisible object, the body wrapped in dark wire-like strands, but a single shaft of warm light breaks through from above, touching the chest, suggesting release is possible, deep reds and shadows, the moment before letting go"
+    },
+    {
+      "id": "1-quote",
+      "path": "public/assets/slides/ch1/quote.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm amber accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a perfect circle of light floating in darkness, surrounded by concentric rings like ripples in water, golden ratio spiral faintly visible, ancient stone geometry, warm amber and deep shadow, the wound as a doorway through which light enters"
+    },
+    {
+      "id": "1-meditation",
+      "path": "public/assets/slides/ch1/meditation.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm amber accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a figure seated in stillness, eyes closed, holding a guitar that is dissolving into light particles, the particles rising like breath, warm glow emanating from the chest, deep calm, a practice nook bathed in soft golden light, the silence between heartbeats made visible"
+    },
+    {
+      "id": "2-title",
+      "path": "public/assets/slides/ch2/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm orange accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, two overlapping circles of light creating a lens of interference, the space between them vibrating with tension, a figure standing at the edge of a threshold looking back, morning mist, the first friction before change, warm orange and deep shadow, the limma as a narrow gap of light"
+    },
+    {
+      "id": "2-yin-0",
+      "path": "public/assets/slides/ch2/yin-0.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm orange accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a mirror reflecting a mirror, infinite regression, a figure seeing their own back, the observer within the observed, dark wood and warm candlelight, the question 'who is playing me?' made visual, philosophical depth, Occitan troubadour manuscript texture"
+    },
+    {
+      "id": "2-quote",
+      "path": "public/assets/slides/ch2/quote.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm orange accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, an unexamined life as a dim corridor of closed doors, and one door slightly ajar with warm light spilling through, an invitation, ancient Greek architecture, marble and shadow, the examined life as the only path worth walking"
+    },
+    {
+      "id": "3-title",
+      "path": "public/assets/slides/ch3/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm golden accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a winding path through autumn forest, a traveler with a walking staff, the Major 2nd as two steps forward, dappled golden light through orange leaves, the journey beginning, hope and movement, warm golden tones, the 9:8 ratio as stepping stones across a stream"
+    },
+    {
+      "id": "4-title",
+      "path": "public/assets/slides/ch4/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm amber accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a figure looking out a rain-streaked window, longing visible in posture, a minor third as two notes that want to resolve but haven't yet, melancholic beauty, warm amber and cool blue contrast, the blues as a color and a feeling, deep emotional resonance"
+    },
+    {
+      "id": "5-title",
+      "path": "public/assets/slides/ch5/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with bright gold accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a field of flowers opening to the sun, the Major 3rd as joy made visible, bright warm gold and green, a child's hand reaching toward light, unbridled happiness, the 5:4 ratio as five petals around a center, nature's celebration of the major third"
+    },
+    {
+      "id": "6-title",
+      "path": "public/assets/slides/ch6/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm teal accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, an open doorway in an ancient stone wall, beyond it only sky and questions, the Perfect 4th as suspended inquiry, a figure standing at the threshold not crossing, the question more important than the answer, teal and warm shadow, architectural mystery"
+    },
+    {
+      "id": "7-title",
+      "path": "public/assets/slides/ch7/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with deep purple accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a figure breaking through a wall of ice, shards flying, the Tritone as crisis and breakthrough, the diabolus in musica as liberation, dark purple and explosive warm light from within, the moment of transformation, struggle and triumph, the square root of two as an irrational breaking of rational bounds"
+    },
+    {
+      "id": "8-title",
+      "path": "public/assets/slides/ch8/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with strong gold accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a cathedral interior with light streaming through rose windows, the Perfect 5th as power and stability, a figure standing in the center of a cross of light, the overtone series as pillars of gold, strength and resolution, the 3:2 ratio as three steps up and two down, triumphant and grounded"
+    },
+    {
+      "id": "9-title",
+      "path": "public/assets/slides/ch9/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm bronze accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, an old photograph fading at the edges, a memory of a melody, the Minor 6th as nostalgia, a figure reaching toward something just out of frame, warm sepia and soft focus, the memory of music more beautiful than the music itself, longing and distance, the 8:5 ratio as memory losing definition"
+    },
+    {
+      "id": "10-title",
+      "path": "public/assets/slides/ch10/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with bright warm accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a figure climbing a mountain at sunrise, the first rays breaking the horizon, the Major 6th as hope and aspiration, reaching upward, warm gold and cool dawn blue, uplift and striving, the 5:3 ratio as five fingers reaching for three stars, triumphant and tender"
+    },
+    {
+      "id": "11-title",
+      "path": "public/assets/slides/ch11/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with warm amber accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a winding road through rolling hills at dusk, the traveler returning home changed, the Minor 7th as unresolved journey, warm amber sunset and long shadows, the return that is not an ending, circular motion, the 16:9 ratio as a spiral returning to its origin"
+    },
+    {
+      "id": "12-title",
+      "path": "public/assets/slides/ch12/title.png",
+      "prompt": "Cinematic wide shot, moody chiaroscuro lighting, dark charcoal background with brilliant gold accent light, subtle film grain, soft bokeh, no text, no letters, no words, no typography, atmospheric, emotional, painterly, a door opening into blinding warm light, the Major 7th as arrival and expectation, the leading tone pulling toward resolution, a figure stepping through the threshold, brilliant gold and white warmth, homecoming, the 15:8 ratio as fifteen steps ending at the door of one home"
+    }
+  ]
+}
