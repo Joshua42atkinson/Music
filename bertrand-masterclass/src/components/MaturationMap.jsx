@@ -60,12 +60,21 @@ const HERO_STAGES = [
 
 export default function MaturationMap() {
   const navigate = useNavigate();
-  const { bardLevel, streak, practiceMinutes } = useScaffolding();
+  const { bardLevel, streak, practiceMinutes, traction } = useScaffolding();
   const { progress, getFretProgress, currentFret } = useDAGProgress();
   const { locale, t } = useLocale();
   const lang = locale;
 
   const bardTitle = useMemo(() => getBardTitle(bardLevel, lang), [bardLevel, lang]);
+
+  const currentMode = useMemo(() => {
+    const sandboxMode = traction?.settings?.sandboxMode;
+    const aiEnabled = traction?.settings?.aiEnabled !== false;
+    if (!sandboxMode && aiEnabled) return { label: 'Apprenticeship', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderColor: 'rgba(167,139,250,0.25)' };
+    if (!sandboxMode && !aiEnabled) return { label: 'Self-Study', color: '#34d399', background: 'rgba(52,211,153,0.1)', borderColor: 'rgba(52,211,153,0.25)' };
+    if (sandboxMode && aiEnabled) return { label: 'Exploration', color: '#fbbf24', background: 'rgba(251,191,38,0.1)', borderColor: 'rgba(251,191,38,0.25)' };
+    return { label: 'Library', color: '#9ca3af', background: 'rgba(156,163,175,0.1)', borderColor: 'rgba(156,163,175,0.25)' };
+  }, [traction]);
 
   const fretData = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => {
@@ -98,11 +107,11 @@ export default function MaturationMap() {
         percentage: prog.percentage,
         isComplete: prog.isComplete,
         isCurrent: fret === currentFret,
-        isLocked: fret > 1 && !progress.completedNodes.some(id => id.startsWith(`fret-${fret}-`)) && prog.percentage === 0,
+        isLocked: !sandboxMode && fret > 1 && !progress.completedNodes.some(id => id.startsWith(`fret-${fret}-`)) && prog.percentage === 0,
         pillars,
       };
     });
-  }, [progress, getFretProgress, currentFret]);
+  }, [progress, getFretProgress, currentFret, sandboxMode]);
 
   // Find the highest unlocked fret
   const highestUnlocked = useMemo(() => {
@@ -132,6 +141,24 @@ export default function MaturationMap() {
           <p style={styles.subtitle}>
             Lv.{bardLevel} — {bardTitle}
           </p>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            marginTop: 4,
+            padding: '2px 8px',
+            borderRadius: 12,
+            background: currentMode.background,
+            border: `1px solid ${currentMode.borderColor}`,
+            color: currentMode.color,
+            fontSize: '0.6rem',
+            fontFamily: "'JetBrains Mono', monospace",
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
+          }}>
+            {currentMode.label}
+          </div>
         </div>
         <button onClick={() => navigate('/')} style={styles.navBtn} aria-label="Home">
           <Home size={18} />

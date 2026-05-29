@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useScaffolding } from '../ScaffoldingProvider';
 import { useLocale } from '../../hooks/useLocale';
 import { useAuth } from '../../hooks/useAuth';
@@ -36,6 +36,11 @@ export default function CharacterSheet() {
   const xpNext = getXpForNextLevel(bardLevel);
   const xpProgress = xpNext > 0 ? Math.min(1, xpCurrent / xpNext) : 1;
   const completedFrets = Object.values(traction.frets || {}).filter(f => (f.traction || 0) >= 60).length;
+
+  const allMilestones = Array.from({ length: 12 }, (_, i) => `fret-${i + 1}-class-milestone`);
+  const completedMilestones = allMilestones.filter(mId => traction.completedNodes?.includes(mId));
+  const hasCompletedCourse = completedMilestones.length === 12;
+  const [showCertModal, setShowCertModal] = useState(false);
 
   // Badge system — interval mastery from Adventure
   const intervalMastery = useMemo(() => getIntervalMastery(), []);
@@ -103,6 +108,44 @@ export default function CharacterSheet() {
 
   return (
     <div style={styles.sheet}>
+      {hasCompletedCourse && (
+        <div style={styles.celebrationCard}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🌟 🎓 🌟</div>
+          <h3 style={styles.celebrationTitle}>
+            {lang === 'fr' ? 'APPRENTI TROUBADOUR ACCOMPLI' : 'TROUBADOUR APPRENTICE'}
+          </h3>
+          <p style={styles.celebrationText}>
+            {lang === 'fr' 
+              ? `Félicitations, ${studentName}! Vous avez terminé l'ensemble des 12 frettes somatiques du Masterclass de Bertrand Laurence. Votre dévouement envers la géométrie de l'instrument et l'harmonie pythagoricienne est admirable.`
+              : `Congratulations, ${studentName}! You have successfully journeyed through all 12 somatic frets of the Bertrand Laurence Masterclass. Your dedication to physical tone, CAGED geometry, and Pythagorean intervals is complete.`}
+          </p>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button 
+              onClick={() => setShowCertModal(true)} 
+              style={styles.certButton}
+            >
+              🎓 {lang === 'fr' ? 'Voir le Certificat' : 'View Certificate'}
+            </button>
+            <a 
+              href="https://bertrandguitarstudio.duetpartner.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                ...styles.certButton,
+                background: 'linear-gradient(135deg, #10b981, #047857)',
+                color: '#ffffff',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              🎸 {lang === 'fr' ? 'Audition de Bertrand' : 'Audition with Bertrand'}
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Header — Name & Level */}
       <div style={styles.header}>
         <div style={styles.portrait}>
@@ -312,6 +355,120 @@ export default function CharacterSheet() {
           />
         </div>
       </div>
+
+      {showCertModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+          backdropFilter: 'blur(5px)'
+        }} className="no-print">
+          <div style={{
+            background: '#1c1510',
+            border: '3px double #d4af37',
+            padding: '30px',
+            maxWidth: '650px',
+            width: '100%',
+            borderRadius: '8px',
+            textAlign: 'center',
+            boxShadow: '0 0 40px rgba(0,0,0,0.5)',
+            position: 'relative',
+            color: '#f3e5c8',
+          }}>
+            <button 
+              onClick={() => setShowCertModal(false)}
+              style={{
+                position: 'absolute',
+                top: 15, right: 15,
+                background: 'none',
+                border: 'none',
+                color: '#d4af37',
+                fontSize: '1.2rem',
+                cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+            
+            {/* Printable Certificate Frame */}
+            <div id="printable-certificate" style={{
+              border: '1px solid rgba(212,175,55,0.4)',
+              padding: '24px',
+              borderRadius: '4px',
+              backgroundColor: '#1f1812',
+              backgroundImage: 'radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%)',
+            }}>
+              <div style={{ fontSize: '2rem', color: '#d4af37', marginBottom: 10 }}>📜</div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.8rem', color: '#d4af37', letterSpacing: '0.05em', margin: '0 0 10px', textTransform: 'uppercase' }}>
+                {lang === 'fr' ? "Certificat d'Apprentissage" : "Troubadour Apprentice Certificate"}
+              </h2>
+              <div style={{ fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>
+                {lang === 'fr' ? "ACADÉMIE DE MUSIQUE VOIX VIVE" : "VOIX VIVE MUSIC ACADEMY"}
+              </div>
+              <p style={{ fontStyle: 'italic', fontSize: '0.9rem', margin: '0 0 15px' }}>
+                {lang === 'fr' ? "Ce document atteste que" : "This is to certify that"}
+              </p>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.2rem', color: '#f3e5c8', margin: '10px 0 20px', textShadow: '0 2px 4px rgba(0,0,0,0.5)', borderBottom: '1px solid rgba(212,175,55,0.3)', paddingBottom: '10px', display: 'inline-block', minWidth: '280px' }}>
+                {studentName}
+              </h3>
+              <p style={{ fontSize: '0.85rem', lineHeight: 1.6, maxWidth: '480px', margin: '0 auto 20px' }}>
+                {lang === 'fr' 
+                  ? "a terminé avec succès le cursus de 12 frettes d'initiation somatique et d'harmonie pythagoricienne sous le mentorat virtuel du Maître Troubadour Bertrand Laurence."
+                  : "has successfully completed all 12 somatic frets of initiatory guitar training, physical mechanics, and Pythagorean ratio intervals under the virtual mentorship of Master Troubadour Bertrand Laurence."}
+              </p>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 35, padding: '0 20px' }}>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: '0.8rem', fontFamily: "'Cormorant Garamond', serif", borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: 4, width: '140px', fontStyle: 'italic' }}>
+                    {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
+                  </div>
+                  <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
+                    {lang === 'fr' ? "Date d'obtention" : "Date of Award"}
+                  </div>
+                </div>
+                
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.9rem', fontFamily: "'Cormorant Garamond', serif", color: '#d4af37', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: 4, width: '140px', fontStyle: 'italic', fontWeight: 600 }}>
+                    Bertrand Laurence
+                  </div>
+                  <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
+                    {lang === 'fr' ? "Sceau du Mentorat" : "Mentorship Seal"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 15, justifyContent: 'center', marginTop: 25 }}>
+              <button 
+                onClick={() => window.print()}
+                style={{
+                  ...styles.certButton,
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  color: '#ffffff',
+                }}
+              >
+                🖨️ {lang === 'fr' ? 'Imprimer / PDF' : 'Print / Save PDF'}
+              </button>
+              <button 
+                onClick={() => setShowCertModal(false)}
+                style={{
+                  ...styles.certButton,
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: '#ffffff',
+                }}
+              >
+                {lang === 'fr' ? 'Fermer' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -612,6 +769,47 @@ const styles = {
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: '0.75rem',
     cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  celebrationCard: {
+    padding: '24px',
+    background: 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(167,139,250,0.15))',
+    border: '2px double #d4af37',
+    borderRadius: '16px',
+    boxShadow: '0 0 30px rgba(212,175,55,0.25)',
+    marginBottom: '24px',
+    textAlign: 'center',
+    color: '#f3e5c8',
+  },
+  celebrationTitle: {
+    fontFamily: "'Cormorant Garamond', serif",
+    fontSize: '1.4rem',
+    color: '#d4af37',
+    margin: '0 0 10px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
+  celebrationText: {
+    fontFamily: "'Inter', sans-serif",
+    fontSize: '0.8rem',
+    color: 'rgba(243,229,200,0.85)',
+    lineHeight: 1.5,
+    margin: '0 0 20px',
+  },
+  certButton: {
+    background: 'linear-gradient(135deg, #d4af37, #aa7c11)',
+    color: '#1a120b',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '10px 20px',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px rgba(212,175,55,0.3)',
     transition: 'all 0.2s',
   }
 };

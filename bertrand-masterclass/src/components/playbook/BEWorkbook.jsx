@@ -154,14 +154,6 @@ export default function BEWorkbook() {
         <div style={styles.fretEmotion}>{meta.emotion}</div>
       </div>
 
-      {/* ── Today's Focus Card ── */}
-      <TodayFocusCard
-        traction={traction}
-        nextRecommended={nextRecommended}
-        practiceLog={practiceLog}
-        onStartPractice={() => logPracticeSession(practiceLog, setPracticeLog, nextRecommended)}
-      />
-
       {/* ── Tab Navigation ── */}
       <div style={styles.tabBar}>
         {[

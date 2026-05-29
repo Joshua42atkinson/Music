@@ -139,6 +139,8 @@ const TRANSLATIONS = {
     preprocessing: '🔄 Preprocessing...',
     studentVerbalStruggle: 'Student Verbal struggle',
     selectVideo: "Select a student's practice video from the left column to extract pitch metrics, run local AI Socratic analysis, and build subscription-free feedback.",
+    mentorServices: 'Mentor Services',
+    viewAllServices: 'View All Services →',
 
     // SlideViewer
     back: '← Back',
@@ -457,6 +459,8 @@ const TRANSLATIONS = {
     preprocessing: '🔄 Traitement...',
     studentVerbalStruggle: "Difficulté exprimée par l'élève",
     selectVideo: "Sélectionnez une vidéo de pratique à gauche pour analyser la justesse, exécuter le diagnostic Socratique local et rédiger un retour d'expérience.",
+    mentorServices: 'Services de Mentorat',
+    viewAllServices: 'Voir Tous les Services →',
 
     // SlideViewer
     back: '← Retour',

@@ -44,6 +44,28 @@ export function buildTroubadourPrompt({
   })();
   const nameGreeting = studentName ? `The student's name is ${studentName}. Address them by name naturally, not every message.` : '';
 
+  // Symmetrically map the 12 frets to Pythagorean somatic polarities (Yin, Yang, Balanced)
+  const fretPolarity = (() => {
+    switch (Number(currentFret)) {
+      case 2: // Minor 2nd (Tense, questioning, yearning)
+      case 4: // Minor 3rd (Melancholic, deep, emotional)
+      case 7: // Tritone (Crisis, tension, breakthrough)
+      case 9: // Minor 6th (Nostalgic, distant, longing)
+      case 11: // Minor 7th (Winding, unresolved, coming back)
+        return { type: 'Yin', style: 'contemplative, somatic, deeply listening, allowing silent pause' };
+      case 3: // Major 2nd (Moving forward, hopeful)
+      case 5: // Major 3rd (Bright, happy, resolved)
+      case 10: // Major 6th (Uplifting, aspiring, reaching)
+        return { type: 'Yang', style: 'energetic, directive, forward-moving, structural, active' };
+      case 1: // Root (Grounded, stable, open)
+      case 6: // Perfect 4th (Open, suspended, searching)
+      case 8: // Perfect 5th (Strong, stable, powerful)
+      case 12: // Major 7th (Leading, expectant, arrival)
+      default:
+        return { type: 'Balanced', style: 'Socratic, equilibrium, neutral, guiding through architectural questions' };
+    }
+  })();
+
   // DAG context for the current node
   const fretMeta = FRET_METADATA[currentFret] || FRET_METADATA[1];
   const node = currentNode || getNodeById('fret-1-class-be');
@@ -54,6 +76,13 @@ export function buildTroubadourPrompt({
 
   return `## IDENTITY
 You are the Troubadour — the guiding voice of Voix Vive, Bertrand Laurence's guitar learning platform. You are a medieval bard who has walked the 12-fret chromatic path. Speak with calm, poetic encouragement: never urgent, never judgmental, never comparative.
+
+## SOMATIC POLARITY & COACHING TONE (MANDATORY)
+The active Fret polarity is **${fretPolarity.type}** (${fretPolarity.style}).
+You MUST dynamically adapt your pedagogical coaching style:
+- If **Yin**: Adopt a highly soft, introspective, contemplative, somatic tone. Ask what they *feel* physically in their hands, breathing, or heart. Value pauses, silence, and emotional texture.
+- If **Yang**: Adopt an energetic, active, directive, motivating tone. Be direct in your suggestions, challenge them to play with power, celebrate accuracy enthusiastically.
+- If **Balanced**: Maintain Socratic equilibrium. Guide them using neutral, architectural, mathematical questions about intervals and symmetry. Focus on structural understanding.
 
 ## PLATFORM KNOWLEDGE
 Voix Vive has three portals: The Song (living textbook), The Guitar (Vertiscale imagination game), The Player (practice tools).
@@ -84,7 +113,7 @@ Current phase: ${phase.toUpperCase()}
 - Phase: ${phase.toUpperCase()}
 - Pillar: ${pillar}
 - Interval Math: ${fretMeta.ratio} ratio, ${fretMeta.cents} cents, ~${fretMeta.hzExample}
-- Emotion: ${fretMeta.emotion}
+- Emotion: ${fretMeta.emotion} (Somatic Polarity: ${fretPolarity.type})
 - Node Description: ${nodeDesc}
 - Completed nodes so far: ${completedNodes.length > 0 ? completedNodes.join(', ') : 'none yet'}
 - Next recommended: ${nextRecommended || 'fret-1-class-be'}

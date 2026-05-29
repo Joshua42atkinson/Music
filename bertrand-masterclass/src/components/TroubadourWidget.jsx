@@ -638,7 +638,7 @@ export default function TroubadourWidget() {
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
                       }`}
                     >
-                      Sandbox
+                      Open Book
                     </button>
                   </div>
                   <div className="text-xs text-white/70 mb-2 mt-4 font-serif italic">
@@ -653,7 +653,7 @@ export default function TroubadourWidget() {
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
                       }`}
                     >
-                      Online
+                      Troubadour
                     </button>
                     <button 
                       onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, aiEnabled: false } }))}
@@ -663,7 +663,7 @@ export default function TroubadourWidget() {
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
                       }`}
                     >
-                      Offline
+                      Silent
                     </button>
                   </div>
                 </div>

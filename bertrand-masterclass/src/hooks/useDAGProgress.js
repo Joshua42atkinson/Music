@@ -46,6 +46,31 @@ function saveProgress(progress) {
 
 export function useDAGProgress() {
   const [progress, setProgress] = useState(loadProgress);
+  const [sandboxMode, setSandboxMode] = useState(() => {
+    try {
+      const raw = localStorage.getItem('bard_traction');
+      if (raw) return JSON.parse(raw).settings?.sandboxMode === true;
+    } catch {}
+    return false;
+  });
+
+  // Keep sandboxMode synced across tab updates and context updates
+  useEffect(() => {
+    const handleStorage = () => {
+      try {
+        const raw = localStorage.getItem('bard_traction');
+        if (raw) {
+          setSandboxMode(JSON.parse(raw).settings?.sandboxMode === true);
+        }
+      } catch {}
+    };
+    window.addEventListener('storage', handleStorage);
+    const interval = setInterval(handleStorage, 1000);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      clearInterval(interval);
+    };
+  }, []);
   
   // ── Computed values ──
   const currentNode = useMemo(() => getNodeById(progress.currentNodeId), [progress.currentNodeId]);
@@ -59,22 +84,23 @@ export function useDAGProgress() {
     [progress.completedNodes]
   );
   
-  const unlockedNodesList = useMemo(() =>
-    progress.unlockedNodes.map(id => getNodeById(id)).filter(Boolean),
-    [progress.unlockedNodes]
-  );
+  const unlockedNodesList = useMemo(() => {
+    if (sandboxMode) return dagNodes;
+    return progress.unlockedNodes.map(id => getNodeById(id)).filter(Boolean);
+  }, [progress.unlockedNodes, sandboxMode]);
   
   const recommendedNodesList = useMemo(() => {
     const recs = dagNodes
-      .filter(n => isNodeRecommended(n.id, progress.completedNodes))
+      .filter(n => isNodeRecommended(n.id, progress.completedNodes, sandboxMode))
       .map(n => n.id);
     return recs.map(id => getNodeById(id)).filter(Boolean);
-  }, [progress.completedNodes]);
+  }, [progress.completedNodes, sandboxMode]);
   
   const nextRecommendedNode = useMemo(() => {
-    const nextId = getNextRecommendedNode(progress.completedNodes, currentNode?.pillar);
+    const nextId = getNextRecommendedNode(progress.completedNodes, currentNode?.pillar, sandboxMode);
     return nextId ? getNodeById(nextId) : null;
-  }, [progress.completedNodes, currentNode]);
+  }, [progress.completedNodes, currentNode, sandboxMode]);
+
   
   // ── Actions ──
   
@@ -90,7 +116,7 @@ export function useDAGProgress() {
         ...prev,
         completedNodes: newCompleted,
         unlockedNodes: newUnlocked,
-        currentNodeId: getNextRecommendedNode(newCompleted, getNodeById(nodeId)?.pillar) || nodeId,
+        currentNodeId: getNextRecommendedNode(newCompleted, getNodeById(nodeId)?.pillar, sandboxMode) || nodeId,
         pathHistory: [...prev.pathHistory, { nodeId, timestamp: new Date().toISOString() }],
         lastAccessed: new Date().toISOString(),
       };

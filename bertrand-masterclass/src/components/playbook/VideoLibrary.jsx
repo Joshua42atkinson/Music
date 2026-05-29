@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useScaffolding } from '../ScaffoldingProvider';
 import { useLocale } from '../../hooks/useLocale';
 import { FRET_METADATA } from '../../data/dag/dagNodes';
@@ -24,94 +24,94 @@ import { FRET_METADATA } from '../../data/dag/dagNodes';
 //   - A local asset path (/assets/videos/...)
 //   - '#' = placeholder awaiting upload
 const VIDEO_CATALOG = [
-  // ── FRET 1: Root Note ──
+  // ── FRET 1: Root Note (Rhythm & Foundation) ──
   {
     fret: 1,
     clips: [
       {
-        id: 'f1-breath',
-        title: { en: 'The Breath Before the Note', fr: 'Le Souffle Avant la Note' },
-        description: { en: 'Bertrand introduces the foundational breathing technique that precedes every practice session.', fr: 'Bertrand présente la technique de respiration fondamentale qui précède chaque séance.' },
-        duration: '4:32',
-        phase: 'be',
-        src: '#',
-        thumbnail: '/assets/portal_guitar.png',
-      },
-      {
-        id: 'f1-root-listen',
-        title: { en: 'Hearing the Root', fr: 'Entendre la Fondamentale' },
-        description: { en: 'How to hear the E in the world around you before touching the guitar.', fr: 'Comment entendre le Mi dans le monde autour de vous avant de toucher la guitare.' },
-        duration: '3:15',
-        phase: 'do',
-        src: '#',
-        thumbnail: '/assets/portal_song.png',
-      },
-      {
-        id: 'f1-first-note',
-        title: { en: 'Your First Note', fr: 'Votre Première Note' },
-        description: { en: 'Playing the open E string — tone, posture, and intention.', fr: 'Jouer la corde de Mi à vide — ton, posture et intention.' },
-        duration: '5:40',
+        id: 'f1-eugene-strut',
+        title: { en: 'The Eugene Strut (Live)', fr: 'La Démarche d\'Eugene (En Direct)' },
+        description: { en: 'A masterclass in foundational rhythm and groove. Watch how Bertrand establishes the root pulse.', fr: 'Une classe de maître sur le rythme fondamental et le groove. Regardez comment Bertrand établit la pulsation.' },
+        duration: '4:22',
         phase: 'play',
-        src: '#',
+        src: 'https://www.youtube.com/embed/R3fR8XwjevY',
         thumbnail: '/assets/portal_player.png',
+      },
+      {
+        id: 'f1-no-thanks',
+        title: { en: 'No Thanks, I\'ll Walk', fr: 'Non Merci, Je Vais Marcher' },
+        description: { en: 'Acoustic Blues performance showing the power of the walking bass line and steady root motion.', fr: 'Performance de blues acoustique montrant la puissance de la ligne de basse marchante.' },
+        duration: '3:04',
+        phase: 'do',
+        src: 'https://www.youtube.com/embed/cvy5U8itTTA',
+        thumbnail: '/assets/portal_guitar.png',
       },
     ],
   },
-  // ── FRET 2: Minor 2nd ──
+  // ── FRET 2: Minor 2nd (Tension & Movement) ──
   {
     fret: 2,
     clips: [
       {
-        id: 'f2-tension',
-        title: { en: 'The Sound of Tension', fr: 'Le Son de la Tension' },
-        description: { en: 'Understanding the minor 2nd — the most tense interval in music.', fr: 'Comprendre la seconde mineure — l\'intervalle le plus tendu de la musique.' },
-        duration: '4:10',
+        id: 'f2-coal-burner',
+        title: { en: 'Coal Burner', fr: 'Le Brûleur de Charbon' },
+        description: { en: 'Listen to the tension in the driving rhythm and the half-step bends simulating a train whistle.', fr: 'Écoutez la tension dans le rythme entraînant et les bends d\'un demi-ton simulant un sifflet de train.' },
+        duration: '3:45',
         phase: 'be',
-        src: '#',
+        src: 'https://www.youtube.com/embed/6h-k1vjD1Jw',
         thumbnail: '/assets/portal_song.png',
-      },
-      {
-        id: 'f2-hold',
-        title: { en: 'Holding Tension Without Fear', fr: 'Tenir la Tension Sans Peur' },
-        description: { en: 'Bertrand demonstrates how to sit with dissonance and let it resolve naturally.', fr: 'Bertrand montre comment rester avec la dissonance et la laisser se résoudre naturellement.' },
-        duration: '2:15',
-        phase: 'do',
-        src: '#',
-        thumbnail: '/assets/portal_guitar.png',
       },
     ],
   },
-  // ── FRET 3: Major 2nd ──
+  // ── FRET 3: Major 2nd (Forward Motion) ──
   {
     fret: 3,
     clips: [
       {
-        id: 'f3-vertical',
-        title: { en: 'Vertical Scales Introduction', fr: 'Introduction aux Gammes Verticales' },
-        description: { en: 'The Vertiscale concept — why we play up instead of across.', fr: 'Le concept de Vertiscale — pourquoi on joue vers le haut plutôt qu\'en travers.' },
-        duration: '5:40',
-        phase: 'do',
-        src: '#',
+        id: 'f3-capacitor',
+        title: { en: 'Capacitor Boogie (Live)', fr: 'Capacitor Boogie (En Direct)' },
+        description: { en: 'Live at Blackstone River Theater. Notice the relentless forward motion and fingerpicking mastery.', fr: 'En direct au Blackstone River Theater. Remarquez le mouvement constant vers l\'avant et la maîtrise du fingerpicking.' },
+        duration: '5:28',
+        phase: 'play',
+        src: 'https://www.youtube.com/embed/3NAahYlwZJQ',
         thumbnail: '/assets/portal_guitar.png',
       },
-    ],
-  },
-  // ── FRET 4: Minor 3rd ──
-  {
-    fret: 4,
-    clips: [
       {
-        id: 'f4-left-hand',
-        title: { en: 'Left Hand Positioning', fr: 'Positionnement de la Main Gauche' },
-        description: { en: 'Thumb placement, wrist angle, and finger independence for the minor 3rd stretch.', fr: 'Placement du pouce, angle du poignet et indépendance des doigts pour l\'écart de tierce mineure.' },
-        duration: '3:20',
-        phase: 'play',
-        src: '#',
+        id: 'f3-sky-river',
+        title: { en: 'Sky River Grass', fr: 'Sky River Grass' },
+        description: { en: 'An exploration of open strings and major intervals, providing a sense of journey and flow.', fr: 'Une exploration des cordes à vide et des intervalles majeurs, donnant un sentiment de voyage.' },
+        duration: '2:56',
+        phase: 'do',
+        src: 'https://www.youtube.com/embed/t6TBgEMf6hY',
         thumbnail: '/assets/portal_player.png',
       },
     ],
   },
-  // ── FRET 5-12: Awaiting Bertrand's content ──
+  // ── FRET 4: Minor 3rd (The Blues) ──
+  {
+    fret: 4,
+    clips: [
+      {
+        id: 'f4-pays-du-blues',
+        title: { en: 'Au Pays du Blues (Live)', fr: 'Au Pays du Blues (En Direct)' },
+        description: { en: 'Live at the Narrows. A definitive demonstration of acoustic blues phrasing and the minor 3rd.', fr: 'En direct au Narrows. Une démonstration définitive du phrasé blues acoustique et de la tierce mineure.' },
+        duration: '5:13',
+        phase: 'play',
+        src: 'https://www.youtube.com/embed/w_FA7gZnqRo',
+        thumbnail: '/assets/portal_song.png',
+      },
+      {
+        id: 'f4-tous-les-jours',
+        title: { en: 'Tous les jours, J\'ai des Bleus', fr: 'Tous les jours, J\'ai des Bleus' },
+        description: { en: 'Everyday I have the blues. Watch Bertrand channel deep emotion through the fretboard.', fr: 'Chaque jour j\'ai le blues. Regardez Bertrand canaliser une émotion profonde à travers le manche.' },
+        duration: '4:15',
+        phase: 'be',
+        src: 'https://www.youtube.com/embed/KL2NUJgYh8o',
+        thumbnail: '/assets/portal_player.png',
+      },
+    ],
+  },
+  // ── FRET 5-12: Awaiting remaining contextual mapping ──
   ...Array.from({ length: 8 }, (_, i) => ({
     fret: i + 5,
     clips: [],
@@ -129,6 +129,7 @@ export default function VideoLibrary() {
   const { traction } = useScaffolding();
   const { locale } = useLocale();
   const lang = locale;
+  const [activeVideo, setActiveVideo] = useState(null);
 
   const currentFret = useMemo(() => {
     const nodeId = traction?.currentNodeId || 'fret-1-class-be';
@@ -195,25 +196,40 @@ export default function VideoLibrary() {
                     borderColor: phase.border,
                     opacity: isPlaceholder ? 0.7 : 1,
                   }}>
-                    {/* Thumbnail */}
+                    {/* Thumbnail or Video Player */}
                     <div style={styles.thumbnailWrap}>
-                      <img
-                        src={clip.thumbnail || '/assets/portal_guitar.png'}
-                        alt={localize(clip.title)}
-                        style={styles.thumbnail}
-                        draggable={false}
-                      />
-                      <div style={styles.thumbnailOverlay}>
-                        <span style={styles.playIcon}>▶</span>
-                      </div>
-                      <span style={{
-                        ...styles.durationBadge,
-                        background: phase.bg,
-                        borderColor: phase.border,
-                        color: phase.text,
-                      }}>
-                        {clip.duration}
-                      </span>
+                      {activeVideo === clip.id ? (
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={`${clip.src}?autoplay=1`}
+                          title={localize(clip.title)}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          style={styles.thumbnail}
+                        />
+                      ) : (
+                        <>
+                          <img
+                            src={clip.thumbnail || '/assets/portal_guitar.png'}
+                            alt={localize(clip.title)}
+                            style={styles.thumbnail}
+                            draggable={false}
+                          />
+                          <div style={styles.thumbnailOverlay}>
+                            <span style={styles.playIcon}>▶</span>
+                          </div>
+                          <span style={{
+                            ...styles.durationBadge,
+                            background: phase.bg,
+                            borderColor: phase.border,
+                            color: phase.text,
+                          }}>
+                            {clip.duration}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     {/* Info */}
@@ -233,13 +249,18 @@ export default function VideoLibrary() {
                           {lang === 'fr' ? '📽️ Bientôt disponible' : '📽️ Coming soon'}
                         </span>
                       ) : (
-                        <button style={{
-                          ...styles.watchBtn,
-                          background: phase.bg,
-                          borderColor: phase.border,
-                          color: phase.text,
-                        }}>
-                          {lang === 'fr' ? '▶ Regarder' : '▶ Watch'}
+                        <button
+                          onClick={() => setActiveVideo(activeVideo === clip.id ? null : clip.id)}
+                          style={{
+                            ...styles.watchBtn,
+                            background: phase.bg,
+                            borderColor: phase.border,
+                            color: phase.text,
+                          }}
+                        >
+                          {activeVideo === clip.id
+                            ? (lang === 'fr' ? 'Fermer' : 'Close')
+                            : (lang === 'fr' ? '▶ Regarder' : '▶ Watch')}
                         </button>
                       )}
                     </div>

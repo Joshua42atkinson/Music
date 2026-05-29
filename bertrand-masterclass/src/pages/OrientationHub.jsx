@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Home, BookOpen, Guitar, X } from 'lucide-react';
+import { ArrowLeft, Home, BookOpen, Guitar, X, ShieldAlert, Award } from 'lucide-react';
 import frets from '../data/chapterData';
 import SlideViewer from '../components/SlideViewer';
 import NeckMenu from '../components/NeckMenu';
@@ -8,6 +8,8 @@ import SongwritingCompanion from '../components/SongwritingCompanion';
 import { generateSlides } from '../data/slideGenerator';
 import { getChapterProgress } from '../data/localDatabase';
 import AuthButton from '../components/AuthButton';
+import { useScaffolding } from '../components/ScaffoldingProvider';
+import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -45,6 +47,54 @@ const OrientationHub = () => {
   const [activeFret, setActiveFret] = useState(null);
   const [showQuill, setShowQuill] = useState(false);
   const navigate = useNavigate();
+  const { traction } = useScaffolding();
+  const { locale } = useLocale();
+  
+  const sandboxMode = traction?.settings?.sandboxMode;
+  const aiEnabled = traction?.settings?.aiEnabled !== false;
+
+  const getModeLabel = () => {
+    if (!sandboxMode && aiEnabled) {
+      return { 
+        label: 'Apprenticeship Mode', 
+        color: '#a78bfa', 
+        borderColor: 'rgba(167,139,250,0.3)',
+        background: 'rgba(167,139,250,0.1)',
+        description: 'Guided Path + AI Somatic Mentorship',
+        certBadge: true
+      };
+    }
+    if (!sandboxMode && !aiEnabled) {
+      return { 
+        label: 'Self-Study Mode', 
+        color: '#34d399', 
+        borderColor: 'rgba(52,211,153,0.3)',
+        background: 'rgba(52,211,153,0.1)',
+        description: 'Guided Path (Silent)',
+        certBadge: true
+      };
+    }
+    if (sandboxMode && aiEnabled) {
+      return { 
+        label: 'Exploration Mode', 
+        color: '#fbbf24', 
+        borderColor: 'rgba(251,191,38,0.3)',
+        background: 'rgba(251,191,38,0.1)',
+        description: 'Open Book Sandbox + AI Somatic Mentorship',
+        certBadge: false
+      };
+    }
+    return { 
+      label: 'Library Reference Mode', 
+      color: '#9ca3af', 
+      borderColor: 'rgba(156,163,175,0.3)',
+      background: 'rgba(156,163,175,0.1)',
+      description: 'Open Book Sandbox (Silent)',
+      certBadge: false
+    };
+  };
+
+  const currentMode = getModeLabel();
 
   if (activeFret) {
     return (
@@ -60,13 +110,14 @@ const OrientationHub = () => {
     const totalSlides = generateSlides(ch).length;
     const progress = getChapterProgress(ch.id, totalSlides);
     const badge = PROGRESS_BADGES[progress];
+    const localizedSubtitle = ch.subtitle[locale] || ch.subtitle.en || ch.subtitle;
     return {
       ...ch,
       symbol: CHAPTER_ICONS[ch.id]?.symbol || ch.icon,
       // Append progress indicator to subtitle
       subtitle: badge
-        ? `${ch.subtitle}  ${badge.label}`
-        : ch.subtitle,
+        ? `${localizedSubtitle}  ${badge.label}`
+        : localizedSubtitle,
     };
   });
 
@@ -105,6 +156,48 @@ const OrientationHub = () => {
           <ArrowLeft size={14} />
           Back
         </button>
+
+        {/* Centered Mode Status Pill */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+          padding: '4px 12px',
+          borderRadius: 20,
+          background: currentMode.background,
+          border: `1px solid ${currentMode.borderColor}`,
+          backdropFilter: 'blur(10px)',
+          textAlign: 'center',
+          maxWidth: '260px',
+          boxShadow: `0 0 10px ${currentMode.background}`
+        }} title={currentMode.description}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            color: currentMode.color,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase'
+          }}>
+            {currentMode.certBadge && <Award size={10} style={{ color: currentMode.color }} />}
+            {currentMode.label}
+          </div>
+          <div style={{
+            fontSize: '0.5rem',
+            color: 'rgba(255, 255, 255, 0.45)',
+            fontFamily: "'Inter', sans-serif",
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: '240px'
+          }}>
+            {currentMode.description}
+          </div>
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button

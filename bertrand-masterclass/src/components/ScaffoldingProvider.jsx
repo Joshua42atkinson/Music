@@ -138,7 +138,7 @@ export function ScaffoldingProvider({ children }) {
   const currentFret = currentNode?.fret || 1;
   const currentPhase = getCurrentPhase(traction, currentFret);
   const completedNodes = traction.completedNodes || [];
-  const nextRecommended = getNextRecommendedNode(completedNodes, currentNode?.pillar || 'class');
+  const nextRecommended = getNextRecommendedNode(completedNodes, currentNode?.pillar || 'class', settings.sandboxMode);
 
   const completePhase = useCallback((fretIdOrNodeId, phase) => {
     // Accept either a numeric fretId or a nodeId string like 'fret-1-class-be'

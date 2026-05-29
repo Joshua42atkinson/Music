@@ -83,7 +83,7 @@ export function getNewlyUnlockedNodes(completedNodeId) {
  * @param {string} [currentPillar] - 'class' | 'guitar' | 'workbook'
  * @returns {string|null} - Node ID or null if all complete
  */
-export function getNextRecommendedNode(completedNodeIds, currentPillar = 'class') {
+export function getNextRecommendedNode(completedNodeIds, currentPillar = 'class', sandboxMode = false) {
   // Find the highest fret with completed nodes
   const completedFrets = new Set();
   completedNodeIds.forEach(id => {
@@ -101,7 +101,7 @@ export function getNextRecommendedNode(completedNodeIds, currentPillar = 'class'
   const currentFretNodes = dagNodes.filter(n => n.fret === maxCompletedFret && n.pillar === currentPillar);
   for (const phase of phaseOrder) {
     const node = currentFretNodes.find(n => n.phase === phase && !completedNodeIds.includes(n.id));
-    if (node && isNodeUnlocked(node.id, completedNodeIds)) {
+    if (node && isNodeUnlocked(node.id, completedNodeIds, sandboxMode)) {
       return node.id;
     }
   }
@@ -113,7 +113,7 @@ export function getNextRecommendedNode(completedNodeIds, currentPillar = 'class'
     const pillarNodes = dagNodes.filter(n => n.fret === maxCompletedFret && n.pillar === pillar);
     for (const phase of phaseOrder) {
       const node = pillarNodes.find(n => n.phase === phase && !completedNodeIds.includes(n.id));
-      if (node && isNodeUnlocked(node.id, completedNodeIds)) {
+      if (node && isNodeUnlocked(node.id, completedNodeIds, sandboxMode)) {
         return node.id;
       }
     }
@@ -124,7 +124,7 @@ export function getNextRecommendedNode(completedNodeIds, currentPillar = 'class'
   if (nextFret <= 12) {
     const nextFretNodes = dagNodes.filter(n => n.fret === nextFret);
     for (const node of nextFretNodes) {
-      if (!completedNodeIds.includes(node.id) && isNodeUnlocked(node.id, completedNodeIds)) {
+      if (!completedNodeIds.includes(node.id) && isNodeUnlocked(node.id, completedNodeIds, sandboxMode)) {
         return node.id;
       }
     }
