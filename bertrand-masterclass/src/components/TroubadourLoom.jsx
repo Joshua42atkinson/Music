@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useScaffolding } from './ScaffoldingProvider';
 import { getBardicTitle, getMasteryStars } from '../data/bardicTitles';
 import { FRET_METADATA } from '../data/dag/dagNodes';
 import CapstoneCard from './CapstoneCard';
+import CharacterSheet from './CharacterSheet';
 
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : TroubadourLoom.jsx                                   ║
@@ -12,12 +13,21 @@ import CapstoneCard from './CapstoneCard';
 // ║           not game. The student BECOMES the Troubadour.        ║
 // ╚════════════════════════════════════════════════════════════════╝
 
+const TYPE_LABELS = {
+  storyteller: 'The Storyteller',
+  craftsman: 'The Craftsman',
+  ear: 'The Ear',
+  seeker: 'The Seeker',
+};
+
 export default function TroubadourLoom() {
   const { traction, completedNodes } = useScaffolding();
+  const [showSheet, setShowSheet] = useState(false);
 
   const bardLevel = traction?.bardLevel || 1;
   const title = getBardicTitle(bardLevel);
   const totalTraction = traction?.totalTraction || 0;
+  const troubadourType = traction?.studentProfile?.troubadourType;
   const maxTraction = 1200; // 12 frets × 100
 
   // Gather fret data for myelination map
@@ -113,6 +123,26 @@ export default function TroubadourLoom() {
         <StatCard label="Traction" value={`${Math.round((totalTraction / maxTraction) * 100)}%`} icon="⚡" />
       </div>
 
+      {/* ── Troubadour Type ── */}
+      <div style={styles.typeSection}>
+        <div style={styles.typeHeader}>
+          <div>
+            <h2 style={styles.sectionTitle}>Troubadour Type</h2>
+            <p style={styles.sectionSubtitle}>
+              {troubadourType
+                ? `${TYPE_LABELS[troubadourType]} — The AI adapts to your learning nature.`
+                : 'Discover how you learn best. The AI adapts to your nature.'}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSheet(true)}
+            style={styles.typeButton}
+          >
+            {troubadourType ? 'Change' : 'Discover'}
+          </button>
+        </div>
+      </div>
+
       {/* ── The Capstone ── */}
       <CapstoneCard traction={traction} />
 
@@ -143,6 +173,15 @@ export default function TroubadourLoom() {
           />
         </div>
       </div>
+
+      {/* ── Character Sheet Modal ── */}
+      {showSheet && (
+        <div style={styles.modalOverlay} onClick={() => setShowSheet(false)}>
+          <div style={styles.modal} onClick={e => e.stopPropagation()}>
+            <CharacterSheet onClose={() => setShowSheet(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -412,5 +451,50 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
     letterSpacing: '0.05em',
+  },
+  typeSection: {
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 24,
+  },
+  typeHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 16,
+  },
+  typeButton: {
+    padding: '8px 16px',
+    borderRadius: 8,
+    border: '1px solid rgba(201,169,110,0.4)',
+    background: 'transparent',
+    color: '#c9a96e',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  modalOverlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.8)',
+    backdropFilter: 'blur(8px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
+    padding: 24,
+  },
+  modal: {
+    background: '#0a0a0f',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    maxHeight: '90vh',
+    overflow: 'auto',
+    width: '100%',
+    maxWidth: 640,
   },
 };

@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { getOfflineResponse } from '../data/troubadourOffline';
 
 // ═══════════════════════════════════════════════════════════════════
 // useTroubadourAI — Unified AI hook for the Troubadour
@@ -104,8 +105,22 @@ export function useTroubadourAI() {
       || STEP_URL
       || LOCAL_URL;
 
+    // ── Offline fallback ─────────────────────────────────────────
     if (!baseUrl) {
-      throw new Error('No AI backend available. Try starting LM Studio locally.');
+      const userMsg = messages[messages.length - 1]?.content || '';
+      const { response } = getOfflineResponse(userMsg);
+      setIsLoading(true);
+      // Simulate streaming by yielding word by word
+      const words = response.split(' ');
+      let full = '';
+      for (const word of words) {
+        const chunk = full ? ' ' + word : word;
+        full += chunk;
+        onChunk?.(chunk, full);
+        await new Promise(r => setTimeout(r, 30)); // natural pacing
+      }
+      setIsLoading(false);
+      return;
     }
 
     const payload = {
