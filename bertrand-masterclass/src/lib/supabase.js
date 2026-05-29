@@ -37,6 +37,7 @@ export async function signInWithGoogle() {
     provider: 'google',
     options: {
       redirectTo: `${window.location.origin}/auth/callback`,
+      scopes: 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/drive.file',
     },
   });
   if (error) throw error;

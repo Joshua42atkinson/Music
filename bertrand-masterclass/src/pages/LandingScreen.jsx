@@ -814,6 +814,21 @@ export default function LandingScreen() {
           </a>
           <br />
           <a
+            href="/guitar/map"
+            style={{
+              color: 'rgba(201,169,110,0.25)',
+              textDecoration: 'none',
+              fontSize: '0.55rem',
+              transition: 'color 0.3s',
+              marginRight: 12,
+            }}
+            onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.5)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.25)'}
+          >
+            Maturation Map
+          </a>
+          <span style={{ color: 'rgba(201,169,110,0.15)', marginRight: 12 }}>&middot;</span>
+          <a
             href="/mentor"
             style={{
               color: 'rgba(201,169,110,0.25)',
