@@ -2,12 +2,13 @@ import { useState, useCallback, useRef } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════
 // useTroubadourAI — Unified AI hook for the Troubadour
-// Priority: 1) Hosted vLLM (GMKtek)  2) Local LM Studio  3) Offline
+// Priority: 1) Hosted vLLM (GMKtek)  2) llama.cpp Nemotron  3) StepAudio  4) LM Studio  5) Offline
 // ═══════════════════════════════════════════════════════════════════
 
 const REMOTE_URL   = import.meta.env.VITE_TROUBADOUR_API_URL;        // e.g. https://troubadour.yourdomain.com/v1
 const LOCAL_URL    = 'http://localhost:1234/v1';                     // LM Studio dev
 const STEP_URL     = 'http://localhost:9998/v1';                     // StepAudio local
+const LLAMA_URL    = 'http://localhost:8080/v1';                     // llama.cpp Nemotron Super (1M context)
 const API_KEY      = import.meta.env.VITE_TROUBADOUR_API_KEY || '';
 
 export function useTroubadourAI() {
@@ -59,7 +60,22 @@ export function useTroubadourAI() {
       // StepAudio not running
     }
 
-    // 3. Try LM Studio (localhost:1234)
+    // 3. Try llama.cpp Nemotron Super (localhost:8080)
+    try {
+      const resp = await fetch(`${LLAMA_URL}/models`, { method: 'GET' });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.data?.length > 0) {
+          setIsReady(true);
+          setBackend('local');
+          return { connected: true, backend: 'local-llama', model: data.data[0] };
+        }
+      }
+    } catch (e) {
+      // llama.cpp not running
+    }
+
+    // 4. Try LM Studio (localhost:1234)
     try {
       const resp = await fetch(`${LOCAL_URL}/models`, { method: 'GET' });
       if (resp.ok) {
@@ -74,7 +90,7 @@ export function useTroubadourAI() {
       // LM Studio not running
     }
 
-    // 4. Offline
+    // 5. Offline
     setIsReady(false);
     setBackend('offline');
     return { connected: false, backend: 'offline' };
@@ -84,6 +100,7 @@ export function useTroubadourAI() {
   const chatStream = useCallback(async (messages, onChunk, options = {}) => {
     const baseUrl = options.baseUrl
       || (backend === 'remote' ? REMOTE_URL : null)
+      || LLAMA_URL
       || STEP_URL
       || LOCAL_URL;
 
