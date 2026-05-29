@@ -62,46 +62,21 @@ export default function CharacterSheet() {
 
   const fileInputRef = useRef(null);
 
-  const handleExport = () => {
-    const saveState = {
-      version: 1,
-      timestamp: new Date().toISOString(),
-      bard_traction: localStorage.getItem('bard_traction'),
-      voix_vive_dag_progress: localStorage.getItem('voix_vive_dag_progress'),
-      voix_vive_adventure_session: localStorage.getItem('voix_vive_adventure_session')
-    };
-    
-    const blob = new Blob([JSON.stringify(saveState, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${studentName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_journal.voixvive`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleExport = async () => {
+    await exportVoixViveFile(studentName);
   };
 
-  const handleImport = (e) => {
+  const handleImport = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const saveState = JSON.parse(e.target.result);
-        if (saveState.bard_traction) localStorage.setItem('bard_traction', saveState.bard_traction);
-        if (saveState.voix_vive_dag_progress) localStorage.setItem('voix_vive_dag_progress', saveState.voix_vive_dag_progress);
-        if (saveState.voix_vive_adventure_session) localStorage.setItem('voix_vive_adventure_session', saveState.voix_vive_adventure_session);
-        
-        // Reload to rehydrate state from localStorage
-        window.location.reload();
-      } catch (err) {
-        alert(lang === 'fr' ? 'Fichier de sauvegarde invalide.' : 'Invalid save file.');
-        console.error("Failed to parse save file:", err);
-      }
-    };
-    reader.readAsText(file);
+    try {
+      await importVoixViveFile(file);
+      window.location.reload();
+    } catch (err) {
+      alert(lang === 'fr' ? 'Fichier de sauvegarde invalide.' : 'Invalid save file.');
+    }
+    
     // Reset file input so same file can be uploaded again if needed
     if (fileInputRef.current) fileInputRef.current.value = '';
   };

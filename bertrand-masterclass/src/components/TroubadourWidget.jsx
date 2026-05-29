@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, SkipForward, Music, Minus, Plus, Square, HelpCircle, MessageSquare, Send, Wifi, WifiOff, Mic, MicOff, Settings, Download, Upload, User } from 'lucide-react';
 import { Guitar } from 'lucide-react';
+import { exportVoixViveFile, importVoixViveFile } from '../data/saveState';
 import { useLocale } from '../hooks/useLocale';
 import { useTroubadourAI } from '../hooks/useTroubadourAI';
 import { useBackendBridge } from '../hooks/useBackendBridge';
@@ -322,31 +323,19 @@ export default function TroubadourWidget() {
 
   const activeProfile = localStorage.getItem('active_student_profile');
 
-  const exportVoixVive = () => {
-    const data = JSON.stringify(traction, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'adventurer_journal.voixvive';
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportVoixVive = async () => {
+    await exportVoixViveFile('adventurer');
   };
 
-  const importVoixVive = (e) => {
+  const importVoixVive = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const data = JSON.parse(evt.target.result);
-        updateTraction(() => data);
-        alert('Memory Card loaded successfully!');
-      } catch (err) {
-        alert('Failed to load Memory Card. Invalid format.');
-      }
-    };
-    reader.readAsText(file);
+    try {
+      await importVoixViveFile(file);
+      window.location.reload();
+    } catch (err) {
+      alert(locale === 'fr' ? "Fichier invalide." : "Invalid save file.");
+    }
   };
 
   return (
