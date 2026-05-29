@@ -806,7 +806,7 @@ const FRET_5_NODES = [
     "type": "slide",
     "title": "Major 3rd — Class BE",
     "description": "BE phase for Major 3rd (Class)",
-    "troubadourPrompt": "Close your eyes and picture the story unfolding at the fifth fret, what colors and characters appear? Alors, let that image guide your fingers as you prepare to play, Over.",
+    "troubadourPrompt": "Close your eyes. The Major 3rd is the sound of sunlight entering a room. It is the interval that defines every major chord — the difference between sadness and joy, between minor and major. Before you play, hear that brightness inside. What does warmth sound like? Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -820,7 +820,7 @@ const FRET_5_NODES = [
     "type": "slide",
     "title": "Major 3rd — Class DO",
     "description": "DO phase for Major 3rd (Class)",
-    "troubadourPrompt": "Hum the note that lives at the fifth fret, feeling its vibration around 440 Hz, like a heart beating steady. Ecoute, let your voice match that pitch, and notice how the ratio sings in your chest, Over.",
+    "troubadourPrompt": "Hum any note. Now sing the note four semitones higher — a Major 3rd above. Feel how your voice lifts, like stepping from shadow into light. The ratio is 5:4, the simplest consonance after the octave. Your body already knows this sound. Over.",
     "prerequisites": [
       "fret-5-class-be"
     ],
@@ -836,7 +836,7 @@ const FRET_5_NODES = [
     "type": "slide",
     "title": "Major 3rd — Class PLAY",
     "description": "PLAY phase for Major 3rd (Class)",
-    "troubadourPrompt": "Place your index finger on the fifth fret of the second string to sound a B note. Voila, start now and let the tone ring clear, Over.",
+    "troubadourPrompt": "Play the open low E string. Now fret the G♯ at the fourth fret. Together, that is a Major 3rd — Root plus brightness. This is how Notes become Chords become Songs. Strum both and let the warmth fill the room. Over.",
     "prerequisites": [
       "fret-5-class-do"
     ],
@@ -852,7 +852,7 @@ const FRET_5_NODES = [
     "type": "tool",
     "title": "Major 3rd — Guitar BE",
     "description": "BE phase for Major 3rd (Guitar)",
-    "troubadourPrompt": "Sit tall, inhale deeply for four counts, feeling the air fill your belly like a warm breeze. Alors, exhale slowly for six counts, releasing tension as you center your focus on the fifth fret, Over.",
+    "troubadourPrompt": "Before you map the fretboard, the body must be loose. Roll your shoulders three times. Shake your fretting hand. The CAGED system you are about to learn requires spatial awareness — you cannot see patterns while your muscles are locked. Breathe. Over.",
     "prerequisites": [
       "fret-5-class-be"
     ],
@@ -868,7 +868,7 @@ const FRET_5_NODES = [
     "type": "game",
     "title": "Major 3rd — Guitar DO",
     "description": "DO phase for Major 3rd (Guitar)",
-    "troubadourPrompt": "Play the note at the fifth fret on the first string and listen closely to its pitch. Ecoute, can you name whether it is an E or an F#, trusting your inner tuner, Over.",
+    "troubadourPrompt": "Play the open A string, then the C♯ at the fourth fret. That is a Major 3rd. Now play the open D, then the F♯ at the fourth fret. Same shape — same interval — different root. The geometry repeats. That is the secret of the guitar. Over.",
     "prerequisites": [
       "fret-5-guitar-be"
     ],
@@ -884,7 +884,7 @@ const FRET_5_NODES = [
     "type": "game",
     "title": "Major 3rd — Guitar PLAY",
     "description": "PLAY phase for Major 3rd (Guitar)",
-    "troubadourPrompt": "From the open third string, slide up to the fifth fret to play a perfect fourth interval. Voila, let the two notes blend like old friends, Over.",
+    "troubadourPrompt": "Build a C major chord from scratch: Root C, Major 3rd E, Perfect 5th G. Play each note individually first. Sing each one. Now strum all three together. You just built a chord from intervals — not from a diagram, from understanding. Bravo. Over.",
     "prerequisites": [
       "fret-5-guitar-do"
     ],
@@ -900,7 +900,7 @@ const FRET_5_NODES = [
     "type": "journal",
     "title": "Major 3rd — Workbook BE",
     "description": "BE phase for Major 3rd (Workbook)",
-    "troubadourPrompt": "In your journal, describe a scene where the fifth fret is a doorway to a hidden garden. Alors, write what you see, hear, and feel as you step through, Over.",
+    "troubadourPrompt": "In your journal: You now know the difference between a Major and Minor 3rd — between light and shadow. Write about a moment in your life when something shifted from dark to bright. One sentence is enough. Over.",
     "prerequisites": [
       "fret-5-class-be"
     ],
@@ -916,7 +916,7 @@ const FRET_5_NODES = [
     "type": "journal",
     "title": "Major 3rd — Workbook DO",
     "description": "DO phase for Major 3rd (Workbook)",
-    "troubadourPrompt": "Recall the hum you sang earlier and note how the pitch felt in your throat. Ecoute, describe any shifts in color or emotion that arose as you listened, Over.",
+    "troubadourPrompt": "When you played the Major 3rd, did your body respond differently than to the Minor 3rd? The Major is warmth, sunlight, resolution. The Minor was melancholy, longing. Write which one your body prefers — and notice that there is no wrong answer. Over.",
     "prerequisites": [
       "fret-5-workbook-be"
     ],
@@ -932,7 +932,7 @@ const FRET_5_NODES = [
     "type": "submission",
     "title": "Major 3rd — Workbook PLAY",
     "description": "PLAY phase for Major 3rd (Workbook)",
-    "troubadourPrompt": "Set up your recorder and play the fifth‑fret B note three times, listening for even tone. Voila, press play and celebrate the sound you created, Over.",
+    "troubadourPrompt": "Record yourself building a Major chord from scratch — Root, Major 3rd, Perfect 5th — and then strumming it. You are not copying a shape from a book. You are constructing harmony from understanding. Submit it. Over.",
     "prerequisites": [
       "fret-5-workbook-do"
     ],
@@ -993,7 +993,7 @@ const FRET_6_NODES = [
     "type": "slide",
     "title": "Perfect 4th — Class BE",
     "description": "BE phase for Perfect 4th (Class)",
-    "troubadourPrompt": "What would be the scene in the movie if this note were a character stepping onto the stage? Alors, laissez votre imagination jouer comme un troubadour sous les étoiles, Over.",
+    "troubadourPrompt": "The Perfect 4th is the heart of your guitar's geometry. Every string except one is tuned in Perfect 4ths. This is the Approach to the Inmost Cave — the moment you realize the fretboard is not random chaos. It is a grid of repeating shapes. See it. Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -1007,7 +1007,7 @@ const FRET_6_NODES = [
     "type": "slide",
     "title": "Perfect 4th — Class DO",
     "description": "DO phase for Perfect 4th (Class)",
-    "troubadourPrompt": "Hum the note you just heard, feeling its vibration at 440 Hz like a gentle heartbeat. Ecoutez la résonance intérieure et laissez-la guider votre voix, Over.",
+    "troubadourPrompt": "Play the open low E string. Now play the A string — open. That is a Perfect 4th: five semitones. The same interval that tunes your guitar also builds the foundation of the CAGED system. Hum the E, then hum the A. Feel the distance. Over.",
     "prerequisites": [
       "fret-6-class-be"
     ],
@@ -1023,7 +1023,7 @@ const FRET_6_NODES = [
     "type": "slide",
     "title": "Perfect 4th — Class PLAY",
     "description": "PLAY phase for Perfect 4th (Class)",
-    "troubadourPrompt": "Place your finger on the sixth fret of the high E string to sound a B flat, feeling the tension like a drawn bow. Alors, start now, and let the note ring bright as a morning bell, Over.",
+    "troubadourPrompt": "This is where ©SHEARL becomes your superpower. See the C chord shape. Now slide it up two frets — that is D. See the pattern? The CAGED system means five shapes cover the entire neck. Play the C shape, then the A shape, at the same root. Same chord, different geography. Over.",
     "prerequisites": [
       "fret-6-class-do"
     ],
@@ -1039,7 +1039,7 @@ const FRET_6_NODES = [
     "type": "tool",
     "title": "Perfect 4th — Guitar BE",
     "description": "BE phase for Perfect 4th (Guitar)",
-    "troubadourPrompt": "Close your eyes, inhale deeply through the nose, and exhale slowly through the mouth, feeling the breath flow like a gentle river. Ecoutez le silence intérieur et laissez-le ancrer votre présence, Over.",
+    "troubadourPrompt": "You are about to explore the entire fretboard. Before you do, relax your thumb behind the neck — it should be resting, not squeezing. Your wrist should be loose, your forearm relaxed. The neck is not a weapon to grip. It is a landscape to walk across. Breathe. Over.",
     "prerequisites": [
       "fret-6-class-be"
     ],
@@ -1056,7 +1056,7 @@ const FRET_6_NODES = [
     "type": "game",
     "title": "Perfect 4th — Guitar DO",
     "description": "DO phase for Perfect 4th (Guitar)",
-    "troubadourPrompt": "Play a random note on the sixth fret and listen carefully to its pitch, as if tuning a distant bell. Alors, identify the tone you hear and name it with confidence, bravo, Over.",
+    "troubadourPrompt": "Play a C chord in the open position. Now find the same C chord using the A-shape barre at the third fret. Same notes, different fingers, different neighborhood on the neck. ©SHEARL: See the shape before you play it. Hear the chord before you strum. Over.",
     "prerequisites": [
       "fret-6-guitar-be"
     ],
@@ -1073,7 +1073,7 @@ const FRET_6_NODES = [
     "type": "game",
     "title": "Perfect 4th — Guitar PLAY",
     "description": "PLAY phase for Perfect 4th (Guitar)",
-    "troubadourPrompt": "Place your fingers to play a perfect fourth: root on the sixth fret of the A string and the higher note on the sixth fret of the D string. Alors, play it now, letting the interval sing like a duet of old friends, Over.",
+    "troubadourPrompt": "Play a G chord — open position. Now play G using the E-shape barre at the third fret. Now the D-shape at the seventh fret. Three neighborhoods, one chord. You are not memorizing — you are navigating. The map is becoming real. Over.",
     "prerequisites": [
       "fret-6-guitar-do"
     ],
@@ -1090,7 +1090,7 @@ const FRET_6_NODES = [
     "type": "journal",
     "title": "Perfect 4th — Workbook BE",
     "description": "BE phase for Perfect 4th (Workbook)",
-    "troubadourPrompt": "Write a short scene where the melody you just heard becomes a character wandering through a medieval market. Alors, let your words flow freely and capture the colors of that imagined world, Over.",
+    "troubadourPrompt": "In your journal: Draw a rough sketch of the neck showing where you found the same chord in three different positions. You do not need artistic talent — stick figures and circles are perfect. The act of drawing maps the fretboard in your spatial memory. Over.",
     "prerequisites": [
       "fret-6-class-be"
     ],
@@ -1106,7 +1106,7 @@ const FRET_6_NODES = [
     "type": "journal",
     "title": "Perfect 4th — Workbook DO",
     "description": "DO phase for Perfect 4th (Workbook)",
-    "troubadourPrompt": "Think back to the note you hummed and describe the feeling it evoked in your body. Alors, note any images or emotions that surfaced, honoring your inner musician, Over.",
+    "troubadourPrompt": "When you moved the chord shape up the neck, did it feel like the same chord or a different one? Write about what changed — the physical feeling in your hand, the brightness or darkness of the sound, the confidence or hesitation in your fingers. Over.",
     "prerequisites": [
       "fret-6-workbook-be"
     ],
@@ -1122,7 +1122,7 @@ const FRET_6_NODES = [
     "type": "submission",
     "title": "Perfect 4th — Workbook PLAY",
     "description": "PLAY phase for Perfect 4th (Workbook)",
-    "troubadourPrompt": "Set up your recorder and play the interval you practiced, aiming for clear tone and steady rhythm. Alors, press record and let your guitar speak, knowing each attempt is a step forward, Over.",
+    "troubadourPrompt": "Record yourself playing the same chord in three CAGED positions up the neck. No strumming pattern required — just clean, ringing chords, one after another. Show the fretboard that you can see its geometry. Submit it. Over.",
     "prerequisites": [
       "fret-6-workbook-do"
     ],
@@ -1183,7 +1183,7 @@ const FRET_7_NODES = [
     "type": "slide",
     "title": "Tritone — Class BE",
     "description": "BE phase for Tritone (Class)",
-    "troubadourPrompt": "Alors, close your eyes and picture a cinematic moment where this note lives. Feel the story unfold as you let the melody guide you, Over.",
+    "troubadourPrompt": "The Tritone. Six semitones — exactly half the octave. The medieval church called it Diabolus in Musica — the Devil in Music. It is the most unstable, tense, and terrifying interval in all of Western harmony. And you are about to hold it in your hands without flinching. This is the Ordeal. Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -1197,7 +1197,7 @@ const FRET_7_NODES = [
     "type": "slide",
     "title": "Tritone — Class DO",
     "description": "DO phase for Tritone (Class)",
-    "troubadourPrompt": "Écoute, hum the B at fret 7, around 494 Hz, letting your voice find its pitch. Notice how the vibration resonates in your chest, like a gentle wave, Over.",
+    "troubadourPrompt": "Play the open low E. Now fret the B♭ at the sixth fret. Hold both. Listen to the beating — that ugly, restless vibration. That is the Tritone. It wants to resolve. Your body wants to move away from it. Do not move. Sit in the dissonance. Breathe. This is ©PLING! at its hardest. Over.",
     "prerequisites": [
       "fret-7-class-be"
     ],
@@ -1213,7 +1213,7 @@ const FRET_7_NODES = [
     "type": "slide",
     "title": "Tritone — Class PLAY",
     "description": "PLAY phase for Tritone (Class)",
-    "troubadourPrompt": "Place your finger on the seventh fret of the G string to sound a D. Start now, voila, let the note ring, Over.",
+    "troubadourPrompt": "Now resolve it. Play the Tritone — then move one fret down to the Perfect 5th. Feel the tension dissolve. That gravitational pull from chaos to order is what drives all of Western music. Every blues song, every jazz standard, every film score. You just felt it in your fingers. Over.",
     "prerequisites": [
       "fret-7-class-do"
     ],
@@ -1229,7 +1229,7 @@ const FRET_7_NODES = [
     "type": "tool",
     "title": "Tritone — Guitar BE",
     "description": "BE phase for Tritone (Guitar)",
-    "troubadourPrompt": "Alors, inhale deeply for four counts, then exhale slowly, releasing tension. Center yourself in this moment, ready to create, Over.",
+    "troubadourPrompt": "The Ordeal requires courage. Before you enter the ©PLING! Trainer, scan your body for tension. The Tritone will provoke discomfort — your jaw may clench, your shoulders may rise. Notice this. Release it. The only way through the Devil's interval is relaxation. Over.",
     "prerequisites": [
       "fret-7-class-be"
     ],
@@ -1246,7 +1246,7 @@ const FRET_7_NODES = [
     "type": "game",
     "title": "Tritone — Guitar DO",
     "description": "DO phase for Tritone (Guitar)",
-    "troubadourPrompt": "Écoute carefully as I play two notes; try to name the interval you hear. Trust your inner ear, and let the sound guide your answer, Over.",
+    "troubadourPrompt": "Sing the root note. Now sing the note six frets higher — the Tritone. It is the hardest interval to sing because it has no natural resting place. If you can sing the Devil's interval, you can sing anything. ©PLING! — sing it, then play it. Over.",
     "prerequisites": [
       "fret-7-guitar-be"
     ],
@@ -1263,7 +1263,7 @@ const FRET_7_NODES = [
     "type": "game",
     "title": "Tritone — Guitar PLAY",
     "description": "PLAY phase for Tritone (Guitar)",
-    "troubadourPrompt": "Play the interval from the open string to the seventh fret, feeling the distance between them. Bravo, let each note sing clearly as you move, Over.",
+    "troubadourPrompt": "Play the Tritone. Hold it for four breaths. Now resolve to the Perfect 5th. Hold that for four breaths. Back to the Tritone. Resolve again. You are training your fingers and your nervous system to move through tension without panic. This is the Ordeal, and you are surviving it. Over.",
     "prerequisites": [
       "fret-7-guitar-do"
     ],
@@ -1280,7 +1280,7 @@ const FRET_7_NODES = [
     "type": "journal",
     "title": "Tritone — Workbook BE",
     "description": "BE phase for Tritone (Workbook)",
-    "troubadourPrompt": "Voila, take a moment to journal: what story does the note at fret seven inspire in you? Write freely, letting your imagination flow onto the page, Over.",
+    "troubadourPrompt": "In your journal: The Devil's interval was banned by the medieval church. Why do you think musicians kept playing it anyway? What does tension teach us that comfort cannot? Write one honest sentence. Over.",
     "prerequisites": [
       "fret-7-class-be"
     ],
@@ -1296,7 +1296,7 @@ const FRET_7_NODES = [
     "type": "journal",
     "title": "Tritone — Workbook DO",
     "description": "DO phase for Tritone (Workbook)",
-    "troubadourPrompt": "Alors, reflect on the sounds you just heard; what emotions or images arose? Note any insights, allowing them to deepen your musical awareness, Over.",
+    "troubadourPrompt": "When you held the Tritone, what happened in your body? Did your shoulders rise? Did your breath stop? The Tritone is a somatic mirror — it reveals where you hold tension. Write about what it showed you. Over.",
     "prerequisites": [
       "fret-7-workbook-be"
     ],
@@ -1312,7 +1312,7 @@ const FRET_7_NODES = [
     "type": "submission",
     "title": "Tritone — Workbook PLAY",
     "description": "PLAY phase for Tritone (Workbook)",
-    "troubadourPrompt": "Écoute, set up your recorder and capture your rendition of the fret‑seven note. Play with confidence, then listen back to celebrate your progress, Over.",
+    "troubadourPrompt": "Record yourself playing the Tritone and resolving it to the Perfect 5th — three times. Do not rush the resolution. Let the dissonance ring. Let the resolution breathe. This recording proves you can sit with musical tension and transform it. Submit it. Over.",
     "prerequisites": [
       "fret-7-workbook-do"
     ],
@@ -1373,7 +1373,7 @@ const FRET_8_NODES = [
     "type": "slide",
     "title": "Perfect 5th — Class BE",
     "description": "BE phase for Perfect 5th (Class)",
-    "troubadourPrompt": "Alors, imaginez la scène du film qui accompagne cette note à la huitième frette, quelles couleurs et quels mouvements voyez-vous? Over.",
+    "troubadourPrompt": "The Perfect 5th is the Reward after the Ordeal. Seven semitones of pure consonance — the most stable interval after the octave. It is the sound of power chords, church bells, and open tuning. After surviving the Devil's Note, you have earned this clarity. Close your eyes and hear it before you play it. Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -1387,7 +1387,7 @@ const FRET_8_NODES = [
     "type": "slide",
     "title": "Perfect 5th — Class DO",
     "description": "DO phase for Perfect 5th (Class)",
-    "troubadourPrompt": "Voila, écoutez la note à la huitième frette et fredonnez-la en ressentant sa vibration autour de 440 Hz, comme un souffle chaleureux. Over.",
+    "troubadourPrompt": "Hum any comfortable note. Now sing the note seven semitones higher — a Perfect 5th. It should feel like coming home after a long journey. The ratio is 3:2, the most natural consonance. Pythagoras heard it in the blacksmith's hammers. You hear it in every rock song ever written. Over.",
     "prerequisites": [
       "fret-8-class-be"
     ],
@@ -1403,7 +1403,7 @@ const FRET_8_NODES = [
     "type": "slide",
     "title": "Perfect 5th — Class PLAY",
     "description": "PLAY phase for Perfect 5th (Class)",
-    "troubadourPrompt": "Alors, placez votre doigt sur la huitième frette de la corde de Si et jouez la note. Start now Over.",
+    "troubadourPrompt": "Play the open low E. Now fret the B at the seventh fret. Root and Perfect 5th. That is a power chord. Two fingers, infinite power. Every rock anthem, every hymn, every war cry — built on this ratio. Strum it and feel the authority in your hands. Over.",
     "prerequisites": [
       "fret-8-class-do"
     ],
@@ -1419,7 +1419,7 @@ const FRET_8_NODES = [
     "type": "tool",
     "title": "Perfect 5th — Guitar BE",
     "description": "BE phase for Perfect 5th (Guitar)",
-    "troubadourPrompt": "Ecoutez votre respiration, inspirez profondément en comptant jusqu'à quatre, puis expirez lentement en relâchant la tension. Over.",
+    "troubadourPrompt": "After the Tritone's chaos, your body may still be holding tension. Shake your hands. Roll your wrists. The Perfect 5th requires confidence, not force — you cannot play a power chord while gripping the neck like a weapon. Loose hands. Strong sound. Over.",
     "prerequisites": [
       "fret-8-class-be"
     ],
@@ -1435,7 +1435,7 @@ const FRET_8_NODES = [
     "type": "game",
     "title": "Perfect 5th — Guitar DO",
     "description": "DO phase for Perfect 5th (Guitar)",
-    "troubadourPrompt": "Alors, écoutez attentivement les deux notes jouées à la huitième frette et identifiez l'intervalle que vous entendez. Over.",
+    "troubadourPrompt": "Play a power chord on E. Now slide the shape up two frets — that is F♯5. Two more — A♭5. The shape never changes. Your ear tracks the root, your hand follows the geometry. This is ©FHEAL in action — feel the chord before you think about it. Over.",
     "prerequisites": [
       "fret-8-guitar-be"
     ],
@@ -1451,7 +1451,7 @@ const FRET_8_NODES = [
     "type": "game",
     "title": "Perfect 5th — Guitar PLAY",
     "description": "PLAY phase for Perfect 5th (Guitar)",
-    "troubadourPrompt": "Voila, jouez l'intervalle de tierce majeure en plaçant vos doigts sur la huitième frette de la corde de Sol et la dixième frette de la corde de Si. Over.",
+    "troubadourPrompt": "Play a power chord progression: E5 → A5 → D5 → A5 → E5. Use only downstrokes. Feel the weight of each chord landing like a footstep. You are not playing notes — you are driving rhythm. The Perfect 5th is the engine of the guitar. Over.",
     "prerequisites": [
       "fret-8-guitar-do"
     ],
@@ -1467,7 +1467,7 @@ const FRET_8_NODES = [
     "type": "journal",
     "title": "Perfect 5th — Workbook BE",
     "description": "BE phase for Perfect 5th (Workbook)",
-    "troubadourPrompt": "Alors, dans votre journal, décrivez l'histoire que la note à la huitième frette vous inspire, comme un troubadour racontant une légende. Over.",
+    "troubadourPrompt": "In your journal: The power chord is the most democratic sound in music — anyone can play it within minutes. Why do you think simplicity carries so much emotional weight? Write about a time when less was more. Over.",
     "prerequisites": [
       "fret-8-class-be"
     ],
@@ -1483,7 +1483,7 @@ const FRET_8_NODES = [
     "type": "journal",
     "title": "Perfect 5th — Workbook DO",
     "description": "DO phase for Perfect 5th (Workbook)",
-    "troubadourPrompt": "Ecoutez intérieurement ce que vous avez entendu récemment et notez les émotions ou les images qui émergent. Over.",
+    "troubadourPrompt": "When you played the power chord progression, did your right hand find a natural rhythm? Did your body want to nod, tap, or sway? Write about what your body did without being told to. That is ©FHEAL — the body already knows. Over.",
     "prerequisites": [
       "fret-8-workbook-be"
     ],
@@ -1499,7 +1499,7 @@ const FRET_8_NODES = [
     "type": "submission",
     "title": "Perfect 5th — Workbook PLAY",
     "description": "PLAY phase for Perfect 5th (Workbook)",
-    "troubadourPrompt": "Voila, prenez votre téléphone ou votre enregistreur et capturez-vous en train de jouer l'intervalle à la huitième frette, puis réécoutez avec bienveillance. Over.",
+    "troubadourPrompt": "Record yourself playing a power chord progression of your own design — any roots, any rhythm. Make it feel like something. Make it mean something. This is the first time you are composing, not practicing. Submit it. Over.",
     "prerequisites": [
       "fret-8-workbook-do"
     ],
@@ -1536,7 +1536,7 @@ const FRET_8_NODES = [
     "type": "reflection",
     "title": "FHEAL — The Power",
     "description": "No judgment. Just observation. The inner critic has no place here.",
-    "troubadourPrompt": "Bravo, relâchez toute critique envers vous-même et permettez à la musique de simplement être, comme un souffle qui passe. Over.",
+    "troubadourPrompt": "©FHEAL — Feel the weight of the guitar in your lap. Hold the last chord. Embrace the silence after it fades. Accept that what you played is exactly what it needed to be. Let go. You have survived the Ordeal and claimed the Reward. Over.",
     "prerequisites": [
       "fret-8-workbook-be",
       "fret-8-workbook-do",
@@ -1560,7 +1560,7 @@ const FRET_9_NODES = [
     "type": "slide",
     "title": "Minor 6th — Class BE",
     "description": "BE phase for Minor 6th (Class)",
-    "troubadourPrompt": "Explore the Minor 6th in the class pillar. BE phase. Over.",
+    "troubadourPrompt": "The Minor 6th is eight semitones — the inversion of the Major 3rd. Where the Major 3rd was sunlight, the Minor 6th is the memory of sunlight. It is the interval of film scores and lullabies, of Beauty and the Beast and Love Story. You are on the Road Back. The journey home begins now. Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -1574,7 +1574,7 @@ const FRET_9_NODES = [
     "type": "slide",
     "title": "Minor 6th — Class DO",
     "description": "DO phase for Minor 6th (Class)",
-    "troubadourPrompt": "Explore the Minor 6th in the class pillar. DO phase. Over.",
+    "troubadourPrompt": "Play the open low E. Now fret the C at the eighth fret. That searching, bittersweet sound is the Minor 6th. Sing the root, then try to sing the Minor 6th. Your inner ear must stretch further than before — eight semitones is a wide leap. Trust it. Over.",
     "prerequisites": [
       "fret-9-class-be"
     ],
@@ -1590,7 +1590,7 @@ const FRET_9_NODES = [
     "type": "slide",
     "title": "Minor 6th — Class PLAY",
     "description": "PLAY phase for Minor 6th (Class)",
-    "troubadourPrompt": "Explore the Minor 6th in the class pillar. PLAY phase. Over.",
+    "troubadourPrompt": "This is where all three protocols converge. Play the Root. ©SHEARL — see the eighth fret in your mind's eye. ©PLING! — sing the Minor 6th before you play it. ©FHEAL — now play it without thinking, letting the sound arise from your body. Three protocols, one note. Over.",
     "prerequisites": [
       "fret-9-class-do"
     ],
@@ -1606,7 +1606,7 @@ const FRET_9_NODES = [
     "type": "tool",
     "title": "Minor 6th — Guitar BE",
     "description": "BE phase for Minor 6th (Guitar)",
-    "troubadourPrompt": "Explore the Minor 6th in the guitar pillar. BE phase. Over.",
+    "troubadourPrompt": "You are about to enter the Vertiscale Engine — the convergence of everything you have learned. Before you begin, find the minimum finger pressure needed to make a clean note at the eighth fret. Use the Pressure Threshold technique from Fret 9. Effortlessness is the goal. Over.",
     "prerequisites": [
       "fret-9-class-be"
     ],
@@ -1623,7 +1623,7 @@ const FRET_9_NODES = [
     "type": "game",
     "title": "Minor 6th — Guitar DO",
     "description": "DO phase for Minor 6th (Guitar)",
-    "troubadourPrompt": "Explore the Minor 6th in the guitar pillar. DO phase. Over.",
+    "troubadourPrompt": "Phase 1 of the Vertiscale: The Inner Fretboard. Flash patterns will appear — memorize them using ©SHEARL before tapping. Your spatial memory is being tested. You are no longer reading the neck; you are recalling it from inside. Over.",
     "prerequisites": [
       "fret-9-guitar-be"
     ],
@@ -1640,7 +1640,7 @@ const FRET_9_NODES = [
     "type": "game",
     "title": "Minor 6th — Guitar PLAY",
     "description": "PLAY phase for Minor 6th (Guitar)",
-    "troubadourPrompt": "Explore the Minor 6th in the guitar pillar. PLAY phase. Over.",
+    "troubadourPrompt": "Phase 2 of the Vertiscale: The Inner Ear. Notes will descend. Sing them before they reach the bottom. ©PLING! — your voice leads, your fingers follow. If you can sing the note, you own it. If you cannot, you are borrowing it. Make it yours. Over.",
     "prerequisites": [
       "fret-9-guitar-do"
     ],
@@ -1657,7 +1657,7 @@ const FRET_9_NODES = [
     "type": "journal",
     "title": "Minor 6th — Workbook BE",
     "description": "BE phase for Minor 6th (Workbook)",
-    "troubadourPrompt": "Explore the Minor 6th in the workbook pillar. BE phase. Over.",
+    "troubadourPrompt": "In your journal: The Road Back is the hero's longest stretch. What in your musical journey so far has felt like a long road? What kept you walking? Write about your persistence — not your talent. Over.",
     "prerequisites": [
       "fret-9-class-be"
     ],
@@ -1673,7 +1673,7 @@ const FRET_9_NODES = [
     "type": "journal",
     "title": "Minor 6th — Workbook DO",
     "description": "DO phase for Minor 6th (Workbook)",
-    "troubadourPrompt": "Explore the Minor 6th in the workbook pillar. DO phase. Over.",
+    "troubadourPrompt": "After the Vertiscale, reflect: which phase was hardest — seeing, singing, or feeling? That gap is your growth edge. Write about the phase that challenged you most and why. The awareness alone is progress. Over.",
     "prerequisites": [
       "fret-9-workbook-be"
     ],
@@ -1689,7 +1689,7 @@ const FRET_9_NODES = [
     "type": "submission",
     "title": "Minor 6th — Workbook PLAY",
     "description": "PLAY phase for Minor 6th (Workbook)",
-    "troubadourPrompt": "Explore the Minor 6th in the workbook pillar. PLAY phase. Over.",
+    "troubadourPrompt": "Record yourself playing the Vertiscale — ascending from Root through all 12 intervals on a single string. Play it too slow. Slower than you think is right. Myelination requires patience, not speed. Submit it. Over.",
     "prerequisites": [
       "fret-9-workbook-do"
     ],
@@ -1726,7 +1726,7 @@ const FRET_9_NODES = [
     "type": "reflection",
     "title": "FHEAL — The Longing",
     "description": "No judgment. Just observation. The inner critic has no place here.",
-    "troubadourPrompt": "FHEAL: Feel, Hold, Embrace, Accept, Let go. Over.",
+    "troubadourPrompt": "©FHEAL in full. Feel the fatigue in your fingers. Hold the guitar against your chest. Embrace the fact that you just played through the hardest chapter in the curriculum. Accept your current level without comparison. Let go of what you think you should sound like. You sound like you. Over.",
     "prerequisites": [
       "fret-9-workbook-be",
       "fret-9-workbook-do",
@@ -1750,7 +1750,7 @@ const FRET_10_NODES = [
     "type": "slide",
     "title": "Major 6th — Class BE",
     "description": "BE phase for Major 6th (Class)",
-    "troubadourPrompt": "Close your eyes and picture a cinematic moment that this Fret 10 tone could underscore. Over. What would be the scene in the movie? Over.",
+    "troubadourPrompt": "The Major 6th is the Resurrection. Nine semitones of nostalgia, hope, and wistful beauty. It is the interval you hear in lullabies and farewells. This chapter is about being seen — performing not for perfection, but for connection. The audience does not hear your technique. They feel your story. Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -1764,7 +1764,7 @@ const FRET_10_NODES = [
     "type": "slide",
     "title": "Major 6th — Class DO",
     "description": "DO phase for Major 6th (Class)",
-    "troubadourPrompt": "Listen to the pure tone ringing at approximately 330 Hz, the note you’ll find at Fret 10 on the B string. Over. Now hum or sing that pitch, letting your voice match the vibration. Over.",
+    "troubadourPrompt": "Play the open low E. Now sing — do not play — the note nine semitones higher. That is the Major 6th. It is a wide leap. If your voice cracks or wobbles, that is honesty, not failure. Sing it three times. Each time, your voice will find it more easily. Over.",
     "prerequisites": [
       "fret-10-class-be"
     ],
@@ -1780,7 +1780,7 @@ const FRET_10_NODES = [
     "type": "slide",
     "title": "Major 6th — Class PLAY",
     "description": "PLAY phase for Major 6th (Class)",
-    "troubadourPrompt": "Place your finger firmly on the high E string at Fret 10 to sound a bright G. Over. Start now and let the note ring clearly. Over.",
+    "troubadourPrompt": "Play a melody — any melody you love. Not from a book. Not from a lesson. From memory. Play it slowly, with feeling. Dedicate it to someone. The act of dedicating changes everything — your touch softens, your tempo breathes, your heart opens. This is the Performing pillar. Over.",
     "prerequisites": [
       "fret-10-class-do"
     ],
@@ -1796,7 +1796,7 @@ const FRET_10_NODES = [
     "type": "tool",
     "title": "Major 6th — Guitar BE",
     "description": "BE phase for Major 6th (Guitar)",
-    "troubadourPrompt": "Sit tall, inhale deeply through the nose, and exhale slowly through the mouth, feeling the guitar’s wood against your chest. Over. Alors, let each breath center your focus as you prepare to play Fret 10. Over.",
+    "troubadourPrompt": "This chapter is about recording anxiety — the fear of being heard. Before you open the Coaching Portal, sit with that fear. Name it. Is it the fear of being judged? Of not being good enough? That fear is exactly what the Troubadour’s Journey is designed to dissolve. Breathe. Over.",
     "prerequisites": [
       "fret-10-class-be"
     ],
@@ -1812,7 +1812,7 @@ const FRET_10_NODES = [
     "type": "game",
     "title": "Major 6th — Guitar DO",
     "description": "DO phase for Major 6th (Guitar)",
-    "troubadourPrompt": "Écoute carefully as I play two notes; one is the open string, the other is the note at Fret 10. Over. Identify whether the interval you hear is a major second, minor third, or perfect fourth. Over.",
+    "troubadourPrompt": "Play the same simple melody three times. First time: play it as if you are sad. Second time: as if you are celebrating. Third time: as if you are saying goodbye. Same notes. Three completely different performances. Emotional conditioning — this is what separates a guitarist from a musician. Over.",
     "prerequisites": [
       "fret-10-guitar-be"
     ],
@@ -1828,7 +1828,7 @@ const FRET_10_NODES = [
     "type": "game",
     "title": "Major 6th — Guitar PLAY",
     "description": "PLAY phase for Major 6th (Guitar)",
-    "troubadourPrompt": "Now play the interval we just identified, moving from the open string to Fret 10 on the same string. Over. Bravo, you’ve just voiced the interval with your fingers. Over.",
+    "troubadourPrompt": "Open the Coaching Portal. Turn on your camera. Look into it. Play your dedicated melody. You are performing for Bertrand — and more importantly, for yourself. This is being seen. This is the Resurrection. Bravo. Over.",
     "prerequisites": [
       "fret-10-guitar-do"
     ],
@@ -1844,7 +1844,7 @@ const FRET_10_NODES = [
     "type": "journal",
     "title": "Major 6th — Workbook BE",
     "description": "BE phase for Major 6th (Workbook)",
-    "troubadourPrompt": "Voila, take a moment to write down the movie scene you imagined for the Fret 10 sound. Over. Describe the colors, emotions, and story that this note inspires in you. Over.",
+    "troubadourPrompt": "In your journal: What was it like to be recorded? Did you notice your body tensing? Did the inner critic appear? Write honestly about the experience of performing on camera. There is no wrong answer — only awareness. Over.",
     "prerequisites": [
       "fret-10-class-be"
     ],
@@ -1860,7 +1860,7 @@ const FRET_10_NODES = [
     "type": "journal",
     "title": "Major 6th — Workbook DO",
     "description": "DO phase for Major 6th (Workbook)",
-    "troubadourPrompt": "Alors, reflect on the pitch you hummed and how closely your voice matched the guitar’s tone. Over. Note any adjustments you made and what they reveal about your ear. Over.",
+    "troubadourPrompt": "When you played the melody three ways — sad, joyful, farewell — which version felt most natural? Which felt forced? Write about what your body wanted to express versus what your mind told it to express. The gap between them is your growth edge. Over.",
     "prerequisites": [
       "fret-10-workbook-be"
     ],
@@ -1876,7 +1876,7 @@ const FRET_10_NODES = [
     "type": "submission",
     "title": "Major 6th — Workbook PLAY",
     "description": "PLAY phase for Major 6th (Workbook)",
-    "troubadourPrompt": "Set up your recorder and capture a clean take of the Fret 10 note you just played. Over. Bravo, listening back will show you the true voice of your instrument. Over.",
+    "troubadourPrompt": "Record your dedicated melody one final time. This time, do not think about technique. Do not think about the camera. Think only about the person you are playing for. Submit it to Bertrand. He will hear not your skill, but your heart. Over.",
     "prerequisites": [
       "fret-10-workbook-do"
     ],
@@ -1913,7 +1913,7 @@ const FRET_10_NODES = [
     "type": "reflection",
     "title": "FHEAL — The Love",
     "description": "No judgment. Just observation. The inner critic has no place here.",
-    "troubadourPrompt": "Voila, close your practice session by releasing any tension or judgment about today’s playing. Over. Let the music flow freely, trusting that each note is a step forward. Over",
+    "troubadourPrompt": "©FHEAL — You were seen today. You performed. You submitted. That took more courage than any scale or chord progression. Feel the relief. Hold the pride. Embrace the vulnerability. Accept that you are a musician. Let go of the idea that you are not ready. You are. Over.",
     "prerequisites": [
       "fret-10-workbook-be",
       "fret-10-workbook-do",
@@ -1937,7 +1937,7 @@ const FRET_11_NODES = [
     "type": "slide",
     "title": "Minor 7th — Class BE",
     "description": "BE phase for Minor 7th (Class)",
-    "troubadourPrompt": "Close your eyes and let the vibration of fret eleven paint a picture in your mind. Alors, what would be the scene in the movie, Over.",
+    "troubadourPrompt": "The Minor 7th — ten semitones. This is the Return. The interval that makes a Dominant 7th chord demand resolution. It is the sound of blues, of jazz, of soul. Every 12-bar blues you have ever heard pivots on this interval. You are almost home. One more step. Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -1951,7 +1951,7 @@ const FRET_11_NODES = [
     "type": "slide",
     "title": "Minor 7th — Class DO",
     "description": "DO phase for Minor 7th (Class)",
-    "troubadourPrompt": "Feel the pure tone of fret eleven resonating at approximately 329.63 Hz, like a bright bell. Ecoute, hum or sing that pitch, letting your voice match the frequency, Over.",
+    "troubadourPrompt": "Play a G chord. Now add the F on the first fret of the high E string. That gritty, unresolved sound is G7 — a Dominant 7th. The Minor 7th is the note that creates the gravitational pull back to C. Hum the G, then hum the F. Feel how the F leans toward the E. That lean is the Return. Over.",
     "prerequisites": [
       "fret-11-class-be"
     ],
@@ -1967,7 +1967,7 @@ const FRET_11_NODES = [
     "type": "slide",
     "title": "Minor 7th — Class PLAY",
     "description": "PLAY phase for Minor 7th (Class)",
-    "troubadourPrompt": "On the high E string, fret eleven sounds the note D. Start now, Over.",
+    "troubadourPrompt": "Play a simple 12-bar blues in E: E7 for four bars, A7 for two, E7 for two, B7 for one, A7 for one, E7 for two. Every chord is a Dominant 7th — every chord contains the Minor 7th interval. You are not learning theory. You are playing the blues. Over.",
     "prerequisites": [
       "fret-11-class-do"
     ],
@@ -1983,7 +1983,7 @@ const FRET_11_NODES = [
     "type": "tool",
     "title": "Minor 7th — Guitar BE",
     "description": "BE phase for Minor 7th (Guitar)",
-    "troubadourPrompt": "Sit tall, inhale deeply through the nose, and exhale slowly through the mouth. Ecoute votre souffle, et laissez-le vous ancrer, Over.",
+    "troubadourPrompt": "The blues requires a relaxed right hand and a loose wrist. Before you play, shake your strumming hand for ten seconds. Let it go completely limp. Now pick up the guitar and strum — keep that looseness. The blues does not come from effort. It comes from release. Over.",
     "prerequisites": [
       "fret-11-class-be"
     ],
@@ -1999,7 +1999,7 @@ const FRET_11_NODES = [
     "type": "game",
     "title": "Minor 7th — Guitar DO",
     "description": "DO phase for Minor 7th (Guitar)",
-    "troubadourPrompt": "Listen carefully as I play two notes spaced by a major third. Identify whether you hear a major third or a minor third, Over.",
+    "troubadourPrompt": "Play a Dominant 7th chord. Now mute all the strings with your left hand and strum the muted strings rhythmically — chuck-chuck-chuck. Now alternate: chord, mute, chord, mute. That is the funk groove. Right-hand muting is the secret weapon of rhythm guitar. Over.",
     "prerequisites": [
       "fret-11-guitar-be"
     ],
@@ -2015,7 +2015,7 @@ const FRET_11_NODES = [
     "type": "game",
     "title": "Minor 7th — Guitar PLAY",
     "description": "PLAY phase for Minor 7th (Guitar)",
-    "troubadourPrompt": "Place your ring finger on the B string, fret eleven, and your index on the G string, fret nine to form a major third. Play the interval, let it ring, and feel the harmony, Over.",
+    "troubadourPrompt": "Play a 12-bar blues with a shuffle feel. Swing the eighth notes — long-short, long-short, like a heartbeat with a limp. This is not straight time. This is the blues talking. Let your body sway. If your head is not moving, the rhythm is not in your body yet. Over.",
     "prerequisites": [
       "fret-11-guitar-do"
     ],
@@ -2031,7 +2031,7 @@ const FRET_11_NODES = [
     "type": "journal",
     "title": "Minor 7th — Workbook BE",
     "description": "BE phase for Minor 7th (Workbook)",
-    "troubadourPrompt": "Open your journal and let the image from your imagination flow onto the page. Alors, describe the movie scene you imagined at fret eleven, Over.",
+    "troubadourPrompt": "In your journal: The blues is not a style — it is a feeling. Everyone has the blues. Write about a moment in your life that felt like a 12-bar loop — a pattern you kept repeating until something finally shifted. One honest paragraph. Over.",
     "prerequisites": [
       "fret-11-class-be"
     ],
@@ -2047,7 +2047,7 @@ const FRET_11_NODES = [
     "type": "journal",
     "title": "Minor 7th — Workbook DO",
     "description": "DO phase for Minor 7th (Workbook)",
-    "troubadourPrompt": "Take a moment to reflect on the sound you just heard and how it resonated within you. Note any emotions or images that arose from the sound, Over.",
+    "troubadourPrompt": "When you played the shuffle, did your body want to move? Did you smile? Did you feel something unlock? The Minor 7th is the most emotionally honest interval — it does not pretend to be resolved. Write about what felt authentic in your playing today. Over.",
     "prerequisites": [
       "fret-11-workbook-be"
     ],
@@ -2063,7 +2063,7 @@ const FRET_11_NODES = [
     "type": "submission",
     "title": "Minor 7th — Workbook PLAY",
     "description": "PLAY phase for Minor 7th (Workbook)",
-    "troubadourPrompt": "Set up your recorder, take a deep breath, and play the interval you just practiced. Press play, capture your performance, and listen back with kindness, Over.",
+    "troubadourPrompt": "Record yourself playing a 12-bar blues in any key. Use Dominant 7th chords. Use a shuffle rhythm. Play it like you mean it — not like you are practicing it. This is the blues. It does not care about perfection. It cares about truth. Submit it. Over.",
     "prerequisites": [
       "fret-11-workbook-do"
     ],
@@ -2100,7 +2100,7 @@ const FRET_11_NODES = [
     "type": "reflection",
     "title": "FHEAL — The Blues",
     "description": "No judgment. Just observation. The inner critic has no place here.",
-    "troubadourPrompt": "Allow yourself to release any judgment about today's practice. Release any critique, breathe, and trust your journey, Over.",
+    "troubadourPrompt": "©FHEAL — The blues taught you that imperfection is not failure. It is expression. Feel the rhythm still in your body. Hold the last chord ringing in your memory. Embrace the rawness of what you played. Accept that the blues is you, speaking. Let go of the need to be polished. Over.",
     "prerequisites": [
       "fret-11-workbook-be",
       "fret-11-workbook-do",
@@ -2124,7 +2124,7 @@ const FRET_12_NODES = [
     "type": "slide",
     "title": "Major 7th — Class BE",
     "description": "BE phase for Major 7th (Class)",
-    "troubadourPrompt": "Explore the Major 7th in the class pillar. BE phase. Over.",
+    "troubadourPrompt": "The Major 7th. Eleven semitones — one half-step from the Octave. The final interval. It is the sound of arrival that has not quite landed. The dissonance of a Cmaj7 chord is not ugly — it is elegant, hovering, luminous. Like standing on the threshold of home, seeing the light inside. This is the Return with the Elixir. Over.",
     "prerequisites": [],
     "suggestedAfter": [],
     "xpValue": 10,
@@ -2138,7 +2138,7 @@ const FRET_12_NODES = [
     "type": "slide",
     "title": "Major 7th — Class DO",
     "description": "DO phase for Major 7th (Class)",
-    "troubadourPrompt": "Explore the Major 7th in the class pillar. DO phase. Over.",
+    "troubadourPrompt": "Play a C major chord. Now lift your index finger off the first fret of the B string, letting the open B ring. That shimmering, almost-resolved sound is Cmaj7. The Major 7th hovers one semitone below the Octave — close enough to taste home but not quite there. Sing the B, then sing the C above it. Feel how close they are. Over.",
     "prerequisites": [
       "fret-12-class-be"
     ],
@@ -2154,7 +2154,7 @@ const FRET_12_NODES = [
     "type": "slide",
     "title": "Major 7th — Class PLAY",
     "description": "PLAY phase for Major 7th (Class)",
-    "troubadourPrompt": "Explore the Major 7th in the class pillar. PLAY phase. Over.",
+    "troubadourPrompt": "Play four chords: Cmaj7, Am7, Dm7, G7. Let each chord ring for a full breath. That progression is the sound of every bossa nova, every chill jazz café, every sunset. You are not playing notes — you are painting with intervals. Every color you have learned is in those four chords. Over.",
     "prerequisites": [
       "fret-12-class-do"
     ],
@@ -2170,7 +2170,7 @@ const FRET_12_NODES = [
     "type": "tool",
     "title": "Major 7th — Guitar BE",
     "description": "BE phase for Major 7th (Guitar)",
-    "troubadourPrompt": "Explore the Major 7th in the guitar pillar. BE phase. Over.",
+    "troubadourPrompt": "You have walked all 12 frets. Before this final practice session, sit with the guitar in your lap and do nothing for sixty seconds. No playing. No thinking. Just breathing. You began at Fret 1 by learning to breathe. You end at Fret 12 the same way. The circle closes. Over.",
     "prerequisites": [
       "fret-12-class-be"
     ],
@@ -2186,7 +2186,7 @@ const FRET_12_NODES = [
     "type": "game",
     "title": "Major 7th — Guitar DO",
     "description": "DO phase for Major 7th (Guitar)",
-    "troubadourPrompt": "Explore the Major 7th in the guitar pillar. DO phase. Over.",
+    "troubadourPrompt": "Play the Chromatic Vertiscale: starting from the open E, play every fret — one by one — up to the 12th fret. Each fret is an interval you have mastered. Root, Minor 2nd, Major 2nd, Minor 3rd, Major 3rd, Perfect 4th, Tritone, Perfect 5th, Minor 6th, Major 6th, Minor 7th, Major 7th, Octave. Name each one as you play it. Over.",
     "prerequisites": [
       "fret-12-guitar-be"
     ],
@@ -2202,7 +2202,7 @@ const FRET_12_NODES = [
     "type": "game",
     "title": "Major 7th — Guitar PLAY",
     "description": "PLAY phase for Major 7th (Guitar)",
-    "troubadourPrompt": "Explore the Major 7th in the guitar pillar. PLAY phase. Over.",
+    "troubadourPrompt": "Now improvise freely across the entire neck. Use any interval, any position, any rhythm. There are no wrong notes — only choices. ©FHEAL is fully active. You are not practicing. You are playing. You are the instrument playing the instrument. Over.",
     "prerequisites": [
       "fret-12-guitar-do"
     ],
@@ -2218,7 +2218,7 @@ const FRET_12_NODES = [
     "type": "journal",
     "title": "Major 7th — Workbook BE",
     "description": "BE phase for Major 7th (Workbook)",
-    "troubadourPrompt": "Explore the Major 7th in the workbook pillar. BE phase. Over.",
+    "troubadourPrompt": "In your journal: You began this journey by asking 'What does the root note feel like?' Now ask: 'Who am I as a musician?' Not who you want to be. Who you are right now, today, at this fret. Write one paragraph — no editing, no judgment. Over.",
     "prerequisites": [
       "fret-12-class-be"
     ],
@@ -2234,7 +2234,7 @@ const FRET_12_NODES = [
     "type": "journal",
     "title": "Major 7th — Workbook DO",
     "description": "DO phase for Major 7th (Workbook)",
-    "troubadourPrompt": "Explore the Major 7th in the workbook pillar. DO phase. Over.",
+    "troubadourPrompt": "Look back through your journal entries — from Fret 1 to now. Read your own words. Notice how your language has changed. The student who wrote at Fret 1 is not the same person writing at Fret 12. Write about what you notice. That difference is the elixir. Over.",
     "prerequisites": [
       "fret-12-workbook-be"
     ],
@@ -2250,7 +2250,7 @@ const FRET_12_NODES = [
     "type": "submission",
     "title": "Major 7th — Workbook PLAY",
     "description": "PLAY phase for Major 7th (Workbook)",
-    "troubadourPrompt": "Explore the Major 7th in the workbook pillar. PLAY phase. Over.",
+    "troubadourPrompt": "Record your Capstone Audition. Play anything you want — a song, an improvisation, a melody you composed. Play it for Bertrand. Play it for yourself. This recording is the proof that you walked all 12 frets and arrived home. Submit it. Bravo. Over.",
     "prerequisites": [
       "fret-12-workbook-do"
     ],
@@ -2285,7 +2285,7 @@ const FRET_12_NODES = [
     "type": "reflection",
     "title": "FHEAL — The Lead",
     "description": "No judgment. Just observation. The inner critic has no place here.",
-    "troubadourPrompt": "FHEAL: Feel, Hold, Embrace, Accept, Let go. Over.",
+    "troubadourPrompt": "©FHEAL — the final reflection. Feel the weight of twelve chapters of growth. Hold the memory of every interval, every journal entry, every recording. Embrace the musician you have become. Accept that the journey never truly ends — only this chapter does. Let go of the student. You are a Troubadour now. Over.",
     "prerequisites": [
       "fret-12-workbook-be",
       "fret-12-workbook-do",
