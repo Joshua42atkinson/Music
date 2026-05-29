@@ -1,0 +1,21 @@
+{
+  "short_name": "Voix Vive",
+  "name": "Voix Vive Academy",
+  "icons": [
+    {
+      "src": "/assets/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#050508",
+  "display": "standalone",
+  "theme_color": "#c9a96e",
+  "description": "Voix Vive 12-fret journey from silence to song."
+}

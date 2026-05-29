@@ -588,6 +588,13 @@ function speak(text, rate = 0.85) {
 - [ ] **PWA manifest** — Installable, offline cache
 - [ ] **Service worker** — Offline mode for core features
 
+### Phase 5.5: Aesthetic & PEARL Harmonization (IN PROGRESS)
+
+**Goal:** Ensure every route and component is compliant with the strict PEARL file header standard (`05_PEARL_STANDARD.md`) and visually aligns with the esoteric, sovereign "Slow Web" aesthetic.
+
+- [ ] **PEARL Compliance Sweep** — Audit and apply headers to all core shells (`LandingScreen`, `GuitarWorkbench`, `PlaybookShell`).
+- [ ] **Aesthetic Review** — Harmonize component styling, removing default generic UI elements in favor of thematic, immersive designs.
+
 ### Phase 6: Android (Moonshot — Revenue Gate: $2,500/mo)
 
 **Prerequisites from you:** Open Android Studio (when I say so), choose Tauri vs Capacitor

@@ -90,7 +90,7 @@ export default function TermsOfService() {
         </button>
 
         <h1>Terms of Service</h1>
-        <p className="legal-updated">Last updated: May 19, 2026</p>
+        <p className="legal-updated">Last updated: May 29, 2026</p>
 
         <p>
           Welcome to Voix Vive, a guitar learning platform operated by Bertrand 
@@ -159,18 +159,19 @@ export default function TermsOfService() {
           <li>Misrepresent your identity when submitting practice recordings</li>
         </ul>
 
-        <h2>8. Disclaimer</h2>
+        <h2>8. Educational Tool & Medical Disclaimer</h2>
         <p>
-          Voix Vive is provided "as is." We make no guarantees about musical skill 
+          Voix Vive is an educational tool provided "as is." We make no guarantees about musical skill 
           improvement, career outcomes, or performance results. Learning guitar is 
           a personal journey — the platform supports that journey but cannot 
           guarantee specific outcomes.
         </p>
         <p>
-          The breathing exercises and somatic techniques described in the curriculum 
-          are for general wellness purposes. They are not medical advice. If you have 
-          a respiratory condition or other health concern, consult a healthcare 
-          professional before using breathing-based features.
+          <strong>No Medical Advice:</strong> The breathing exercises, somatic techniques, and physical check-ins described in the curriculum 
+          are for general educational and wellness purposes only. They are absolutely not medical advice, diagnosis, or treatment. 
+          If you have a respiratory condition, physical injury, or other health concern, consult a qualified healthcare 
+          professional before using the breathing-based or somatic features. By using the platform, you acknowledge that 
+          you are responsible for your own physical well-being while practicing.
         </p>
 
         <h2>9. Limitation of Liability</h2>

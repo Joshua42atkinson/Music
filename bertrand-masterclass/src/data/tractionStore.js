@@ -25,7 +25,7 @@ const DEFAULT_STATE = {
   lastPracticeDate: null,
   streak: 0,
   pitchRoomScore: 0,
-  pitchRoomHighScore: 0,
+  pitchRoomBestAccuracy: 0,
   // DAG Navigation
   currentNodeId: 'fret-1-class-be', // Everyone starts here
   completedNodes: [],
@@ -34,6 +34,8 @@ const DEFAULT_STATE = {
     showFretNumbers: true,
     showMetronome: true,
     showCAGEDOverlay: true,
+    sandboxMode: false,
+    aiEnabled: true,
     scaffoldingLevel: 1.0 // 1.0 = full scaffolding, 0.0 = none
   }
 };
@@ -181,7 +183,7 @@ export function updatePitchScore(state, points) {
   const newState = {
     ...state,
     pitchRoomScore: newScore,
-    pitchRoomHighScore: Math.max(state.pitchRoomHighScore, newScore)
+    pitchRoomBestAccuracy: Math.max(state.pitchRoomBestAccuracy, newScore)
   };
   saveTraction(newState);
   return newState;

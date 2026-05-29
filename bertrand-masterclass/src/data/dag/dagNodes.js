@@ -86,7 +86,7 @@ const FRET_1_NODES = [
     title: 'Fret 1 Complete — The Foundation',
     description: 'You have imagined, heard, and played the root note.',
     troubadourPrompt: "Voilà. Fret 1 — complete. You are an instrument playing an instrument. The foundation is laid. Bravo. Tomorrow, the Minor 2nd. But for now, breathe. Trust the process. Over.",
-    prerequisites: ['fret-1-class-be', 'fret-1-class-do', 'fret-1-class-play'],
+    prerequisites: ['fret-1-class-be', 'fret-1-class-do', 'fret-1-class-play', 'fret-1-guitar-milestone'],
     suggestedAfter: ['fret-2-class-be'],
     xpValue: 25,
     estimatedMinutes: 2,
@@ -148,6 +148,22 @@ const FRET_1_NODES = [
     estimatedMinutes: 10,
     toolId: 'pling-orbs',
     toolConfig: { notes: ['E2'], descending: true, orbSpeed: 'slow' },
+  },
+
+    {
+    id: 'fret-1-guitar-milestone',
+    pillar: 'guitar',
+    fret: 1,
+    phase: 'all',
+    type: 'milestone',
+    title: 'The Somatic Gate',
+    description: 'Physical mastery check.',
+    troubadourPrompt: 'Before we proceed, a somatic check. Hold the interval for 60 seconds. Breathe from the diaphragm. Let the tension melt. Over.',
+    prerequisites: ['fret-1-guitar-be', 'fret-1-guitar-do', 'fret-1-guitar-play'],
+    suggestedAfter: [],
+    xpValue: 10,
+    estimatedMinutes: 2,
+    audioCue: 'completion-chime',
   },
 
   // ═══════════════════════════════════════════════════════════

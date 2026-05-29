@@ -26,7 +26,10 @@ const FOCUS_TIPS = [
   'Let "wrong" notes exist without flinching.',
 ];
 
-const PracticeTimer = () => {
+import { useScaffolding } from './ScaffoldingProvider';
+
+const PracticeTimer = ({ fretId = 2 }) => {
+  const { completePhase, updateTraction } = useScaffolding();
   const [minutes, setMinutes] = useState(15);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
   const [isActive, setIsActive] = useState(false);
@@ -61,6 +64,10 @@ const PracticeTimer = () => {
           });
           setMode('break');
           setTimeLeft(5 * 60);
+          
+          // Auto-mark node complete after time threshold
+          completePhase(`fret-${fretId}-guitar-do`, 'do');
+          updateTraction(prev => ({ ...prev, practiceMinutes: (prev.practiceMinutes || 0) + minutes }));
         } else {
           setCompletionMessage({
             icon: '♫',

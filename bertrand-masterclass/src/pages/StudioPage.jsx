@@ -40,7 +40,11 @@ export default function StudioPage() {
 
   const handlePayment = (stripeLink) => {
     if (stripeLink) {
-      window.open(stripeLink, '_blank');
+      if (stripeLink.includes('mock_')) {
+        alert("This Stripe link is in MOCK mode for the Silent Beta. Bertrand has not yet provided the live Stripe Payment URLs.");
+      } else {
+        window.open(stripeLink, '_blank');
+      }
     } else {
       // Scroll to payment methods section as fallback
       document.getElementById('payment-methods')?.scrollIntoView({ behavior: 'smooth' });

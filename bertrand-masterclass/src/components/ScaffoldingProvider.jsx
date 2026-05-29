@@ -19,6 +19,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { loadTraction, saveTraction, getScaffoldingLevel, getCurrentPhase, completeDAGPhase, attemptDAGPhase, setCurrentNode, completeNode, markDepthExplored, passSomaticGate } from '../data/tractionStore';
 import { saveProgress, getProgress } from '../data/localDatabase';
 import { getTractionState, saveTractionState, migrateLocalToCloud } from '../lib/supabase';
+import { useAuth } from '../hooks/useAuth';
 import { getNodeById } from '../data/dag/dagNodes';
 import { getNextRecommendedNode } from '../data/dag/dagEdges';
 
@@ -38,82 +39,19 @@ const ScaffoldingContext = createContext(null);
 export function ScaffoldingProvider({ children }) {
   const [traction, setTraction] = useState(loadTraction());
   const [isHydrated, setIsHydrated] = useState(false);
+  const { user } = useAuth();
   const [userId, setUserId] = useState(null);
 
-  // ── Listen for auth state changes (login / logout) ──
-  useEffect(() => {
-    let unsub = null;
+  // ── No Auth Listener needed for Sovereign Mode ──
 
-    const setupAuthListener = async () => {
-      try {
-        const mod = await import('../lib/supabase');
-        const supabase = mod.default;
-        if (!supabase) return;
-
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUserId(session.user.id);
-        }
-
-        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-          const newId = session?.user?.id || null;
-          setUserId(prev => {
-            if (prev !== newId) {
-              // Auth changed — we'll handle hydration in the next effect cycle
-              if (newId) {
-                console.log('[VoixVive] User logged in:', newId);
-              } else {
-                console.log('[VoixVive] User logged out');
-              }
-            }
-            return newId;
-          });
-        });
-        unsub = listener.subscription;
-      } catch {
-        // Supabase not configured — stay in offline mode
-      }
-    };
-
-    setupAuthListener();
-    return () => unsub?.unsubscribe();
-  }, []);
-
-  // ── On mount: hydrate from cloud (if logged in) or IndexedDB ──
+  // ── On mount: hydrate from IndexedDB backup (if localStorage empty) ──
   useEffect(() => {
     const hydrate = async () => {
       const localState = loadTraction();
       const isEmptyState = !localState.lastPracticeDate && localState.bardLevel <= 1 && localState.practiceMinutes === 0;
 
-      // Check if Supabase auth has a user
-      let sessionUserId = null;
-      try {
-        const { getSession } = await import('../lib/supabase');
-        const session = await getSession();
-        sessionUserId = session?.user?.id || null;
-      } catch {
-        sessionUserId = null;
-      }
-
-      if (sessionUserId) {
-        // Logged in — try cloud first
-        setUserId(sessionUserId);
-        try {
-          const cloudData = await getTractionState(sessionUserId);
-          if (cloudData) {
-            saveTraction(cloudData);
-            setTraction(cloudData);
-            console.info('[VoixVive] Restored progress from Supabase cloud.');
-          } else {
-            // First login — migrate local data to cloud
-            await migrateLocalToCloud(sessionUserId, localState);
-            console.info('[VoixVive] Migrated local progress to Supabase cloud.');
-          }
-        } catch (err) {
-          console.warn('[VoixVive] Supabase load failed, using localStorage:', err);
-        }
-      } else if (isEmptyState) {
-        // Not logged in, localStorage empty — try IndexedDB backup
+      if (isEmptyState) {
+        // LocalStorage empty — try IndexedDB backup
         try {
           const idbState = await getProgress();
           if (idbState) {
@@ -131,6 +69,34 @@ export function ScaffoldingProvider({ children }) {
 
     hydrate();
   }, []);
+
+  // ── Sync with Supabase on Login ──
+  useEffect(() => {
+    if (!user) {
+      setUserId(null);
+      return;
+    }
+
+    setUserId(user.id);
+    const syncCloudData = async () => {
+      try {
+        const cloudTraction = await getTractionState(user.id);
+        if (cloudTraction) {
+          console.info('[VoixVive] Hydrating local state from Supabase cloud...');
+          saveTraction(cloudTraction);
+          setTraction(cloudTraction);
+        } else {
+          // No cloud data yet — migrate existing local progress
+          const currentLocal = loadTraction();
+          await migrateLocalToCloud(user.id, currentLocal);
+        }
+      } catch (err) {
+        console.error('[VoixVive] Supabase sync failed:', err);
+      }
+    };
+    
+    syncCloudData();
+  }, [user]);
 
   // ── Periodic re-sync from localStorage (multi-tab support) ──
   useEffect(() => {
@@ -151,12 +117,14 @@ export function ScaffoldingProvider({ children }) {
       saveTraction(next);
       // Async durable backup to IndexedDB — non-blocking
       saveProgress(next).catch(() => {});
-      // If logged in, also save to Supabase cloud — non-blocking
+      
+      // Async durable backup to Supabase if logged in
       if (userId) {
         saveTractionState(userId, next).catch(err => {
-          console.warn('[VoixVive] Supabase save failed (will retry on next update):', err);
+          console.warn('[VoixVive] Background Supabase sync failed:', err);
         });
       }
+      
       return next;
     });
   }, [userId]);

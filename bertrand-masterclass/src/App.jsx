@@ -16,7 +16,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ScaffoldingProvider } from './components/ScaffoldingProvider';
-import AmbientPlayer from './components/AmbientPlayer';
+import TroubadourWidget from './components/TroubadourWidget';
 
 // ── Eagerly loaded: first paint ──
 import LandingScreen from './pages/LandingScreen';
@@ -36,6 +36,7 @@ const AdventurePlayer = React.lazy(() => import('./game/AdventurePlayer'));
 const AuthCallback = React.lazy(() => import('./pages/AuthCallback'));
 const ChromaticMonomyth = React.lazy(() => import('./components/ChromaticMonomyth'));
 const MentorDashboard = React.lazy(() => import('./pages/MentorDashboard'));
+const MaturationMap = React.lazy(() => import('./components/MaturationMap'));
 
 // ── On-brand loading fallback ──
 function LoadingScreen() {
@@ -82,13 +83,14 @@ function App() {
 function AppContent() {
   return (
     <div className="min-h-[100svh] bg-cf-void text-cf-ink relative">
-      <AmbientPlayer />
+      <TroubadourWidget />
       <Suspense fallback={<LoadingScreen />}>
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<LandingScreen />} />
             <Route path="/song" element={<OrientationHub />} />
             <Route path="/guitar" element={<ErrorBoundary><GuitarWorkbench /></ErrorBoundary>} />
+            <Route path="/guitar/map" element={<ErrorBoundary><MaturationMap /></ErrorBoundary>} />
             <Route path="/player" element={<ErrorBoundary><PlayerPortal /></ErrorBoundary>} />
             <Route path="/playbook" element={<ErrorBoundary><PlaybookShell /></ErrorBoundary>} />
             <Route path="/privacy" element={<PrivacyPolicy />} />

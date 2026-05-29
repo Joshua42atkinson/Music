@@ -42,7 +42,8 @@ export function buildEdgeMap() {
  * @param {string[]} completedNodeIds
  * @returns {boolean}
  */
-export function isNodeUnlocked(nodeId, completedNodeIds) {
+export function isNodeUnlocked(nodeId, completedNodeIds, sandboxMode = false) {
+  if (sandboxMode) return true;
   const node = getNodeById(nodeId);
   if (!node) return false;
   if (node.prerequisites.length === 0) return true; // First nodes are always unlocked
@@ -55,8 +56,8 @@ export function isNodeUnlocked(nodeId, completedNodeIds) {
  * @param {string[]} completedNodeIds
  * @returns {boolean}
  */
-export function isNodeRecommended(nodeId, completedNodeIds) {
-  if (!isNodeUnlocked(nodeId, completedNodeIds)) return false;
+export function isNodeRecommended(nodeId, completedNodeIds, sandboxMode = false) {
+  if (!isNodeUnlocked(nodeId, completedNodeIds, sandboxMode)) return false;
   const node = getNodeById(nodeId);
   if (!node) return false;
   if (completedNodeIds.includes(nodeId)) return false; // Already completed

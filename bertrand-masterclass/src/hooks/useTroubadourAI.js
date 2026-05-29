@@ -4,6 +4,7 @@ import { getOfflineResponse } from '../data/troubadourOffline';
 // ═══════════════════════════════════════════════════════════════════
 // useTroubadourAI — Unified AI hook for the Troubadour
 // Priority: 1) Hosted vLLM (GMKtek)  2) llama.cpp Nemotron  3) StepAudio  4) LM Studio  5) Offline
+// Now includes Web Speech API TTS for spoken pedagogical responses.
 // ═══════════════════════════════════════════════════════════════════
 
 const REMOTE_URL   = import.meta.env.VITE_TROUBADOUR_API_URL;        // e.g. https://troubadour.yourdomain.com/v1
@@ -19,9 +20,47 @@ export function useTroubadourAI() {
   const [backend, setBackend]   = useState(null); // 'remote' | 'local' | 'offline'
   const abortRef = useRef(null);
 
+  const speakText = useCallback((text, locale = 'en') => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const isFrench = locale.startsWith('fr');
+    
+    // Try to find a French voice, or an English voice based on locale
+    let voice = voices.find(v => isFrench ? v.lang.startsWith('fr') : v.lang.startsWith('en'));
+    // If English, a French-accented English voice is a nice bonus if available (e.g. Thomas or Thomas (French))
+    if (!isFrench) {
+       const frenchAccent = voices.find(v => v.lang.startsWith('en') && v.name.includes('French'));
+       if (frenchAccent) voice = frenchAccent;
+    }
+    
+    if (voice) utterance.voice = voice;
+    utterance.rate = 0.95; // Slightly slower, more thoughtful
+    utterance.pitch = 0.95; 
+    
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
   // ── Detect which backend is alive ──────────────────────────────
   const detectBackend = useCallback(async () => {
     setError(null);
+
+    // 0. Check Offline Override (AI Guidance setting)
+    try {
+      const raw = localStorage.getItem('bard_traction');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.settings?.aiEnabled === false) {
+          setIsReady(true);
+          setBackend('offline');
+          return { connected: true, backend: 'offline', model: { id: 'troubadour-offline-static' } };
+        }
+      }
+    } catch (e) {
+      // proceed if parsing fails
+    }
 
     // 1. Try hosted vLLM (production)
     if (REMOTE_URL) {
@@ -101,9 +140,7 @@ export function useTroubadourAI() {
   const chatStream = useCallback(async (messages, onChunk, options = {}) => {
     const baseUrl = options.baseUrl
       || (backend === 'remote' ? REMOTE_URL : null)
-      || LLAMA_URL
-      || STEP_URL
-      || LOCAL_URL;
+      || (backend === 'local' ? (LLAMA_URL || STEP_URL || LOCAL_URL) : null);
 
     // ── Offline fallback ─────────────────────────────────────────
     if (!baseUrl) {
@@ -120,7 +157,8 @@ export function useTroubadourAI() {
         await new Promise(r => setTimeout(r, 30)); // natural pacing
       }
       setIsLoading(false);
-      return;
+      speakText(full, options.locale || 'en');
+      return { choices: [{ message: { role: 'assistant', content: full } }] };
     }
 
     const payload = {
@@ -173,11 +211,26 @@ export function useTroubadourAI() {
       }
 
       setIsLoading(false);
+      speakText(full, options.locale || 'en');
       return { choices: [{ message: { role: 'assistant', content: full } }] };
     } catch (err) {
-      setIsLoading(false);
       if (err.name === 'AbortError') throw new Error('Cancelled');
-      throw err;
+      
+      // FALLBACK TO OFFLINE if the request fails (e.g. LLM crashed/stopped)
+      console.warn('[VoixVive] AI Backend fetch failed. Falling back to offline responses.', err);
+      const userMsg = messages[messages.length - 1]?.content || '';
+      const { response } = getOfflineResponse(userMsg);
+      const words = response.split(' ');
+      let full = '';
+      for (const word of words) {
+        const chunk = full ? ' ' + word : word;
+        full += chunk;
+        onChunk?.(chunk, full);
+        await new Promise(r => setTimeout(r, 30)); // natural pacing
+      }
+      setIsLoading(false);
+      speakText(full, options.locale || 'en');
+      return { choices: [{ message: { role: 'assistant', content: full } }] };
     }
   }, [backend]);
 
@@ -185,6 +238,7 @@ export function useTroubadourAI() {
     abortRef.current?.abort();
     abortRef.current = null;
     setIsLoading(false);
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
   }, []);
 
   return {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import frets from '../data/chapterData';
@@ -59,6 +59,58 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
   });
   const slide = slides[currentIdx];
 
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const synth = window.speechSynthesis;
+
+  const getReadableText = useCallback((s) => {
+    let text = "";
+    if (s.title) text += localize(s.title) + ". ";
+    if (s.subtitle) text += localize(s.subtitle) + ". ";
+    if (s.body) text += localize(s.body) + ". ";
+    if (s.quote) text += localize(s.quote) + ". ";
+    if (s.musicGrammar) text += localize(s.musicGrammar) + ". ";
+    if (s.guitarGrammar) text += localize(s.guitarGrammar) + ". ";
+    return text.replace(/<[^>]+>/g, '');
+  }, [localize]);
+
+  const speakSlide = useCallback((s) => {
+    if (!synth) return;
+    synth.cancel();
+    const text = getReadableText(s);
+    if (!text) return;
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
+    utterance.rate = 0.9;
+    
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    
+    synth.speak(utterance);
+  }, [getReadableText, synth, locale]);
+
+  const toggleSpeech = () => {
+    if (isSpeaking) {
+      synth.cancel();
+      setIsSpeaking(false);
+    } else {
+      speakSlide(slide);
+    }
+  };
+
+  useEffect(() => {
+    if (isSpeaking) {
+      speakSlide(slide);
+    }
+  }, [currentIdx, slide]); 
+
+  useEffect(() => {
+    return () => {
+      if (synth) synth.cancel();
+    };
+  }, [synth]);
+
   // Show swipe hint only once, ever
   useEffect(() => {
     if (showSwipeHint) {
@@ -99,8 +151,19 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     }
   }, [slides, fretId, updateTraction]);
 
-  const handleNext = () => goTo(currentIdx + 1, 1);
-  const handlePrev = () => goTo(currentIdx - 1, -1);
+  const handleNext = useCallback(() => goTo(currentIdx + 1, 1), [currentIdx, goTo]);
+  const handlePrev = useCallback(() => goTo(currentIdx - 1, -1), [currentIdx, goTo]);
+
+  const goNextFret = useCallback(() => {
+    const nextId = fretId < 12 ? fretId + 1 : 1;
+    setCurrentIdx(0);
+    if (onFretChange) onFretChange(nextId);
+  }, [fretId, onFretChange]);
+
+  const openFretboard = useCallback(() => {
+    setFretboardOpen(true);
+    if (navigator.vibrate) navigator.vibrate(15);
+  }, []);
 
   const handleDragEnd = (e, info) => {
     // Don't process slide swipes if fretboard is open
@@ -114,15 +177,58 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     else if (info.offset.x > SWIPE_THRESHOLD || info.velocity.x > SWIPE_VELOCITY) handlePrev();
   };
 
-  const goNextFret = () => {
-    const nextId = fretId < 12 ? fretId + 1 : 1;
-    setCurrentIdx(0);
-    if (onFretChange) onFretChange(nextId);
-  };
+  // Web Speech API Voice Commands
+  const recognitionRef = useRef(null);
+  const [isListeningForCommands, setIsListeningForCommands] = useState(false);
 
-  const openFretboard = () => {
-    setFretboardOpen(true);
-    if (navigator.vibrate) navigator.vibrate(15);
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition && isListeningForCommands) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
+
+      recognition.onresult = (event) => {
+        const last = event.results.length - 1;
+        const command = event.results[last][0].transcript.trim().toLowerCase();
+        
+        if (command.includes('next') || command.includes('suivant') || command.includes('avance')) {
+          if (currentIdx === slides.length - 1) goNextFret();
+          else handleNext();
+        } else if (command.includes('back') || command.includes('retour') || command.includes('précédent') || command.includes('previous')) {
+          handlePrev();
+        } else if (command.includes('fretboard') || command.includes('guitare') || command.includes('manche')) {
+          openFretboard();
+        } else if (command.includes('exit') || command.includes('quitter')) {
+          if (onBack) onBack();
+        } else if (command.includes('read') || command.includes('lire')) {
+          speakSlide(slide);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+        setIsListeningForCommands(false);
+      };
+
+      recognition.onend = () => {
+        if (isListeningForCommands) {
+          try { recognition.start(); } catch (e) {}
+        }
+      };
+
+      recognition.start();
+      recognitionRef.current = recognition;
+
+      return () => {
+        recognition.stop();
+      };
+    }
+  }, [isListeningForCommands, locale, handleNext, handlePrev, openFretboard, onBack, speakSlide, slide, currentIdx, slides.length, goNextFret]);
+
+  const toggleCommandListening = () => {
+    setIsListeningForCommands(prev => !prev);
   };
 
   return (
@@ -435,7 +541,31 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
       <div className="sv-topbar">
         <button className="sv-back" onClick={onBack}>{t('back')}</button>
         <span className="sv-chapter-label">Ch.{fret.id} · {localize(fret.title)}</span>
-        <span className="sv-page-num">{currentIdx + 1}/{slides.length}</span>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button 
+            onClick={toggleSpeech}
+            style={{ 
+              background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer',
+              opacity: isSpeaking ? 1 : 0.5, color: isSpeaking ? '#c9a96e' : '#a0aab8',
+              padding: '0 4px'
+            }}
+            title={isSpeaking ? "Stop Reading" : "Read Aloud"}
+          >
+            {isSpeaking ? '🔊' : '🔈'}
+          </button>
+          <button 
+            onClick={toggleCommandListening}
+            style={{ 
+              background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer',
+              opacity: isListeningForCommands ? 1 : 0.5, color: isListeningForCommands ? '#c9a96e' : '#a0aab8',
+              padding: '0 4px'
+            }}
+            title={isListeningForCommands ? "Stop Listening" : "Voice Commands"}
+          >
+            {isListeningForCommands ? '🎙️' : '🎤'}
+          </button>
+          <span className="sv-page-num">{currentIdx + 1}/{slides.length}</span>
+        </div>
       </div>
 
       {/* ── Progress Bar ── */}

@@ -183,7 +183,6 @@ export async function migrateLocalToCloud(userId, localTraction) {
       current_chapter: localTraction.bardLevel || 1,
       bard_level: localTraction.bardLevel || 1,
       xp: localTraction.totalTraction || 0,
-      florins: 0,
       instrument: 'guitar',
     });
     console.log('[Supabase] Created default student profile');

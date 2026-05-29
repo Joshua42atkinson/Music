@@ -6,22 +6,34 @@ import CharacterSheet from './CharacterSheet';
 import QuestLog from './QuestLog';
 import { JournalFeed } from './JournalEntry';
 import VideoRecorder from './VideoRecorder';
+import VideoLibrary from './VideoLibrary';
 import SongwritingCompanion from '../SongwritingCompanion';
 import BEWorkbook from './BEWorkbook';
 import { ArrowLeft } from 'lucide-react';
 import { useLocale } from '../../hooks/useLocale';
+import AuthButton from '../AuthButton';
 
-// ═══════════════════════════════════════════════════════════
-// TROUBADOUR'S PLAYBOOK — D&D Player Handbook Shell
-// Tabbed layout: Character / Quests / Songbook / Journal
-// Replaces the old DigitalBinder tool-launcher approach
-// with a narrative-driven, living document.
-// ═══════════════════════════════════════════════════════════
+// ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
+// ║ FILE    : PlaybookShell.jsx                                   ║
+// ║ WHAT    : Renders the D&D Player Handbook layout for student  ║
+// ║           progression, quest logging, and songwriting.        ║
+// ║ WHY     : Centralizes meta-learning activities so the student ║
+// ║           can reflect, plan, and create outside the fretboard.║
+// ║ WHO     : Student — the primary reflective environment.       ║
+// ║ OWNS    : Tab state for Character, Quests, Workbook, Songbook ║
+// ║           and Journal.                                        ║
+// ║ NEEDS   : CharacterSheet, QuestLog, JournalFeed, BEWorkbook   ║
+// ║ RULES   : Do not add generic components; maintain the RPG vibe║
+// ║           This is a 'Somatic Integration' space, keep it slow.║
+// ║ FIX AT  : Route '/playbook' → PlaybookShell.jsx               ║
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                    ║
+// ╚═══════════════════════════════════════════════════════════════╝
 
 const TABS = [
   { id: 'character', icon: '⚔️', en: 'Character', fr: 'Personnage' },
   { id: 'quests',    icon: '🗺️', en: 'Quests',    fr: 'Quêtes' },
   { id: 'workbook',  icon: '📖', en: 'Workbook',  fr: 'Cahier' },
+  { id: 'library',   icon: '📽️', en: 'Library',   fr: 'Vidéos' },
   { id: 'songbook',  icon: '✍️', en: 'Songbook',  fr: 'Recueil' },
   { id: 'journal',   icon: '📓', en: 'Journal',   fr: 'Journal' },
 ];
@@ -70,14 +82,17 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
             {t('heroGuide')}
           </p>
         </div>
-        <button style={styles.backBtn} onClick={backHandler} aria-label="Return to home">
-          <img
-            src="/assets/wordmark.png"
-            alt="Voix Vive"
-            style={{ height: '32px', width: 'auto' }}
-            draggable={false}
-          />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <AuthButton />
+          <button style={styles.backBtn} onClick={backHandler} aria-label="Return to home">
+            <img
+              src="/assets/wordmark.png"
+              alt="Voix Vive"
+              style={{ height: '32px', width: 'auto' }}
+              draggable={false}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Tab bar */}
@@ -111,6 +126,7 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
             {activeTab === 'character' && <CharacterSheet />}
             {activeTab === 'quests' && <QuestLog onOpenSlides={handleOpenSlides} />}
             {activeTab === 'workbook' && <BEWorkbook />}
+            {activeTab === 'library' && <VideoLibrary />}
             {activeTab === 'songbook' && <SongwritingCompanion />}
             {activeTab === 'journal' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -154,7 +170,6 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    marginLeft: '52px',
   },
   headerCenter: {
     flex: 1,

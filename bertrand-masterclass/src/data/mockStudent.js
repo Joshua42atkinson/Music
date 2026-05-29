@@ -48,7 +48,7 @@ function _generate(seed) {
       practiceLog.push({
         date: daysAgo(i),
         duration: rInt(10, 45),
-        nodes: [`fret-${rInt(1, Math.max(1, completedFrets))}-${pick(['class', 'ear', 'tech', 'creative', 'perform'])}-${pick(['be', 'do', 'play'])}`],
+        nodes: [`fret-${rInt(1, Math.max(1, completedFrets))}-${pick(['class', 'guitar', 'workbook'])}-${pick(['be', 'do', 'play'])}`],
         notes: pick(PRACTICE_NOTES),
       });
     }
@@ -114,7 +114,7 @@ function _generate(seed) {
 function generateCompletedNodes(frets) {
   const nodes = [];
   Object.entries(frets).forEach(([fretId, f]) => {
-    const pillars = ['class', 'ear', 'tech', 'creative', 'perform'];
+    const pillars = ['class', 'guitar', 'workbook'];
     pillars.forEach(p => {
       if (f.beCompleted) nodes.push(`fret-${fretId}-${p}-be`);
       if (f.doCompleted) nodes.push(`fret-${fretId}-${p}-do`);

@@ -468,7 +468,7 @@ export function getIntervalMastery() {
       const sang = visits.some(v => v.singingScore !== null && v.singingScore > 0);
       if (passedPitch && sang) badges[badge.id] = 'owned';
 
-      // Mastered: passed pitch + sang with high score + found bonus branch
+      // Mastered: passed pitch + sang with strong proficiency + found bonus branch
       const highSing = visits.some(v => v.singingScore !== null && v.singingScore >= 0.7);
       const bonus = visits.some(v => v.branchType === 'bonus');
       if (passedPitch && highSing && bonus) badges[badge.id] = 'mastered';

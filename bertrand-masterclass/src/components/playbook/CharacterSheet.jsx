@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useScaffolding } from '../ScaffoldingProvider';
 import { useLocale } from '../../hooks/useLocale';
 import { useAuth } from '../../hooks/useAuth';
@@ -26,7 +26,7 @@ import {
 // ╚═════════════════════════════════════════════════════════════════╝
 
 export default function CharacterSheet() {
-  const { traction, bardLevel, practiceMinutes, streak, breathingSessions, userId } = useScaffolding();
+  const { traction, updateTraction, bardLevel, practiceMinutes, streak, breathingSessions, userId } = useScaffolding();
   const { locale, t } = useLocale();
   const { user } = useAuth();
   const lang = locale;
@@ -40,6 +40,10 @@ export default function CharacterSheet() {
   // Badge system — interval mastery from Adventure
   const intervalMastery = useMemo(() => getIntervalMastery(), []);
   const profile = useMemo(() => computeTroubadourProfile(traction), [traction]);
+  const overriddenType = useMemo(() => 
+    traction.troubadourTypeOverride ? TROUBADOUR_TYPES.find(t => t.id === traction.troubadourTypeOverride) : null
+  , [traction.troubadourTypeOverride]);
+  const displayType = overriddenType || profile.dominantType;
 
   // Use Google user data when logged in, fallback to localStorage profile
   const isLoggedIn = !!userId;
@@ -50,6 +54,52 @@ export default function CharacterSheet() {
     try { return localStorage.getItem('active_student_profile') || t('adventurer'); }
     catch { return t('adventurer'); }
   })();
+
+  const fileInputRef = useRef(null);
+
+  const handleExport = () => {
+    const saveState = {
+      version: 1,
+      timestamp: new Date().toISOString(),
+      bard_traction: localStorage.getItem('bard_traction'),
+      voix_vive_dag_progress: localStorage.getItem('voix_vive_dag_progress'),
+      voix_vive_adventure_session: localStorage.getItem('voix_vive_adventure_session')
+    };
+    
+    const blob = new Blob([JSON.stringify(saveState, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${studentName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_journal.voixvive`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const saveState = JSON.parse(e.target.result);
+        if (saveState.bard_traction) localStorage.setItem('bard_traction', saveState.bard_traction);
+        if (saveState.voix_vive_dag_progress) localStorage.setItem('voix_vive_dag_progress', saveState.voix_vive_dag_progress);
+        if (saveState.voix_vive_adventure_session) localStorage.setItem('voix_vive_adventure_session', saveState.voix_vive_adventure_session);
+        
+        // Reload to rehydrate state from localStorage
+        window.location.reload();
+      } catch (err) {
+        alert(lang === 'fr' ? 'Fichier de sauvegarde invalide.' : 'Invalid save file.');
+        console.error("Failed to parse save file:", err);
+      }
+    };
+    reader.readAsText(file);
+    // Reset file input so same file can be uploaded again if needed
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   return (
     <div style={styles.sheet}>
@@ -181,9 +231,24 @@ export default function CharacterSheet() {
         <h3 style={styles.statBlockTitle}>
           {lang === 'fr' ? 'Type de Troubadour' : 'Troubadour Type'}
         </h3>
-        {profile.dominantType && (
+        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+          <select 
+            value={traction.troubadourTypeOverride || ''}
+            onChange={(e) => updateTraction({ troubadourTypeOverride: e.target.value || null })}
+            style={styles.typeSelector}
+          >
+            <option value="">{lang === 'fr' ? 'Détection automatique' : 'Auto-detect'}</option>
+            {TROUBADOUR_TYPES.map(type => (
+              <option key={type.id} value={type.id}>
+                {type.icon} {type.name[lang]}
+              </option>
+            ))}
+          </select>
+        </div>
+        {displayType && (
           <p style={styles.emergentClass}>
-            {profile.dominantType.icon} {profile.dominantType.name[lang]}
+            {displayType.icon} {displayType.name[lang]}
+            {overriddenType && <span style={styles.overrideBadge}>{lang === 'fr' ? ' (Choisi)' : ' (Chosen)'}</span>}
           </p>
         )}
         <div style={styles.attunementGrid}>
@@ -211,6 +276,40 @@ export default function CharacterSheet() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Memory Card System */}
+      <div style={{ ...styles.statBlock, marginTop: '32px' }}>
+        <h3 style={styles.statBlockTitle}>
+          {lang === 'fr' ? 'Le Journal du Troubadour' : "The Troubadour's Journal"}
+        </h3>
+        <p style={{ ...styles.subtitle, textAlign: 'center', marginBottom: '16px', opacity: 0.6, fontSize: '0.65rem', textTransform: 'none', letterSpacing: 'normal', fontFamily: "'Inter', sans-serif" }}>
+          {lang === 'fr' 
+            ? "Vous êtes le seul propriétaire de vos données. Sauvegardez votre journal localement pour ne pas perdre votre progression."
+            : "You are the sole owner of your data. Download your journal to safely backup your progress."}
+        </p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button 
+            onClick={handleExport}
+            style={styles.saveButton}
+          >
+            💾 {lang === 'fr' ? 'Sceller le Journal' : 'Seal the Journal'}
+          </button>
+          
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            style={styles.loadButton}
+          >
+            📜 {lang === 'fr' ? 'Présenter le Journal' : 'Present your Journal'}
+          </button>
+          <input 
+            type="file" 
+            accept=".voixvive,.json"
+            ref={fileInputRef}
+            onChange={handleImport}
+            style={{ display: 'none' }}
+          />
         </div>
       </div>
     </div>
@@ -442,6 +541,24 @@ const styles = {
     flexDirection: 'column',
     gap: '10px',
   },
+  typeSelector: {
+    background: 'rgba(0,0,0,0.3)',
+    color: '#e0d0aa',
+    border: '1px solid rgba(201,169,110,0.3)',
+    padding: '6px 12px',
+    borderRadius: '8px',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.75rem',
+    outline: 'none',
+    cursor: 'pointer',
+    appearance: 'none',
+  },
+  overrideBadge: {
+    fontSize: '0.75rem',
+    fontStyle: 'normal',
+    color: 'rgba(255,255,255,0.4)',
+    fontFamily: "'JetBrains Mono', monospace",
+  },
   attunementRow: {
     display: 'flex',
     alignItems: 'center',
@@ -475,4 +592,26 @@ const styles = {
     borderRadius: '2px',
     transition: 'width 0.5s ease',
   },
+  saveButton: {
+    padding: '10px 16px',
+    background: 'rgba(201,169,110,0.1)',
+    border: '1px solid rgba(201,169,110,0.3)',
+    color: '#e0d0aa',
+    borderRadius: '8px',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.75rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  loadButton: {
+    padding: '10px 16px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    color: 'rgba(255,255,255,0.8)',
+    borderRadius: '8px',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.75rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  }
 };

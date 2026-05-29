@@ -7,6 +7,7 @@ import NeckMenu from '../components/NeckMenu';
 import SongwritingCompanion from '../components/SongwritingCompanion';
 import { generateSlides } from '../data/slideGenerator';
 import { getChapterProgress } from '../data/localDatabase';
+import AuthButton from '../components/AuthButton';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -132,6 +133,7 @@ const OrientationHub = () => {
             <BookOpen size={14} />
             Chart
           </button>
+          <AuthButton />
           <button
             onClick={() => navigate('/')}
             style={{

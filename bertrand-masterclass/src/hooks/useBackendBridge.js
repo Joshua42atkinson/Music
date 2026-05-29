@@ -325,44 +325,16 @@ export function useBackendBridge() {
   }, [isDaaSConnected]);
 
 
-
-  const earnFlorins = useCallback(async (name, amount) => {
-    if (!isDaaSConnected) return null;
-    try {
-      const resp = await fetch(`${DAAS_API_BASE}/db/profiles/earn`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, amount }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        return data.florins;
-      }
-    } catch (e) {
-      console.error('Failed to earn florins:', e);
-    }
+  // [DEPRECATED] Florins economy removed — Great Game purge
+  const earnFlorins = useCallback(async () => {
+    console.warn('[VoixVive] earnFlorins is deprecated — Great Game economy removed');
     return null;
-  }, [isDaaSConnected]);
+  }, []);
 
-  const spendFlorins = useCallback(async (name, amount) => {
-    if (!isDaaSConnected) return null;
-    try {
-      const resp = await fetch(`${DAAS_API_BASE}/db/profiles/spend`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, amount }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data.success) return data.florins;
-      }
-    } catch (e) {
-      console.error('Failed to spend florins:', e);
-    }
+  const spendFlorins = useCallback(async () => {
+    console.warn('[VoixVive] spendFlorins is deprecated — Great Game economy removed');
     return null;
-  }, [isDaaSConnected]);
-
-
+  }, []);
 
   useEffect(() => {
     // Don't auto-connect - make it manual to prevent blocking

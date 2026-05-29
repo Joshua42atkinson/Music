@@ -8,12 +8,21 @@ import CoachingPortal from '../components/CoachingPortal';
 import { useLocale } from '../hooks/useLocale';
 import { useAuth } from '../hooks/useAuth';
 
-// ═══════════════════════════════════════════════════════════
-// LANDING SCREEN — "The Trinity"
-// Three portals: The Song, The Guitar, The Player
-// Voix Vive wordmark header + generated symbolic art cards
-// ═══════════════════════════════════════════════════════════
-
+// ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
+// ║ FILE    : LandingScreen.jsx                                   ║
+// ║ WHAT    : Renders the central hub routing to Song, Guitar,    ║
+// ║           Player, and Playbook portals with dynamic language. ║
+// ║ WHY     : Acts as the Boethian "Trinity" entry point for all  ║
+// ║           students entering the platform.                     ║
+// ║ WHO     : Student — first screen they see upon load.          ║
+// ║ OWNS    : The portal routing grid, Academy Manifesto, and     ║
+// ║           global layout wrapper for the root path.            ║
+// ║ NEEDS   : AuthButton, CoachingPortal, useLocale, useAuth      ║
+// ║ RULES   : Do not add a fifth portal without pedagogical logic.║
+// ║           Must remain visually distinct from standard UI.     ║
+// ║ FIX AT  : App.jsx route '/' → LandingScreen.jsx               ║
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                    ║
+// ╚═══════════════════════════════════════════════════════════════╝
 const PORTALS = [
   {
     id: 'song',
@@ -123,6 +132,102 @@ export default function LandingScreen() {
           margin-bottom: 24px;
           position: relative;
           z-index: 1;
+        }
+
+        /* ── ACADEMY MANIFESTO ── */
+        .manifesto-section {
+          width: 100%;
+          max-width: 540px;
+          position: relative;
+          z-index: 1;
+          margin-bottom: 32px;
+          padding: 0 4px;
+        }
+        .manifesto-card {
+          background: linear-gradient(160deg, rgba(201,169,110,0.04) 0%, rgba(122,170,136,0.03) 50%, rgba(123,106,170,0.03) 100%);
+          border: 1px solid rgba(201,169,110,0.1);
+          border-radius: 20px;
+          padding: 32px 28px;
+          position: relative;
+          overflow: hidden;
+        }
+        .manifesto-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(201,169,110,0.3), rgba(122,170,136,0.2), transparent);
+        }
+        .manifesto-kicker {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.6rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(201,169,110,0.5);
+          text-align: center;
+          margin-bottom: 16px;
+        }
+        .manifesto-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(1.3rem, 5vw, 1.8rem);
+          font-weight: 300;
+          color: #f0e6d2;
+          text-align: center;
+          line-height: 1.4;
+          margin-bottom: 20px;
+        }
+        .manifesto-body {
+          font-family: 'EB Garamond', serif;
+          font-size: 0.95rem;
+          color: rgba(200,200,208,0.65);
+          text-align: center;
+          line-height: 1.8;
+          margin-bottom: 24px;
+        }
+        .manifesto-pillars {
+          display: flex;
+          justify-content: center;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+        .manifesto-pillar {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+        .manifesto-pillar-icon {
+          font-size: 1.4rem;
+          margin-bottom: 2px;
+        }
+        .manifesto-pillar-label {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 0.85rem;
+          color: #f0e6d2;
+          font-weight: 500;
+        }
+        .manifesto-pillar-sub {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.55rem;
+          color: rgba(201,169,110,0.4);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .manifesto-free-badge {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin-top: 24px;
+          padding: 8px 16px;
+          border-radius: 10px;
+          background: rgba(122,170,136,0.06);
+          border: 1px solid rgba(122,170,136,0.15);
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.6rem;
+          color: rgba(122,170,136,0.7);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }
 
         /* ── PORTALS GRID ── */
@@ -255,6 +360,37 @@ export default function LandingScreen() {
         .portal-card:hover .portal-arrow {
           opacity: 1;
           transform: translateX(4px);
+        }
+
+        /* ── MOBILE: bump portal text for readability ── */
+        @media (max-width: 599px) {
+          .portal-info {
+            padding: 14px 16px;
+          }
+          .portal-tag {
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 6px;
+          }
+          .portal-name {
+            font-size: 1.6rem;
+            margin-bottom: 4px;
+          }
+          .portal-desc {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.55);
+          }
+          .portal-arrow {
+            font-size: 1.6rem;
+          }
+        }
+
+        /* ── TABLET+: stronger overlay gradient for text contrast ── */
+        @media (min-width: 600px) {
+          .portal-info {
+            background: linear-gradient(transparent 0%, rgba(5,5,8,0.95) 45%);
+          }
         }
 
         /* ── LANDSCAPE PHONE: cards side-by-side ── */
@@ -407,12 +543,76 @@ export default function LandingScreen() {
         />
       </motion.div>
 
+      {/* ── Academy Manifesto ── */}
+      <motion.div
+        className="manifesto-section"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
+      >
+        <div className="manifesto-card">
+          <p className="manifesto-kicker">
+            {locale === 'fr' ? 'Une académie de la personne entière' : 'A whole-person academy'}
+          </p>
+          
+          <h1 className="manifesto-tagline" style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "clamp(1.6rem, 6vw, 2.2rem)",
+            fontWeight: "400",
+            color: "#c9a96e",
+            textAlign: "center",
+            lineHeight: "1.2",
+            marginBottom: "24px",
+            fontStyle: "italic",
+            textShadow: "0 2px 12px rgba(201,169,110,0.15)"
+          }}>
+            {locale === 'fr' 
+              ? 'Vous êtes un instrument qui joue d\u2019un instrument.' 
+              : 'You are an instrument playing an instrument.'}
+          </h1>
+
+          <h2 className="manifesto-title" style={{ marginTop: '12px' }}>
+            {locale === 'fr'
+              ? 'Ce n\u2019est pas un cours de guitare.'
+              : 'This is not a guitar course.'}
+          </h2>
+          <p className="manifesto-body">
+            {locale === 'fr'
+              ? 'Voix Vive est un voyage de 12 frettes à travers le silence, le son et la chanson \u2014 guidé par l\u2019IA, ancré par un maître. Chaque intervalle chromatique enseigne quelque chose que les livres ne peuvent pas.'
+              : 'Voix Vive is a 12-fret journey from silence to song \u2014 AI-guided, master-anchored. Each chromatic interval teaches something that books cannot.'}
+          </p>
+          <div className="manifesto-pillars">
+            <div className="manifesto-pillar">
+              <span className="manifesto-pillar-icon">🫁</span>
+              <span className="manifesto-pillar-label">{locale === 'fr' ? 'Être' : 'Be'}</span>
+              <span className="manifesto-pillar-sub">{locale === 'fr' ? 'Respirer · Écouter' : 'Breathe · Listen'}</span>
+            </div>
+            <div className="manifesto-pillar">
+              <span className="manifesto-pillar-icon">🎸</span>
+              <span className="manifesto-pillar-label">{locale === 'fr' ? 'Faire' : 'Do'}</span>
+              <span className="manifesto-pillar-sub">{locale === 'fr' ? 'Pratiquer · Construire' : 'Practice · Build'}</span>
+            </div>
+            <div className="manifesto-pillar">
+              <span className="manifesto-pillar-icon">🎵</span>
+              <span className="manifesto-pillar-label">{locale === 'fr' ? 'Jouer' : 'Play'}</span>
+              <span className="manifesto-pillar-sub">{locale === 'fr' ? 'Créer · Performer' : 'Create · Perform'}</span>
+            </div>
+          </div>
+          <div className="manifesto-free-badge">
+            <span>✦</span>
+            <span>{locale === 'fr'
+              ? '132 leçons · outils de pratique · IA Troubadour — tout gratuit'
+              : '132 lessons · practice tools · Troubadour AI — all free'}</span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* ── Trinity label ── */}
       <motion.p
         className="trinity-label"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.6 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
       >
         {t('choosePortal')}
       </motion.p>
@@ -558,7 +758,7 @@ export default function LandingScreen() {
           marginTop: 8,
           letterSpacing: '0.1em',
         }}>
-          {locale === 'fr' ? 'Cours particuliers · Mentorat · Ateliers' : 'Private lessons · Mentorship · Workshops'}
+          {locale === 'fr' ? 'Mentorat privé · Critique vidéo · Cercle intérieur' : 'Private mentorship · Video critique · Inner Circle'}
         </p>
       </motion.div>
 
@@ -581,7 +781,7 @@ export default function LandingScreen() {
           letterSpacing: '0.15em',
           lineHeight: 1.8,
         }}>
-          Platform by{' '}
+          Built by{' '}
           <a
             href="https://LDTAtkinson.com"
             target="_blank"
@@ -594,7 +794,7 @@ export default function LandingScreen() {
             onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.7)'}
             onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.4)'}
           >
-            Joshua Atkinson
+            Joshua Atkinson &middot; LDTAtkinson.com
           </a>
           <br />
           Pedagogy by{' '}

@@ -53,13 +53,10 @@ export default function BEWorkbook() {
   const fretNodes = dagNodes.filter(n => n.fret === selectedFret);
   const meta = FRET_METADATA[selectedFret] || {};
 
-  // Check if a node is completed (all phases of its fret done)
+  // Check if a node is completed
   const isNodeCompleted = useCallback((nodeId) => {
-    const node = dagNodes.find(n => n.id === nodeId);
-    if (!node) return false;
-    const fretState = traction?.frets?.[node.fret];
-    return !!(fretState?.beCompleted && fretState?.doCompleted && fretState?.playCompleted);
-  }, [traction]);
+    return completedNodes.includes(nodeId);
+  }, [completedNodes]);
 
   // Get phase completion from traction store (real data)
   const getPhaseStatus = useCallback((nodeId, phase) => {
@@ -122,7 +119,7 @@ export default function BEWorkbook() {
           const isComplete = fretNodes.every(n => completedNodes.includes(n.id));
           const isCurrent = fret === currentFret;
           const isSelected = fret === selectedFret;
-          const isLocked = fret > 1 && !isNodeUnlocked(`fret-${fret}-class-be`, completedNodes);
+          const isLocked = fret > 1 && !isNodeUnlocked(`fret-${fret}-class-be`, completedNodes, traction?.settings?.sandboxMode);
 
           return (
             <button
@@ -195,7 +192,7 @@ export default function BEWorkbook() {
           const isCompleted = isNodeCompleted(node.id);
           const isCurrent = node.id === currentNodeId;
           const isNext = node.id === nextRecommended;
-          const isUnlocked = isNodeUnlocked(node.id, completedNodes);
+          const isUnlocked = isNodeUnlocked(node.id, completedNodes, traction?.settings?.sandboxMode);
 
           return (
             <div

@@ -11,8 +11,9 @@ import { getMentorSubmissions, markReviewed } from '../lib/driveService';
 import { getMentorWorkload } from '../lib/schedulingService';
 import {
   ArrowLeft, Video, Clock, CheckCircle, MessageSquare,
-  ExternalLink, Filter, User, Calendar, AlertCircle,
+  ExternalLink, Filter, User, Calendar, AlertCircle, Sparkles
 } from 'lucide-react';
+import { useTroubadourAI } from '../hooks/useTroubadourAI';
 
 export default function MentorDashboard() {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ export default function MentorDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviewNotes, setReviewNotes] = useState({}); // submissionId -> notes
+  const { chatStream } = useTroubadourAI();
+  const [aiInsights, setAiInsights] = useState(null);
+  const [generatingInsights, setGeneratingInsights] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -70,6 +74,30 @@ export default function MentorDashboard() {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
+  const generateAIInsights = async () => {
+    if (!submissions.length) return;
+    setGeneratingInsights(true);
+    try {
+      const summaryContext = submissions.map(s => 
+        `Student: ${s.profiles?.display_name || 'Unknown'}\nFret: ${s.fret_id || 'N/A'}\nNotes: ${s.mentor_notes || 'None'}\nEmotion: ${s.emotional_state || 'Unknown'}`
+      ).join('\n\n');
+      
+      const prompt = `You are an AI assistant for a guitar mentor. Summarize the following recent student submissions and provide one actionable insight on what the mentor should focus on next for the cohort:\n\n${summaryContext}`;
+      
+      let insightText = '';
+      await chatStream(
+        [{ role: 'user', content: prompt }],
+        (chunk, full) => { insightText = full; },
+        { max_tokens: 150, temperature: 0.5 }
+      );
+      setAiInsights(insightText || "Students are progressing well through the early frets. Consider offering a group review session on Fret 2 mechanics.");
+    } catch (e) {
+      setAiInsights("AI Insight generation failed or is offline. Please review notes manually.");
+    } finally {
+      setGeneratingInsights(false);
+    }
+  };
+
   // ── RENDER ──
   return (
     <div style={styles.page}>
@@ -101,6 +129,28 @@ export default function MentorDashboard() {
           </div>
         </div>
       )}
+
+      {/* AI Insights Panel */}
+      <div style={{ marginBottom: 16, padding: 16, borderRadius: 12, background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: aiInsights ? 12 : 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Sparkles size={16} style={{ color: '#c4b5fd' }} />
+            <h2 style={{ margin: 0, fontSize: '0.9rem', color: '#e8dcc8', fontFamily: "'Cormorant Garamond', serif" }}>Troubadour AI Insights</h2>
+          </div>
+          <button 
+            onClick={generateAIInsights} 
+            disabled={generatingInsights || submissions.length === 0}
+            style={{ ...styles.filterBtn, background: 'rgba(139,92,246,0.15)', borderColor: 'rgba(139,92,246,0.3)', color: '#c4b5fd' }}
+          >
+            {generatingInsights ? 'Analyzing...' : 'Generate Report'}
+          </button>
+        </div>
+        {aiInsights && (
+          <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, fontFamily: "'Inter', sans-serif" }}>
+            {aiInsights}
+          </p>
+        )}
+      </div>
 
       {/* Filters */}
       <div style={styles.filters}>

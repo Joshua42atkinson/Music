@@ -1,7 +1,7 @@
 # 🎸 VOIX VIVE — Master Context & Business Platform
 
 > **Purpose:** Load this file into a new AI session to instantly recover full project context.  
-> **Last Updated:** 2026-05-28 (Troubadour identity, certification, 121 DAG nodes, AI beta gate, vLLM serving guide)  
+> **Last Updated:** 2026-05-29 (Beta QA Phase, 144-Node DAG, Sandbox Mode, Sovereign Widget, AI Toggles, PEARL 5.5)
 > **Project Root:** `/home/joshua/Workflow/Other/Bertrand-Masterclass/Music/bertrand-masterclass/`  
 > **Dev Server:** `npm run dev` → localhost:5173  
 > **Git Remote:** https://github.com/joshua42atkinson/Music.git  
@@ -298,7 +298,7 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 - [x] Remove distracting floating Bertrand photo from LandingScreen
 
 **Phase 0.5 — Identity & DAG (COMPLETED 2026-05-28):**
-- [x] **121 DAG nodes** — Fret 1-12, all pillars, all phases (Nemotron-generated)
+- [x] **144 DAG nodes** — Fret 1-12, all pillars, all phases (Nemotron-generated)
 - [x] **Bardic Titles** — 12 stations mapped to Bard Level 1-12
 - [x] **TroubadourLoom** — Identity page with myelination map, practice stats, mentor hooks
 - [x] **PracticeJournal** — 20-min DAG-based daily session generator
@@ -306,6 +306,12 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 - [x] **BEWorkbook** — DAG node cards with BE→DO→PLAY progression + unlocking logic
 - [x] **State migration** — Old student traction state merges with new defaults
 - [x] **18 restored slide images** — brain.png, caged_system.png, ch1-ch12 content
+
+**Phase 0.55 — Beta QA & System Widget (COMPLETED 2026-05-29):**
+- [x] **Vitest UI + Coverage** — Automated testing suite verifying the DAG constraints
+- [x] **Sandbox Mode** — Temporary Curriculum Rule override for unstructured practice
+- [x] **Sovereign Widget SYS Tab** — .voixvive memory card backup/load UI
+- [x] **Documentation Hygiene** — Unified architectures and updated pedagogy for Somatic Gates
 
 **Phase 0.6 — AI Infrastructure (COMPLETED 2026-05-28):**
 - [x] **useTroubadourAI hook** — Remote vLLM → StepAudio → LM Studio → offline fallback

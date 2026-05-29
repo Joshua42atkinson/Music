@@ -1,11 +1,17 @@
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : GuitarWorkbench.jsx                                  ║
-// ║ WHAT    : Guided practice hub — ONE suggestion, AI-guided    ║
-// ║ WHY     : 12 tools is too many choices. Students need ONE    ║
-// ║           invitation based on where they are in curriculum.   ║
-// ║ RULES   : Tools are CALLED, not chosen (design doc §2)        ║
-// ║           AI Troubadour is the primary interface               ║
-// ║           Somatic check-in always available before practice     ║
+// ║ WHAT    : Guided practice hub providing ONE suggested practice ║
+// ║           and access to the 12 fret tools based on curriculum. ║
+// ║ WHY     : Students need curation over choice; 12 tools is too  ║
+// ║           many. The workbench guides the somatic check-in.     ║
+// ║ WHO     : Student — primary environment for 'DO' phase.        ║
+// ║ OWNS    : The suggested tool logic, tool modal state, and      ║
+// ║           rendering the Character/Sensations statistics.       ║
+// ║ NEEDS   : ScaffoldingProvider, useLocale, db (IndexedDB)       ║
+// ║ RULES   : Tools are CALLED, not chosen (design doc §2).        ║
+// ║           Never show a "next" button, only "begin".            ║
+// ║ FIX AT  : Route '/guitar' → GuitarWorkbench.jsx                ║
+// ║ STAGE   : IMPLEMENT (ADDIECRAPEYE phase 4)                     ║
 // ╚═════════════════════════════════════════════════════════════════╝
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -20,8 +26,10 @@ import {
 import {
   Wind, Timer, Music, Feather, Grid3x3, BookOpen, Mic, Activity, Zap,
   Video, Layers, Play, X, Sparkles, ChevronDown, ChevronUp,
-  HelpCircle, Heart, Brain, Ear, Compass, ArrowLeft,
+  HelpCircle, Heart, Brain, Ear, Compass, ArrowLeft, Map,
 } from 'lucide-react';
+
+import AuthButton from './AuthButton';
 
 // ── Tool components ──
 import BreathingGate from './BreathingGate';
@@ -58,7 +66,7 @@ function ToolModal({ tool, onClose }) {
   const renderTool = () => {
     switch (tool.id) {
       case 1: return <BreathingGate />;
-      case 2: return <PracticeTimer />;
+      case 2: return <PracticeTimer fretId={tool.id} />;
       case 3: return <PitchRoom />;
       case 4: return <SongwritingCompanion />;
       case 5: return <IntervalVisualizer />;
@@ -202,6 +210,7 @@ export default function GuitarWorkbench() {
           <p style={styles.headerSub}>Your practice companion</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <AuthButton />
           <button onClick={() => navigate(-1)} style={styles.backBtn} aria-label="Back">
             <ArrowLeft size={20} style={{ color: '#c9a96e' }} />
           </button>
@@ -263,6 +272,9 @@ export default function GuitarWorkbench() {
           </button>
           <button onClick={() => navigate('/song')} style={{ ...styles.quickActionBtn, opacity: 0.7 }}>
             <BookOpen size={14} /> Return to /song
+          </button>
+          <button onClick={() => navigate('/guitar/map')} style={{ ...styles.quickActionBtn, opacity: 0.7 }}>
+            <Map size={14} /> View Map
           </button>
         </div>
       </div>

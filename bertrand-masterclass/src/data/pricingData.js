@@ -28,7 +28,7 @@ export const PAYMENT_METHODS = [
     primary: true,
     // ⚠️ Verify exact Venmo handle with Bertrand — his QR (BLVenmo.jpg) is on his resources page
     handle: '@BertrandLaurence',
-    qrImage: '/assets/venmo_qr.png',
+    qrImage: '/assets/venmo_qr.svg',
   },
   {
     id: 'paypal',

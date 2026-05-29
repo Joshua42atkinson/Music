@@ -244,7 +244,7 @@ const TRANSLATIONS = {
     streakLabel: 'Streak',
     minLabel: 'Min',
     breathsLabel: 'Breaths',
-    florinsLabel: 'Florins',
+
     questsLabel: 'Quests',
     abilities: '\u2500\u2500 ABILITIES \u2500\u2500',
     intervalMastery: '\u2500\u2500 INTERVAL MASTERY \u2500\u2500',
@@ -562,7 +562,7 @@ const TRANSLATIONS = {
     streakLabel: 'S\u00e9rie',
     minLabel: 'Min',
     breathsLabel: 'Souffles',
-    florinsLabel: 'Florins',
+
     questsLabel: 'Qu\u00eates',
     abilities: '\u2500\u2500 COMP\u00c9TENCES \u2500\u2500',
     intervalMastery: '\u2500\u2500 MA\u00ceTRISE DES INTERVALLES \u2500\u2500',

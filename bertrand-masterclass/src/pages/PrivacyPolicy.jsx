@@ -90,17 +90,17 @@ export default function PrivacyPolicy() {
         </button>
 
         <h1>Privacy Policy</h1>
-        <p className="legal-updated">Last updated: May 19, 2026</p>
+        <p className="legal-updated">Last updated: May 29, 2026</p>
 
         <p>
           Voix Vive is a guitar learning platform created by Joshua Atkinson for
           Bertrand Laurence Guitar Studio. We believe your practice is private.
           This policy explains what data we access, what stays on your device,
-          and what (if anything) leaves it.
+          and what is synced securely to the cloud.
         </p>
 
         <div className="legal-highlight">
-          <p><strong>The short version:</strong> Almost everything stays on your device. We don't track you, we don't sell your data, and we don't use cookies.</p>
+          <p><strong>The short version:</strong> Core practice happens on your device. If you create an account, we securely sync your progress using Supabase so you can resume on any device. We don't track you for ads, we don't sell your data, and we don't use third-party marketing cookies.</p>
         </div>
 
         <h2>1. What We Access</h2>
@@ -120,13 +120,19 @@ export default function PrivacyPolicy() {
           <li>Recordings are never automatically uploaded. If and when the async review feature launches, you will explicitly choose to submit a recording.</li>
         </ul>
 
-        <h2>2. Data Stored on Your Device</h2>
+        <h2>2. Data Storage & Accounts</h2>
+        <p><strong>Anonymous Users (Offline Mode)</strong></p>
         <ul>
-          <li><strong>localStorage:</strong> Practice progress, Bard Level, scaffolding state, ambient player preferences, and game session scores. This data persists between visits but never leaves your browser.</li>
-          <li><strong>IndexedDB (via Dexie.js):</strong> Practice recordings, session journals, and submission history. All stored locally.</li>
+          <li><strong>localStorage:</strong> Practice progress, Bard Level, scaffolding state, ambient player preferences, and game session scores persist on your device.</li>
+          <li><strong>IndexedDB:</strong> Practice recordings, session journals, and submission history are stored locally.</li>
+        </ul>
+        <p><strong>Registered Users (Cloud Sync)</strong></p>
+        <ul>
+          <li><strong>Google OAuth:</strong> If you sign in with Google, we receive your basic profile information (email address and name) to create your account. We do not access your Google data beyond the basic authentication profile.</li>
+          <li><strong>Supabase:</strong> Your practice progress and traction data are securely synced to our Supabase database. This allows you to pick up where you left off on any device. Your video recordings currently remain entirely local.</li>
         </ul>
 
-        <p>To delete all locally stored data, clear your browser's site data for this domain.</p>
+        <p>To delete all locally stored data, clear your browser's site data for this domain. To request account deletion, please contact us.</p>
 
         <h2>3. What We Do NOT Collect</h2>
         <ul>

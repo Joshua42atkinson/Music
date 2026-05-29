@@ -81,6 +81,15 @@ These are Bertrand's IP. Use the ©symbol always. Never paraphrase or abbreviate
 
 ---
 
+## SOMATIC GATES (BE → DO → PLAY)
+
+Progression through the curriculum is physically gated. A student cannot advance to the next cognitive concept until the body has proven it understands the current one.
+1. **BE (Somatic State / Imagination):** The student must read the theory, imagine the sound, and visualize the pattern without touching the guitar.
+2. **DO (Kinesthetic Execution / Pitch):** The student must physically execute the technique or perfectly audiate the pitch (verified via the microphone in the PitchRoom).
+3. **PLAY (Flow State / Creativity):** The student must freely express the concept without judgment.
+
+---
+
 ## THE 12-CHAPTER CHROMATIC MONOMYTH
 
 Each chapter maps: **chromatic tone → monomyth stage → protocol → digital tool**
