@@ -1,6 +1,6 @@
 # VOIX VIVE — Architecture & Data Flow
 > **Reference for all technical decisions, data wiring, and file structure.**
-> Last Updated: 2026-05-27
+> Last Updated: 2026-05-28
 >
 > **This document is the source of truth. If code contradicts this doc, the doc is right.**
 
@@ -117,7 +117,11 @@ App.jsx
   ├── Troubadour (AmbientPlayer)  [global — bottom-right floating widget]
   │   ├── Music player
   │   ├── Metronome
-  │   └── AI Chat (unified)
+  │   └── AI Chat (useTroubadourAI)
+  │       ├── Remote vLLM (GMKtek)
+  │       ├── Local LM Studio (fallback)
+  │       └── Offline (static cues)
+  ├── BetaGate                     [PIN-protected AI beta access]
   ├── LandingScreen
   │   ├── CoachingPortal (modal)
   │   └── ProfileModal (modal)
@@ -146,8 +150,14 @@ App.jsx
   ├── AdventurePlayer (lazy)       [/adventure — standalone]
   ├── PlayerPortal (lazy)          [submissions + library + pricing]
   │   ├── PracticeRecorder (modal)
+  │   ├── TroubadourLoom           [identity + myelination map + mentor]
+  │   │   ├── CapstoneCard         [certification tiers + audition]
+  │   │   └── MentorCard           [$5 / $45 / $100 interactions]
   │   └── ServiceCard (new)
   ├── PlaybookShell (lazy)
+  │   ├── BEWorkbook               [DAG node cards + PracticeJournal]
+  │   │   ├── PracticeJournal      [20-min daily session generator]
+  │   │   └── DAGProgressBar       [fret-level progress]
   │   ├── CharacterSheet
   │   ├── QuestLog
   │   ├── Songbook
@@ -168,17 +178,29 @@ App.jsx
   totalTraction: 1840,
   practiceMinutes: 142,
   streak: 4,               // days
-  fretsUnlocked: [1, 2, 3, 9],
+  completedNodes: ['fret-1-class-be', 'fret-1-class-do'],
   frets: {
     1: {
       traction: 80,        // 0-100, drives Bard Level
-      yinCompleted: true,  // reached last slide in SlideViewer
-      yangCompleted: false, // completed game phase for this fret
-      phase1Unlocked: true,
-      phase2Unlocked: false,
-      phase3Unlocked: false,
+      beCompleted: true,
+      doCompleted: true,
+      playCompleted: false,
+      beMastery: 2,        // 0-3
+      doMastery: 1,
+      playMastery: 0,
+      beResonance: true,   // achieved through repetition + depth
+      doResonance: false,
+      playResonance: false,
+      beAttempts: 2,
+      doAttempts: 1,
+      playAttempts: 0,
+      depthExplored: true, // viewed all slides/depth content
+      lastAccessed: '2026-05-28T14:30:00Z',
     },
     // ... frets 1-12
+  },
+  studentProfile: {
+    troubadourType: 'storyteller', // storyteller | craftsman | ear | seeker
   }
 }
 ```
