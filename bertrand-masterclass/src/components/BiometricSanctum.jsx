@@ -105,6 +105,10 @@ export default function BiometricSanctum({ onBiometricsChange }) {
     rest: t('somaticRest'),
   };
 
+  // Hiding stub for v1.0-beta release
+  return null;
+
+  /*
   return (
     <div className="bg-[#100e0b]/90 border border-cf-gold/20 rounded-2xl p-5 backdrop-blur-xl shadow-2xl relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-cf-gold/5 via-transparent to-transparent pointer-events-none" />
@@ -173,4 +177,5 @@ export default function BiometricSanctum({ onBiometricsChange }) {
       </p>
     </div>
   );
+  */
 }
