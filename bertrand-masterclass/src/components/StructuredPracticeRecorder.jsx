@@ -161,6 +161,21 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
     }
   };
 
+  // ── Stop recording early ──
+  const stopRecording = useCallback(() => {
+    clearInterval(timerRef.current);
+    clearInterval(breathRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+  }, []);
+
+  // ── Finish session → emotional input → upload ──
+  const finishSession = useCallback(() => {
+    stopRecording();
+    setStage('emotional-input');
+  }, [stopRecording]);
+
   // ── Timer engine (uses refs to avoid React state race conditions) ──
   useEffect(() => {
     if (!stage.startsWith('recording-phase')) return;
@@ -213,21 +228,6 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
     }, 20000);
     return () => clearInterval(interval);
   }, [currentPhaseIndex]);
-
-  // ── Stop recording early ──
-  const stopRecording = useCallback(() => {
-    clearInterval(timerRef.current);
-    clearInterval(breathRef.current);
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
-    }
-  }, []);
-
-  // ── Finish session → emotional input → upload ──
-  const finishSession = useCallback(() => {
-    stopRecording();
-    setStage('emotional-input');
-  }, [stopRecording]);
 
   // ── Submit emotional state + upload ──
   const submitSession = async () => {

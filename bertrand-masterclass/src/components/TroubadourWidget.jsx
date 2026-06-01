@@ -28,7 +28,7 @@ function ServerLight({ connected, label, color }) {
         boxShadow: connected ? `0 0 4px ${color}` : 'none',
         transition: 'all 0.3s',
       }} />
-      <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.04em' }}>
+      <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.04em' }}>
         {label}
       </span>
     </div>
@@ -536,16 +536,16 @@ export default function TroubadourWidget() {
           title="Troubadour"
         >
           {activeProfile ? (
-            <div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white font-bold font-serif text-lg uppercase shadow-inner">
+            <div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white font-bold font-serif text-2xl uppercase shadow-inner">
               {activeProfile.charAt(0)}
             </div>
           ) : (
-            <Guitar size={20} className={isPlaying ? 'text-violet-400 animate-pulse' : 'text-violet-400/70'} />
+            <Guitar size={30} className={isPlaying ? 'text-violet-400 animate-pulse' : 'text-violet-400/70'} />
           )}
           {/* Notification badge */}
           {hasNotifications && (
             <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 border-2 border-[#050508] flex items-center justify-center">
-              <span className="text-[8px] font-bold text-[#050508] font-mono">
+              <span className="text-xs font-bold text-[#050508] font-mono">
                 {notifications.length}
               </span>
             </span>
@@ -560,22 +560,22 @@ export default function TroubadourWidget() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -10, scale: 0.95 }}
               className="bg-[#12100e]/95 backdrop-blur-xl border border-violet-500/30 rounded-2xl p-4 shadow-2xl"
-              style={{ minWidth: 300, maxWidth: 340 }}
+              style={{ minWidth: 420, maxWidth: 480 }}
             >
               {/* Mode toggle + help */}
               <div className="flex items-center gap-1 mb-4">
                 <div className="flex gap-1 p-1 bg-black/40 rounded-lg flex-1">
                   <button
                     onClick={() => handleModeSwitch('music')}
-                    className={`flex-1 py-1.5 text-xs font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
+                    className={`flex-1 py-1.5 text-base font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
                       mode === 'music' ? 'bg-violet-500 text-white font-bold' : 'text-white/40 hover:text-white'
                     }`}
                   >
-                    <Music size={10} /> {t('music')}
+                    <Music size={15} /> {t('music')}
                   </button>
                   <button
                     onClick={() => handleModeSwitch('click')}
-                    className={`flex-1 py-1.5 text-xs font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
+                    className={`flex-1 py-1.5 text-base font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
                       mode === 'click' ? 'bg-violet-500 text-white font-bold' : 'text-white/40 hover:text-white'
                     }`}
                   >
@@ -587,34 +587,34 @@ export default function TroubadourWidget() {
                   </button>
                   <button
                     onClick={() => handleModeSwitch('system')}
-                    className={`flex-1 py-1.5 text-xs font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
+                    className={`flex-1 py-1.5 text-base font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
                       mode === 'system' ? 'bg-violet-500 text-white font-bold' : 'text-white/40 hover:text-white'
                     }`}
                   >
-                    <Settings size={10} /> SYS
+                    <Settings size={15} /> SYS
                   </button>
                   <button
                     onClick={() => handleModeSwitch('portal')}
-                    className={`flex-1 py-1.5 text-xs font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
+                    className={`flex-1 py-1.5 text-base font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
                       mode === 'portal' ? 'bg-violet-500 text-white font-bold' : 'text-white/40 hover:text-white'
                     }`}
                   >
-                    <Compass size={10} /> NAV
+                    <Compass size={15} /> NAV
                   </button>
                 </div>
                 <button
                   onClick={() => setShowHelp(true)}
-                  className="ml-1 px-2 py-1 rounded-lg flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-violet-300 bg-violet-500/10 border border-violet-500/30 hover:bg-violet-500/20 hover:border-violet-400/50 transition-all flex-shrink-0"
+                  className="ml-1 px-2 py-1 rounded-lg flex items-center gap-1 text-base font-mono uppercase tracking-wider text-violet-300 bg-violet-500/10 border border-violet-500/30 hover:bg-violet-500/20 hover:border-violet-400/50 transition-all flex-shrink-0"
                   title={t('help')}
                 >
-                  <HelpCircle size={12} /> {t('help') || 'Help'}
+                  <HelpCircle size={18} /> {t('help') || 'Help'}
                 </button>
               </div>
 
               {/* ── NOTIFICATION HUB ── */}
               {hasNotifications && (
                 <div className="mb-3 space-y-2">
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-amber-400/60 mb-1.5">
+                  <div className="text-base font-mono uppercase tracking-widest text-amber-400/60 mb-1.5">
                     {locale === 'fr' ? 'Notifications' : 'Notifications'}
                   </div>
                   {notifications.map(n => (
@@ -630,15 +630,15 @@ export default function TroubadourWidget() {
                       onClick={n.action}
                     >
                       <div className="flex items-start gap-2">
-                        <span className="text-sm leading-none mt-0.5">{n.icon}</span>
+                        <span className="text-lg leading-none mt-0.5">{n.icon}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[11px] font-mono font-bold text-white/80 uppercase tracking-wide">
+                          <p className="text-lg font-mono font-bold text-white/80 uppercase tracking-wide">
                             {n.title}
                           </p>
-                          <p className="text-[10px] text-white/40 mt-0.5 leading-relaxed">
+                          <p className="text-base text-white/40 mt-0.5 leading-relaxed">
                             {n.message}
                           </p>
-                          <p className="text-[9px] font-mono text-violet-400/70 mt-1 uppercase tracking-wider">
+                          <p className="text-sm font-mono text-violet-400/70 mt-1 uppercase tracking-wider">
                             {n.actionLabel} ›
                           </p>
                         </div>
@@ -652,29 +652,29 @@ export default function TroubadourWidget() {
               {mode === 'music' && (
                 <div>
                   <div className="flex items-center justify-between mb-3 border-b border-violet-500/20 pb-2">
-                    <span className="text-xs font-mono uppercase tracking-widest text-violet-400">
+                    <span className="text-base font-mono uppercase tracking-widest text-violet-400">
                       {t('nowPlaying')}
                     </span>
                     <button onClick={toggleMute} className="text-cf-slate hover:text-white transition-colors">
-                      {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                      {isMuted ? <VolumeX size={21} /> : <Volume2 size={21} />}
                     </button>
                   </div>
 
                   {hasError ? (
-                    <p className="text-xs text-white/30 text-center py-4 font-mono">
+                    <p className="text-base text-white/30 text-center py-4 font-mono">
                       {t('noAudioFile')}
                     </p>
                   ) : (
                     <>
                       <div className="mb-3">
-                        <div className="text-sm text-white font-medium truncate">{localize(track.title)}</div>
-                        <div className="text-[10px] text-cf-slate font-mono uppercase tracking-wider">{track.artist}</div>
+                        <div className="text-lg text-white font-medium truncate">{localize(track.title)}</div>
+                        <div className="text-base text-cf-slate font-mono uppercase tracking-wider">{track.artist}</div>
                       </div>
                       <div className="mb-3">
                         <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden mb-1">
                           <div className="h-full bg-violet-400/70 rounded-full transition-all duration-1000" style={{ width: `${progress}%` }} />
                         </div>
-                        <div className="flex justify-between text-[9px] text-cf-slate font-mono">
+                        <div className="flex justify-between text-sm text-cf-slate font-mono">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
@@ -682,22 +682,22 @@ export default function TroubadourWidget() {
                       <div className="flex items-center justify-center gap-4 mb-3">
                         <button onClick={toggleMusic}
                           className="w-12 h-12 rounded-full bg-violet-500/15 flex items-center justify-center text-violet-300 border border-violet-500/35 hover:bg-violet-500/25 transition-all">
-                          {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-1" />}
+                          {isPlaying ? <Pause size={30} /> : <Play size={30} className="ml-1" />}
                         </button>
                         {TRACKS.length > 1 && (
                           <button onClick={skipTrack}
                             className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-cf-slate hover:text-white transition-colors">
-                            <SkipForward size={14} />
+                            <SkipForward size={21} />
                           </button>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <Music size={10} className="text-cf-slate flex-shrink-0" />
+                        <Music size={15} className="text-cf-slate flex-shrink-0" />
                         <input type="range" min="0" max="1" step="0.05" value={volume}
                           onChange={e => handleVol(parseFloat(e.target.value))}
                           className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-violet-400"
                         />
-                        <span className="text-[9px] text-cf-slate font-mono w-6 text-right">{Math.round(volume * 100)}</span>
+                        <span className="text-sm text-cf-slate font-mono w-6 text-right">{Math.round(volume * 100)}</span>
                       </div>
                     </>
                   )}
@@ -708,7 +708,7 @@ export default function TroubadourWidget() {
               {mode === 'click' && (
                 <div>
                   <div className="border-b border-violet-500/20 pb-2 mb-4">
-                    <span className="text-xs font-mono uppercase tracking-widest text-violet-400">
+                    <span className="text-base font-mono uppercase tracking-widest text-violet-400">
                       {t('metronome')}
                     </span>
                   </div>
@@ -729,21 +729,21 @@ export default function TroubadourWidget() {
                   {/* BPM */}
                   <div className="text-center mb-4">
                     <div className="text-4xl font-bold font-mono text-white">{metro.bpm}</div>
-                    <div className="text-[9px] font-mono uppercase tracking-widest text-violet-400/60">BPM</div>
+                    <div className="text-sm font-mono uppercase tracking-widest text-violet-400/60">BPM</div>
                   </div>
 
                   {/* BPM slider */}
                   <div className="flex items-center gap-2 mb-3">
                     <button onClick={() => metro.setBpm(b => Math.max(40, b - 1))}
                       className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors">
-                      <Minus size={12} />
+                      <Minus size={18} />
                     </button>
                     <input type="range" min="40" max="240" value={metro.bpm}
                       onChange={e => metro.setBpm(parseInt(e.target.value))}
                       className="flex-1 accent-violet-400 h-1" />
                     <button onClick={() => metro.setBpm(b => Math.min(240, b + 1))}
                       className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors">
-                      <Plus size={12} />
+                      <Plus size={18} />
                     </button>
                   </div>
 
@@ -751,7 +751,7 @@ export default function TroubadourWidget() {
                   <div className="flex justify-between items-center bg-white/5 rounded-lg p-0.5 border border-white/10 mb-3">
                     {[2, 3, 4, 5, 6].map(n => (
                       <button key={n} onClick={() => metro.setBeats(n)}
-                        className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                        className={`flex-1 py-1.5 text-base font-bold rounded-md transition-colors ${
                           metro.beats === n ? 'bg-violet-500 text-white' : 'text-white/40 hover:text-white'
                         }`}>
                         {n}/4
@@ -761,26 +761,26 @@ export default function TroubadourWidget() {
 
                   {/* Click volume */}
                   <div className="flex items-center gap-2 mb-3">
-                    <Volume2 size={11} className="text-white/30 flex-shrink-0" />
+                    <Volume2 size={16} className="text-white/30 flex-shrink-0" />
                     <input type="range" min="0" max="1" step="0.05" value={metro.volume}
                       onChange={e => metro.setVolume(parseFloat(e.target.value))}
                       className="flex-1 accent-white/50 h-1" />
-                    <span className="text-[9px] text-white/30 font-mono w-6 text-right">{Math.round(metro.volume * 100)}</span>
+                    <span className="text-sm text-white/30 font-mono w-6 text-right">{Math.round(metro.volume * 100)}</span>
                   </div>
 
                   {/* Tap + Start/Stop */}
                   <div className="flex gap-2">
                     <button onClick={metro.tap}
-                      className="flex-1 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider border border-violet-500/30 bg-violet-500/5 text-violet-400/80 hover:bg-violet-500/15 hover:text-violet-300 transition-all active:scale-95">
+                      className="flex-1 py-2.5 rounded-xl text-base font-mono uppercase tracking-wider border border-violet-500/30 bg-violet-500/5 text-violet-400/80 hover:bg-violet-500/15 hover:text-violet-300 transition-all active:scale-95">
                       {t('tap')}
                     </button>
                     <button onClick={() => metro.setIsPlaying(v => !v)}
-                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
+                      className={`flex-1 py-2.5 rounded-xl text-base font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
                         metro.isPlaying
                           ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                           : 'bg-violet-500 text-white shadow-[0_0_12px_rgba(139,92,246,0.3)]'
                       }`}>
-                      {metro.isPlaying ? <><Square size={12} fill="currentColor" /> {t('stop')}</> : <><Play size={12} fill="currentColor" /> {t('start')}</>}
+                      {metro.isPlaying ? <><Square size={18} fill="currentColor" /> {t('stop')}</> : <><Play size={18} fill="currentColor" /> {t('start')}</>}
                     </button>
                   </div>
                 </div>
@@ -792,37 +792,37 @@ export default function TroubadourWidget() {
                   {/* Game Mode Tracker */}
                   <div className="mb-4 p-3 bg-white/5 border border-amber-500/20 rounded-xl">
                     <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
-                      <span className="text-xs font-mono uppercase tracking-widest text-amber-400">
+                      <span className="text-base font-mono uppercase tracking-widest text-amber-400">
                         Apprentice Status
                       </span>
-                      <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-mono">
+                      <span className="text-base bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-mono">
                         Lv.{bardLevel}
                       </span>
                     </div>
-                    <div className="flex justify-between text-[10px] font-mono text-white/60 mb-3 px-1">
+                    <div className="flex justify-between text-base font-mono text-white/60 mb-3 px-1">
                       <div className="flex flex-col items-center">
-                        <span className="text-white text-xs mb-0.5">{streak || 0}</span>
+                        <span className="text-white text-base mb-0.5">{streak || 0}</span>
                         <span className="text-white/40">Streak</span>
                       </div>
                       <div className="flex flex-col items-center border-l border-white/10 pl-4">
-                        <span className="text-white text-xs mb-0.5">{practiceMinutes || 0}</span>
+                        <span className="text-white text-base mb-0.5">{practiceMinutes || 0}</span>
                         <span className="text-white/40">Minutes</span>
                       </div>
                       <div className="flex flex-col items-center border-l border-white/10 pl-4">
-                        <span className="text-white text-xs mb-0.5">{completedNodes.length}</span>
+                        <span className="text-white text-base mb-0.5">{completedNodes.length}</span>
                         <span className="text-white/40">Frets</span>
                       </div>
                     </div>
                     <button 
                       onClick={() => navigate('/song')} 
-                      className="w-full py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-xs font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95"
+                      className="w-full py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-base font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95"
                     >
-                      <Play size={12} fill="currentColor" /> Resume Journey
+                      <Play size={18} fill="currentColor" /> Resume Journey
                     </button>
                   </div>
 
                   <div className="border-b border-violet-500/20 pb-2 mb-3 mt-4">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-violet-400/60">
+                    <span className="text-base font-mono uppercase tracking-widest text-violet-400/60">
                       All Portals
                     </span>
                   </div>
@@ -830,47 +830,47 @@ export default function TroubadourWidget() {
                   <div className="flex flex-col gap-2">
                     <button 
                       onClick={() => navigate('/')} 
-                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                      className={`py-2 px-3 rounded-lg text-base font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
                         location.pathname === '/' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
                       }`}
                     >
-                      <User size={14} /> Home Portal
+                      <User size={21} /> Home Portal
                     </button>
 
                     <button 
                       onClick={() => navigate('/song')} 
-                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                      className={`py-2 px-3 rounded-lg text-base font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
                         location.pathname === '/song' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
                       }`}
                     >
-                      <Music size={14} /> Orientation Hub
+                      <Music size={21} /> Orientation Hub
                     </button>
 
                     <button 
                       onClick={() => navigate('/guitar')} 
-                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                      className={`py-2 px-3 rounded-lg text-base font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
                         location.pathname === '/guitar' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
                       }`}
                     >
-                      <Guitar size={14} /> Guitar Workbench
+                      <Guitar size={21} /> Guitar Workbench
                     </button>
 
                     <button 
                       onClick={() => navigate('/player')} 
-                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                      className={`py-2 px-3 rounded-lg text-base font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
                         location.pathname === '/player' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
                       }`}
                     >
-                      <Play size={14} /> Audio & Videos
+                      <Play size={21} /> Audio & Videos
                     </button>
 
                     <button 
                       onClick={() => navigate('/guitar/map')} 
-                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                      className={`py-2 px-3 rounded-lg text-base font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
                         location.pathname === '/guitar/map' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
                       }`}
                     >
-                      <Compass size={14} /> Maturation Map
+                      <Compass size={21} /> Maturation Map
                     </button>
                   </div>
                 </div>
@@ -880,46 +880,46 @@ export default function TroubadourWidget() {
               {mode === 'system' && (
                 <div>
                   <div className="border-b border-violet-500/20 pb-2 mb-4">
-                    <span className="text-xs font-mono uppercase tracking-widest text-violet-400">
+                    <span className="text-base font-mono uppercase tracking-widest text-violet-400">
                       System & Identity
                     </span>
                   </div>
                   
                   {activeProfile ? (
                     <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl border border-white/10">
-                      <div className="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center text-white font-bold font-serif text-xl uppercase shadow-inner">
+                      <div className="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center text-white font-bold font-serif text-3xl uppercase shadow-inner">
                         {activeProfile.charAt(0)}
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-white">{activeProfile}</div>
-                        <div className="text-[10px] text-violet-400 font-mono uppercase tracking-wider">Bard Level {bardLevel}</div>
+                        <div className="text-lg font-bold text-white">{activeProfile}</div>
+                        <div className="text-base text-violet-400 font-mono uppercase tracking-wider">Bard Level {bardLevel}</div>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl border border-white/10">
                       <div className="w-10 h-10 rounded-full bg-black/40 border border-white/10 flex items-center justify-center text-white/40">
-                        <User size={16} />
+                        <User size={24} />
                       </div>
                       <div>
-                        <div className="text-sm text-white/50 italic">Unregistered</div>
-                        <div className="text-[10px] text-white/30 font-mono uppercase tracking-wider">Local play only</div>
+                        <div className="text-lg text-white/50 italic">Unregistered</div>
+                        <div className="text-base text-white/30 font-mono uppercase tracking-wider">Local play only</div>
                       </div>
                     </div>
                   )}
 
-                  <div className="text-xs text-white/70 mb-2 font-serif italic">
+                  <div className="text-base text-white/70 mb-2 font-serif italic">
                     The Memory Card
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={exportVoixVive}
-                      className="flex-1 py-2 rounded-lg text-xs font-mono uppercase tracking-wider border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center justify-center gap-2"
+                      className="flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center justify-center gap-2"
                     >
-                      <Download size={12} /> Save State
+                      <Download size={18} /> Save State
                     </button>
                     
-                    <label className="flex-1 py-2 rounded-lg text-xs font-mono uppercase tracking-wider border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                      <Upload size={12} /> Load State
+                    <label className="flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                      <Upload size={18} /> Load State
                       <input 
                         type="file" 
                         accept=".voixvive,.json"
@@ -929,13 +929,13 @@ export default function TroubadourWidget() {
                     </label>
                   </div>
 
-                  <div className="text-xs text-white/70 mb-2 mt-4 font-serif italic">
+                  <div className="text-base text-white/70 mb-2 mt-4 font-serif italic">
                     Curriculum Rules
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, sandboxMode: false } }))}
-                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                      className={`flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border transition-all ${
                         !traction?.settings?.sandboxMode 
                           ? 'border-violet-500 bg-violet-500/20 text-white' 
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
@@ -945,7 +945,7 @@ export default function TroubadourWidget() {
                     </button>
                     <button 
                       onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, sandboxMode: true } }))}
-                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                      className={`flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border transition-all ${
                         traction?.settings?.sandboxMode 
                           ? 'border-amber-500 bg-amber-500/20 text-white' 
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
@@ -954,13 +954,13 @@ export default function TroubadourWidget() {
                       Open Book
                     </button>
                   </div>
-                  <div className="text-xs text-white/70 mb-2 mt-4 font-serif italic">
+                  <div className="text-base text-white/70 mb-2 mt-4 font-serif italic">
                     Audience Focus
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, kidMode: false } }))}
-                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                      className={`flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border transition-all ${
                         !traction?.settings?.kidMode 
                           ? 'border-violet-500 bg-violet-500/20 text-white' 
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
@@ -970,7 +970,7 @@ export default function TroubadourWidget() {
                     </button>
                     <button 
                       onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, kidMode: true } }))}
-                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                      className={`flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border transition-all ${
                         traction?.settings?.kidMode 
                           ? 'border-amber-500 bg-amber-500/20 text-white' 
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
@@ -980,13 +980,13 @@ export default function TroubadourWidget() {
                     </button>
                   </div>
 
-                  <div className="text-xs text-white/70 mb-2 mt-4 font-serif italic">
+                  <div className="text-base text-white/70 mb-2 mt-4 font-serif italic">
                     AI Guidance
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, aiEnabled: true } }))}
-                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                      className={`flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border transition-all ${
                         traction?.settings?.aiEnabled !== false
                           ? 'border-violet-500 bg-violet-500/20 text-white' 
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
@@ -996,7 +996,7 @@ export default function TroubadourWidget() {
                     </button>
                     <button 
                       onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, aiEnabled: false } }))}
-                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                      className={`flex-1 py-2 rounded-lg text-base font-mono uppercase tracking-wider border transition-all ${
                         traction?.settings?.aiEnabled === false
                           ? 'border-amber-500 bg-amber-500/20 text-white' 
                           : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
@@ -1015,7 +1015,7 @@ export default function TroubadourWidget() {
                   <button
                     onClick={loadVoixTier}
                     disabled={voixLoading}
-                    className="w-full py-2 mb-2 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center justify-center gap-2 active:scale-95"
+                    className="w-full py-2 mb-2 rounded-lg text-base font-mono uppercase tracking-wider border transition-all flex items-center justify-center gap-2 active:scale-95"
                     style={{
                       background: voixLoading ? 'rgba(139,92,246,0.1)' : 'rgba(139,92,246,0.15)',
                       borderColor: voixLoading ? 'rgba(139,92,246,0.2)' : 'rgba(139,92,246,0.35)',
@@ -1028,15 +1028,15 @@ export default function TroubadourWidget() {
                       </>
                     ) : (
                       <>
-                        <Download size={12} /> Load Living Voice (~1 GB)
+                        <Download size={18} /> Load Living Voice (~1 GB)
                       </>
                     )}
                   </button>
                 )}
                 {voixReady && (
                   <div className="flex items-center gap-2 mb-2 px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                    <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest">✓ Voix Active</span>
-                    <span className="text-[9px] font-mono text-emerald-400/50">{wllama.modelId}</span>
+                    <span className="text-base font-mono text-emerald-400 uppercase tracking-widest">✓ Voix Active</span>
+                    <span className="text-sm font-mono text-emerald-400/50">{wllama.modelId}</span>
                   </div>
                 )}
                 {/* Server status lights */}
@@ -1048,7 +1048,7 @@ export default function TroubadourWidget() {
                     <ServerLight connected={isDaaSConnected} label="DaaS" color="#7aaa88" />
                     <ServerLight connected={voiceConnected} label="Voice" color="#cc5555" />
                   </div>
-                  <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>
                     {voixReady ? 'Voix' : isLMStudioConnected || isDaaSConnected || voiceConnected ? 'Chant' : 'Souffle'}
                   </span>
                 </div>
@@ -1057,11 +1057,11 @@ export default function TroubadourWidget() {
               {/* ── AI CHAT (always visible) ── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
                 <div className="border-b border-violet-500/20 pb-2 mb-1 flex justify-between items-center">
-                  <span className="text-xs font-mono uppercase tracking-widest text-violet-400">
+                  <span className="text-base font-mono uppercase tracking-widest text-violet-400">
                     {locale === 'fr' ? 'Le Troubadour' : 'The Troubadour'}
                   </span>
                   {detectedEmotion && (
-                    <span className="text-[9px] font-mono uppercase px-2 py-0.5 rounded-full border border-violet-500/30 text-violet-300">
+                    <span className="text-sm font-mono uppercase px-2 py-0.5 rounded-full border border-violet-500/30 text-violet-300">
                       State: {detectedEmotion}
                     </span>
                   )}
@@ -1074,12 +1074,12 @@ export default function TroubadourWidget() {
                 }}>
                   {guideMessages.length === 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Cormorant Garamond, serif', lineHeight: 1.5, fontStyle: 'italic' }}>
+                      <p style={{ fontSize: '1.08rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Cormorant Garamond, serif', lineHeight: 1.5, fontStyle: 'italic' }}>
                         {locale === 'fr'
                           ? 'Je suis le Troubadour — guide de Voix Vive. Demandez-moi n\'importe quoi.'
                           : 'I am the Troubadour — guide of Voix Vive. Ask me anything.'}
                       </p>
-                      <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1.6 }}>
+                      <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.25)', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1.6 }}>
                         {locale === 'fr'
                           ? 'Pratique · Pédagogie · Psychologie · Business · Tech'
                           : 'Practice · Pedagogy · Psychology · Business · Tech'}
@@ -1088,7 +1088,7 @@ export default function TroubadourWidget() {
                   )}
                   {/* AI Disclosure */}
                   <p style={{
-                    fontSize: '0.6rem',
+                    fontSize: '0.9rem',
                     color: 'rgba(255,255,255,0.2)',
                     fontFamily: "'JetBrains Mono', monospace",
                     textAlign: 'center',
@@ -1106,7 +1106,7 @@ export default function TroubadourWidget() {
                       background: msg.role === 'user' ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.05)',
                       border: `1px solid ${msg.role === 'user' ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.08)'}`,
                       borderRadius: 8, padding: '6px 10px',
-                      fontSize: '0.72rem', lineHeight: 1.5,
+                      fontSize: '1.08rem', lineHeight: 1.5,
                       color: msg.role === 'user' ? '#c4b5fd' : 'rgba(255,255,255,0.75)',
                       fontFamily: msg.role === 'user' ? 'JetBrains Mono, monospace' : 'Cormorant Garamond, serif',
                       fontStyle: msg.role === 'assistant' ? 'italic' : 'normal',
@@ -1133,7 +1133,7 @@ export default function TroubadourWidget() {
                       border: `1px solid ${voiceRecording ? 'rgba(204,85,85,0.2)' : 'rgba(255,255,255,0.1)'}`,
                       borderRadius: 8, padding: '6px 10px',
                       color: voiceRecording ? 'rgba(204,85,85,0.6)' : 'rgba(255,255,255,0.8)',
-                      fontSize: '0.72rem',
+                      fontSize: '1.08rem',
                       fontFamily: 'JetBrains Mono, monospace',
                       outline: 'none',
                     }}
@@ -1153,7 +1153,7 @@ export default function TroubadourWidget() {
                       animation: voiceRecording ? 'pulseMic 1.5s ease-in-out infinite' : 'none',
                     }}
                   >
-                    {voiceRecording ? <Mic size={14} /> : <MicOff size={14} />}
+                    {voiceRecording ? <Mic size={21} /> : <MicOff size={21} />}
                   </button>
                   <button
                     onClick={sendGuideMessage}
@@ -1167,14 +1167,14 @@ export default function TroubadourWidget() {
                       transition: 'all 0.2s',
                     }}
                   >
-                    <Send size={12} />
+                    <Send size={18} />
                   </button>
                 </div>
                 
                 {/* ── Net Protocol HUD ── */}
                 {voiceRecording && (
                   <div className="mt-2 p-2 rounded-lg bg-black/40 border border-red-500/20 flex flex-col items-center gap-1">
-                    <span className="text-[9px] text-red-400/80 font-mono uppercase tracking-widest">
+                    <span className="text-sm text-red-400/80 font-mono uppercase tracking-widest">
                       Net Protocol Active
                     </span>
                     <div className="flex gap-2 w-full mt-1">
@@ -1182,7 +1182,7 @@ export default function TroubadourWidget() {
                         <div className="absolute inset-0 bg-red-500/50 animate-[pulseMic_1.5s_ease-in-out_infinite]" />
                       </div>
                     </div>
-                    <span className="text-[10px] text-red-300 font-serif italic mt-1">
+                    <span className="text-base text-red-300 font-serif italic mt-1">
                       Always end your transmission with "Over."
                     </span>
                   </div>

@@ -13,7 +13,7 @@ export function useAuth() {
 
   useEffect(() => {
     if (!supabase) {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 0);
       return;
     }
 

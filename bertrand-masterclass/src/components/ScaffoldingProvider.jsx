@@ -79,11 +79,11 @@ export function ScaffoldingProvider({ children }) {
   // ── Sync with Supabase on Login ──
   useEffect(() => {
     if (!user) {
-      setUserId(null);
+      setTimeout(() => setUserId(null), 0);
       return;
     }
 
-    setUserId(user.id);
+    setTimeout(() => setUserId(user.id), 0);
     const syncCloudData = async () => {
       try {
         const cloudTraction = await getTractionState(user.id);

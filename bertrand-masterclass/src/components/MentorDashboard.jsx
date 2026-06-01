@@ -279,9 +279,10 @@ export default function MentorDashboard({ onClose }) {
     
     setRecStatus('uploading');
     try {
+      const now = new Date().getTime();
       const driveData = await uploadVideo(recBlob, {
         entryType: 'mentor-feedback',
-        fileName: `bertrand-feedback-${selectedSub.id}-${Date.now()}.webm`,
+        fileName: `bertrand-feedback-${selectedSub.id}-${now}.webm`,
       });
 
       const realLink = `\n\n📹 **[Maître Bertrand's Video Review & Somatic Feedback]**\n*Focus on physical Pling resonance, shearl neck glide, and posture.* \nLink: [View Video Feedback](${driveData.webViewLink})\n`;

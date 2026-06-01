@@ -99,6 +99,20 @@ export default function DailyCalibration({ onClose }) {
     }
   }, [pitch, volume, noteInfo, currentStringIdx, step]);
 
+  const handleSuccess = useCallback(() => {
+    // Unlock curriculum in global state
+    const today = new Date().toISOString().split('T')[0];
+    updateTraction(prev => ({
+      ...prev,
+      lastCalibrationDate: today,
+      streaks: (prev.streaks || 0) + 1,
+    }));
+    playPling(440);
+    setTimeout(() => playPling(554.37), 150); // Major 3rd
+    setTimeout(() => playPling(659.25), 300); // Perfect 5th
+    setStep('success');
+  }, [updateTraction]);
+
   // ── Step 2: Somatic Voice Breath Stability Engine ──
   useEffect(() => {
     if (step !== 'breath') return;
@@ -161,21 +175,7 @@ export default function DailyCalibration({ onClose }) {
         return next;
       });
     }
-  }, [pitch, volume, noteInfo, step]);
-
-  const handleSuccess = () => {
-    // Unlock curriculum in global state
-    const today = new Date().toISOString().split('T')[0];
-    updateTraction(prev => ({
-      ...prev,
-      lastCalibrationDate: today,
-      streaks: (prev.streaks || 0) + 1,
-    }));
-    playPling(440);
-    setTimeout(() => playPling(554.37), 150); // Major 3rd
-    setTimeout(() => playPling(659.25), 300); // Perfect 5th
-    setStep('success');
-  };
+  }, [pitch, volume, noteInfo, step, handleSuccess]);
 
   // ── Fast forward bypasses for Friday dev testing ──
   const bypassTuning = () => {

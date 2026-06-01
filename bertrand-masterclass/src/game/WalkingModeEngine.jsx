@@ -45,22 +45,6 @@ export default function WalkingModeEngine() {
   
   const log = (msg) => setLogs(prev => [...prev.slice(-4), msg]);
 
-  // Handle timer tick
-  useEffect(() => {
-    if (sessionState === 'IDLE') return;
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          handlePhaseTransition();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerRef.current);
-  }, [sessionState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Phase Machine
   const handlePhaseTransition = () => {
@@ -148,6 +132,24 @@ export default function WalkingModeEngine() {
       setSessionState('IDLE');
     }
   };
+
+  // Handle timer tick
+  useEffect(() => {
+    if (sessionState === 'IDLE') return;
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          handlePhaseTransition();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerRef.current);
+  }, [sessionState]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   // Listen for the pitch hit
   useEffect(() => {

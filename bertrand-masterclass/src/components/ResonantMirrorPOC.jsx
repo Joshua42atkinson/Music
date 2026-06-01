@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import usePitchDetector from '../hooks/usePitchDetector';
 import { getAudioContext, resumeAudio } from '../audio/audioEngine';
 
@@ -59,15 +59,7 @@ export default function ResonantMirrorPOC() {
     }
   };
 
-  // Phase 2: Detect the pluck and trigger the Pitch-Shifted playback
-  useEffect(() => {
-    // If we are listening for guitar, and we detect a solid pitch and volume spike
-    if (phase === 'LISTENING_GUITAR' && pitch > 0 && volume > 15) {
-      triggerChoir();
-    }
-  }, [pitch, volume, phase]);
-
-  const triggerChoir = () => {
+  const triggerChoir = useCallback(() => {
     if (!humBuffer) return;
     setPhase('PLAYING');
     stopListening(); // Stop mic analysis while playing so it doesn't feedback
@@ -95,7 +87,15 @@ export default function ResonantMirrorPOC() {
       setPhase('LISTENING_GUITAR');
       startListening(); // Go back to listening for the next pluck
     };
-  };
+  }, [humBuffer, stopListening, startListening]);
+
+  // Phase 2: Detect the pluck and trigger the Pitch-Shifted playback
+  useEffect(() => {
+    // If we are listening for guitar, and we detect a solid pitch and volume spike
+    if (phase === 'LISTENING_GUITAR' && pitch > 0 && volume > 15) {
+      triggerChoir();
+    }
+  }, [pitch, volume, phase, triggerChoir]);
 
   const reset = () => {
     stopListening();

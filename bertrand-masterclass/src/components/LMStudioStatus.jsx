@@ -11,9 +11,12 @@ export default function LMStudioStatus({ isConnected, modelInfo, onCheck, loadin
 
   useEffect(() => {
     if (isConnected) {
-      setPulse(true);
-      const timer = setTimeout(() => setPulse(false), 1000);
-      return () => clearTimeout(timer);
+      const timer1 = setTimeout(() => setPulse(true), 0);
+      const timer2 = setTimeout(() => setPulse(false), 1000);
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
     }
   }, [isConnected]);
 
