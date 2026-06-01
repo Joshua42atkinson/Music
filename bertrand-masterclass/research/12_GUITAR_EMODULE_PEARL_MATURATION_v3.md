@@ -73,9 +73,9 @@ These are the 2 deliverables marked "At Risk" in the Week 3 Status Report.
 
 | Task | Effort | Priority | Blocks | Status |
 |------|--------|----------|--------|--------|
-| **Google OAuth consent screen setup** — re-enable `drive.file` scope | 10 min | CRITICAL | All Drive video uploads blocked | ⏳ In Progress |
-| **Mentor response recording** — Screen recorder for Bertrand's feedback | 3-4 hrs | MEDIUM | Bertrand can't send video responses | ⏳ In Progress |
-| **Mentor notifications** — "Reviewed" badge when feedback is ready | 2-3 hrs | MEDIUM | Student never knows when reviewed | ⏳ In Progress |
+| **Google OAuth consent screen setup** — re-enable `drive.file` scope | 10 min | CRITICAL | All Drive video uploads blocked | ✅ COMPLETED |
+| **Mentor response recording** — Screen recorder for Bertrand's feedback | 3-4 hrs | MEDIUM | Bertrand can't send video responses | ✅ COMPLETED |
+| **Mentor notifications** — "Reviewed" badge when feedback is ready | 2-3 hrs | MEDIUM | Student never knows when reviewed | ✅ COMPLETED |
 
 ---
 
@@ -98,7 +98,7 @@ These are the 2 deliverables marked "At Risk" in the Week 3 Status Report.
 - [x] 1. **Fix `useDAGProgress` sandbox awareness** — wire `sandboxMode` through hook (verified and runtime ReferenceError resolved)
 - [x] 2. **Local→cloud data migration** — `migrateLocalToCloud()` on first Supabase login (verified and wired in ScaffoldingProvider)
 - [x] 3. **No-AI fallback chat** — static prompt selector when LM Studio offline (fully wired in `troubadourOffline.js`)
-- [ ] 4. **Google OAuth consent screen** — re-enable `drive.file` scope (10 min in Google Cloud Console)
+- [x] 4. **Google OAuth consent screen** — re-enable `drive.file` scope (10 min in Google Cloud Console)
 
 ### Sprint B: Student Experience (Do Second)
 - [x] 5. **`/guitar/map` route** — Visual 12-fret maturation map as primary navigation hub
@@ -108,10 +108,10 @@ These are the 2 deliverables marked "At Risk" in the Week 3 Status Report.
 - [x] 9. **"Course Complete" detection** — all 12 milestones → celebration screen (fully operational on student profile sheet with cert generation)
 
 ### Sprint C: Mentor Flow (Do Third)
-- [ ] 10. **Mentor response recording** — screen recorder overlay for Bertrand
-- [ ] 11. **Mentor notifications** — "Reviewed" badge on student submissions
-- [ ] 12. **Certificate generation** — simple component (name, date, signature, seal)
-- [ ] 13. **Capstone review flow** — Bertrand approves → cert triggers
+- [x] 10. **Mentor response recording** — screen recorder overlay for Bertrand (Wired to Google Drive)
+- [x] 11. **Mentor notifications** — "Reviewed" badge on student submissions (Visible in Portal)
+- [x] 12. **Certificate generation** — simple component (name, date, signature, seal) (Built in CharacterSheet)
+- [x] 13. **Capstone review flow** — Bertrand approves → cert triggers (Wired via DaaS coaching_tier)
 
 ### Sprint D: Polish (Do Last / Week 7-8)
 - [ ] 14. **PEARL compliance sweep** — file headers on all core shells
