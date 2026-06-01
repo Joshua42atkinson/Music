@@ -4,7 +4,8 @@ description: AI + DAG Harmonization Maturation Map — how the Troubadour and th
 
 # AI + DAG Harmonization — Maturation Map
 > **The Troubadour is not a chatbot. The DAG is not a syllabus. They are one system.**
-> Updated: 2026-05-28
+> Updated: 2026-06-01
+> **New:** Three hardware tiers + comprehensive Claims Map (`docs/CLAIMS_MAP.md`)
 
 ---
 
@@ -68,24 +69,57 @@ Tauri wraps the existing React app in a native desktop shell.
 - **Phone:** Connects via Tailscale to laptop's local AI
 - **Casting:** Chromecast/Miracast for TV practice
 
-### 3. Hardware Tiers (Auto-Detected)
-| Tier | Hardware | Model | Size |
-|------|----------|-------|------|
-| **A** | Desktop / Strix Halo (64GB+ RAM) | Step-Audio-R1.1 | **19GB** |
-| **B** | Laptop (16GB+ RAM) | Step-Audio-2-mini | **6GB** |
-| **C** | Old laptop (8GB RAM) | Gemma-4B AWQ | 2GB |
-| **D** | Very old (4GB RAM) | Phi-3-mini | 800MB |
-| **E** | Phone only | Connects to Tier A/B via Tailscale | 0MB |
+### 3. Three Hardware Tiers (Reframed 2026-06-01)
 
-### 4. AI Architecture (Production vs Development)
-**Production Runtime AI:** StepAudio R1.1 (33B, 4-bit, ~19GB)
-- Runs on student's machine (local)
-- Voice + text generation for Troubadour
-- Web app connects to local llama.cpp server on :9998
-- Hardware tiers auto-detect which model fits
+The maturation map is now organized by **hardware requirement**, not by AI layer name.
 
-**Development AI:** Nemotron 120B (Joshua's workstation only)
-- Generates static content: troubadourPrompts, tutorial scripts, reflection prompts
+#### Tier 1: No Hardware (Web-Only) — Souffle + Voix
+**What the student needs:** A web browser. Nothing else.
+**Download:** 0–2.65 GB (optional, cached in browser OPFS)
+**Server:** None.
+
+| Sub-Tier | Size | Models | What Works |
+|----------|------|--------|-----------|
+| **Souffle** (baseline, always on) | 0 MB | None | Offline keyword prompts (18 categories), Web Speech API TTS, all 12 tools, curriculum slides, progress tracking, .voixvive savestate export |
+| **Voix** (upgrade, toggleable) | ~2.65 GB | LFM2.5-1.2B-Instruct (~700 MB) + Qwen3-TTS 0.6B (~1.65 GB) + Kokoro-82M fallback (~300 MB) | Generative AI chat with DAG-aware compressed prompt (~500 tokens), neural TTS with voice cloning, hands-free voice input, Net Protocol "Over.", 143 automated tests verifying behavior |
+
+**Code:** `useTroubadourAI.js`, `useWllamaTroubadour.js`, `useKokoroTTS.js`, `useVoiceInput.js`, `troubadourOffline.js`, `troubadourPrompt.js`
+**Docs:** `docs/07_MINIMUM_AI_MODE.md`, `docs/CLAIMS_MAP.md`
+
+#### Tier 2: Low Hardware (~6 GB RAM) — Chant Lite
+**What the student needs:** Laptop with ~6 GB free RAM.
+**Download:** ~6 GB (StepAudio Mini Q4)
+**Server:** Runs locally on student's machine.
+
+| Feature | Model | What Works |
+|---------|-------|-----------|
+| Full voice AI | StepAudio Mini (~6 GB, Q4) | Speech-to-speech, natural conversation, paralinguistics |
+| Curriculum RAG | Local vector DB | AI retrieves from curriculum docs for accurate, hallucination-free answers |
+| Calendar-aware pacing | Google Calendar integration | AI adjusts practice schedule based on student's actual calendar |
+| Local storage archive | Drive/Filesystem | All practice journals, recordings, reflections stored locally, searchable |
+
+**Code:** `audioStreamingService.js` (needs StepAudio Mini endpoint), `calendarService.js` (extend for practice events), `localDatabase.js`
+**Docs:** `docs/05_KRIYA_DELIVERY_SYSTEM.md` §5.5, `docs/CLAIMS_MAP.md`
+**Status:** 🔴 NOT IMPLEMENTED. No StepAudio Mini model configured. No RAG. Calendar only books mentor reviews.
+
+#### Tier 3: Pro Hardware (~20 GB VRAM) — Chant
+**What the student needs:** Workstation with ~20 GB VRAM, or cloud GPU instance.
+**Download:** ~19 GB (StepAudio R1.1 33B Q4)
+**Server:** Local (Strix Halo) or cloud vLLM.
+
+| Feature | Model | What Works |
+|---------|-------|-----------|
+| Full Troubadour | StepAudio R1.1 33B | Complete pedagogical depth, voice cloning, emotional nuance, Net Protocol |
+| Mentor dashboard | Supabase + dashboard | Bertrand reviews student DAG traversal, submission queue |
+| Async video feedback | Supabase submissions | Student submits video → Bertrand reviews → feedback injected into Troubadour context |
+| Biofeedback | Fitbit/smartwatch | Heart rate gates practice behind calm-state check |
+
+**Code:** `MentorDashboard.jsx`, `audioStreamingService.js`, `useBackendBridge.js`, `supabase.js`
+**Docs:** `BERTRAND_EXECUTIVE_BRIEF.md`, `docs/07_BERTRAND_MENTORSHIP_INTEGRATION.md`
+**Status:** 🟡 PARTIAL. Server connection code exists. Dashboard exists. But 0% of students have the server running. Video submission infra exists but not wired to mentor workflow.
+
+### 4. Development AI (Joshua's Workstation Only)
+**Nemotron 120B** — generates static content: troubadourPrompts, tutorial scripts, reflection prompts
 - NOT used in production — content is baked into the app at build time
 - Runs on Joshua's Strix Halo during development only
 - **Pattern:** Fire and forget. Build code while Nemotron writes.
@@ -298,15 +332,16 @@ PHASE A (DAG Structure — 60% done)
 
 ---
 
-## CURRENT STATUS (Updated 2026-05-28 Late Night — Pre-Phase C Gate 75% Complete)
+## CURRENT STATUS (Updated 2026-06-01 — Voix Tier Implemented, Pre-Browser Test)
 
 | Phase | Status | % Complete | What's Done | What's Left |
 |-------|--------|------------|-------------|-------------|
 | A: DAG Foundation | � Nearly Complete | 85% | `dagNodes.js` (Fret 1 complete, 2-12 metadata), `dagEdges.js`, `dagTypes.js`, `useDAGProgress.js`, `tractionStore.js` extended with DAG phase tracking, `ScaffoldingProvider.jsx` wired with DAG navigation, unit tests written | Parse Nemotron output → inject 121 prompts into `dagNodes.js` |
 | B: Mechanical Mode | ✅ COMPLETE | 100% | BEWorkbook tab. Mark Complete on SlideViewer + PitchRoom. 4-level mastery. Cross-pillar resonance. Somatic Gate. Audiation Pause. DAG→legacy sync. | Gate met. |
-| C: Prompt v4 | 🟡 Partial | 40% | `buildSystemPrompt()` in `AmbientPlayer.jsx` exists, voice rules established, BERTRAND_LEXICON.md written | Inject DAG context (current node, phase, prerequisites), inject Net Protocol (Over/Ready/Copy/Go ahead), inject BE→DO→PLAY phase rules, Hz/cents/ratio math language |
+| **B+: Voix Tier** | **✅ COMPLETE** | **100%** | **`useKokoroTTS.js` (neural TTS), `useWllamaTroubadour.js` (LFM2.5-1.2B-Instruct GGUF), `useVoiceInput.js` (Web Speech Recognition), `useTroubadourAI.js` rewired with Qwen3→Kokoro→WebSpeech TTS cascade, `TroubadourWidget.jsx` "Load Living Voice" button + voice input + status lights, 143 tests passing** | **Browser test with real audio, download GGUF model** |
+| C: Prompt v4 | 🟡 Partial | 60% | `buildCompressedPrompt()` for Voix tier (~500 tokens, fret/phase/polarity-aware), `buildTroubadourPrompt()` for Chant tier, `enforceOver()` post-processing, Net Protocol "Over." enforced | Inject Hz/cents/ratio math language, test with real LLM inference |
 | D: Guided Tutorial | 🔴 Not started | 0% | — | Class mode UI shell, 20-min script (Nemotron task), BE→DO→PLAY state machine, hands-free voice nav |
-| E: Either/Or Voice | 🟡 Partial | 40% | AudioStreamingService exists, persona switching (troubadour/bernard/bertrand), Real Bertrand vs AI Bertrand concept documented | Settings UI toggle, curated clip library, LLM→token2wav pipeline, generic voice option |
+| E: Either/Or Voice | 🟡 Partial | 50% | `useVoiceInput.js` (Web Speech Recognition), `useKokoroTTS.js` (neural TTS), `audioStreamingService.js` (StepAudio), voice cascade: local STT → StepAudio fallback | Qwen3-TTS 0.6B ONNX integration, Silero VAD always-on, Whisper Base ONNX |
 | F: Dynamic DAG | 🔴 Not started | 0% | — | Adaptive pacing, socratic routing, reflection prompts auto-generated from node context |
 | G: Async Mentorship | 🔴 Not started | 0% | — | Submission metadata with DAG path, mentor dashboard, feedback injection into Troubadour context |
 

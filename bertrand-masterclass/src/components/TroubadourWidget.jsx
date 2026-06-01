@@ -1,15 +1,21 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Volume2, VolumeX, SkipForward, Music, Minus, Plus, Square, HelpCircle, MessageSquare, Send, Wifi, WifiOff, Mic, MicOff, Settings, Download, Upload, User } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, SkipForward, Music, Minus, Plus, Square, HelpCircle, MessageSquare, Send, Wifi, WifiOff, Mic, MicOff, Settings, Download, Upload, User, Compass } from 'lucide-react';
 import { Guitar } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { exportVoixViveFile, importVoixViveFile } from '../data/saveState';
 import { useLocale } from '../hooks/useLocale';
 import { useTroubadourAI } from '../hooks/useTroubadourAI';
+import { useKokoroTTS } from '../hooks/useKokoroTTS';
+import { useWllamaTroubadour } from '../hooks/useWllamaTroubadour';
+import { useQwenTTS } from '../hooks/useQwenTTS';
+import { useVoiceInput } from '../hooks/useVoiceInput';
 import { useBackendBridge } from '../hooks/useBackendBridge';
 import { useScaffolding } from './ScaffoldingProvider';
 import { useMetronome } from '../hooks/useMetronome';
-import { buildTroubadourPrompt, enforceOver } from '../data/troubadourPrompt';
+import { buildChatPrompt, buildTroubadourPrompt, enforceOver } from '../data/troubadourPrompt';
+import { searchChunks, buildContextBlock } from '../data/ragStore';
 import HelpMenu from './HelpMenu';
 
 // ── Server status dot ─────────────────────────────────────────────────
@@ -41,8 +47,14 @@ const TRACKS = [
 
 // ── Main component ──────────────────────────────────────────────────────
 export default function TroubadourWidget() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { locale, t } = useLocale();
-  const { chatStream, backend: aiBackend } = useTroubadourAI();
+  const { chatStream, backend: aiBackend, wllamaRef, kokoroRef, qwenRef, voiceRef, speakText } = useTroubadourAI();
+  const kokoro = useKokoroTTS();
+  const wllama = useWllamaTroubadour();
+  const qwen = useQwenTTS();
+  const voiceInput = useVoiceInput();
   const { isDaaSConnected, isLMStudioConnected } = useBackendBridge();
   const { traction, updateTraction, bardLevel, practiceMinutes, streak, currentNodeId, currentNode, currentFret, currentPhase, completedNodes, nextRecommended } = useScaffolding();
   const [mode, setMode]           = useState('music');
@@ -61,6 +73,92 @@ export default function TroubadourWidget() {
   const [voiceRecording, setVoiceRecording] = useState(false);
   const [voicePlaying, setVoicePlaying] = useState(false);
   const voiceServiceRef = useRef(null);
+
+  // ── Wire AI hooks to useTroubadourAI refs ──────────────────────
+  useEffect(() => { kokoroRef.current = kokoro; }, [kokoro]);
+  useEffect(() => { wllamaRef.current = wllama; }, [wllama]);
+  useEffect(() => { qwenRef.current = qwen; }, [qwen]);
+  useEffect(() => { voiceRef.current = voiceInput; }, [voiceInput]);
+
+  // ── Voix tier load state ───────────────────────────────────────
+  const [voixLoading, setVoixLoading] = useState(false);
+  const [voixReady, setVoixReady] = useState(false);
+
+  // ── Notification Hub ──────────────────────────────────────────
+  // Derive actionable notifications from traction state
+  const notifications = useMemo(() => {
+    const items = [];
+    const now = new Date();
+    const lastPractice = traction.lastPracticeDate ? new Date(traction.lastPracticeDate) : null;
+    const daysSincePractice = lastPractice
+      ? Math.floor((now - lastPractice) / (1000 * 60 * 60 * 24))
+      : Infinity;
+
+    // Practice reminder
+    if (daysSincePractice >= 2) {
+      items.push({
+        id: 'practice-reminder',
+        type: 'reminder',
+        icon: '🎸',
+        title: locale === 'fr' ? 'Temps de pratique' : 'Practice Time',
+        message: daysSincePractice === Infinity
+          ? (locale === 'fr' ? 'Commencez votre parcours musical.' : 'Begin your musical journey.')
+          : (locale === 'fr' ? `Dernier entraînement il y a ${daysSincePractice} jours.` : `Last practice was ${daysSincePractice} days ago.`),
+        action: () => navigate('/guitar'),
+        actionLabel: locale === 'fr' ? 'Aller au Workbench' : 'Open Workbench',
+      });
+    }
+
+    // Orientation recommendation (new student)
+    if (!traction.onboardingComplete && daysSincePractice === Infinity) {
+      items.push({
+        id: 'orientation',
+        type: 'suggestion',
+        icon: '🧭',
+        title: locale === 'fr' ? 'Orientation guidée' : 'Guided Orientation',
+        message: locale === 'fr'
+          ? 'Un parcours de 2 minutes pour configurer votre rythme.'
+          : 'A 2-minute walkthrough to set your pace.',
+        action: () => navigate('/onboarding'),
+        actionLabel: locale === 'fr' ? 'Commencer' : 'Start',
+      });
+    }
+
+    // Streak at risk
+    if (streak > 0 && daysSincePractice >= 1) {
+      items.push({
+        id: 'streak-risk',
+        type: 'alert',
+        icon: '🔥',
+        title: locale === 'fr' ? 'Série en danger' : 'Streak at Risk',
+        message: locale === 'fr'
+          ? `Votre série de ${streak} jours risque de se briser.`
+          : `Your ${streak}-day streak is about to break.`,
+        action: () => navigate('/guitar'),
+        actionLabel: locale === 'fr' ? 'Pratiquer maintenant' : 'Practice Now',
+      });
+    }
+
+    return items;
+  }, [traction, streak, locale, navigate]);
+
+  const hasNotifications = notifications.length > 0;
+
+  const loadVoixTier = async () => {
+    if (voixLoading || voixReady) return;
+    setVoixLoading(true);
+    try {
+      // Load Kokoro TTS first (lighter, ~300 MB)
+      await kokoro.initTTS();
+      // Then load wllama LLM (~700 MB for 1.2B Instruct)
+      await wllama.initEngine('1.2b-instruct');
+      setVoixReady(true);
+    } catch (err) {
+      console.error('[VoixVive] Voix tier load failed:', err);
+    } finally {
+      setVoixLoading(false);
+    }
+  };
   
   // Paralinguistics & Net Protocol State
   const [detectedEmotion, setDetectedEmotion] = useState(null);
@@ -89,20 +187,26 @@ export default function TroubadourWidget() {
   }, [showControls, mode]);
 
   // ═══════════════════════════════════════════════════════════
-  // PROMPT v4 — DAG-aware system prompt with Net Protocol
+  // PROMPT — Natural chat mode for the chat widget
+  // Uses buildChatPrompt for conversation, buildTroubadourPrompt
+  // for game/somatic moments (triggered separately).
   // ═══════════════════════════════════════════════════════════
 
-  const buildSystemPrompt = () => buildTroubadourPrompt({
+  // Memoize base prompt — only rebuilds when student context changes
+  const baseSystemPrompt = useMemo(() => buildChatPrompt({
     traction,
     bardLevel,
-    practiceMinutes,
-    streak,
     currentFret,
-    currentNode,
     currentPhase,
-    completedNodes,
-    nextRecommended,
-  });
+    locale,
+  }), [traction, bardLevel, currentFret, currentPhase, locale]);
+
+  const buildSystemPrompt = useCallback((ragContext = '') => {
+    // Inject RAG context into the {{RAG_CONTEXT}} placeholder
+    return ragContext
+      ? baseSystemPrompt.replace('{{RAG_CONTEXT}}', ragContext)
+      : baseSystemPrompt.replace('{{RAG_CONTEXT}}', 'No specific curriculum entries retrieved for this query. Answer from general knowledge.');
+  }, [baseSystemPrompt]);
 
   const sendGuideMessage = async () => {
     const text = guideInput.trim();
@@ -114,41 +218,119 @@ export default function TroubadourWidget() {
     const placeholder = { role: 'assistant', content: '' };
     setGuideMessages(prev => [...prev, placeholder]);
     try {
+      // Retrieve relevant curriculum context
+      const ragChunks = await searchChunks(text, {
+        topK: 3,
+        locale,
+        filter: { fret: currentFret },
+      });
+      const ragContext = buildContextBlock(ragChunks);
+
       const history = [...guideMessages, userMsg].slice(-8);
       await chatStream(
-        [{ role: 'system', content: buildSystemPrompt() }, ...history],
+        [{ role: 'system', content: buildSystemPrompt(ragContext) }, ...history],
         (chunk, full) => {
           setGuideMessages(prev => [
             ...prev.slice(0, -1),
             { role: 'assistant', content: full },
           ]);
         },
-        { max_tokens: 256, temperature: 0.7 }
+        {
+          max_tokens: 256,
+          temperature: 0.7,
+          mode: 'chat',
+          locale,
+          traction,
+          bardLevel,
+          currentFret,
+          currentPhase,
+        }
       );
     } catch {
       setGuideMessages(prev => [
         ...prev.slice(0, -1),
-        { role: 'assistant', content: locale === 'fr' ? 'Le Troubadour est hors ligne. Lancez LM Studio pour continuer.' : 'The Troubadour is offline. Start LM Studio to continue.' },
+        { role: 'assistant', content: locale === 'fr'
+          ? 'Je suis en mode hors ligne. Posez-moi une question sur la guitare et je ferai de mon mieux.'
+          : 'I\'m in offline mode. Ask me anything about guitar and I\'ll do my best.'
+        },
       ]);
     } finally {
       setGuideStreaming(false);
     }
   };
 
-  // ── Voice mode toggle (StepAudio 2.5) ──
+  // ── Voice input: local STT (Voix tier) or StepAudio (Chant tier) ──
   const toggleVoice = async () => {
-    const { getAudioStreamingService } = await import('../lib/audioStreamingService.js');
-    const svc = getAudioStreamingService();
-    voiceServiceRef.current = svc;
-
+    // If already recording, stop
     if (voiceRecording) {
-      svc.stopRecording();
-      setVoiceRecording(false);
+      // Try local voice input first
+      if (voiceInput.isAvailable && voiceInput.isListening) {
+        voiceInput.stopListening();
+        setVoiceRecording(false);
+        return;
+      }
+      // Try StepAudio voice service
+      if (voiceServiceRef.current) {
+        voiceServiceRef.current.stopRecording();
+        setVoiceRecording(false);
+        return;
+      }
+    }
+
+    // ── Try local voice input (Voix tier: Web Speech Recognition) ──
+    if (voiceInput.isAvailable) {
+      // Cancel any playing TTS so user can speak without hearing themselves echoed
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+      setVoiceRecording(true);
+      voiceInput.startListening(async (transcript, confidence) => {
+        setVoiceRecording(false);
+        setGuideInput(transcript);
+
+        const userMsg = { role: 'user', content: transcript };
+        setGuideMessages(prev => [...prev, userMsg]);
+        setGuideStreaming(true);
+        const placeholder = { role: 'assistant', content: '' };
+        setGuideMessages(prev => [...prev, placeholder]);
+
+        try {
+          // Retrieve RAG context for voice input too
+          const ragChunks = await searchChunks(transcript, {
+            topK: 3, locale, filter: { fret: currentFret },
+          });
+          const ragContext = buildContextBlock(ragChunks);
+
+          await chatStream(
+            [{ role: 'system', content: buildSystemPrompt(ragContext) }, ...guideMessages.slice(-10), userMsg],
+            (chunk, full) => {
+              setGuideMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: full }]);
+            },
+            {
+              max_tokens: 512, temperature: 0.1, mode: 'chat', locale,
+              traction, bardLevel, currentFret, currentPhase,
+            }
+          );
+        } catch {
+          setGuideMessages(prev => [...prev.slice(0, -1), {
+            role: 'assistant',
+            content: locale === 'fr'
+              ? 'Je ne comprends pas bien. Essayez de reformuler.'
+              : 'I didn\'t catch that. Try rephrasing.',
+          }]);
+        } finally {
+          setGuideStreaming(false);
+        }
+      }, locale);
       return;
     }
 
-    if (!voiceConnected) {
-      try {
+    // ── Fallback: StepAudio 2.5 voice service (Chant tier) ──
+    try {
+      const { getAudioStreamingService } = await import('../lib/audioStreamingService.js');
+      const svc = getAudioStreamingService();
+      voiceServiceRef.current = svc;
+
+      if (!voiceConnected) {
         await svc.connect();
         svc.onConnectionChange = (connected) => setVoiceConnected(connected);
         svc.onTextReceived = (text) => {
@@ -158,7 +340,6 @@ export default function TroubadourWidget() {
         svc.onParalinguistic = (evt) => {
           console.log('[Troubadour] Paralinguistic:', evt.emotion, evt.confidence);
           setDetectedEmotion(evt.emotion);
-          // If frustrated, switch mode to music and auto-play the ambient track
           if (evt.emotion === 'frustrated') {
             handleModeSwitchRef.current?.('music');
             audioRef.current?.play().catch(() => {});
@@ -169,14 +350,14 @@ export default function TroubadourWidget() {
           setVoiceConnected(false);
         };
         setVoiceConnected(true);
-      } catch (err) {
-        console.warn('[Troubadour Voice] Connect failed:', err);
-        return;
       }
-    }
 
-    await svc.startRecording();
-    setVoiceRecording(true);
+      await svc.startRecording();
+      setVoiceRecording(true);
+    } catch (err) {
+      console.warn('[Troubadour Voice] All voice methods failed:', err);
+      setVoiceRecording(false);
+    }
   };
 
   // Track if the player has ever been opened to stop the slow, elegant breathing glow
@@ -345,7 +526,7 @@ export default function TroubadourWidget() {
         {/* Floating button — glows until first clicked */}
         <button
           onClick={handleButtonClick}
-          className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md border-2 shadow-lg transition-all ${
+          className={`relative w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md border-2 shadow-lg transition-all ${
             isActive
               ? 'bg-violet-500/25 border-violet-400/60 shadow-[0_0_24px_rgba(139,92,246,0.5)]'
               : !hasClickedOnce
@@ -360,6 +541,14 @@ export default function TroubadourWidget() {
             </div>
           ) : (
             <Guitar size={20} className={isPlaying ? 'text-violet-400 animate-pulse' : 'text-violet-400/70'} />
+          )}
+          {/* Notification badge */}
+          {hasNotifications && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 border-2 border-[#050508] flex items-center justify-center">
+              <span className="text-[8px] font-bold text-[#050508] font-mono">
+                {notifications.length}
+              </span>
+            </span>
           )}
         </button>
 
@@ -404,6 +593,14 @@ export default function TroubadourWidget() {
                   >
                     <Settings size={10} /> SYS
                   </button>
+                  <button
+                    onClick={() => handleModeSwitch('portal')}
+                    className={`flex-1 py-1.5 text-xs font-mono uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-1 ${
+                      mode === 'portal' ? 'bg-violet-500 text-white font-bold' : 'text-white/40 hover:text-white'
+                    }`}
+                  >
+                    <Compass size={10} /> NAV
+                  </button>
                 </div>
                 <button
                   onClick={() => setShowHelp(true)}
@@ -413,6 +610,43 @@ export default function TroubadourWidget() {
                   <HelpCircle size={12} /> {t('help') || 'Help'}
                 </button>
               </div>
+
+              {/* ── NOTIFICATION HUB ── */}
+              {hasNotifications && (
+                <div className="mb-3 space-y-2">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-amber-400/60 mb-1.5">
+                    {locale === 'fr' ? 'Notifications' : 'Notifications'}
+                  </div>
+                  {notifications.map(n => (
+                    <div
+                      key={n.id}
+                      className={`p-2.5 rounded-lg border text-left cursor-pointer transition-all active:scale-95 ${
+                        n.type === 'alert'
+                          ? 'bg-red-500/5 border-red-500/20 hover:bg-red-500/10'
+                          : n.type === 'reminder'
+                            ? 'bg-amber-500/5 border-amber-500/20 hover:bg-amber-500/10'
+                            : 'bg-violet-500/5 border-violet-500/20 hover:bg-violet-500/10'
+                      }`}
+                      onClick={n.action}
+                    >
+                      <div className="flex items-start gap-2">
+                        <span className="text-sm leading-none mt-0.5">{n.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-mono font-bold text-white/80 uppercase tracking-wide">
+                            {n.title}
+                          </p>
+                          <p className="text-[10px] text-white/40 mt-0.5 leading-relaxed">
+                            {n.message}
+                          </p>
+                          <p className="text-[9px] font-mono text-violet-400/70 mt-1 uppercase tracking-wider">
+                            {n.actionLabel} ›
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* ── MUSIC MODE ── */}
               {mode === 'music' && (
@@ -552,6 +786,96 @@ export default function TroubadourWidget() {
                 </div>
               )}
 
+              {/* ── PORTAL NAVIGATION ── */}
+              {mode === 'portal' && (
+                <div>
+                  {/* Game Mode Tracker */}
+                  <div className="mb-4 p-3 bg-white/5 border border-amber-500/20 rounded-xl">
+                    <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+                      <span className="text-xs font-mono uppercase tracking-widest text-amber-400">
+                        Apprentice Status
+                      </span>
+                      <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-mono">
+                        Lv.{bardLevel}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-[10px] font-mono text-white/60 mb-3 px-1">
+                      <div className="flex flex-col items-center">
+                        <span className="text-white text-xs mb-0.5">{streak || 0}</span>
+                        <span className="text-white/40">Streak</span>
+                      </div>
+                      <div className="flex flex-col items-center border-l border-white/10 pl-4">
+                        <span className="text-white text-xs mb-0.5">{practiceMinutes || 0}</span>
+                        <span className="text-white/40">Minutes</span>
+                      </div>
+                      <div className="flex flex-col items-center border-l border-white/10 pl-4">
+                        <span className="text-white text-xs mb-0.5">{completedNodes.length}</span>
+                        <span className="text-white/40">Frets</span>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => navigate('/song')} 
+                      className="w-full py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-xs font-mono uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95"
+                    >
+                      <Play size={12} fill="currentColor" /> Resume Journey
+                    </button>
+                  </div>
+
+                  <div className="border-b border-violet-500/20 pb-2 mb-3 mt-4">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-violet-400/60">
+                      All Portals
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <button 
+                      onClick={() => navigate('/')} 
+                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                        location.pathname === '/' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <User size={14} /> Home Portal
+                    </button>
+
+                    <button 
+                      onClick={() => navigate('/song')} 
+                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                        location.pathname === '/song' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <Music size={14} /> Orientation Hub
+                    </button>
+
+                    <button 
+                      onClick={() => navigate('/guitar')} 
+                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                        location.pathname === '/guitar' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <Guitar size={14} /> Guitar Workbench
+                    </button>
+
+                    <button 
+                      onClick={() => navigate('/player')} 
+                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                        location.pathname === '/player' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <Play size={14} /> Audio & Videos
+                    </button>
+
+                    <button 
+                      onClick={() => navigate('/guitar/map')} 
+                      className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center gap-2 ${
+                        location.pathname === '/guitar/map' ? 'border-amber-500/50 bg-amber-500/20 text-amber-400' : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <Compass size={14} /> Maturation Map
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* ── SYSTEM MODE ── */}
               {mode === 'system' && (
                 <div>
@@ -631,6 +955,32 @@ export default function TroubadourWidget() {
                     </button>
                   </div>
                   <div className="text-xs text-white/70 mb-2 mt-4 font-serif italic">
+                    Audience Focus
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, kidMode: false } }))}
+                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                        !traction?.settings?.kidMode 
+                          ? 'border-violet-500 bg-violet-500/20 text-white' 
+                          : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
+                      }`}
+                    >
+                      Masterclass
+                    </button>
+                    <button 
+                      onClick={() => updateTraction(prev => ({ settings: { ...prev.settings, kidMode: true } }))}
+                      className={`flex-1 py-2 rounded-lg text-[10px] font-mono uppercase tracking-wider border transition-all ${
+                        traction?.settings?.kidMode 
+                          ? 'border-amber-500 bg-amber-500/20 text-white' 
+                          : 'border-white/10 bg-white/5 text-white/40 hover:bg-white/10'
+                      }`}
+                    >
+                      Apprentice
+                    </button>
+                  </div>
+
+                  <div className="text-xs text-white/70 mb-2 mt-4 font-serif italic">
                     AI Guidance
                   </div>
                   <div className="flex gap-2">
@@ -658,16 +1008,50 @@ export default function TroubadourWidget() {
                 </div>
               )}
 
-              {/* ── SERVER STATUS ── */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <ServerLight connected={isLMStudioConnected} label="LM Studio" color="#a78bfa" />
-                  <ServerLight connected={isDaaSConnected} label="DaaS" color="#7aaa88" />
-                  <ServerLight connected={voiceConnected} label="Voice" color="#cc5555" />
+              {/* ── VOIX TIER LOAD + SERVER STATUS ── */}
+              <div style={{ marginTop: 12, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                {/* Load Living Voice button */}
+                {!voixReady && (
+                  <button
+                    onClick={loadVoixTier}
+                    disabled={voixLoading}
+                    className="w-full py-2 mb-2 rounded-lg text-xs font-mono uppercase tracking-wider border transition-all flex items-center justify-center gap-2 active:scale-95"
+                    style={{
+                      background: voixLoading ? 'rgba(139,92,246,0.1)' : 'rgba(139,92,246,0.15)',
+                      borderColor: voixLoading ? 'rgba(139,92,246,0.2)' : 'rgba(139,92,246,0.35)',
+                      color: voixLoading ? 'rgba(167,139,250,0.5)' : '#c4b5fd',
+                    }}
+                  >
+                    {voixLoading ? (
+                      <>
+                        <span className="animate-spin">⏳</span> Loading Living Voice… {kokoro.loadProgress || wllama.loadProgress || 0}%
+                      </>
+                    ) : (
+                      <>
+                        <Download size={12} /> Load Living Voice (~1 GB)
+                      </>
+                    )}
+                  </button>
+                )}
+                {voixReady && (
+                  <div className="flex items-center gap-2 mb-2 px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest">✓ Voix Active</span>
+                    <span className="text-[9px] font-mono text-emerald-400/50">{wllama.modelId}</span>
+                  </div>
+                )}
+                {/* Server status lights */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <ServerLight connected={kokoro.isReady} label="Kokoro" color="#a78bfa" />
+                    <ServerLight connected={wllama.isReady} label="Wllama" color="#7aaa88" />
+                    <ServerLight connected={isLMStudioConnected} label="LM" color="#a78bfa" />
+                    <ServerLight connected={isDaaSConnected} label="DaaS" color="#7aaa88" />
+                    <ServerLight connected={voiceConnected} label="Voice" color="#cc5555" />
+                  </div>
+                  <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {voixReady ? 'Voix' : isLMStudioConnected || isDaaSConnected || voiceConnected ? 'Chant' : 'Souffle'}
+                  </span>
                 </div>
-                <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>
-                  {isLMStudioConnected || isDaaSConnected || voiceConnected ? 'AI Ready' : 'AI Offline'}
-                </span>
               </div>
 
               {/* ── AI CHAT (always visible) ── */}
@@ -689,11 +1073,18 @@ export default function TroubadourWidget() {
                   paddingRight: 4,
                 }}>
                   {guideMessages.length === 0 && (
-                    <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1.5 }}>
-                      {locale === 'fr'
-                        ? 'Demandez au Troubadour…'
-                        : 'Ask the Troubadour about your practice, the curriculum, or your next step…'}
-                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'Cormorant Garamond, serif', lineHeight: 1.5, fontStyle: 'italic' }}>
+                        {locale === 'fr'
+                          ? 'Je suis le Troubadour — guide de Voix Vive. Demandez-moi n\'importe quoi.'
+                          : 'I am the Troubadour — guide of Voix Vive. Ask me anything.'}
+                      </p>
+                      <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1.6 }}>
+                        {locale === 'fr'
+                          ? 'Pratique · Pédagogie · Psychologie · Business · Tech'
+                          : 'Practice · Pedagogy · Psychology · Business · Tech'}
+                      </p>
+                    </div>
                   )}
                   {/* AI Disclosure */}
                   <p style={{

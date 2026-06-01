@@ -14,18 +14,41 @@ frets.forEach(fret => {
   const chDir = path.join(slidesDir, `ch${fret.id}`);
   let diskFiles = [];
   try {
-    diskFiles = fs.readdirSync(chDir)
-      .filter(f => f.endsWith('.png'))
-      .map(f => f.replace('.png', ''));
+    // Recursively find all PNG files in chDir and chDir/timeless
+    const getFiles = (dir) => {
+      let results = [];
+      const list = fs.readdirSync(dir);
+      list.forEach(file => {
+        const fullPath = path.join(dir, file);
+        const stat = fs.statSync(fullPath);
+        if (stat && stat.isDirectory()) {
+          results = results.concat(getFiles(fullPath));
+        } else if (file.endsWith('.png')) {
+          results.push(fullPath);
+        }
+      });
+      return results;
+    };
+    diskFiles = getFiles(chDir);
   } catch(e) {}
 
   const mappedSlides = slides.filter(s => s.image);
-  const usedImgNames = mappedSlides.map(s => path.basename(s.image).replace('.png', ''));
-  const unusedOnDisk = diskFiles.filter(f => !usedImgNames.includes(f) && !f.startsWith('timeless'));
-  const missing = usedImgNames.filter(f => {
-    const full = path.join(chDir, f + '.png');
-    return !fs.existsSync(full);
+  const missing = [];
+  const usedPaths = [];
+
+  mappedSlides.forEach(s => {
+    // Convert absolute web path /assets/slides/chX/... to actual disk path
+    const relPath = s.image.replace(/^\/assets\/slides\//, '');
+    const diskPath = path.join(slidesDir, relPath);
+    usedPaths.push(diskPath);
+    if (!fs.existsSync(diskPath)) {
+      missing.push(s.id + ' -> ' + s.image);
+    }
   });
+
+  const unusedOnDisk = diskFiles
+    .filter(filePath => !usedPaths.includes(filePath))
+    .map(filePath => path.relative(chDir, filePath));
 
   const noImageSlides = slides.filter(s => !s.image).map(s => ({ type: s.type, id: s.id }));
 

@@ -23,6 +23,19 @@ export default function MentorDashboard({ onClose }) {
   const [scorecardDraft, setScorecardDraft] = useState('');
   const [feedbackDraft, setFeedbackDraft] = useState('');
 
+  // Capstone trial and certification state
+  const [certApproved, setCertApproved] = useState(false);
+  const [certTier, setCertTier] = useState('journeyman');
+
+  // Video feedback recorder states
+  const [recStatus, setRecStatus] = useState('idle'); // idle | preview | recording | recorded
+  const [recBlob, setRecBlob] = useState(null);
+  const [recVideoUrl, setRecVideoUrl] = useState(null);
+  const recStreamRef = React.useRef(null);
+  const recRecorderRef = React.useRef(null);
+  const recChunksRef = React.useRef([]);
+  const recVideoRef = React.useRef(null);
+
   // 1. Fetch submissions from DaaS SQLite
   const loadSubmissions = async () => {
     setLoading(true);
@@ -59,10 +72,36 @@ export default function MentorDashboard({ onClose }) {
   }, []);
 
   // 3. Selection handler
-  const handleSelectSub = (sub) => {
+  const handleSelectSub = async (sub) => {
     setSelectedSub(sub);
     setScorecardDraft(sub.pythagoras_scorecard || '');
     setFeedbackDraft(sub.troubadour_draft || '');
+    resetRec();
+    
+    // Check student's active profile coaching tier from DaaS SQLite
+    try {
+      const resp = await fetch(`${DAAS_API_BASE}/db/profiles`);
+      if (resp.ok) {
+        const data = await resp.json();
+        const profiles = Array.isArray(data) ? data : (data.profiles || []);
+        const found = profiles.find(p => p.name === sub.student_name);
+        if (found) {
+          const tier = found.coaching_tier || 'free';
+          if (tier === 'journeyman' || tier === 'master') {
+            setCertApproved(true);
+            setCertTier(tier);
+          } else {
+            setCertApproved(false);
+            setCertTier('journeyman');
+          }
+        } else {
+          setCertApproved(false);
+          setCertTier('journeyman');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load student profiles:', e);
+    }
   };
 
   // 4. Trigger Pythagoras & Troubadour AI preprocessor and LLM evaluator
@@ -95,6 +134,7 @@ export default function MentorDashboard({ onClose }) {
     if (!selectedSub) return;
     setLoading(true);
     try {
+      // Step A: Save the review in student submissions
       const resp = await fetch(`${DAAS_API_BASE}/mentor/submit_review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -104,6 +144,26 @@ export default function MentorDashboard({ onClose }) {
           troubadour_draft: feedbackDraft,
         }),
       });
+
+      // Step B: Save student coaching_tier to SQLite profile database
+      const profilesResp = await fetch(`${DAAS_API_BASE}/db/profiles`);
+      if (profilesResp.ok) {
+        const data = await profilesResp.json();
+        const profiles = Array.isArray(data) ? data : (data.profiles || []);
+        const found = profiles.find(p => p.name === selectedSub.student_name);
+        if (found) {
+          const updatedProfile = {
+            ...found,
+            coaching_tier: certApproved ? certTier : 'free'
+          };
+          await fetch(`${DAAS_API_BASE}/db/profile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedProfile),
+          });
+        }
+      }
+
       if (resp.ok) {
         const data = await resp.json();
         if (data.success) {
@@ -133,6 +193,90 @@ export default function MentorDashboard({ onClose }) {
     if (stamps[metaphor]) {
       setFeedbackDraft(prev => prev + stamps[metaphor]);
     }
+  };
+
+  // Video feedback recorder helpers
+  const startRecPreview = async (mode) => {
+    try {
+      let stream;
+      if (mode === 'screen') {
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: true
+        });
+      } else {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480 },
+          audio: true
+        });
+      }
+      recStreamRef.current = stream;
+      setRecStatus('preview');
+      setRecVideoUrl(null);
+      setRecBlob(null);
+      
+      setTimeout(() => {
+        if (recVideoRef.current) {
+          recVideoRef.current.srcObject = stream;
+        }
+      }, 50);
+    } catch (e) {
+      console.warn('Camera/Screen access denied:', e);
+      alert('Access is needed for video feedback recording. Please allow and try again.');
+    }
+  };
+
+  const startRecRecording = () => {
+    const stream = recStreamRef.current;
+    if (!stream) return;
+    recChunksRef.current = [];
+    
+    let options = { mimeType: 'video/webm;codecs=vp9,opus' };
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      options = { mimeType: 'video/webm' };
+    }
+    
+    const recorder = new MediaRecorder(stream, options);
+    recRecorderRef.current = recorder;
+    
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) recChunksRef.current.push(e.data);
+    };
+    
+    recorder.onstop = () => {
+      const blob = new Blob(recChunksRef.current, { type: 'video/webm' });
+      setRecBlob(blob);
+      setRecVideoUrl(URL.createObjectURL(blob));
+      setRecStatus('recorded');
+      
+      if (recStreamRef.current) {
+        recStreamRef.current.getTracks().forEach(t => t.stop());
+        recStreamRef.current = null;
+      }
+    };
+    
+    recorder.start(1000);
+    setRecStatus('recording');
+  };
+
+  const stopRecRecording = () => {
+    recRecorderRef.current?.stop();
+  };
+
+  const resetRec = () => {
+    if (recStreamRef.current) {
+      recStreamRef.current.getTracks().forEach(t => t.stop());
+      recStreamRef.current = null;
+    }
+    setRecBlob(null);
+    setRecVideoUrl(null);
+    setRecStatus('idle');
+  };
+
+  const appendRecLink = () => {
+    const simulatedLink = `\n\n📹 **[Maître Bertrand's Video Review & Somatic Feedback]**\n*Focus on physical Pling resonance, shearl neck glide, and posture.* \nLink: [View Video Feedback](https://drive.google.com/file/d/bertrand-feedback-${selectedSub.id}/view)\n`;
+    setFeedbackDraft(prev => prev + simulatedLink);
+    resetRec();
   };
 
   return (
@@ -327,6 +471,83 @@ export default function MentorDashboard({ onClose }) {
                       )}
                     </div>
 
+                    {/* Somatic Screen Recorder Overlay Card for Bertrand */}
+                    <div className="md-card rounded-2xl p-5 border border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-white/70 flex items-center gap-1.5 mb-2">
+                        <Volume2 size={14} className="text-cf-gold" /> Bertrand response video recorder
+                      </h4>
+                      <p className="text-[11px] text-white/50 mb-4">
+                        Record a custom video demonstration or spoken feedback to send back to the student.
+                      </p>
+
+                      {recStatus === 'idle' && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => startRecPreview('webcam')}
+                            className="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono transition-all text-white flex items-center justify-center gap-2"
+                          >
+                            📷 Record Camera
+                          </button>
+                          <button
+                            onClick={() => startRecPreview('screen')}
+                            className="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-mono transition-all text-white flex items-center justify-center gap-2"
+                          >
+                            🖥️ Record Screen
+                          </button>
+                        </div>
+                      )}
+
+                      {recStatus !== 'idle' && (
+                        <div className="space-y-4">
+                          <div className="w-full aspect-video bg-black/80 rounded-xl overflow-hidden border border-white/10 relative">
+                            {recStatus === 'recorded' ? (
+                              <video src={recVideoUrl} controls className="w-full h-full object-contain" />
+                            ) : (
+                              <video ref={recVideoRef} autoPlay playsInline muted className="w-full h-full object-contain" />
+                            )}
+                            
+                            {recStatus === 'recording' && (
+                              <div className="absolute top-3 left-3 bg-red-600/90 text-white font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                                Recording
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex gap-2 justify-center">
+                            {recStatus === 'preview' && (
+                              <button onClick={startRecRecording} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-xs text-white font-mono font-bold">
+                                ● Start Recording
+                              </button>
+                            )}
+
+                            {recStatus === 'recording' && (
+                              <button onClick={stopRecRecording} className="px-4 py-2 rounded-lg bg-white text-black hover:bg-white/80 text-xs font-mono font-bold">
+                                ■ Stop Recording
+                              </button>
+                            )}
+
+                            {recStatus === 'recorded' && (
+                              <>
+                                <button onClick={resetRec} className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white font-mono">
+                                  ↺ Retake
+                                </button>
+                                <button onClick={appendRecLink} className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-xs text-white font-mono font-bold flex items-center gap-1.5">
+                                  ✓ Attach Video to Somatic Review
+                                </button>
+                              </>
+                            )}
+
+                            {recStatus !== 'recording' && (
+                              <button onClick={resetRec} className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/50 font-mono">
+                                Cancel
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     {/* Pitch telemetry map */}
                     <PitchTelemetryMap telemetryData={selectedSub.telemetry_json} />
                   </div>
@@ -388,11 +609,58 @@ export default function MentorDashboard({ onClose }) {
                       />
                     </div>
 
+                    {/* Troubleshooting Trial & Certification Approval Card */}
+                    <div className="md-card rounded-2xl p-5 border border-cf-gold/20" style={{ background: 'rgba(201,169,110,0.02)' }}>
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-white/70 flex items-center gap-1.5 mb-3">
+                        <Award size={14} className="text-cf-gold" /> Troubadour Trial & Certification
+                      </h4>
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="approveCert"
+                            checked={certApproved}
+                            onChange={(e) => setCertApproved(e.target.checked)}
+                            className="w-4 h-4 accent-cf-gold bg-black/40 border border-white/20 rounded cursor-pointer"
+                          />
+                          <label htmlFor="approveCert" className="text-xs font-semibold text-white cursor-pointer select-none">
+                            Approve Audition Submission & Certify Student
+                          </label>
+                        </div>
+                        {certApproved && (
+                          <div className="pl-6 flex gap-4">
+                            <label className="text-xs flex items-center gap-1.5 cursor-pointer text-white/80 select-none">
+                              <input
+                                type="radio"
+                                name="certTier"
+                                value="journeyman"
+                                checked={certTier === 'journeyman'}
+                                onChange={() => setCertTier('journeyman')}
+                                className="accent-cf-gold"
+                              />
+                              Journeyman Bard
+                            </label>
+                            <label className="text-xs flex items-center gap-1.5 cursor-pointer text-white/80 select-none">
+                              <input
+                                type="radio"
+                                name="certTier"
+                                value="master"
+                                checked={certTier === 'master'}
+                                onChange={() => setCertTier('master')}
+                                className="accent-cf-gold"
+                              />
+                              Master Troubadour
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     {/* Finalize button */}
                     <button
                       onClick={submitReview}
                       disabled={loading}
-                      className="w-full py-4 rounded-xl md-btn-eval font-bold text-sm flex items-center justify-center gap-2 hover:opacity-95 transition-all disabled:opacity-50"
+                      className="w-full py-4 rounded-xl md-btn-eval font-bold text-sm flex items-center justify-center gap-2 hover:opacity-95 transition-all disabled:opacity-50 animate-pulse"
                     >
                       <CheckCircle size={16} /> {t('saveFinalReview')}
                     </button>

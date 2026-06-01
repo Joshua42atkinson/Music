@@ -5,11 +5,13 @@
 ## 1. The Bertrand Laurence Profile (Knowledge Synthesis)
 
 ### Background & Credentials
-*   **Education:** Alumni of Berklee College of Music, MassArt, and Mirage Mime Theatre.
-*   **Location:** Houlton, Maine (relocated from Cambridge/Boston, MA).
-*   **Experience:** Master guitarist and vocalist, instructor at Passim School of Music (notably the "Hands-On Harmony" class), and a Thumbtack "Top Pro".
-*   **Creative Work:** Solo performer, silent film scorer (e.g., Jean Renoir, Charlie Chaplin), and collaborator on unique projects like the "Aroostook Axe" custom guitar.
-*   **Target Audience:** Adult learners (aged 30-65) who have often quit guitar previously due to performance anxiety, the "inner critic," or traditional methods designed for children.
+*   **Origin:** Born in Rouen, Normandy, France. Moved to Boston in 1979.
+*   **Education:** MassArt (Massachusetts College of Art and Design) alumnus. Background in mime and theatre (Mirage Mime Theatre).
+*   **Location:** Houlton, Maine (relocated from Cambridge/Boston area ~2021).
+*   **Experience:** Guitarist, singer-songwriter, silent film scorer, and storyteller. Instructor at Passim School of Music with an extensive course catalog: All-American Fingerstyle Guitar (Parts 1-4), Slide Guitar (101, 102), Fretboard Logic/Harmony (multiple levels), Guitar & Voice Integrated, and 360° Acoustic Guitar. Thumbtack "Top Pro" for multiple years.
+*   **Musical Styles:** Fingerstyle, blues, swing, ragtime, folk, slide guitar, fretboard harmony. NOT classical-only — his approach spans the full American acoustic tradition through a French sensibility.
+*   **Creative Work:** Silent film scorer (Jean Renoir's *Sur un air de Charleston*, *Joan Walsh Anglund* (2019), *The Reaver* (2017), *Giddy in Love* (2012)). Designer of the "Aroostook Axe" custom guitar (2024 solar eclipse project).
+*   **Target Audience:** Adult learners (aged 30-80+) who have often quit guitar previously due to performance anxiety, the "inner critic," or traditional methods designed for children.
 
 ### Core Pedagogy: "Somatic Mystic"
 Bertrand’s teaching is built on a body-centered, ergonomic, and psychological approach. The foundational premise is: **"The student is not a broken instrument waiting to be repaired — they are the song that has not yet fully sounded."**

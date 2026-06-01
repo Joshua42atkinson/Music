@@ -1,7 +1,7 @@
 # 🎸 VOIX VIVE — Master Context & Business Platform
 
 > **Purpose:** Load this file into a new AI session to instantly recover full project context.  
-> **Last Updated:** 2026-05-29 (Beta QA Phase, 144-Node DAG, Sandbox Mode, Sovereign Widget, AI Toggles, PEARL 5.5)
+> **Last Updated:** 2026-06-01 (Three-Layer AI: Souffle→Voix→Chant, Claims Map, 143 tests passing, LFM2.5-1.2B + StepAudio 33B)
 > **Project Root:** `/home/joshua/Workflow/Other/Bertrand-Masterclass/Music/bertrand-masterclass/`  
 > **Dev Server:** `npm run dev` → localhost:5173  
 > **Git Remote:** https://github.com/joshua42atkinson/Music.git  
@@ -14,6 +14,8 @@
 ## 1. CAST OF CHARACTERS
 
 ### The Developer — Joshua Atkinson
+- Disabled combat veteran (PTSD) — Gunnery Sergeant (E-7), USMC, 17 years of service
+- Marine Aircraft Rescue and Fire Fighting (ARFF) — the somatic/biofeedback design is informed by lived experience
 - Systems Architect, Full-Stack Engineer (Rust/Bevy/WASM/Android/React)
 - Purdue University MS LDT Candidate (EDCI 57300 Practicum, Dr. Jennifer Richardson)
 - Creator of the *Trinity ID AI OS* and the *ADDIECRAPEYE* design framework
@@ -22,15 +24,20 @@
 - **Capabilities:** Can build anything in 2 months — VR/AR, Bevy ECS, Android, full-stack web
 
 ### The Client/SME — Bertrand Laurence
-- Master guitarist & vocalist (Berklee College of Music, MassArt, Mirage Mime Theatre)
-- Creator of the Somatic Mystic philosophy
+- Born in Rouen, Normandy, France — moved to Boston in 1979
+- MassArt (Massachusetts College of Art and Design) alumnus
+- Guitarist, singer-songwriter, silent film scorer, storyteller
+- Styles: Fingerstyle, blues, swing, ragtime, folk, slide guitar, fretboard harmony
+- Creator of the Somatic Mystic philosophy & body-centered pedagogy
 - Proprietary protocols: ©SHEARL, ©PLING!, ©FHEAL
-- **Location:** Houlton, Maine (relocated from Cambridge/Boston area)
+- **Location:** Houlton, Maine (relocated from Cambridge/Boston area ~2021)
 - **Family:** Has family in France he hasn't visited in years — **revenue generation is critical**
+- Passim School of Music: Group class instructor (All-American Fingerstyle 1-4, Slide Guitar, Fretboard Logic, Guitar & Voice Integrated, 360° Acoustic Guitar)
+- Film scoring: Jean Renoir's *Sur un air de Charleston*, *Joan Walsh Anglund* (2019), *The Reaver* (2017)
+- The "Aroostook Axe" custom guitar project (2024 solar eclipse)
+- Thumbtack: Top Pro award, multiple years
 - YouTube: @BertrandLaurenceMusic
 - Studio: https://bertrandguitarstudio.duetpartner.com/
-- Thumbtack: Top Pro award, multiple years
-- Passim School of Music: Group class instructor (Guit&Vocal, Fingerstyle)
 - **Contact:** bertlarrymusic@gmail.com | 617-447-5575
 
 ---
@@ -52,10 +59,18 @@ Revenue comes from (REVENUE-FIRST SEQUENCING — Phase 2-6):
   7. Gift certificates
   8. Tips / support
 
+ACTIVE DEVELOPMENT:
+   The Resonant Mirror — Screenless, audio-first practice game engine
+     Guitar = controller, Voice = avatar, Room = game board
+     Pitch-shifted voice choir built by playing correct intervals
+     Fitbit biofeedback gates practice behind biological calm
+     See: docs/RESONANT_MIRROR_GDD.md & docs/MARKET_ANALYSIS.md
+
 MOONSHOTS (Gated behind proven revenue):
   Android App / PWA — Gate: Revenue ≥ $2,500/mo
   AI Bertrand Coach (fine-tuned Gemma 4) — Gate: Revenue ≥ $2,500/mo
   VR Guitar Classroom (Bevy ECS + OpenXR) — Gate: Revenue ≥ $5,000/mo
+  Resonant Mirror (Full Game Integration) — Gate: Revenue ≥ $5,000/mo
   Roblox Music World (social learning) — Gate: Revenue ≥ $5,000/mo
 ```
 
@@ -265,14 +280,18 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 
 | Task | Read first | Path |
 |------|-----------|------|
+| **What to build next** | **Implementation Roadmap** | `docs/IMPLEMENTATION_ROADMAP.md` |
 | Any game change | **Vertiscale Game Design Doc** | `research/10_design_doc_03_vertiscale_game.md` |
 | Any platform/UI change | **Master Design Doc** | `research/10_MASTER_DESIGN_DOC.md` |
+| What's wired vs ghost code | **Codebase Audit** | `docs/CODEBASE_AUDIT.md` |
+| Kriya → Voix Vive mapping | **Kriya Delivery System** | `docs/05_KRIYA_DELIVERY_SYSTEM.md` |
+| AI tiers / Troubadour architecture | **Minimum AI Mode** | `docs/07_MINIMUM_AI_MODE.md` |
+| Notifications / identity / game | **Game + Notifications + Identity** | `docs/06_GAME_NOTIFICATIONS_IDENTITY.md` |
 | Student profile / pedagogy | **Foundation Doc** | `research/10_design_doc_01_foundation.md` |
 | Curriculum / chapter map | **Curriculum Doc** | `research/10_design_doc_02_curriculum.md` |
 | Tech stack / revenue / IP | **Platform Doc** | `research/10_design_doc_04_platform_and_business.md` |
-| Timeline / milestones | **ROADMAP.md** | `ROADMAP.md` |
-| UX flows / navigation | **UX Map** | `USER_EXPERIENCE_MAP.md` |
-| Current status & checklist | **Maturation Map** | `research/12_GUITAR_EMODULE_PEARL_MATURATION.md` |
+| Current status & checklist | **Maturation Map v3** | `research/12_GUITAR_EMODULE_PEARL_MATURATION_v3.md` |
+| Find any doc | **Master Index** | `docs/00_INDEX.md` |
 
 **Rule:** Update the relevant design doc in the same session you change the code. Documentation is the lens that prevents scope creep.
 
@@ -313,14 +332,22 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 - [x] **Sovereign Widget SYS Tab** — .voixvive memory card backup/load UI
 - [x] **Documentation Hygiene** — Unified architectures and updated pedagogy for Somatic Gates
 
-**Phase 0.6 — AI Infrastructure (COMPLETED 2026-05-28):**
-- [x] **useTroubadourAI hook** — Remote vLLM → StepAudio → LM Studio → offline fallback
+**Phase 0.6 — AI Infrastructure (COMPLETED 2026-06-01):**
+- [x] **useTroubadourAI hook** — Three-tier cascade: Souffle (offline) → Voix (wllama) → Chant (StepAudio/LM Studio)
+- [x] **Offline fallback engine** — `troubadourOffline.js` with 18 keyword categories, fret-aware fallbacks, all ending with "Over."
+- [x] **Compressed prompt** — `buildCompressedPrompt()` ~500 tokens, fret/phase/polarity-aware, tested
+- [x] **wllama in-browser inference** — `useWllamaTroubadour.js` with LFM2.5-1.2B-Instruct Q4_K_M (~700 MB)
+- [x] **Kokoro-82M TTS** — `useKokoroTTS.js` with French (SIWIS) + English voices
+- [x] **Voice input** — `useVoiceInput.js` Web Speech Recognition with locale support
+- [x] **TTS cascade** — Qwen3-TTS → Kokoro → Web Speech API fallback chain
+- [x] **143 automated tests** — `useTroubadourAI`, `useVoiceInput`, `troubadourOffline`, `troubadourCompressedPrompt`, DAG progress, traction store
 - [x] **BetaGate** — PIN-based access control for AI beta testing
 - [x] **MockStudent** — Synthetic personas with practice logs for AI testing
 - [x] **AI disclosure** — "AI assistant trained on Bertrand Laurence's pedagogy" in chat UI
 - [x] **vLLM serving guide** — `research/VLLM_SERVING_GUIDE.md` with ROCm tuning
 - [x] **GMKtek setup script** — `scripts/setup-vllm-gmktek.sh` with `--enable-prefix-caching`
 - [x] **Drift-check workflow** — `.windsurf/workflows/drift-check.md` for future sessions
+- [x] **Claims Map** — `docs/CLAIMS_MAP.md` — 86 claims mapped across 14 documents, three hardware tiers defined
 
 **Phase 1 — Persistence (IN PROGRESS):**
 - [x] Supabase project created (`fmaaihxhfgmqdmtmckmc`) with full schema
@@ -358,7 +385,6 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 - [ ] **ScaffoldingProvider sync** — Read from Supabase when logged in, localStorage when not
 - [ ] **Data migration** — Local → cloud on first login (preserves existing student progress)
 - [ ] **Create `/guitar/map` route** — The Maturation Map as primary navigation
-- [ ] **No-AI fallback** — Static prompt library when LM Studio is offline
 
 **Phase 2 — Mentor Connect:**
 - [ ] Mentor dashboard — Bertrand sees all student progress, submission queue, feedback
@@ -366,13 +392,21 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 - [ ] PlayerPortal merge — Remove pricing, add submission status + mentor link
 - [ ] Async coaching pricing — Per submission? Monthly? Bundled? (needs Bertrand input)
 
-**Phase 3 — Voice + AI:**
-- [ ] Voice TTS — AI responses auto-speak aloud
-- [ ] Voice STT — Speech-to-text in chat input
-- [ ] AI context injection — Troubadour can pull Song pages into chat
-- [ ] AI tool control — Troubadour can set ambient music, metronome via voice
-- [ ] AI prompt engineering — DAG-based reflection prompts
+**Phase 3 — Voice + AI (Three-Layer Architecture) — COMPLETED Tier 1, Tier 2 & 3 pending:**
+- [x] **Tier 1 (Souffle):** Offline fallback — `troubadourOffline.js` 18 keyword categories + Web Speech API TTS
+- [x] **Tier 1 (Souffle):** `aiEnabled` toggle — 🔮/🤫 controls LLM chat only, audio stays on
+- [x] **Tier 1 (Voix):** wllama + LFM2.5-1.2B-Instruct Q4_K_M — in-browser GGUF inference (~700 MB)
+- [x] **Tier 1 (Voix):** Compressed prompt — `buildCompressedPrompt()` ~500 tokens, fret/phase/polarity-aware
+- [x] **Tier 1 (Voix):** wllama detection cascade — inserted in `useTroubadourAI.js` between offline and servers
+- [x] **Tier 1 (Voix):** Voice input — `useVoiceInput.js` Web Speech Recognition with locale support
+- [x] **Tier 1 (Voix):** TTS cascade — Qwen3-TTS → Kokoro-82M → Web Speech API fallback
+- [x] **Tier 1 (Voix):** AI disclosure — "AI assistant trained on Bertrand Laurence's pedagogy" in chat UI
+- [ ] **Tier 2 (Chant Lite):** StepAudio Mini (~6 GB Q4) — local speech-to-speech, RAG, calendar-aware pacing
+- [ ] **Tier 3 (Chant):** StepAudio R1.1 33B — full prompt engineering, voice streaming, Net Protocol
+- [ ] AI tool control — Troubadour can set ambient music, metronome via voice (LLM function calls)
 - [ ] Adventure standalone enhancement — AI narration
+
+> **Full design:** `docs/07_MINIMUM_AI_MODE.md` | **Claims audit:** `docs/CLAIMS_MAP.md`
 
 **Phase 4 — Digital Mirror:**
 - [ ] Video journaling — Low-def self-recording in PlayerPortal
@@ -394,12 +428,13 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 **Needs Bertrand's Input:**
 - [ ] **Color/shape mapping for 12 notes** — "What color and shape for each chromatic note?"
 - [ ] **Review StudioPage copy and pricing** — Confirm rates are current
+- [ ] **Create Stripe account + payment links** — For Quick Question ($5), Video Review ($35), Private Lesson ($65), Inner Circle ($25/mo), Capstone ($100)
 - [ ] **Mentor dashboard preference** — Separate `/mentor` page or integrated notifications?
 - [ ] **Submission review workflow** — How does he want to receive student videos?
 - [ ] **Record welcome video** — 30–60 seconds for landing page
 - [ ] **Provide bio + photo** — For mentor section
 - [ ] **Favorite songs for each fret** — Real examples for Timeless Song slides
-- [ ] **Voice memo for Troubadour** — "Welcome, troubadour..." for AI voice cloning (Phase 3)
+- [ ] **Voice memos for AI cloning** — "Welcome, troubadour..." + coaching snippets: "Beautiful," "Breathe," "Relax the shoulder" (3 seconds each, for Qwen3-TTS voice cloning)
 
 ### 🚀 Future: Moonshots (Gated Behind Revenue)
 - [ ] French i18n — `react-i18next`, `locales/en.json` + `locales/fr.json` (Phase 3)
@@ -415,7 +450,7 @@ PHASE 3 — THE INNER VOICE (©FHEAL)
 ## 9. RULES FOR AI SESSIONS
 
 ### Who this platform is for
-This is **Bertrand Laurence's** guitar teaching platform. Bertrand is a master guitarist and vocalist (Berklee, MassArt) who teaches adult learners through somatic, body-centred methods. Joshua Atkinson built it as a gift. All revenue goes to Bertrand.
+This is **Bertrand Laurence's** guitar teaching platform. Bertrand is a master guitarist and vocalist (MassArt, Mirage Mime Theatre) who teaches adult learners through somatic, body-centred methods. Joshua Atkinson built it as a gift. All revenue goes to Bertrand.
 
 **This platform is NOT:**
 - Trinity ID AI OS (Joshua's separate project at `/home/joshua/Workflow/Desktop/`)
@@ -429,8 +464,9 @@ Do not import concepts, language, or patterns from those projects without explic
 1. Read `CONTEXT.md` §7 (12-fret UI map) — confirm the change fits the structure
 2. For game changes: read `research/10_design_doc_03_vertiscale_game.md` first
 3. For platform changes: read `research/10_MASTER_DESIGN_DOC.md` first
-4. Test in browser **before** declaring something done
-5. Update the relevant design doc in the same session as the code change
+4. For AI changes: read `docs/CLAIMS_MAP.md` — confirm claims are documented
+5. Test in browser **before** declaring something done
+6. Update the relevant design doc in the same session as the code change
 
 ### Language rules (Bertrand's voice only)
 
@@ -449,9 +485,14 @@ Every screen, every tool, every game phase traces back to the 12-fret map in §7
 ### The Troubadour AI
 The platform's AI guide is named **the Troubadour** — a medieval bard who has walked the 12-fret chromatic path. This name is used consistently everywhere: the adventure mode, the chat guide, the AI persona.
 
-**Current implementation:** LM Studio streaming via `useLMStudio` hook, inside `AmbientPlayer.jsx` (the Troubadour tab). System prompt is built dynamically from the student's live character sheet (Bard Level, practice minutes, streak, completed frets).
+**Current implementation (Three-Layer Architecture):**
+- **Souffle** (always on, 0 MB): Offline keyword responses (`troubadourOffline.js`) + Web Speech API TTS. No server, no download.
+- **Voix** (~2.65 GB download): In-browser LFM2.5-1.2B-Instruct GGUF via wllama + Kokoro-82M TTS + voice input. Compressed DAG-aware prompt (~500 tokens). Toggleable.
+- **Chant** (server-required): StepAudio R1.1 33B on localhost:9998 or LM Studio on :1234. Full prompt engineering, voice streaming, Net Protocol.
 
-**Future:** A fine-tuned model trained on Bertrand's teaching data, his written curriculum, and session transcripts. This will become the "Ask Bertrand" model — Bertrand's voice, Bertrand's pedagogy, running on-device.
+**System prompt** built dynamically from student's live state: Bard Level, practice minutes, streak, completed frets, current node, phase, polarity.
+
+**Future:** Fine-tuned model on Bertrand's teaching data. Voice cloning from 3-second recordings via Qwen3-TTS. "Ask Bertrand" — his voice, his pedagogy, running on-device.
 
 **System prompt rules (never break these):**
 - Respond in whatever language the student writes in (EN/FR)
@@ -459,6 +500,31 @@ The platform's AI guide is named **the Troubadour** — a medieval bard who has 
 - Always return to breath, imagination, or one small next step
 - When in doubt, ask a Socratic question
 - Max 2-4 sentences per response
+
+### The home screen is NEVER gated
+**`/` (LandingScreen) must load instantly with zero prerequisites.** No onboarding gate, no breathing exercise, no PIN wall, no login wall. The home screen is the front door — anyone can walk in.
+
+**Onboarding is optional:** Available at `/onboarding` via a "Begin Guided Journey" button. Skippable at any step. Sets `onboardingComplete` so we don't nag, but never blocks access.
+
+**Historical note:** `OnboardingGate` was removed 2026-06-01 after it was discovered it forced 3 breathing cycles before allowing access to the home screen. This violated the principle that the workbook must work without the guru present.
+
+### Consent is hard-coded
+**Every exercise, tool, and prompt is a recommendation, not a command.** The student always chooses.
+
+- Breathing exercises require explicit opt-in consent before starting
+- The Troubadour AI recommends orientation but never demands it
+- No phase, gate, or milestone blocks access to any other feature
+- Help systems explain why something is recommended, not why it is required
+- The `troubadourPrompt.js` Hard Rule #4: "ALL exercises are recommendations, not commands. The student always chooses."
+
+### Login is NEVER a gate to practice
+**Every practice feature works without authentication.** Recording, playback, tools, curriculum — all functional offline and without login.
+
+- Video recording: works locally; cloud save is an upgrade
+- Structured practice sessions: record locally; Drive upload is optional
+- The Playbook: localStorage persists everything; cloud sync is an upgrade
+- `VideoRecorder` and `StructuredPracticeRecorder` must allow recording regardless of auth state
+- The only login-gated features: Google Drive upload, Supabase sync, mentor review queue
 
 ### Practical
 ```
@@ -477,43 +543,54 @@ i18n:         t('key') from useLocale.js — add to both EN and FR sections
 
 ## 10. DOCUMENTATION INDEX
 
-### Core Documentation
+> **Master index:** `docs/00_INDEX.md` — complete map of every doc, what it covers, and cross-references.
+> **Doc convention:** `00_` = index/meta, `01-04` = design, `05-06` = research integration, `07+` = operational.
+
+### BE (Design) — Imagine Before Building
+| Document | Purpose |
+|----------|---------|
+| `docs/00_INDEX.md` | **Master doc map** — what every doc covers, where to find it |
+| `docs/00_SYSTEM_ARCHITECTURE.md` | Technical architecture, data flow, persistence tiers |
+| `docs/01_PEDAGOGY.md` | Bertrand's somatic mystic philosophy, dual-coding engine |
+| `docs/01_ACADEMY_SYLLABUS.md` | 12-fret curriculum overview, interval sequence |
+| `docs/02_BUSINESS_MODEL.md` | Revenue model, pricing, engagement ladder |
+| `docs/05_PEARL_STANDARD.md` | PEARL multi-perspective content review standard |
+| `docs/05_KRIYA_DELIVERY_SYSTEM.md` | 🆕 Kriya Yoga workbook vs Voix Vive delivery comparison |
+| `docs/06_GAME_NOTIFICATIONS_IDENTITY.md` | 🆕 Game system, Practice Garden, identity shedding, notification architecture |
+| `research/10_MASTER_DESIGN_DOC.md` | Single source of truth — pedagogical + architectural |
+| `research/10_design_doc_01_foundation.md` | Pedagogical foundation (subsumed by 10_MASTER) |
+| `research/10_design_doc_02_curriculum.md` | 12-chapter curriculum map (subsumed by 10_MASTER) |
+| `research/10_design_doc_03_vertiscale_game.md` | Vertiscale game design (SHEARL/PLING!/FHEAL) |
+| `research/10_design_doc_04_platform_and_business.md` | Platform + business (subsumed by 10_MASTER) |
+| `research/12_GUITAR_EMODULE_PEARL_MATURATION_v3.md` | Pearl maturation map, current status, legal/IP |
+| `research/13_DAG_EMODULE_FUNNEL.md` | DAG node graph, edges, funnel design |
+
+### DO (Document) — Record What Exists
 | Document | Purpose |
 |----------|---------|
 | `CONTEXT.md` | This file — master project context |
-| `research/12_GUITAR_EMODULE_PEARL_MATURATION.md` | Current status, checklist, legal/IP, Bertrand's needs |
-| `ROADMAP.md` | Development phases and milestones |
-| `USER_EXPERIENCE_MAP.md` | User journey and interaction flows |
+| `docs/CODEBASE_AUDIT.md` | 🆕 Full codebase research analysis — what's wired, ghost, not built |
+| `README.md` | Project overview, dev setup |
 
-### Technical Documentation
+### PLAY (Develop) — Build From Docs Into Code
 | Document | Purpose |
 |----------|---------|
-| `docs/API_REFERENCE.md` | Complete API docs for hooks and components |
-| `docs/ARCHITECTURE_FLOWS.md` | Data flows and state management |
-| `docs/AI_DEVELOPER_GUIDE.md` | AI modification system usage |
-| `docs/LM_STUDIO_SETUP.md` | LM Studio configuration guide |
-| `docs/QUICKSTART_LM_STUDIO.md` | 3-minute setup for AI features |
+| `docs/10_FRIDAY_TESTING_HANDOFF.md` | Testing protocol, Friday deployment cycle |
+| `docs/11_UI_PEARL_STANDARDS.md` | UI/UX standards, component patterns |
+| `docs/IMPLEMENTATION_ROADMAP.md` | ✅ Wiring plan — Layer 0 (AI tier) through Layer 6 (Night Gate) |
+| `docs/07_MINIMUM_AI_MODE.md` | 🆕 Three-layer AI architecture: Whisper→Voice→Song |
 
-### Server Documentation
+### Reference (Operational/Marketing)
 | Document | Purpose |
 |----------|---------|
-| `mcp-server/README.md` | MCP server architecture and setup |
-
-### Business Documentation
-| Document | Purpose |
-|----------|---------|
-| `MEETING_PREP.md` | Stakeholder meeting notes |
+| `docs/BERTRAND_EXECUTIVE_BRIEF.md` | Executive summary for stakeholders |
+| `docs/MARKET_ANALYSIS.md` | Market research, competitive analysis |
+| `docs/RESONANT_MIRROR_GDD.md` | Resonant Mirror game design doc |
+| `docs/RESONANT_MIRROR_WALKING_MODE.md` | Walking mode engine design |
+| `docs/07_BERTRAND_MENTORSHIP_INTEGRATION.md` | Mentor workflow, async review, scheduling |
+| `docs/09_FOUR_MODES_AND_APPRENTICESHIP.md` | Four learning modes, apprenticeship model |
 | `IP_ASSIGNMENT.md` | Intellectual property terms |
-| `Gamifying Guitar Learning with Open Source.md` | Academic proposal |
-
-### Curriculum Documentation
-| Document | Purpose |
-|----------|---------|
-| `research/10_design_doc_01_foundation.md` | Pedagogical foundation |
-| `research/10_design_doc_02_curriculum.md` | 12-chapter curriculum map |
-| `research/10_design_doc_03_vertiscale_game.md` | Game design document |
-| `research/10_design_doc_04_platform_and_business.md` | Platform architecture |
-| `research/10_MASTER_DESIGN_DOC.md` | Master design document |
+| `mcp-server/README.md` | MCP server architecture and setup |
 
 ---
 

@@ -14,6 +14,7 @@ import {
   passSomaticGate,
   markDepthExplored,
   getDefaultFretState,
+  mergeTractionStates,
 } from '../tractionStore';
 
 // Mock localStorage
@@ -148,6 +149,95 @@ describe('Student Flow — Mechanical Mode (Phase B)', () => {
       state = completeDAGPhase(state, 1, 'play');
       expect(state.totalTraction).toBe(100);
       expect(state.bardLevel).toBe(2); // floor(100/100) + 1
+    });
+  });
+
+  describe('Step 6: Smart Cloud Merge (mergeTractionStates)', () => {
+    it('handles null or empty inputs gracefully', () => {
+      const state = loadTraction();
+      expect(mergeTractionStates(null, state)).toEqual(state);
+      expect(mergeTractionStates(state, null)).toEqual(state);
+    });
+
+    it('correctly merges completedNodes union and fretsUnlocked union', () => {
+      let stateA = loadTraction();
+      stateA.completedNodes = ['node-1', 'node-2'];
+      stateA.fretsUnlocked = [1, 2];
+
+      let stateB = loadTraction();
+      stateB.completedNodes = ['node-2', 'node-3'];
+      stateB.fretsUnlocked = [2, 3];
+
+      const merged = mergeTractionStates(stateA, stateB);
+      expect(merged.completedNodes).toEqual(['node-1', 'node-2', 'node-3']);
+      expect(merged.fretsUnlocked).toEqual([1, 2, 3]);
+    });
+
+    it('correctly merges simple numbers (streak, sessions, practiceMinutes) using maximums', () => {
+      let stateA = loadTraction();
+      stateA.practiceMinutes = 10;
+      stateA.streak = 5;
+      stateA.xp = 120;
+
+      let stateB = loadTraction();
+      stateB.practiceMinutes = 20;
+      stateB.streak = 2;
+      stateB.xp = 80;
+
+      const merged = mergeTractionStates(stateA, stateB);
+      expect(merged.practiceMinutes).toBe(20);
+      expect(merged.streak).toBe(5);
+      expect(merged.xp).toBe(120);
+    });
+
+    it('correctly picks lower tensionScore and higher accuracy in frets', () => {
+      let stateA = loadTraction();
+      stateA.frets = {
+        1: {
+          id: 1,
+          traction: 33,
+          pitchAccuracy: 75,
+          tensionScore: 40,
+          beCompleted: true,
+          exercisesCompleted: ['ex-1'],
+        }
+      };
+
+      let stateB = loadTraction();
+      stateB.frets = {
+        1: {
+          id: 1,
+          traction: 66,
+          pitchAccuracy: 90,
+          tensionScore: 20,
+          doCompleted: true,
+          exercisesCompleted: ['ex-2'],
+        }
+      };
+
+      const merged = mergeTractionStates(stateA, stateB);
+      expect(merged.frets[1].traction).toBe(66);
+      expect(merged.frets[1].pitchAccuracy).toBe(90);
+      expect(merged.frets[1].tensionScore).toBe(20);
+      expect(merged.frets[1].beCompleted).toBe(true);
+      expect(merged.frets[1].doCompleted).toBe(true);
+      expect(merged.frets[1].exercisesCompleted).toEqual(['ex-1', 'ex-2']);
+    });
+
+    it('sets currentNodeId based on whichever state has more completed nodes', () => {
+      let stateA = loadTraction();
+      stateA.completedNodes = ['node-1'];
+      stateA.currentNodeId = 'node-a';
+
+      let stateB = loadTraction();
+      stateB.completedNodes = ['node-2', 'node-3'];
+      stateB.currentNodeId = 'node-b';
+
+      const merged1 = mergeTractionStates(stateA, stateB);
+      expect(merged1.currentNodeId).toBe('node-b');
+
+      const merged2 = mergeTractionStates(stateB, stateA);
+      expect(merged2.currentNodeId).toBe('node-b');
     });
   });
 });

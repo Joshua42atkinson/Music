@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,7 @@ import BEWorkbook from './BEWorkbook';
 import { ArrowLeft } from 'lucide-react';
 import { useLocale } from '../../hooks/useLocale';
 import AuthButton from '../AuthButton';
+import { useAuth } from '../../hooks/useAuth';
 
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : PlaybookShell.jsx                                   ║
@@ -30,12 +31,12 @@ import AuthButton from '../AuthButton';
 // ╚═══════════════════════════════════════════════════════════════╝
 
 const TABS = [
-  { id: 'character', icon: '⚔️', en: 'Character', fr: 'Personnage' },
-  { id: 'quests',    icon: '🗺️', en: 'Quests',    fr: 'Quêtes' },
-  { id: 'workbook',  icon: '📖', en: 'Workbook',  fr: 'Cahier' },
-  { id: 'library',   icon: '📽️', en: 'Library',   fr: 'Vidéos' },
-  { id: 'songbook',  icon: '✍️', en: 'Songbook',  fr: 'Recueil' },
-  { id: 'journal',   icon: '📓', en: 'Journal',   fr: 'Journal' },
+  { id: 'character', icon: '📊', en: 'Dashboard', fr: 'Tableau de bord' },
+  { id: 'workbook',  icon: '📚', en: 'Curriculum',  fr: 'Programme' },
+  { id: 'quests',    icon: '🗺️', en: 'Syllabus',    fr: 'Syllabus' },
+  { id: 'library',   icon: '📽️', en: 'Resources',   fr: 'Ressources' },
+  { id: 'songbook',  icon: '✍️', en: 'Projects',  fr: 'Projets' },
+  { id: 'journal',   icon: '📓', en: 'Submissions',   fr: 'Soumissions' },
 ];
 
 export default function PlaybookShell({ onOpenSlides, onBack }) {
@@ -44,6 +45,39 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
   const lang = locale;
   const navigate = useNavigate();
   const backHandler = onBack || (() => navigate('/'));
+  const { user } = useAuth();
+  
+  const [reviewedCount, setReviewedCount] = useState(0);
+
+  const studentName = (() => {
+    const googleName = user?.user_metadata?.full_name || user?.email?.split('@')[0];
+    if (googleName) return googleName;
+    try { return localStorage.getItem('active_student_profile') || 'Adventurer'; }
+    catch { return 'Adventurer'; }
+  })();
+
+  useEffect(() => {
+    const checkSubmissions = async () => {
+      try {
+        const resp = await fetch('http://localhost:8080/api/mentor/submissions');
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.submissions) {
+            const count = data.submissions.filter(
+              s => s.student_name === studentName && s.status === 'reviewed'
+            ).length;
+            setReviewedCount(count);
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to poll submissions in PlaybookShell:', e);
+      }
+    };
+
+    checkSubmissions();
+    const interval = setInterval(checkSubmissions, 10000);
+    return () => clearInterval(interval);
+  }, [studentName]);
 
   const handleOpenSlides = useCallback((fretId) => {
     onOpenSlides?.(fretId);
@@ -76,10 +110,10 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
         </button>
         <div style={styles.headerCenter}>
           <h1 style={styles.title}>
-            {t('troubadourPlaybook')}
+            Academy Learning Portal
           </h1>
           <p style={styles.subtitle}>
-            {t('heroGuide')}
+            Student Management System
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -107,6 +141,26 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
               color: activeTab === tab.id ? '#c9a96e' : 'rgba(255,255,255,0.35)',
             }}
           >
+            {tab.id === 'journal' && reviewedCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '4px',
+                right: '12%',
+                backgroundColor: '#ef4444',
+                color: '#ffffff',
+                borderRadius: '50%',
+                width: '14px',
+                height: '14px',
+                fontSize: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                boxShadow: '0 0 8px #ef4444'
+              }}>
+                {reviewedCount}
+              </span>
+            )}
             <span style={styles.tabIcon}>{tab.icon}</span>
             <span style={styles.tabLabel}>{tab[lang]}</span>
           </button>
@@ -207,6 +261,7 @@ const styles = {
     border: 'none',
     borderBottom: '2px solid transparent',
     cursor: 'pointer',
+    position: 'relative',
     transition: 'all 0.2s ease',
   },
   tabIcon: { fontSize: '1rem' },

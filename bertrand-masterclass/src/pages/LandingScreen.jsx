@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import AuthButton from '../components/AuthButton';
 import CoachingPortal from '../components/CoachingPortal';
 import { useLocale } from '../hooks/useLocale';
 import { useAuth } from '../hooks/useAuth';
+import { useScaffolding } from '../components/ScaffoldingProvider';
 
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : LandingScreen.jsx                                   ║
@@ -68,10 +69,90 @@ export default function LandingScreen() {
   const localize = (val) => (val && typeof val === 'object' ? (val[locale] || val['en']) : val);
 
   const [showCoaching, setShowCoaching] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(() => {
+    // Show welcome popup on first visit only
+    return localStorage.getItem('voixvive_welcome_seen') !== '1';
+  });
   const { user } = useAuth();
+  const { traction } = useScaffolding();
+
+  const sandboxMode = traction?.settings?.sandboxMode;
+  const aiEnabled = traction?.settings?.aiEnabled !== false;
+
+  const currentMode = useMemo(() => {
+    if (!sandboxMode && aiEnabled) return { label: locale === 'fr' ? 'Apprentissage' : 'Apprenticeship', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderColor: 'rgba(167,139,250,0.25)', desc: locale === 'fr' ? 'Parcours guidé + Mentorat IA' : 'Guided Path + AI Somatic Mentorship' };
+    if (!sandboxMode && !aiEnabled) return { label: locale === 'fr' ? 'Auto-apprentissage' : 'Self-Study', color: '#34d399', background: 'rgba(52,211,153,0.1)', borderColor: 'rgba(52,211,153,0.25)', desc: locale === 'fr' ? 'Parcours guidé (Silencieux)' : 'Guided Path (Silent)' };
+    if (sandboxMode && aiEnabled) return { label: locale === 'fr' ? 'Exploration' : 'Exploration', color: '#fbbf24', background: 'rgba(251,191,38,0.1)', borderColor: 'rgba(251,191,38,0.25)', desc: locale === 'fr' ? 'Bac à sable + Mentorat IA' : 'Open Book Sandbox + AI Somatic Mentorship' };
+    return { label: locale === 'fr' ? 'Référence' : 'Library Reference', color: '#9ca3af', background: 'rgba(156,163,175,0.1)', borderColor: 'rgba(156,163,175,0.25)', desc: locale === 'fr' ? 'Bac à sable (Silencieux)' : 'Open Book Sandbox (Silent)' };
+  }, [traction, sandboxMode, locale]);
+
+  const dismissWelcome = () => {
+    localStorage.setItem('voixvive_welcome_seen', '1');
+    setShowWelcome(false);
+  };
 
   return (
     <div className="landing-hub">
+      {/* ── Welcome Popup (first visit only, dismissible) ── */}
+      {showWelcome && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          style={{ background: 'rgba(5,5,8,0.85)', backdropFilter: 'blur(4px)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) dismissWelcome(); }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="relative w-full max-w-md rounded-2xl border border-amber-500/20 bg-[#0a0a14] p-8 shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              onClick={dismissWelcome}
+              className="absolute top-4 right-4 text-white/30 hover:text-white/60 transition-colors"
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="text-center">
+              <div className="text-4xl mb-3">♾️</div>
+              <h2 className="font-serif text-2xl text-[#f0e6d2] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                Welcome to Voix Vive
+              </h2>
+              <p className="text-white/50 text-sm mb-1 leading-relaxed">
+                A journey of twelve frets. Three original songs. One breath at a time.
+              </p>
+              <p className="text-white/40 text-xs mb-6 leading-relaxed">
+                This platform teaches you to hear, imagine, and express music — through Bertrand Laurence's pedagogy and an AI guide who walks beside you.
+              </p>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => { dismissWelcome(); navigate('/onboarding'); }}
+                  className="w-full py-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-xs uppercase tracking-widest hover:bg-amber-500/25 transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <Compass size={14} /> Begin Guided Orientation
+                </button>
+                <button
+                  onClick={dismissWelcome}
+                  className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/50 font-mono text-xs uppercase tracking-widest hover:bg-white/10 hover:text-white/70 transition-all active:scale-95"
+                >
+                  Explore on My Own
+                </button>
+              </div>
+
+              <p className="text-white/20 text-[10px] mt-4 font-mono">
+                Everything is optional. You choose your pace.
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -160,10 +241,10 @@ export default function LandingScreen() {
         }
         .manifesto-kicker {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.6rem;
+          font-size: 0.75rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: rgba(201,169,110,0.5);
+          color: rgba(201,169,110,0.55);
           text-align: center;
           margin-bottom: 16px;
         }
@@ -178,10 +259,10 @@ export default function LandingScreen() {
         }
         .manifesto-body {
           font-family: 'EB Garamond', serif;
-          font-size: 0.95rem;
-          color: rgba(200,200,208,0.65);
+          font-size: 1.05rem;
+          color: rgba(210,210,218,0.75);
           text-align: center;
-          line-height: 1.8;
+          line-height: 1.7;
           margin-bottom: 24px;
         }
         .manifesto-pillars {
@@ -194,22 +275,31 @@ export default function LandingScreen() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
+          gap: 6px;
         }
         .manifesto-pillar-icon {
-          font-size: 1.4rem;
-          margin-bottom: 2px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 56px;
+          height: 56px;
+          margin-bottom: 4px;
+          filter: drop-shadow(0 0 8px rgba(201,169,110,0.15));
+        }
+        .manifesto-pillar-icon svg {
+          width: 100%;
+          height: 100%;
         }
         .manifesto-pillar-label {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 0.85rem;
+          font-size: 1.1rem;
           color: #f0e6d2;
           font-weight: 500;
         }
         .manifesto-pillar-sub {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.55rem;
-          color: rgba(201,169,110,0.4);
+          font-size: 0.7rem;
+          color: rgba(201,169,110,0.5);
           letter-spacing: 0.08em;
           text-transform: uppercase;
         }
@@ -217,17 +307,18 @@ export default function LandingScreen() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
+          gap: 8px;
           margin-top: 24px;
-          padding: 8px 16px;
+          padding: 10px 18px;
           border-radius: 10px;
           background: rgba(122,170,136,0.06);
           border: 1px solid rgba(122,170,136,0.15);
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.6rem;
-          color: rgba(122,170,136,0.7);
-          letter-spacing: 0.08em;
+          font-size: 0.75rem;
+          color: rgba(122,170,136,0.75);
+          letter-spacing: 0.06em;
           text-transform: uppercase;
+          line-height: 1.4;
         }
 
         /* ── PORTALS GRID ── */
@@ -362,8 +453,39 @@ export default function LandingScreen() {
           transform: translateX(4px);
         }
 
-        /* ── MOBILE: bump portal text for readability ── */
+        /* ── MOBILE: bump ALL text for readability ── */
         @media (max-width: 599px) {
+          .manifesto-card {
+            padding: 28px 20px;
+          }
+          .manifesto-kicker {
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+          }
+          .manifesto-body {
+            font-size: 1.1rem;
+            line-height: 1.65;
+          }
+          .manifesto-pillar-icon {
+            width: 64px;
+            height: 64px;
+          }
+          .manifesto-pillar-label {
+            font-size: 1.2rem;
+          }
+          .manifesto-pillar-sub {
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+          }
+          .manifesto-free-badge {
+            font-size: 0.8rem;
+            padding: 12px 16px;
+            line-height: 1.5;
+          }
+          .trinity-label {
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+          }
           .portal-info {
             padding: 14px 16px;
           }
@@ -583,17 +705,95 @@ export default function LandingScreen() {
           </p>
           <div className="manifesto-pillars">
             <div className="manifesto-pillar">
-              <span className="manifesto-pillar-icon">🫁</span>
+              <span className="manifesto-pillar-icon">
+                {/* BE — Triskelion Spiral: breath, being, stillness */}
+                <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="beGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="rgba(201,169,110,0.15)" />
+                      <stop offset="100%" stopColor="transparent" />
+                    </radialGradient>
+                    <linearGradient id="beStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#c9a96e" />
+                      <stop offset="50%" stopColor="#e8d5a8" />
+                      <stop offset="100%" stopColor="#c9a96e" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="26" cy="26" r="25" fill="url(#beGlow)" />
+                  {/* Triple spiral — triskelion */}
+                  <path d="M26 26 C26 20, 20 16, 18 20 C16 24, 20 26, 26 26" stroke="url(#beStroke)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.9" />
+                  <path d="M26 26 C30 30, 36 28, 34 24 C32 20, 28 22, 26 26" stroke="url(#beStroke)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.9" />
+                  <path d="M26 26 C22 30, 22 36, 26 34 C30 32, 28 28, 26 26" stroke="url(#beStroke)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.9" />
+                  {/* Outer breath rings */}
+                  <circle cx="26" cy="26" r="18" stroke="#c9a96e" strokeWidth="0.5" fill="none" opacity="0.25" strokeDasharray="3 5" />
+                  <circle cx="26" cy="26" r="23" stroke="#c9a96e" strokeWidth="0.4" fill="none" opacity="0.12" strokeDasharray="2 6" />
+                  {/* Center dot */}
+                  <circle cx="26" cy="26" r="2" fill="#c9a96e" opacity="0.6" />
+                </svg>
+              </span>
               <span className="manifesto-pillar-label">{locale === 'fr' ? 'Être' : 'Be'}</span>
               <span className="manifesto-pillar-sub">{locale === 'fr' ? 'Respirer · Écouter' : 'Breathe · Listen'}</span>
             </div>
             <div className="manifesto-pillar">
-              <span className="manifesto-pillar-icon">🎸</span>
+              <span className="manifesto-pillar-icon">
+                {/* DO — Vibrating Strings: practice, tension, craft */}
+                <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="doGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="rgba(122,170,136,0.12)" />
+                      <stop offset="100%" stopColor="transparent" />
+                    </radialGradient>
+                    <linearGradient id="doStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#7aaa88" />
+                      <stop offset="50%" stopColor="#b8d4be" />
+                      <stop offset="100%" stopColor="#7aaa88" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="26" cy="26" r="25" fill="url(#doGlow)" />
+                  {/* Five vibrating strings */}
+                  <path d="M14 10 Q26 24, 14 42" stroke="url(#doStroke)" strokeWidth="1" fill="none" opacity="0.4" />
+                  <path d="M20 8 Q30 22, 20 44" stroke="url(#doStroke)" strokeWidth="1.2" fill="none" opacity="0.55" />
+                  <path d="M26 7 Q34 26, 26 45" stroke="url(#doStroke)" strokeWidth="1.5" fill="none" opacity="0.8" />
+                  <path d="M32 8 Q38 22, 32 44" stroke="url(#doStroke)" strokeWidth="1.2" fill="none" opacity="0.55" />
+                  <path d="M38 10 Q44 24, 38 42" stroke="url(#doStroke)" strokeWidth="1" fill="none" opacity="0.4" />
+                  {/* Bridge lines */}
+                  <line x1="12" y1="14" x2="40" y2="14" stroke="#7aaa88" strokeWidth="0.6" opacity="0.3" />
+                  <line x1="12" y1="38" x2="40" y2="38" stroke="#7aaa88" strokeWidth="0.6" opacity="0.3" />
+                  {/* Resonance dot */}
+                  <circle cx="26" cy="26" r="2" fill="#7aaa88" opacity="0.5" />
+                </svg>
+              </span>
               <span className="manifesto-pillar-label">{locale === 'fr' ? 'Faire' : 'Do'}</span>
               <span className="manifesto-pillar-sub">{locale === 'fr' ? 'Pratiquer · Construire' : 'Practice · Build'}</span>
             </div>
             <div className="manifesto-pillar">
-              <span className="manifesto-pillar-icon">🎵</span>
+              <span className="manifesto-pillar-icon">
+                {/* PLAY — Radiating Resonance: creation, performance, expression */}
+                <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="playGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="rgba(192,120,152,0.12)" />
+                      <stop offset="100%" stopColor="transparent" />
+                    </radialGradient>
+                    <linearGradient id="playStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#c07898" />
+                      <stop offset="50%" stopColor="#e0a8c0" />
+                      <stop offset="100%" stopColor="#c07898" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="26" cy="26" r="25" fill="url(#playGlow)" />
+                  {/* Radiating sound waves */}
+                  <path d="M26 18 Q32 22, 26 26 Q20 30, 26 34" stroke="url(#playStroke)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.85" />
+                  <path d="M20 14 Q28 20, 20 26 Q12 32, 20 38" stroke="#c07898" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.4" />
+                  <path d="M32 14 Q40 20, 32 26 Q24 32, 32 38" stroke="#c07898" strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.4" />
+                  {/* Outer resonance arcs */}
+                  <path d="M14 12 Q22 18, 14 26 Q6 34, 14 40" stroke="#c07898" strokeWidth="0.6" fill="none" strokeLinecap="round" opacity="0.2" />
+                  <path d="M38 12 Q46 18, 38 26 Q30 34, 38 40" stroke="#c07898" strokeWidth="0.6" fill="none" strokeLinecap="round" opacity="0.2" />
+                  {/* Center tone point */}
+                  <circle cx="26" cy="26" r="2.5" fill="#c07898" opacity="0.6" />
+                  <circle cx="26" cy="26" r="5" stroke="#c07898" strokeWidth="0.5" fill="none" opacity="0.3" />
+                </svg>
+              </span>
               <span className="manifesto-pillar-label">{locale === 'fr' ? 'Jouer' : 'Play'}</span>
               <span className="manifesto-pillar-sub">{locale === 'fr' ? 'Créer · Performer' : 'Create · Perform'}</span>
             </div>
@@ -621,8 +821,10 @@ export default function LandingScreen() {
       <motion.div
         style={{
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           alignItems: 'center',
+          width: '100%',
+          maxWidth: '540px',
           gap: 10,
           marginBottom: '16px',
           position: 'relative',
@@ -632,26 +834,53 @@ export default function LandingScreen() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.6 }}
       >
-        <AuthButton />
-        <button
-          onClick={toggleLocale}
-          style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(201, 169, 110, 0.2)',
-            borderRadius: '8px',
-            padding: '8px 16px',
-            color: '#c9a96e',
+        {/* Dynamic Mode Pill */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 2,
+          padding: '6px 12px',
+          borderRadius: '12px',
+          background: currentMode.background,
+          border: `1px solid ${currentMode.borderColor}`,
+          backdropFilter: 'blur(10px)',
+          boxShadow: `0 0 12px ${currentMode.background}`
+        }} title={currentMode.desc}>
+          <div style={{
             fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.7rem',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            transition: 'all 0.3s'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(201,169,110,0.1)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-        >
-          🌐 {locale === 'fr' ? 'EN' : 'FR'}
-        </button>
+            fontSize: '0.6rem',
+            fontWeight: 700,
+            color: currentMode.color,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase'
+          }}>
+            ● {currentMode.label}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <AuthButton />
+          <button
+            onClick={toggleLocale}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(201, 169, 110, 0.2)',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              color: '#c9a96e',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.3s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(201,169,110,0.1)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+          >
+            🌐 {locale === 'fr' ? 'EN' : 'FR'}
+          </button>
+        </div>
       </motion.div>
 
       {/* ── Anonymous mode banner ── */}
@@ -839,7 +1068,37 @@ export default function LandingScreen() {
             onMouseEnter={e => e.target.style.color = 'rgba(201,169,110,0.5)'}
             onMouseLeave={e => e.target.style.color = 'rgba(201,169,110,0.25)'}
           >
-            Mentor Portal →
+            Mentor Portal
+          </a>
+          <span style={{ color: 'rgba(201,169,110,0.15)', margin: '0 12px' }}>&middot;</span>
+          <a
+            href="/poc"
+            style={{
+              color: 'rgba(239,68,68,0.4)',
+              textDecoration: 'none',
+              fontSize: '0.55rem',
+              fontWeight: 'bold',
+              transition: 'color 0.3s',
+            }}
+            onMouseEnter={e => e.target.style.color = 'rgba(239,68,68,0.8)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(239,68,68,0.4)'}
+          >
+            Engine POC
+          </a>
+          <span style={{ color: 'rgba(201,169,110,0.15)', margin: '0 12px' }}>&middot;</span>
+          <a
+            href="/walking"
+            style={{
+              color: 'rgba(56,189,248,0.4)',
+              textDecoration: 'none',
+              fontSize: '0.55rem',
+              fontWeight: 'bold',
+              transition: 'color 0.3s',
+            }}
+            onMouseEnter={e => e.target.style.color = 'rgba(56,189,248,0.8)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(56,189,248,0.4)'}
+          >
+            Voix Vive Engine →
           </a>
         </p>
       </motion.div>

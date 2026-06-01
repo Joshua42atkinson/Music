@@ -138,7 +138,7 @@ export const SERVICES = [
       'Vocal pitch training with guitar as coach',
       'Ear training, range expansion, breath work',
       'Fun vocal warm-ups and improvisation games',
-      'Based on Berklee vocal pedagogy',
+      'Vocal-motor integration through guitar-singing synthesis',
       'No prior singing experience needed',
     ],
   },

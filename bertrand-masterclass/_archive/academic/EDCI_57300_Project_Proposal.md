@@ -32,7 +32,7 @@ The web platform is built with React 18, Vite, and Tailwind CSS, deployed on Ver
 
 ### Organization Description
 
-**Bertrand Laurence Guitar Studio** is an independent music education practice operated by Bertrand Laurence, a master guitarist and vocalist with credentials from Berklee College of Music, MassArt, and Mirage Mime Theatre. Bertrand has developed a proprietary somatic philosophy called "Somatic Mystic" and three training protocols (©SHEARL, ©PLING!, ©FHEAL) that form the core of his teaching method.
+**Bertrand Laurence Guitar Studio** is an independent music education practice operated by Bertrand Laurence, a master guitarist and vocalist with training from MassArt and Mirage Mime Theatre. Bertrand has developed a proprietary somatic philosophy called "Somatic Mystic" and three training protocols (©SHEARL, ©PLING!, ©FHEAL) that form the core of his teaching method.
 
 Located in Houlton, Maine (relocated from the Cambridge/Boston area), Bertrand operates as a solo practitioner offering private lessons, group classes through Passim School of Music, and online coaching via Thumbtack (where he has received the Top Pro award for multiple years). His client base includes adult learners aged 30-65, many of whom have previously attempted to learn guitar but stopped due to performance anxiety, inner critic dominance, and teaching methods designed for children rather than adults.
 
@@ -419,7 +419,7 @@ What prevents a well-funded competitor from cloning Voix Vive?
 
 | Moat Element | Description |
 |--------------|-------------|
-| **SME Authenticity** | Bertrand's Berklee + MassArt + Mirage Mime credentials, 10+ years of Passim curriculum, Thumbtack Top Pro status — not replicable by any SaaS company |
+| **SME Authenticity** | Bertrand's MassArt + Mirage Mime training, 10+ years of Passim curriculum, Thumbtack Top Pro status — not replicable by any SaaS company |
 | **Trademarked Pedagogy** | ©SHEARL, ©PLING!, ©FHEAL are Bertrand's IP — competitors cannot use the protocols, only imitate around them |
 | **Philosophical Position** | Anti-dopamine "Slow Web" framing is an explicit market segment that gamified incumbents (Yousician, Fender Play) cannot pivot to without alienating their existing user base |
 | **Adult-Learner Focus** | The 30–65 adult-learner segment with prior quit history is underserved; competitors target beginners, children, or hobbyist gamers |
@@ -438,7 +438,7 @@ This section presents an unfiltered evaluation of project strengths and weakness
 
 2. **Functional Product, Not a Deck** — The platform is shipped, builds clean (`npm run build` exits 0), and is deployed to a real domain (voix-vive.com). This places the project ahead of the majority of practicum projects which present concept artifacts rather than working systems.
 
-3. **Defensible SME Moat** — Bertrand's credentials (Berklee, MassArt, Mirage Mime), 10+ years of Passim curriculum, Thumbtack Top Pro status, and trademarked protocols (©SHEARL, ©PLING!, ©FHEAL) constitute a moat that no SaaS competitor can replicate by any amount of capital or engineering investment.
+3. **Defensible SME Moat** — Bertrand's training (MassArt, Mirage Mime), 10+ years of Passim curriculum, Thumbtack Top Pro status, and trademarked protocols (©SHEARL, ©PLING!, ©FHEAL) constitute a moat that no SaaS competitor can replicate by any amount of capital or engineering investment.
 
 4. **Quantifiably Sovereign Cost Structure** — The local-first AI architecture (LM Studio + DaaS) is not a marketing claim — it is a verifiable architectural decision with a concrete dollar value (≥ $300/mo savings vs. SaaS-equivalent). This is the technical heart of the financial sovereignty thesis.
 

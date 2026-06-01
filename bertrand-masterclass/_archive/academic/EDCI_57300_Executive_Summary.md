@@ -18,7 +18,7 @@ Voix Vive ("The Living Voice") is a web-based somatic guitar mentorship platform
 4. **Local AI Coaching (DaaS)** — A locally hosted LLM backend (LM Studio) providing Socratic coaching at zero marginal cloud cost.
 
 **Organization.**
-Bertrand Laurence Guitar Studio is an independent music education practice operated from Houlton, Maine. Bertrand holds credentials from Berklee College of Music, MassArt, and Mirage Mime Theatre, and teaches group classes at Passim School of Music in Cambridge, MA (Thumbtack Top Pro, multiple years). His audience is adult learners (ages 30–65) managing performance anxiety, inner-critic interference, and fragmented practice time. The studio is transitioning from an hourly-lesson model to a scalable digital hybrid, with the free textbook serving as a marketing funnel to paid services.
+Bertrand Laurence Guitar Studio is an independent music education practice operated from Houlton, Maine. Bertrand has trained at MassArt and Mirage Mime Theatre, and teaches group classes at Passim School of Music in Cambridge, MA (Thumbtack Top Pro, multiple years). His audience is adult learners (ages 30–65) managing performance anxiety, inner-critic interference, and fragmented practice time. The studio is transitioning from an hourly-lesson model to a scalable digital hybrid, with the free textbook serving as a marketing funnel to paid services.
 
 **Goals and Deliverables.**
 *Primary Goal:* Deploy a web platform and local AI coaching infrastructure that expands the expressive range of adult guitar students while establishing financial sovereignty for the instructor.

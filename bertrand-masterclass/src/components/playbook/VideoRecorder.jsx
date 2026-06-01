@@ -64,7 +64,20 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
   }, []);
 
   const uploadToDrive = useCallback(async () => {
-    if (!recordedBlob || !user) return;
+    if (!recordedBlob) return;
+
+    // Not logged in: download locally
+    if (!user) {
+      const url = URL.createObjectURL(recordedBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `voix-vive-practice-fret${fretId}-${Date.now()}.webm`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setStatus('done');
+      return;
+    }
+
     setStatus('uploading');
     setUploadError(null);
 
@@ -122,13 +135,13 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
             cursor: 'pointer',
           }}
         >
-          📹 {user ? 'Record Practice Video' : 'Sign in to record video'}
+          📹 Record Practice Video
         </button>
-        {user && (
-          <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
-            Saved to your Google Drive. Shared with mentor.
-          </p>
-        )}
+        <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+          {user 
+            ? 'Saved to your Google Drive. Shared with mentor.' 
+            : 'Recorded locally. Sign in to save to Google Drive.'}
+        </p>
       </div>
     );
   }
@@ -168,15 +181,9 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
           <button onClick={reset} style={btnStyle('rgba(255,255,255,0.2)')}>
             ↺ Retake
           </button>
-          {user ? (
-            <button onClick={uploadToDrive} style={btnStyle('#7aaa88')}>
-              ⬆ Save to Drive
-            </button>
-          ) : (
-            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', alignSelf: 'center' }}>
-              Sign in to save
-            </span>
-          )}
+          <button onClick={uploadToDrive} style={btnStyle(user ? '#7aaa88' : 'rgba(201,169,110,0.3)')}>
+            {user ? '⬆ Save to Drive' : '⬇ Download Recording'}
+          </button>
         </div>
       )}
 
@@ -186,9 +193,11 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
 
       {status === 'done' && (
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '0.75rem', color: '#7aaa88' }}>✓ Saved to your Google Drive!</p>
+          <p style={{ fontSize: '0.75rem', color: '#7aaa88' }}>
+            {user ? '✓ Saved to your Google Drive!' : '✓ Recording saved to your device'}
+          </p>
           <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
-            Your mentor can now review it.
+            {user ? 'Your mentor can now review it.' : 'Sign in anytime to upload to Google Drive.'}
           </p>
         </div>
       )}

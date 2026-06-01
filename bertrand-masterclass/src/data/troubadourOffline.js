@@ -3,6 +3,11 @@
 // When all AI backends are offline, the Troubadour still speaks.
 // These are pre-written responses from Bertrand's actual pedagogy.
 // ═══════════════════════════════════════════════════════════
+//
+// LAYER 1: WHISPER — The Offline Guru
+// Kriya principle: the workbook must work without the guru present.
+// Every student gets this. No server, no download, no AI toggle.
+// ═══════════════════════════════════════════════════════════
 
 // Pattern: [keyword] → response
 // The chat input is matched against keywords. Best match wins.
@@ -88,10 +93,119 @@ export const OFFLINE_RESPONSES = [
     keywords: ['breath', 'breathe', 'relax', 'calm', 'center'],
     response: 'The breath is the metronome beneath the metronome. Before you play, breathe. While you play, breathe. When you stop, breathe. The guitar is an instrument. You are the instrument. Over.',
   },
+
+  // ── Fret-specific prompts (Whisper tier enrichment) ──────────
+  // These give the offline Troubadour awareness of the 12-fret journey
+  // even without an LLM. Each fret gets a somatic coaching prompt.
+
+  {
+    keywords: ['fret 1', 'root note', 'open string', 'foundation', 'beginning', 'start'],
+    response: 'The root note is not a place on the neck. It is the place inside you that says "I am here." Play the open low E. Let it vibrate through your body. What does it feel like? Over.',
+  },
+  {
+    keywords: ['fret 2', 'minor 2nd', 'semitone', 'half step', 'awakening'],
+    response: 'The smallest step on the guitar is the largest step in music. One fret. C to C#. The world tilts. Play it slowly. Listen to the tension. That is the Minor 2nd — the awakening. Over.',
+  },
+  {
+    keywords: ['fret 3', 'major 2nd', 'whole step', 'whole tone', 'journey'],
+    response: 'The Major 2nd is the first step of the journey. C to D. It moves forward. It has hope. Play it and walk. The fretboard is a road. Over.',
+  },
+  {
+    keywords: ['fret 4', 'minor 3rd', 'sad', 'melancholy', 'longing', 'sorrow'],
+    response: 'The Minor 3rd is the sound of longing. C to Eb. It is the color of evening light. Play it and feel the melancholy. Do not rush past it. The sadness is the teacher. Over.',
+  },
+  {
+    keywords: ['fret 5', 'major 3rd', 'happy', 'bright', 'joy', 'sunshine'],
+    response: 'The Major 3rd is the sound of joy. C to E. It is the first chord you ever loved. Play it and smile. The guitar is smiling with you. Over.',
+  },
+  {
+    keywords: ['fret 6', 'perfect 4th', 'question', 'suspended', 'searching', 'maiden'],
+    response: 'The Perfect 4th is a question that hangs in the air. C to F. It does not resolve. It searches. Play it and wait. The answer is coming. But not yet. Over.',
+  },
+  {
+    keywords: ['fret 7', 'tritone', 'ordeal', 'crisis', 'breakthrough', 'devil\'s interval'],
+    response: 'Fret 7 is the ordeal. The tritone. C to F#. It is the crisis that makes you or breaks you. Play it. Sit in the discomfort. The breakthrough is on the other side. Over.',
+  },
+  {
+    keywords: ['fret 8', 'perfect 5th', 'power', 'strength', 'stable', 'grounded'],
+    response: 'The Perfect 5th is power. C to G. It is the most stable interval after the octave. Play it and feel the ground beneath you. You are standing on something real. Over.',
+  },
+  {
+    keywords: ['fret 9', 'minor 6th', 'memory', 'nostalgia', 'distant', 'far away'],
+    response: 'The Minor 6th is the sound of memory. C to Ab. It is the interval of nostalgia — of looking back at something beautiful and far away. Play it. What do you remember? Over.',
+  },
+  {
+    keywords: ['fret 10', 'major 6th', 'hope', 'uplifting', 'aspiring', 'reaching'],
+    response: 'The Major 6th is the sound of hope. C to A. It reaches upward without strain. Play it and feel your chest open. The next note is always possible. Over.',
+  },
+  {
+    keywords: ['fret 11', 'minor 7th', 'return', 'winding', 'unresolved', 'coming back'],
+    response: 'The Minor 7th is the return that is not yet complete. C to Bb. It is winding, unresolved, coming back but not quite home. Play it and feel the pull. Home is one fret away. Over.',
+  },
+  {
+    keywords: ['fret 12', 'major 7th', 'octave', 'home', 'arrival', 'completion'],
+    response: 'The Major 7th is almost home. C to B. One more half step and you arrive at the octave — the same note, transformed. Play it. You have walked the entire chromatic path. Voila. Over.',
+  },
+
+  // ── Phase-specific prompts (BE/DO/PLAY awareness) ──────────
+
+  {
+    keywords: ['imagine', 'visualize', 'see it', 'picture', 'be phase', 'inner fretboard'],
+    response: 'Close your eyes. The Inner Fretboard is not on the guitar — it is in you. See the pattern before you touch the strings. What would be the scene in the movie? Over.',
+  },
+  {
+    keywords: ['hum', 'sing', 'audiate', 'hear it', 'do phase', 'inner ear', 'pling'],
+    response: 'Before you play, sing. The voice knows the pitch before the finger finds the fret. Hum the note. Then find it. The ear is the true instrument. Over.',
+  },
+  {
+    keywords: ['play', 'start now', 'do it', 'action', 'play phase', 'fheal', 'free'],
+    response: 'Start now. Be active in the process. Do not wait for permission. The guitar will teach you if you listen. Play what you are saying. So it becomes one thing. Over.',
+  },
+  {
+    keywords: ['milestone', 'complete', 'done', 'finished', 'bravo', 'celebrate'],
+    response: 'Voila. You have arrived. The interval is conquered. Not because you played it perfectly — because you stayed with it. Breathe. Trust the process. Over.',
+  },
+
+  // ── Protocol-specific prompts ────────────────────────────────
+
+  {
+    keywords: ['shearl', 'flash', 'imagine mode', 'see hear feel', 'pattern'],
+    response: 'SHEARL: See the pattern. Hear the sound. Feel the shape in your hand. The flash will disappear — but the impression remains. Do not guess. Remember. Over.',
+  },
+  {
+    keywords: ['pling', 'sing and play', 'voice and guitar', 'audiate'],
+    response: 'PLING: Sing the pitch before you play it. Your voice and the guitar are one instrument. If you can sing it, you can play it. If you cannot sing it, you are not hearing it yet. Over.',
+  },
+  {
+    keywords: ['fheal', 'free playing', 'express', 'no critic', 'creative'],
+    response: 'FHEAL: Play without the inner critic. There is no wrong note — only the next note. Express freely. The music is already inside you. Let it out. Over.',
+  },
 ];
 
-// Fallback for unmatched input
+// Fallback for unmatched input — fret-aware when possible
 export const OFFLINE_FALLBACK = 'I am resting now, but the teaching is always here. Try the PracticeJournal for a guided session, or explore the next unlocked fret in your workbook. Every note is a step. Over.';
+
+/**
+ * Get a fret-aware offline prompt when no keyword matches.
+ * Uses the student's current fret to give contextual guidance.
+ */
+export function getFretAwareFallback(currentFret = 1) {
+  const fretPrompts = {
+    1: 'You are at the Root Note. Play the open low E. Feel it vibrate through your body. The foundation is laid. Over.',
+    2: 'You are at the Minor 2nd. The smallest step. Play C then C#. Listen to the tension. The awakening begins. Over.',
+    3: 'You are at the Major 2nd. The journey starts. Play C then D. It moves forward. Trust the movement. Over.',
+    4: 'You are at the Minor 3rd. The sound of longing. Play C then Eb. Sit with the melancholy. It is teaching you. Over.',
+    5: 'You are at the Major 3rd. The sound of joy. Play C then E. The guitar is smiling with you. Over.',
+    6: 'You are at the Perfect 4th. The question that hangs. Play C then F. Wait for the answer. It is coming. Over.',
+    7: 'You are at the Tritone. The ordeal. Play C then F#. Sit in the discomfort. The breakthrough is near. Over.',
+    8: 'You are at the Perfect 5th. Power and stability. Play C then G. Feel the ground beneath you. Over.',
+    9: 'You are at the Minor 6th. The sound of memory. Play C then Ab. What do you remember? Over.',
+    10: 'You are at the Major 6th. The sound of hope. Play C then A. Your chest opens. The next note is possible. Over.',
+    11: 'You are at the Minor 7th. The return. Play C then Bb. Almost home. One fret away. Over.',
+    12: 'You are at the Major 7th. Almost the octave. Play C then B. You have walked the entire chromatic path. Voila. Over.',
+  };
+  return fretPrompts[currentFret] || OFFLINE_FALLBACK;
+}
 
 /**
  * Find the best matching offline response for a user message.

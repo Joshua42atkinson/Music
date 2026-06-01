@@ -153,11 +153,11 @@ export default function GuitarWorkbench() {
   const navigate = useNavigate();
   const { locale, t } = useLocale();
   const lang = locale;
-  const { bardLevel, practiceMinutes, streak } = useScaffolding();
+  const { bardLevel, practiceMinutes, streak, traction } = useScaffolding();
+  const isKidMode = traction?.settings?.kidMode === true;
   const [activeTool, setActiveTool] = useState(null);
   const [journalEntries, setJournalEntries] = useState([]);
   const [showAllTools, setShowAllTools] = useState(false);
-  const [showQuill, setShowQuill] = useState(false);
   const [practiceCtx] = useState(() => getPracticeContext());
 
   // Load journal
@@ -214,12 +214,6 @@ export default function GuitarWorkbench() {
           <button onClick={() => navigate(-1)} style={styles.backBtn} aria-label="Back">
             <ArrowLeft size={20} style={{ color: '#c9a96e' }} />
           </button>
-          <button onClick={handleHelpClick} style={styles.helpBtn} aria-label="Ask the Troubadour">
-            <HelpCircle size={20} style={{ color: '#c9a96e' }} />
-          </button>
-          <button onClick={() => navigate('/')} style={styles.backBtn} aria-label="Home">
-            <img src="/assets/wordmark.png" alt="Voix Vive" style={{ height: 28 }} draggable={false} />
-          </button>
         </div>
       </div>
 
@@ -259,24 +253,6 @@ export default function GuitarWorkbench() {
             <SuggestedPractice suggestion={suggestion} onOpenTool={handleOpenTool} lang={lang} />
           </>
         )}
-      </div>
-
-      {/* ── QUICK ACTIONS ── */}
-      <div style={{ padding: '16px 16px 0', maxWidth: 640, margin: '0 auto' }}>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button onClick={handleHelpClick} style={styles.quickActionBtn}>
-            <Sparkles size={14} /> Ask the Troubadour
-          </button>
-          <button onClick={() => setShowQuill(true)} style={{ ...styles.quickActionBtn, opacity: 0.7 }}>
-            <Feather size={14} /> Troubadour's Quill
-          </button>
-          <button onClick={() => navigate('/song')} style={{ ...styles.quickActionBtn, opacity: 0.7 }}>
-            <BookOpen size={14} /> Return to /song
-          </button>
-          <button onClick={() => navigate('/guitar/map')} style={{ ...styles.quickActionBtn, opacity: 0.7 }}>
-            <Map size={14} /> View Map
-          </button>
-        </div>
       </div>
 
       {/* ── YOUR JOURNEY ── */}
@@ -392,12 +368,14 @@ export default function GuitarWorkbench() {
                     </div>
                     <div style={{ textAlign: 'left' }}>
                       <h3 style={{ margin: '0 0 2px', fontSize: '0.9rem', fontWeight: 600, color: '#e8dcc8', lineHeight: 1.2 }}>{tool.shortName}</h3>
-                      <p style={{ margin: 0, fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.04em' }}>{tool.desc}</p>
+                      {!isKidMode && <p style={{ margin: 0, fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.04em' }}>{tool.desc}</p>}
                     </div>
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4, textAlign: 'left' }}>
-                    {tool.telemetry}
-                  </p>
+                  {!isKidMode && (
+                    <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4, textAlign: 'left' }}>
+                      {tool.telemetry}
+                    </p>
+                  )}
                   <div style={{ ...styles.toolProtocolStripe, background: `linear-gradient(90deg, transparent, ${colors.text}, transparent)` }} />
                 </button>
               );
@@ -432,16 +410,6 @@ export default function GuitarWorkbench() {
 
       {/* ── TOOL MODAL ── */}
       {activeTool && <ToolModal tool={activeTool} onClose={() => setActiveTool(null)} />}
-
-      {/* ── Troubadour's Quill Overlay ── */}
-      {showQuill && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 600, background: 'rgba(5,5,8,0.97)', backdropFilter: 'blur(12px)', overflowY: 'auto' }}>
-          <button onClick={() => setShowQuill(false)} style={{ position: 'sticky', top: '12px', float: 'right', zIndex: 601, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', margin: '12px 16px' }}>
-            <X size={18} />
-          </button>
-          <SongwritingCompanion />
-        </div>
-      )}
 
     </div>
   );

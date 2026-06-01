@@ -13,6 +13,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '../hooks/useLocale';
 import { useScaffolding } from './ScaffoldingProvider';
+import { useAuth } from '../hooks/useAuth';
 import { db } from '../data/localDatabase';
 import { loadTraction } from '../data/tractionStore';
 import PracticeRecorder from './PracticeRecorder';
@@ -90,6 +91,7 @@ export default function PlayerPortal() {
   const navigate = useNavigate();
   const { locale, t } = useLocale();
   const { streak, practiceMinutes } = useScaffolding();
+  const { user } = useAuth();
   const lang = locale;
 
   const [showRecorder, setShowRecorder] = useState(false);
@@ -227,6 +229,33 @@ export default function PlayerPortal() {
     };
     load();
   }, []);
+
+  const playRecording = async (sub) => {
+    try {
+      const outboxItems = await db.outbox.toArray();
+      const match = outboxItems.find(item => item.timestamp === sub.timestamp || item.size === sub.size);
+      if (match && match.blob) {
+        const url = URL.createObjectURL(match.blob);
+        setSelectedVideo({
+          title: sub.exerciseName || 'Practice Recording',
+          description: `Recorded on ${formatDate(sub.timestamp)}`,
+          blobUrl: url,
+          mediaType: sub.mediaType || 'video',
+        });
+      } else {
+        alert('Local recording video/audio blob not found in IndexedDB outbox.');
+      }
+    } catch (e) {
+      console.warn('[PlayerPortal] Failed to play recording:', e);
+    }
+  };
+
+  const closeVideoModal = () => {
+    if (selectedVideo && selectedVideo.blobUrl) {
+      URL.revokeObjectURL(selectedVideo.blobUrl);
+    }
+    setSelectedVideo(null);
+  };
 
   return (
     <div style={styles.page}>
@@ -400,7 +429,13 @@ export default function PlayerPortal() {
             ) : (
               <div style={styles.submissionList}>
                 {submissions.map(sub => (
-                  <div key={sub.id} style={styles.submissionCard}>
+                  <div 
+                    key={sub.id} 
+                    style={{ ...styles.submissionCard, cursor: 'pointer' }}
+                    onClick={() => playRecording(sub)}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,169,110,0.3)'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={styles.submissionThumb}>
                         <Play size={16} style={{ color: 'rgba(255,255,255,0.4)' }} />
@@ -550,19 +585,27 @@ export default function PlayerPortal() {
 
       {/* ── VIDEO PLAYER MODAL ── */}
       {selectedVideo && (
-        <div style={styles.videoModal} onClick={() => setSelectedVideo(null)}>
+        <div style={styles.videoModal} onClick={closeVideoModal}>
           <div style={styles.videoModalContent} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <h3 style={{ margin: 0, fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', color: '#f0e6d2' }}>{selectedVideo.title}</h3>
-              <button onClick={() => setSelectedVideo(null)} style={styles.closeBtn}>
+              <button onClick={closeVideoModal} style={styles.closeBtn}>
                 <ArrowLeft size={18} /> Back
               </button>
             </div>
             <div style={styles.videoPlayer}>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', textAlign: 'center' }}>
-                🎬 {selectedVideo.title}<br />
-                <span style={{ fontSize: '0.7rem' }}>(Video placeholder — integrate with CDN or DaaS)</span>
-              </p>
+              {selectedVideo.blobUrl ? (
+                selectedVideo.mediaType === 'audio' ? (
+                  <audio src={selectedVideo.blobUrl} controls autoPlay style={{ width: '80%' }} />
+                ) : (
+                  <video src={selectedVideo.blobUrl} controls autoPlay style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 10 }} />
+                )
+              ) : (
+                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem', textAlign: 'center' }}>
+                  🎬 {selectedVideo.title}<br />
+                  <span style={{ fontSize: '0.7rem' }}>(Video placeholder — integrate with CDN or DaaS)</span>
+                </p>
+              )}
             </div>
             <p style={{ margin: '12px 0 0', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
               {selectedVideo.description}

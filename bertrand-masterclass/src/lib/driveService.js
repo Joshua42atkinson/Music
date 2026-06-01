@@ -5,7 +5,10 @@
 // Supabase stores only metadata (file IDs, not bytes).
 // ═══════════════════════════════════════════════════════════
 
-const MENTOR_EMAIL = import.meta.env.VITE_MENTOR_EMAIL || 'joshua42atkinson@gmail.com';
+const MENTOR_EMAIL = import.meta.env.VITE_MENTOR_EMAIL;
+if (!MENTOR_EMAIL) {
+  console.warn('[DriveService] VITE_MENTOR_EMAIL not set — mentor sharing disabled');
+}
 const DRIVE_FOLDER_NAME = 'Voix Vive Submissions';
 
 // ── Get Google access token from Supabase session ──
@@ -78,6 +81,10 @@ export async function getOrCreateSubmissionsFolder() {
  * Share a Drive file/folder with the mentor email.
  */
 export async function shareWithMentor(fileId, role = 'writer') {
+  if (!MENTOR_EMAIL) {
+    console.warn('[DriveService] Cannot share — VITE_MENTOR_EMAIL not configured');
+    return null;
+  }
   return driveFetch(`/files/${fileId}/permissions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

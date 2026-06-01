@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useScaffolding } from '../ScaffoldingProvider';
 import { useLocale } from '../../hooks/useLocale';
 import { useAuth } from '../../hooks/useAuth';
@@ -40,6 +40,10 @@ export default function CharacterSheet() {
   const allMilestones = Array.from({ length: 12 }, (_, i) => `fret-${i + 1}-class-milestone`);
   const completedMilestones = allMilestones.filter(mId => traction.completedNodes?.includes(mId));
   const hasCompletedCourse = completedMilestones.length === 12;
+
+  // Multi-tiered certifications status
+  const [coachingTier, setCoachingTier] = useState('free');
+  const [selectedCert, setSelectedCert] = useState(null); // 'apprentice' | 'journeyman' | 'master' | null
   const [showCertModal, setShowCertModal] = useState(false);
 
   // Badge system — interval mastery from Adventure
@@ -59,6 +63,26 @@ export default function CharacterSheet() {
     try { return localStorage.getItem('active_student_profile') || t('adventurer'); }
     catch { return t('adventurer'); }
   })();
+
+  // Synchronize coaching_tier dynamically from the DaaS server
+  useEffect(() => {
+    const fetchTier = async () => {
+      try {
+        const resp = await fetch(`http://localhost:8080/api/db/profile?name=${encodeURIComponent(studentName)}`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.profile) {
+            setCoachingTier(data.profile.coaching_tier || 'free');
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to load profile tier in CharacterSheet:', e);
+      }
+    };
+    if (studentName) {
+      fetchTier();
+    }
+  }, [studentName]);
 
   const fileInputRef = useRef(null);
 
@@ -81,45 +105,206 @@ export default function CharacterSheet() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Determine certification lock states
+  const isApprenticeUnlocked = completedFrets >= 4;
+  const isJourneymanUnlocked = completedFrets >= 8 && (coachingTier === 'journeyman' || coachingTier === 'master');
+  const isMasterUnlocked = completedFrets >= 12 && coachingTier === 'master';
+
   return (
     <div style={styles.sheet}>
-      {hasCompletedCourse && (
-        <div style={styles.celebrationCard}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🌟 🎓 🌟</div>
-          <h3 style={styles.celebrationTitle}>
-            {lang === 'fr' ? 'APPRENTI TROUBADOUR ACCOMPLI' : 'TROUBADOUR APPRENTICE'}
-          </h3>
-          <p style={styles.celebrationText}>
-            {lang === 'fr' 
-              ? `Félicitations, ${studentName}! Vous avez terminé l'ensemble des 12 frettes somatiques du Masterclass de Bertrand Laurence. Votre dévouement envers la géométrie de l'instrument et l'harmonie pythagoricienne est admirable.`
-              : `Congratulations, ${studentName}! You have successfully journeyed through all 12 somatic frets of the Bertrand Laurence Masterclass. Your dedication to physical tone, CAGED geometry, and Pythagorean intervals is complete.`}
-          </p>
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button 
-              onClick={() => setShowCertModal(true)} 
-              style={styles.certButton}
-            >
-              🎓 {lang === 'fr' ? 'Voir le Certificat' : 'View Certificate'}
-            </button>
-            <a 
-              href="https://bertrandguitarstudio.duetpartner.com/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{
-                ...styles.certButton,
-                background: 'linear-gradient(135deg, #10b981, #047857)',
-                color: '#ffffff',
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              🎸 {lang === 'fr' ? 'Audition de Bertrand' : 'Audition with Bertrand'}
-            </a>
+      {/* Academy Degrees & Certifications Section */}
+      <div style={styles.celebrationCard}>
+        <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🎓 🏆 📜</div>
+        <h3 style={styles.celebrationTitle}>
+          {lang === 'fr' ? 'DEGRÉS ACADÉMIQUES & PARCHEMINS' : 'ACADEMY DEGREES & CERTIFICATIONS'}
+        </h3>
+        <p style={styles.celebrationText}>
+          {lang === 'fr' 
+            ? `Consultez et téléchargez vos diplômes officiels signés par Maître Bertrand Laurence au fur et à mesure de votre progression somatique.`
+            : `View and download your official printed scrolls certified and signed by Master Troubadour Bertrand Laurence as you mature your somatic guitar skills.`}
+        </p>
+        
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '16px',
+          width: '100%',
+          maxWidth: '800px',
+          margin: '16px auto 0',
+          textAlign: 'left'
+        }}>
+          {/* Tier 1: Apprentice Bard */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: isApprenticeUnlocked ? '1px solid rgba(201,169,110,0.3)' : '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: '12px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: isApprenticeUnlocked ? '#e0d0aa' : 'rgba(255,255,255,0.4)' }}>
+                  Apprentice Bard
+                </span>
+                <span>{isApprenticeUnlocked ? '⭐' : '🔒'}</span>
+              </div>
+              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
+                {lang === 'fr' 
+                  ? 'Déverrouillé après 4 modules complétés. Aucun examen requis.' 
+                  : 'Unlocked at Fret 1–4 completed. No audition required.'}
+              </p>
+            </div>
+            {isApprenticeUnlocked ? (
+              <button 
+                onClick={() => { setSelectedCert('apprentice'); setShowCertModal(true); }}
+                style={{
+                  ...styles.certButton,
+                  width: '100%',
+                  padding: '8px 12px',
+                  fontSize: '0.75rem'
+                }}
+              >
+                📜 {lang === 'fr' ? 'Parchemin' : 'View Scroll'}
+              </button>
+            ) : (
+              <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', padding: '8px 0' }}>
+                {completedFrets}/4 Frets Complete
+              </div>
+            )}
+          </div>
+
+          {/* Tier 2: Journeyman Bard */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: isJourneymanUnlocked ? '1px solid rgba(201,169,110,0.5)' : '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: '12px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: isJourneymanUnlocked ? '#e0d0aa' : 'rgba(255,255,255,0.4)' }}>
+                  Journeyman Bard
+                </span>
+                <span>{isJourneymanUnlocked ? '🌟' : '🔒'}</span>
+              </div>
+              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
+                {lang === 'fr' 
+                  ? 'Exige 8 modules et l\'évaluation d\'audition de Bertrand ($45).' 
+                  : 'Requires Fret 1–8 complete + Bertrand\'s Capstone audition ($45).'}
+              </p>
+            </div>
+            {isJourneymanUnlocked ? (
+              <button 
+                onClick={() => { setSelectedCert('journeyman'); setShowCertModal(true); }}
+                style={{
+                  ...styles.certButton,
+                  width: '100%',
+                  padding: '8px 12px',
+                  fontSize: '0.75rem',
+                  background: 'linear-gradient(135deg, #c9a96e, #8a6f3e)'
+                }}
+              >
+                📜 {lang === 'fr' ? 'Parchemin' : 'View Scroll'}
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center' }}>
+                  {completedFrets}/8 Frets Complete
+                </div>
+                <a
+                  href="https://bertrandguitarstudio.duetpartner.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    ...styles.certButton,
+                    width: '100%',
+                    padding: '6px 8px',
+                    fontSize: '0.65rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.8)',
+                    textDecoration: 'none',
+                    textAlign: 'center'
+                  }}
+                >
+                  🎸 {lang === 'fr' ? 'Audition ($45)' : 'Book Audition ($45)'}
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Tier 3: Bertrand Approved Troubadour */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: isMasterUnlocked ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: '12px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: isMasterUnlocked ? '#d4af37' : 'rgba(255,255,255,0.4)' }}>
+                  Troubadour Master
+                </span>
+                <span>{isMasterUnlocked ? '👑' : '🔒'}</span>
+              </div>
+              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
+                {lang === 'fr' 
+                  ? 'Exige les 12 modules et l\'évaluation de Bertrand ($100).' 
+                  : 'Requires all 12 modules + Bertrand\'s Capstone master approval ($100).'}
+              </p>
+            </div>
+            {isMasterUnlocked ? (
+              <button 
+                onClick={() => { setSelectedCert('master'); setShowCertModal(true); }}
+                style={{
+                  ...styles.certButton,
+                  width: '100%',
+                  padding: '8px 12px',
+                  fontSize: '0.75rem',
+                  background: 'linear-gradient(135deg, #d4af37, #aa7c11)'
+                }}
+              >
+                📜 {lang === 'fr' ? 'Parchemin' : 'View Scroll'}
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center' }}>
+                  {completedFrets}/12 Frets Complete
+                </div>
+                <a
+                  href="https://bertrandguitarstudio.duetpartner.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    ...styles.certButton,
+                    width: '100%',
+                    padding: '6px 8px',
+                    fontSize: '0.65rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.8)',
+                    textDecoration: 'none',
+                    textAlign: 'center'
+                  }}
+                >
+                  🎸 {lang === 'fr' ? 'Master review' : 'Book Master Review'}
+                </a>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Header — Name & Level */}
       <div style={styles.header}>
@@ -137,7 +322,7 @@ export default function CharacterSheet() {
         <div style={styles.headerText}>
           <h2 style={styles.name}>{studentName}</h2>
           <p style={styles.title}>
-            Lv.{bardLevel} — {title}
+            Masterclass Learner Profile
           </p>
           {isLoggedIn && (
             <p style={styles.cloudStatus}>☁️ {t('synced') || 'Cloud sync active'}</p>
@@ -176,14 +361,14 @@ export default function CharacterSheet() {
         <div style={styles.quickStat}>
           <span style={styles.quickIcon}>🏔️</span>
           <span style={styles.quickValue}>{completedFrets}/12</span>
-          <span style={styles.quickLabel}>{t('questsLabel')}</span>
+          <span style={styles.quickLabel}>Modules</span>
         </div>
       </div>
 
       {/* Stat Block — 5 Core Abilities */}
       <div style={styles.statBlock}>
         <h3 style={styles.statBlockTitle}>
-          {t('abilities')}
+          Core Competencies
         </h3>
         <div style={styles.statsGrid}>
           {CORE_STATS.map(stat => {
@@ -247,7 +432,7 @@ export default function CharacterSheet() {
       {/* Troubadour Type — Four Archetypes */}
       <div style={styles.statBlock}>
         <h3 style={styles.statBlockTitle}>
-          {lang === 'fr' ? 'Type de Troubadour' : 'Troubadour Type'}
+          Student Archetype
         </h3>
         <div style={{ textAlign: 'center', marginBottom: '16px' }}>
           <select 
@@ -331,7 +516,7 @@ export default function CharacterSheet() {
         </div>
       </div>
 
-      {showCertModal && (
+      {showCertModal && selectedCert && (
         <div style={{
           position: 'fixed',
           inset: 0,
@@ -343,20 +528,49 @@ export default function CharacterSheet() {
           padding: '20px',
           backdropFilter: 'blur(5px)'
         }} className="no-print">
+          <style>{`
+            @media print {
+              body * {
+                visibility: hidden;
+              }
+              #printable-certificate, #printable-certificate * {
+                visibility: visible;
+              }
+              #printable-certificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: #fbf8f0 !important;
+                color: #2c1a04 !important;
+                border: 8px double #8a6f3e !important;
+                padding: 50px !important;
+                box-sizing: border-box;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+              }
+              .no-print {
+                display: none !important;
+              }
+            }
+          `}</style>
+          
           <div style={{
             background: '#1c1510',
-            border: '3px double #d4af37',
+            border: selectedCert === 'master' ? '3px double #d4af37' : selectedCert === 'journeyman' ? '3px double #c9a96e' : '3px double #8a8a8a',
             padding: '30px',
             maxWidth: '650px',
             width: '100%',
             borderRadius: '8px',
             textAlign: 'center',
-            boxShadow: '0 0 40px rgba(0,0,0,0.5)',
+            boxShadow: '0 0 40px rgba(0,0,0,0.6)',
             position: 'relative',
             color: '#f3e5c8',
           }}>
             <button 
-              onClick={() => setShowCertModal(false)}
+              onClick={() => { setShowCertModal(false); setSelectedCert(null); }}
               style={{
                 position: 'absolute',
                 top: 15, right: 15,
@@ -372,31 +586,91 @@ export default function CharacterSheet() {
             
             {/* Printable Certificate Frame */}
             <div id="printable-certificate" style={{
-              border: '1px solid rgba(212,175,55,0.4)',
-              padding: '24px',
+              border: selectedCert === 'master' ? '2px solid rgba(212,175,55,0.6)' : selectedCert === 'journeyman' ? '2px solid rgba(201,169,110,0.4)' : '2px solid rgba(255,255,255,0.2)',
+              padding: '32px 24px',
               borderRadius: '4px',
               backgroundColor: '#1f1812',
-              backgroundImage: 'radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%)',
+              backgroundImage: selectedCert === 'master' 
+                ? 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 80%)'
+                : 'radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 80%)',
+              boxShadow: selectedCert === 'master' ? '0 0 20px rgba(212,175,55,0.15) inset' : 'none'
             }}>
-              <div style={{ fontSize: '2rem', color: '#d4af37', marginBottom: 10 }}>📜</div>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.8rem', color: '#d4af37', letterSpacing: '0.05em', margin: '0 0 10px', textTransform: 'uppercase' }}>
-                {lang === 'fr' ? "Certificat d'Apprentissage" : "Troubadour Apprentice Certificate"}
+              {/* Emblem */}
+              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>
+                {selectedCert === 'master' ? '👑' : selectedCert === 'journeyman' ? '🌟' : '⭐'}
+              </div>
+              
+              {/* Header Title */}
+              <h2 style={{ 
+                fontFamily: "'Cormorant Garamond', serif", 
+                fontSize: selectedCert === 'master' ? '2.2rem' : '1.8rem', 
+                color: selectedCert === 'master' ? '#d4af37' : '#e0d0aa', 
+                letterSpacing: '0.06em', 
+                margin: '0 0 8px', 
+                textTransform: 'uppercase' 
+              }}>
+                {selectedCert === 'master' 
+                  ? (lang === 'fr' ? "Grand Parchemin de Maître Troubadour" : "Bertrand Approved Troubadour Master Scroll")
+                  : selectedCert === 'journeyman'
+                  ? (lang === 'fr' ? "Brevet de Troubadour Compagnon" : "Troubadour Journeyman Certificate")
+                  : (lang === 'fr' ? "Certificat d'Apprenti Troubadour" : "Troubadour Apprentice Certificate")
+                }
               </h2>
-              <div style={{ fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace", color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>
+              
+              <div style={{ 
+                fontSize: '0.75rem', 
+                fontFamily: "'JetBrains Mono', monospace", 
+                color: selectedCert === 'master' ? '#d4af37' : 'rgba(255,255,255,0.4)', 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.15em', 
+                marginBottom: 24 
+              }}>
                 {lang === 'fr' ? "ACADÉMIE DE MUSIQUE VOIX VIVE" : "VOIX VIVE MUSIC ACADEMY"}
               </div>
-              <p style={{ fontStyle: 'italic', fontSize: '0.9rem', margin: '0 0 15px' }}>
-                {lang === 'fr' ? "Ce document atteste que" : "This is to certify that"}
-              </p>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.2rem', color: '#f3e5c8', margin: '10px 0 20px', textShadow: '0 2px 4px rgba(0,0,0,0.5)', borderBottom: '1px solid rgba(212,175,55,0.3)', paddingBottom: '10px', display: 'inline-block', minWidth: '280px' }}>
-                {studentName}
-              </h3>
-              <p style={{ fontSize: '0.85rem', lineHeight: 1.6, maxWidth: '480px', margin: '0 auto 20px' }}>
-                {lang === 'fr' 
-                  ? "a terminé avec succès le cursus de 12 frettes d'initiation somatique et d'harmonie pythagoricienne sous le mentorat virtuel du Maître Troubadour Bertrand Laurence."
-                  : "has successfully completed all 12 somatic frets of initiatory guitar training, physical mechanics, and Pythagorean ratio intervals under the virtual mentorship of Master Troubadour Bertrand Laurence."}
+              
+              <p style={{ fontStyle: 'italic', fontSize: '0.9rem', margin: '0 0 15px', color: 'rgba(255,255,255,0.7)' }}>
+                {lang === 'fr' ? "Ce document atteste officiellement que" : "This is to certify that"}
               </p>
               
+              {/* Student Name */}
+              <h3 style={{ 
+                fontFamily: "'Cormorant Garamond', serif", 
+                fontSize: '2.4rem', 
+                color: '#ffffff', 
+                margin: '10px 0 20px', 
+                textShadow: '0 2px 4px rgba(0,0,0,0.5)', 
+                borderBottom: '1px solid rgba(212,175,55,0.3)', 
+                paddingBottom: '10px', 
+                display: 'inline-block', 
+                minWidth: '320px' 
+              }}>
+                {studentName}
+              </h3>
+              
+              {/* Detailed Somatic Text */}
+              <p style={{ 
+                fontSize: '0.85rem', 
+                lineHeight: 1.6, 
+                maxWidth: '520px', 
+                margin: '0 auto 24px',
+                color: 'rgba(255,255,255,0.85)'
+              }}>
+                {selectedCert === 'master' ? (
+                  lang === 'fr' 
+                    ? "a atteint une maîtrise somatique absolue des 12 frettes de la guitare, démontrant une résonance acoustique parfaite (©PLING!), des glissements fluides (©CISAILLEMENT) et une parfaite géométrie physique des intervalles pythagoriciens sous le mentorat de Bertrand Laurence."
+                    : "has successfully demonstrated absolute somatic mastery of all 12 frets of the guitar, integrating pure PLING sonic resonance, frictionless SHEARL finger-gliding mechanics, and precise interval ratios under the personal supervision and endorsement of Bertrand Laurence."
+                ) : selectedCert === 'journeyman' ? (
+                  lang === 'fr' 
+                    ? "a complété avec succès l'initiation somatique des Frettes 1 à 8 et a démontré une compétence mécanique professionnelle validée par l'évaluation d'audition de Maître Bertrand Laurence."
+                    : "has completed somatic guitar modules 1 through 8, establishing beautiful tone geometry, hand balance, and somatic recovery metrics validated by Bertrand Laurence's official Capstone review."
+                ) : (
+                  lang === 'fr' 
+                    ? "a complété avec succès l'initiation somatique des Frettes 1 à 4, démontrant une intégration rigoureuse de la résonance absolue du PLING et du confort physique."
+                    : "has successfully unlocked somatic guitar modules 1 through 4, establishing strong foundational physical balance, CAGED fretboard visualization, and basic somatic tone mechanics."
+                )}
+              </p>
+              
+              {/* Seals and signatures */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 35, padding: '0 20px' }}>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontSize: '0.8rem', fontFamily: "'Cormorant Garamond', serif", borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: 4, width: '140px', fontStyle: 'italic' }}>
@@ -407,8 +681,31 @@ export default function CharacterSheet() {
                   </div>
                 </div>
                 
+                {/* Wax Seal Graphic for Premium Feel */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <svg width="50" height="50" viewBox="0 0 100 100" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))' }}>
+                    <circle cx="50" cy="50" r="42" fill={selectedCert === 'master' ? '#b22222' : selectedCert === 'journeyman' ? '#a0522d' : '#4682b4'} opacity="0.9" />
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#d4af37" strokeWidth="2" strokeDasharray="3,3" />
+                    <text x="50" y="55" textAnchor="middle" fill="#d4af37" fontSize="12" fontWeight="bold" fontFamily="'Cormorant Garamond', serif">
+                      {selectedCert === 'master' ? 'MASTER' : selectedCert === 'journeyman' ? 'BARD' : 'APPR'}
+                    </text>
+                  </svg>
+                  <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
+                    {lang === 'fr' ? "Sceau Officiel" : "Official Seal"}
+                  </span>
+                </div>
+                
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.9rem', fontFamily: "'Cormorant Garamond', serif", color: '#d4af37', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: 4, width: '140px', fontStyle: 'italic', fontWeight: 600 }}>
+                  <div style={{ 
+                    fontSize: '1rem', 
+                    fontFamily: "'Cormorant Garamond', serif", 
+                    color: '#d4af37', 
+                    borderBottom: '1px solid rgba(255,255,255,0.2)', 
+                    paddingBottom: 4, 
+                    width: '140px', 
+                    fontStyle: 'italic', 
+                    fontWeight: 600 
+                  }}>
                     Bertrand Laurence
                   </div>
                   <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
@@ -430,7 +727,7 @@ export default function CharacterSheet() {
                 🖨️ {lang === 'fr' ? 'Imprimer / PDF' : 'Print / Save PDF'}
               </button>
               <button 
-                onClick={() => setShowCertModal(false)}
+                onClick={() => { setShowCertModal(false); setSelectedCert(null); }}
                 style={{
                   ...styles.certButton,
                   background: 'rgba(255,255,255,0.1)',

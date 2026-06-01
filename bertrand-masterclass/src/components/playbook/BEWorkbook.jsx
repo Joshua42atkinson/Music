@@ -35,10 +35,11 @@ export default function BEWorkbook() {
     advanceNode,
     navigateToNode,
     traction,
+    updateTraction,
   } = useScaffolding();
 
   const [selectedFret, setSelectedFret] = useState(currentFret || 1);
-  const [activeTab, setActiveTab] = useState('progress'); // 'progress' | 'journal' | 'schedule'
+  const [activeTab, setActiveTab] = useState('schedule'); // 'progress' | 'journal' | 'schedule'
   const [practiceLog, setPracticeLog] = useState(() => {
     try { return JSON.parse(localStorage.getItem('voixvive_practice_log') || '[]'); }
     catch { return []; }
@@ -100,20 +101,13 @@ export default function BEWorkbook() {
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <h2 style={styles.title}>BE → DO → PLAY Workbook</h2>
+        <h2 style={styles.title}>Academy Curriculum Path</h2>
         <p style={styles.subtitle}>
-          Fret {selectedFret} — {meta.interval} ({meta.character})
+          Module {selectedFret} — {meta.interval} ({meta.character})
         </p>
       </div>
 
-      {/* Practice Journal — wraps around the student */}
-      <PracticeJournal
-        traction={traction}
-        nextRecommended={nextRecommended}
-        completedNodes={completedNodes}
-      />
-
-      {/* Fret Selector */}
+      {/* Module Selector */}
       <div style={styles.fretSelector}>
         {Array.from({ length: 12 }, (_, i) => i + 1).map(fret => {
           const isComplete = fretNodes.every(n => completedNodes.includes(n.id));
@@ -159,7 +153,7 @@ export default function BEWorkbook() {
         {[
           { key: 'progress', label: 'Progress', icon: '📊' },
           { key: 'journal', label: 'Practice Journal', icon: '📓' },
-          { key: 'schedule', label: 'Schedule', icon: '📅' },
+          { key: 'schedule', label: 'Today', icon: '☀️' },
         ].map(tab => (
           <button
             key={tab.key}
@@ -296,6 +290,184 @@ export default function BEWorkbook() {
 
         </>
       )}
+
+      {activeTab === 'journal' && (
+        <PracticeJournal
+          traction={traction}
+          nextRecommended={nextRecommended}
+          completedNodes={completedNodes}
+        />
+      )}
+
+      {activeTab === 'schedule' && (() => {
+        const today = new Date().toDateString();
+        const todayLog = practiceLog.filter(l => new Date(l.date).toDateString() === today);
+        const doneBreath = todayLog.some(l => l.attribute === 'Soma');
+        const doneHand = todayLog.some(l => l.attribute === 'Logos');
+        const doneJournal = todayLog.some(l => l.attribute === 'Harmonia');
+        const todayXp = todayLog.reduce((sum, l) => sum + (l.xp || 0), 0);
+        const sessionsToday = todayLog.length;
+        const currentFretTool = {
+          1: 'Breathing Gate', 2: 'Practice Timer', 3: 'Pitch Room',
+          4: "Troubadour's Quill", 5: 'Interval Visualizer', 6: 'Grid Map',
+          7: 'PLING! Trainer', 8: 'Microtonal Tracker', 9: 'Playable Guitar',
+          10: 'Async Assessor', 11: 'Multi-Key Hub', 12: 'Rhythm Engine',
+        };
+        const fretToolName = currentFretTool[selectedFret] || 'Breathing Gate';
+
+        return (
+        <div style={styles.dailyContainer}>
+          {/* Today's header */}
+          <div style={styles.dailyHeader}>
+            <div>
+              <h3 style={styles.dailyTitle}>Today's Practice</h3>
+              <p style={styles.dailyDate}>{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            </div>
+            <div style={styles.dailySummary}>
+              <span style={styles.dailySumValue}>{todayXp}</span>
+              <span style={styles.dailySumLabel}>XP today</span>
+            </div>
+          </div>
+
+          {/* Progress dots */}
+          <div style={styles.dailyDots}>
+            <div style={{ ...styles.dailyDot, background: doneBreath ? '#60a5fa' : 'rgba(255,255,255,0.08)' }} />
+            <div style={{ ...styles.dailyDotLine, background: doneBreath && doneHand ? 'rgba(167,139,250,0.4)' : 'rgba(255,255,255,0.06)' }} />
+            <div style={{ ...styles.dailyDot, background: doneHand ? '#a78bfa' : 'rgba(255,255,255,0.08)' }} />
+            <div style={{ ...styles.dailyDotLine, background: doneHand && doneJournal ? 'rgba(52,211,153,0.4)' : 'rgba(255,255,255,0.06)' }} />
+            <div style={{ ...styles.dailyDot, background: doneJournal ? '#34d399' : 'rgba(255,255,255,0.08)' }} />
+          </div>
+          <p style={styles.dailyDotLabel}>
+            {sessionsToday === 0 ? 'No sessions yet — start with your breath.' :
+             sessionsToday === 3 ? '✨ All three rituals complete. Beautiful.' :
+             `${sessionsToday} of 3 daily rituals complete.`}
+          </p>
+
+          {/* Session Cards */}
+          <div style={styles.dailyCards}>
+            {/* Morning — Breathe */}
+            <div style={{
+              ...styles.dailyCard,
+              borderColor: doneBreath ? 'rgba(96,165,250,0.35)' : 'rgba(255,255,255,0.08)',
+              background: doneBreath ? 'rgba(96,165,250,0.06)' : 'rgba(255,255,255,0.02)',
+            }}>
+              <div style={styles.dailyCardHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: '1.3rem' }}>☀️</span>
+                  <div>
+                    <h4 style={styles.dailyCardTitle}>Morning — Breathe</h4>
+                    <p style={styles.dailyCardTool}>Breathing Gate · Fret {selectedFret}</p>
+                  </div>
+                </div>
+                <span style={{ ...styles.dailyCardXp, color: doneBreath ? '#34d399' : '#fbbf24' }}>
+                  {doneBreath ? '✓ Done' : '+25 XP'}
+                </span>
+              </div>
+              <p style={styles.dailyCardDesc}>
+                Sit with your guitar. Close your eyes. Breathe 3 slow cycles. Release your shoulders. Then begin.
+              </p>
+              {!doneBreath && (
+                <button
+                  onClick={() => {
+                    const entry = { date: new Date().toISOString(), activity: 'Morning Breathing', xp: 25, attribute: 'Soma' };
+                    setPracticeLog(prev => [entry, ...prev]);
+                    updateTraction(prev => ({ ...prev, xp: (prev.xp || 0) + 25, breathingSessions: (prev.breathingSessions || 0) + 1 }));
+                    completePhase?.(currentNodeId || 'fret-1-class-be', 'be');
+                  }}
+                  style={styles.dailyCardBtn}
+                >
+                  Start Breathing Session
+                </button>
+              )}
+            </div>
+
+            {/* Afternoon — Practice */}
+            <div style={{
+              ...styles.dailyCard,
+              borderColor: doneHand ? 'rgba(167,139,250,0.35)' : 'rgba(255,255,255,0.08)',
+              background: doneHand ? 'rgba(167,139,250,0.06)' : 'rgba(255,255,255,0.02)',
+            }}>
+              <div style={styles.dailyCardHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: '1.3rem' }}>🎸</span>
+                  <div>
+                    <h4 style={styles.dailyCardTitle}>Afternoon — Practice</h4>
+                    <p style={styles.dailyCardTool}>{fretToolName} · Fret {selectedFret}</p>
+                  </div>
+                </div>
+                <span style={{ ...styles.dailyCardXp, color: doneHand ? '#34d399' : '#fbbf24' }}>
+                  {doneHand ? '✓ Done' : '+35 XP'}
+                </span>
+              </div>
+              <p style={styles.dailyCardDesc}>
+                Open {fretToolName} and work through today's exercises. Listen first, then play. Practice too slow.
+              </p>
+              {!doneHand && (
+                <button
+                  onClick={() => {
+                    const entry = { date: new Date().toISOString(), activity: `Practice: ${fretToolName}`, xp: 35, attribute: 'Logos' };
+                    setPracticeLog(prev => [entry, ...prev]);
+                    updateTraction(prev => ({ ...prev, xp: (prev.xp || 0) + 35, rhythmSessions: (prev.rhythmSessions || 0) + 1, pitchSessions: (prev.pitchSessions || 0) + 1 }));
+                    completePhase?.(currentNodeId || 'fret-1-class-be', 'do');
+                  }}
+                  style={{ ...styles.dailyCardBtn, background: 'rgba(167,139,250,0.12)', color: '#a78bfa', borderColor: 'rgba(167,139,250,0.3)' }}
+                >
+                  Start Practice Session
+                </button>
+              )}
+            </div>
+
+            {/* Evening — Reflect */}
+            <div style={{
+              ...styles.dailyCard,
+              borderColor: doneJournal ? 'rgba(52,211,153,0.35)' : 'rgba(255,255,255,0.08)',
+              background: doneJournal ? 'rgba(52,211,153,0.06)' : 'rgba(255,255,255,0.02)',
+            }}>
+              <div style={styles.dailyCardHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: '1.3rem' }}>📓</span>
+                  <div>
+                    <h4 style={styles.dailyCardTitle}>Evening — Reflect</h4>
+                    <p style={styles.dailyCardTool}>Practice Journal</p>
+                  </div>
+                </div>
+                <span style={{ ...styles.dailyCardXp, color: doneJournal ? '#34d399' : '#fbbf24' }}>
+                  {doneJournal ? '✓ Done' : '+50 XP'}
+                </span>
+              </div>
+              <p style={styles.dailyCardDesc}>
+                What did you notice today? Write one sentence about how your body felt while playing.
+              </p>
+              {!doneJournal && (
+                <button
+                  onClick={() => {
+                    const entry = { date: new Date().toISOString(), activity: 'Evening Journal', xp: 50, attribute: 'Harmonia' };
+                    setPracticeLog(prev => [entry, ...prev]);
+                    updateTraction(prev => ({ ...prev, xp: (prev.xp || 0) + 50, journalEntries: (prev.journalEntries || 0) + 1 }));
+                    completePhase?.(currentNodeId || 'fret-1-class-be', 'play');
+                  }}
+                  style={{ ...styles.dailyCardBtn, background: 'rgba(52,211,153,0.12)', color: '#34d399', borderColor: 'rgba(52,211,153,0.3)' }}
+                >
+                  Write Today's Reflection
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Recent activity log (collapsed, subtle) */}
+          {practiceLog.length > 0 && (
+            <div style={styles.dailyLog}>
+              <p style={styles.dailyLogTitle}>Recent Activity</p>
+              {practiceLog.slice(0, 5).map((log, i) => (
+                <p key={i} style={styles.dailyLogEntry}>
+                  {new Date(log.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · {log.activity} · +{log.xp} XP
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+        );
+      })()}
 
       {/* Overall Progress — calculated from phase completion, not node array */}
       {(() => {
@@ -600,5 +772,151 @@ const styles = {
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: '0.7rem',
     color: 'rgba(255,255,255,0.4)',
+  },
+  dailyContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+    marginBottom: 24,
+  },
+  dailyHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  dailyTitle: {
+    margin: 0,
+    fontFamily: "'Cormorant Garamond', serif",
+    fontSize: '1.3rem',
+    fontWeight: 600,
+    color: '#f0e6d2',
+  },
+  dailyDate: {
+    margin: '4px 0 0',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.7rem',
+    color: 'rgba(255,255,255,0.35)',
+    letterSpacing: '0.04em',
+  },
+  dailySummary: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  dailySumValue: {
+    fontFamily: "'Cormorant Garamond', serif",
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    color: '#fbbf24',
+  },
+  dailySumLabel: {
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.55rem',
+    color: 'rgba(255,255,255,0.3)',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+  },
+  dailyDots: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 0,
+    padding: '8px 0',
+  },
+  dailyDot: {
+    width: 14,
+    height: 14,
+    borderRadius: '50%',
+    transition: 'background 0.3s ease',
+  },
+  dailyDotLine: {
+    width: 40,
+    height: 2,
+    transition: 'background 0.3s ease',
+  },
+  dailyDotLabel: {
+    textAlign: 'center',
+    fontSize: '0.8rem',
+    color: 'rgba(255,255,255,0.45)',
+    margin: '0 0 4px',
+    lineHeight: 1.4,
+  },
+  dailyCards: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12,
+  },
+  dailyCard: {
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 14,
+    padding: '18px 20px',
+    transition: 'all 0.3s ease',
+  },
+  dailyCardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  dailyCardTitle: {
+    margin: 0,
+    fontSize: '1rem',
+    fontWeight: 600,
+    color: '#f0e6d2',
+    fontFamily: "'Cormorant Garamond', serif",
+  },
+  dailyCardTool: {
+    margin: '2px 0 0',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.65rem',
+    color: 'rgba(255,255,255,0.35)',
+    letterSpacing: '0.04em',
+  },
+  dailyCardXp: {
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.75rem',
+    fontWeight: 600,
+  },
+  dailyCardDesc: {
+    margin: '0 0 14px',
+    fontSize: '0.85rem',
+    color: 'rgba(255,255,255,0.5)',
+    lineHeight: 1.5,
+  },
+  dailyCardBtn: {
+    width: '100%',
+    padding: '12px',
+    borderRadius: 10,
+    background: 'rgba(96,165,250,0.12)',
+    border: '1px solid rgba(96,165,250,0.3)',
+    color: '#60a5fa',
+    fontFamily: "'Inter', sans-serif",
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  dailyLog: {
+    marginTop: 8,
+    padding: '14px 16px',
+    borderRadius: 10,
+    background: 'rgba(255,255,255,0.02)',
+    border: '1px solid rgba(255,255,255,0.05)',
+  },
+  dailyLogTitle: {
+    margin: '0 0 8px',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.6rem',
+    color: 'rgba(255,255,255,0.3)',
+    letterSpacing: '0.1em',
+    textTransform: 'uppercase',
+  },
+  dailyLogEntry: {
+    margin: '3px 0',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.7rem',
+    color: 'rgba(255,255,255,0.35)',
+    lineHeight: 1.5,
   },
 };

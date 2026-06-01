@@ -2,7 +2,7 @@
 // SLIDE GENERATOR — Converts chapterData into swipeable slides
 // Each chapter becomes a deck of bite-sized phone-friendly slides
 // ═══════════════════════════════════════════════════════════
-import TIMELESS_SONG_SLIDES from './timelessSongSlides';
+import TIMELESS_SONG_SLIDES from './timelessSongSlides.js';
 
 /**
  * Helper to construct a bilingual object or string depending on input type
@@ -30,7 +30,7 @@ const SLIDE_IMAGES = {
   '1-quote':      '/assets/slides/ch1/quote.png',
   '1-concept-0':  '/assets/slides/ch1/concept-kinesthesis.png',
   '1-concept-1':  '/assets/slides/ch1/concept-fascia.png',
-  '1-concept-2':  '/assets/slides/ch1/concept-sympathetic.png',
+  '1-concept-2':  '/assets/slides/ch1/concept-vagal.png',
   '1-meditation': '/assets/slides/ch1/meditation.png',
   '1-yang-intro': '/assets/slides/ch1/yang-intro.png',
   '1-exercise-0': '/assets/slides/ch1/exercise-0.png',

@@ -37,6 +37,9 @@ const AuthCallback = React.lazy(() => import('./pages/AuthCallback'));
 const ChromaticMonomyth = React.lazy(() => import('./components/ChromaticMonomyth'));
 const MentorDashboard = React.lazy(() => import('./pages/MentorDashboard'));
 const MaturationMap = React.lazy(() => import('./components/MaturationMap'));
+const Onboarding = React.lazy(() => import('./components/Onboarding'));
+const ResonantMirrorPOC = React.lazy(() => import('./components/ResonantMirrorPOC'));
+const WalkingModeEngine = React.lazy(() => import('./game/WalkingModeEngine'));
 
 // ── On-brand loading fallback ──
 function LoadingScreen() {
@@ -88,6 +91,7 @@ function AppContent() {
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<LandingScreen />} />
+            <Route path="/onboarding" element={<ErrorBoundary><Onboarding /></ErrorBoundary>} />
             <Route path="/song" element={<OrientationHub />} />
             <Route path="/guitar" element={<ErrorBoundary><GuitarWorkbench /></ErrorBoundary>} />
             <Route path="/guitar/map" element={<ErrorBoundary><MaturationMap /></ErrorBoundary>} />
@@ -103,6 +107,8 @@ function AppContent() {
             <Route path="/auth/callback" element={<ErrorBoundary><AuthCallback /></ErrorBoundary>} />
             <Route path="/monomyth" element={<ErrorBoundary><ChromaticMonomyth /></ErrorBoundary>} />
             <Route path="/mentor" element={<ErrorBoundary><MentorDashboard /></ErrorBoundary>} />
+            <Route path="/poc" element={<ErrorBoundary><ResonantMirrorPOC /></ErrorBoundary>} />
+            <Route path="/walking" element={<ErrorBoundary><WalkingModeEngine /></ErrorBoundary>} />
           </Routes>
         </AnimatePresence>
       </Suspense>

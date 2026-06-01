@@ -5,7 +5,7 @@
 // ║ STAGE   : IMPLEMENT (AI+DAG Harmonization Phase A)           ║
 // ╚═══════════════════════════════════════════════════════════════╝
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { dagNodes, getNodeById, getNodesByFret, FRET_METADATA } from '../data/dag/dagNodes';
 import { 
   isNodeUnlocked, 
@@ -13,6 +13,8 @@ import {
   getNextRecommendedNode,
   getNewlyUnlockedNodes 
 } from '../data/dag/dagEdges';
+import { useScaffolding } from '../components/ScaffoldingProvider';
+import { attemptDAGPhase } from '../data/tractionStore';
 
 const DAG_PROGRESS_KEY = 'voix_vive_dag_progress';
 
@@ -45,7 +47,11 @@ function saveProgress(progress) {
 }
 
 export function useDAGProgress() {
-  const [progress, setProgress] = useState(loadProgress);
+  const scaffolding = useScaffolding();
+  const isUsingScaffolding = scaffolding && !scaffolding.isFallback;
+
+  // Local state is used as a fallback/isolated mode for tests
+  const [localProgress, setLocalProgress] = useState(loadProgress);
   const [sandboxMode, setSandboxMode] = useState(() => {
     try {
       const raw = localStorage.getItem('bard_traction');
@@ -71,41 +77,57 @@ export function useDAGProgress() {
       clearInterval(interval);
     };
   }, []);
-  
-  // ── Computed values ──
-  const currentNode = useMemo(() => getNodeById(progress.currentNodeId), [progress.currentNodeId]);
+
+  // ── Unified State getters ──
+  const currentNodeId = useMemo(() => {
+    return isUsingScaffolding ? scaffolding.currentNodeId : localProgress.currentNodeId;
+  }, [isUsingScaffolding, scaffolding.currentNodeId, localProgress.currentNodeId]);
+
+  const completedNodesArray = useMemo(() => {
+    return isUsingScaffolding ? scaffolding.completedNodes : localProgress.completedNodes;
+  }, [isUsingScaffolding, scaffolding.completedNodes, localProgress.completedNodes]);
+
+  const currentNode = useMemo(() => getNodeById(currentNodeId), [currentNodeId]);
   
   const currentFret = useMemo(() => currentNode?.fret || 1, [currentNode]);
   
   const currentFretMetadata = useMemo(() => FRET_METADATA[currentFret] || {}, [currentFret]);
   
   const completedNodesList = useMemo(() => 
-    progress.completedNodes.map(id => getNodeById(id)).filter(Boolean),
-    [progress.completedNodes]
+    completedNodesArray.map(id => getNodeById(id)).filter(Boolean),
+    [completedNodesArray]
   );
   
   const unlockedNodesList = useMemo(() => {
     if (sandboxMode) return dagNodes;
-    return progress.unlockedNodes.map(id => getNodeById(id)).filter(Boolean);
-  }, [progress.unlockedNodes, sandboxMode]);
+    if (isUsingScaffolding) {
+      return dagNodes.filter(n => isNodeUnlocked(n.id, completedNodesArray, sandboxMode));
+    }
+    return localProgress.unlockedNodes.map(id => getNodeById(id)).filter(Boolean);
+  }, [localProgress.unlockedNodes, completedNodesArray, sandboxMode, isUsingScaffolding]);
   
   const recommendedNodesList = useMemo(() => {
     const recs = dagNodes
-      .filter(n => isNodeRecommended(n.id, progress.completedNodes, sandboxMode))
+      .filter(n => isNodeRecommended(n.id, completedNodesArray, sandboxMode))
       .map(n => n.id);
     return recs.map(id => getNodeById(id)).filter(Boolean);
-  }, [progress.completedNodes, sandboxMode]);
+  }, [completedNodesArray, sandboxMode]);
   
   const nextRecommendedNode = useMemo(() => {
-    const nextId = getNextRecommendedNode(progress.completedNodes, currentNode?.pillar, sandboxMode);
+    const nextId = getNextRecommendedNode(completedNodesArray, currentNode?.pillar, sandboxMode);
     return nextId ? getNodeById(nextId) : null;
-  }, [progress.completedNodes, currentNode, sandboxMode]);
+  }, [completedNodesArray, currentNode, sandboxMode]);
 
   
   // ── Actions ──
   
   const completeNode = useCallback((nodeId) => {
-    setProgress(prev => {
+    if (isUsingScaffolding) {
+      scaffolding.advanceNode(nodeId);
+      return;
+    }
+    
+    setLocalProgress(prev => {
       if (prev.completedNodes.includes(nodeId)) return prev;
       
       const newCompleted = [...prev.completedNodes, nodeId];
@@ -124,10 +146,15 @@ export function useDAGProgress() {
       saveProgress(newProgress);
       return newProgress;
     });
-  }, []);
+  }, [isUsingScaffolding, scaffolding, sandboxMode]);
   
   const setCurrentNode = useCallback((nodeId) => {
-    setProgress(prev => {
+    if (isUsingScaffolding) {
+      scaffolding.navigateToNode(nodeId);
+      return;
+    }
+    
+    setLocalProgress(prev => {
       const newProgress = {
         ...prev,
         currentNodeId: nodeId,
@@ -136,10 +163,27 @@ export function useDAGProgress() {
       saveProgress(newProgress);
       return newProgress;
     });
-  }, []);
+  }, [isUsingScaffolding, scaffolding]);
   
   const getPhaseState = useCallback((nodeId) => {
-    return progress.phaseStates[nodeId] || {
+    if (isUsingScaffolding) {
+      const node = getNodeById(nodeId);
+      if (node) {
+        const fretState = scaffolding.traction.frets?.[node.fret] || {};
+        const phase = node.phase === 'all' ? 'be' : node.phase; // fallback if phase is 'all'
+        return {
+          beCompleted: !!fretState.beCompleted,
+          doCompleted: !!fretState.doCompleted,
+          playCompleted: !!fretState.playCompleted,
+          beAttempts: fretState.beAttempts || 0,
+          doAttempts: fretState.doAttempts || 0,
+          playAttempts: fretState.playAttempts || 0,
+          lastAccessed: fretState.lastAccessed || null,
+        };
+      }
+    }
+    
+    return localProgress.phaseStates[nodeId] || {
       beCompleted: false,
       doCompleted: false,
       playCompleted: false,
@@ -148,10 +192,22 @@ export function useDAGProgress() {
       playAttempts: 0,
       lastAccessed: null,
     };
-  }, [progress.phaseStates]);
+  }, [isUsingScaffolding, scaffolding.traction.frets, localProgress.phaseStates]);
   
   const updatePhaseState = useCallback((nodeId, phase, status) => {
-    setProgress(prev => {
+    if (isUsingScaffolding) {
+      if (status === 'completed') {
+        scaffolding.completePhase(nodeId, phase);
+      } else if (status === 'attempted') {
+        const node = getNodeById(nodeId);
+        if (node) {
+          scaffolding.updateTraction(prev => attemptDAGPhase(prev, node.fret, phase));
+        }
+      }
+      return;
+    }
+    
+    setLocalProgress(prev => {
       const current = prev.phaseStates[nodeId] || {};
       const newPhaseState = {
         ...current,
@@ -179,32 +235,40 @@ export function useDAGProgress() {
       saveProgress(newProgress);
       return newProgress;
     });
-  }, []);
+  }, [isUsingScaffolding, scaffolding]);
   
   const getFretProgress = useCallback((fret) => {
     const fretNodes = getNodesByFret(fret);
-    const completed = fretNodes.filter(n => progress.completedNodes.includes(n.id));
+    const completed = fretNodes.filter(n => completedNodesArray.includes(n.id));
     return {
       total: fretNodes.length,
       completed: completed.length,
       percentage: fretNodes.length > 0 ? Math.round((completed.length / fretNodes.length) * 100) : 0,
       isComplete: completed.length === fretNodes.length,
     };
-  }, [progress.completedNodes]);
+  }, [completedNodesArray]);
   
   const getPillarProgress = useCallback((pillar) => {
     const pillarNodes = dagNodes.filter(n => n.pillar === pillar);
-    const completed = pillarNodes.filter(n => progress.completedNodes.includes(n.id));
+    const completed = pillarNodes.filter(n => completedNodesArray.includes(n.id));
     return {
       total: pillarNodes.length,
       completed: completed.length,
       percentage: pillarNodes.length > 0 ? Math.round((completed.length / pillarNodes.length) * 100) : 0,
     };
-  }, [progress.completedNodes]);
+  }, [completedNodesArray]);
   
   return {
     // State
-    progress,
+    progress: {
+      currentNodeId,
+      completedNodes: completedNodesArray,
+      unlockedNodes: unlockedNodesList.map(n => n.id),
+      recommendedNodes: recommendedNodesList.map(n => n.id),
+      phaseStates: isUsingScaffolding ? {} : localProgress.phaseStates,
+      pathHistory: isUsingScaffolding ? [] : localProgress.pathHistory,
+      lastAccessed: isUsingScaffolding ? null : localProgress.lastAccessed,
+    },
     currentNode,
     currentFret,
     currentFretMetadata,

@@ -304,7 +304,7 @@ export const TIMELESS_SONG_SLIDES = {
       quote: 'Simplicity is the ultimate sophistication.',
       author: 'Leonardo da Vinci',
       ratio: '4:3 — Perfect 4th',
-      image: '/assets/slides/ch6/timeless/luthier.png',
+      image: '/assets/slides/ch6/timeless/instrument.png',
       accent: '#5f27cd',
       references: [
         { title: 'Harmonie Universelle', author: 'Marin Mersenne', date: '1636', context: 'Contains detailed measurements and tuning instructions for lutes and early guitars, confirming the quartal tuning tradition.' }

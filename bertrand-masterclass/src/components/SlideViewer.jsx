@@ -10,6 +10,7 @@ import { saveSlidePosition, getSlidePosition } from '../data/localDatabase';
 import { useLocale } from '../hooks/useLocale';
 import { useScaffolding } from './ScaffoldingProvider';
 import { updateFretTraction, getFretState, passSomaticGate, getDefaultFretState } from '../data/tractionStore';
+import { generateSlideImage, generateSlideSvgString } from '../utils/slideArtGenerator';
 
 // ═══════════════════════════════════════════════════════════
 // SLIDE VIEWER — Phone-native swipeable chapter reader
@@ -49,6 +50,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     return Math.min(saved, slides.length - 1);
   });
   const [direction, setDirection] = useState(0);
+  const [imageErrors, setImageErrors] = useState(new Set());
   const [fretboardOpen, setFretboardOpen] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(() => {
     try {
@@ -313,7 +315,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
         }
-        .sv-image-zone img {
+        .sv-image-zone img, .sv-image-zone svg {
           width: 100%; height: auto; max-height: 45vh; object-fit: cover; opacity: 0.9;
           transition: opacity 1.5s ease-in-out; display: block;
         }
@@ -525,7 +527,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
             height: auto; max-height: none;
             width: 40%; flex-shrink: 0;
           }
-          .sv-image-zone img {
+          .sv-image-zone img, .sv-image-zone svg {
             height: auto; min-height: 100%;
           }
           .sv-image-overlay {
@@ -596,19 +598,26 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
           >
             {/* Image Zone */}
             <div className="sv-image-zone">
-              {slide.image ? (
+              {slide.image && !imageErrors.has(slide.id) ? (
                 <img
                   src={slide.image}
                   alt=""
                   draggable={false}
-                  onError={(e) => console.error('Slide image failed:', slide.id, e.target.src.slice(0, 100))}
+                  onError={() => {
+                    console.warn('Slide image failed to load, falling back to procedural SVG:', slide.id);
+                    setImageErrors(prev => {
+                      const next = new Set(prev);
+                      next.add(slide.id);
+                      return next;
+                    });
+                  }}
                 />
               ) : (
-                <div className="sv-image-gradient" style={{
-                  background: `radial-gradient(ellipse at 50% 40%, ${slide.accent}20 0%, ${slide.accent}08 40%, #030306 100%)`
-                }}>
-                  {slide.icon && <span className="sv-image-icon">{slide.icon}</span>}
-                </div>
+                <div 
+                  className="sv-procedural-svg-container"
+                  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  dangerouslySetInnerHTML={{ __html: generateSlideSvgString(slide) }}
+                />
               )}
               <div className="sv-image-overlay" />
             </div>

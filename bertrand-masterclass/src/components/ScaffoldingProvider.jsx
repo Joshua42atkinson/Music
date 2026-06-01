@@ -16,12 +16,13 @@
 // ╚═══════════════════════════════════════════════════════════════╝
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loadTraction, saveTraction, getScaffoldingLevel, getCurrentPhase, completeDAGPhase, attemptDAGPhase, setCurrentNode, completeNode, markDepthExplored, passSomaticGate } from '../data/tractionStore';
+import { loadTraction, saveTraction, getScaffoldingLevel, getCurrentPhase, completeDAGPhase, attemptDAGPhase, setCurrentNode, completeNode, markDepthExplored, passSomaticGate, mergeTractionStates } from '../data/tractionStore';
 import { saveProgress, getProgress } from '../data/localDatabase';
 import { getTractionState, saveTractionState, migrateLocalToCloud } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getNodeById } from '../data/dag/dagNodes';
 import { getNextRecommendedNode } from '../data/dag/dagEdges';
+import { indexCurriculum } from '../data/curriculumIndexer';
 
 // ═══════════════════════════════════════════════════════════
 // SCAFFOLDING PROVIDER
@@ -65,6 +66,11 @@ export function ScaffoldingProvider({ children }) {
       }
 
       setIsHydrated(true);
+
+      // Index curriculum for RAG (async, non-blocking)
+      indexCurriculum().catch(err => {
+        console.warn('[VoixVive] Curriculum indexing failed:', err);
+      });
     };
 
     hydrate();
@@ -81,13 +87,20 @@ export function ScaffoldingProvider({ children }) {
     const syncCloudData = async () => {
       try {
         const cloudTraction = await getTractionState(user.id);
+        const currentLocal = loadTraction();
         if (cloudTraction) {
-          console.info('[VoixVive] Hydrating local state from Supabase cloud...');
-          saveTraction(cloudTraction);
-          setTraction(cloudTraction);
+          console.info('[VoixVive] Merging local state with Supabase cloud...');
+          const mergedTraction = mergeTractionStates(currentLocal, cloudTraction);
+          
+          // Save the merged state locally
+          saveTraction(mergedTraction);
+          setTraction(mergedTraction);
+          
+          // Upload the merged state back to the cloud so cloud is up-to-date
+          await saveTractionState(user.id, mergedTraction);
+          console.info('[VoixVive] Cloud state synchronized successfully.');
         } else {
           // No cloud data yet — migrate existing local progress
-          const currentLocal = loadTraction();
           await migrateLocalToCloud(user.id, currentLocal);
         }
       } catch (err) {
@@ -229,6 +242,7 @@ export function useScaffolding() {
   if (!ctx) {
     // Graceful fallback for components used outside the provider
     return {
+      isFallback: true,
       traction: loadTraction(),
       refreshTraction: () => {},
       updateTraction: () => {},

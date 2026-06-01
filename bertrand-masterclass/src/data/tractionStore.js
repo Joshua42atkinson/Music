@@ -22,10 +22,21 @@ const DEFAULT_STATE = {
   fretsUnlocked: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   frets: {},
   breathingSessions: 0,
+  rhythmSessions: 0,
+  pitchSessions: 0,
+  journalEntries: 0,
+  songsWritten: 0,
+  xp: 0,
   lastPracticeDate: null,
+  lastPracticeTimestamp: 0,
   streak: 0,
   pitchRoomScore: 0,
   pitchRoomBestAccuracy: 0,
+  // Game Progression
+  onboardingComplete: false,
+  commitmentTier: null,       // 'gentle' | 'committed' | 'intensive'
+  journeyStartDate: null,     // ISO date string — set during onboarding
+  songs: {},                  // { 1: { submitted: false, date: null }, 2: ..., 3: ... }
   // DAG Navigation
   currentNodeId: 'fret-1-class-be', // Everyone starts here
   completedNodes: [],
@@ -432,4 +443,132 @@ export function completeNode(state, nodeId) {
   };
   saveTraction(newState);
   return newState;
+}
+
+/**
+ * Merge local and cloud traction states intelligently.
+ * Combines progress, counts, and takes the best results without overwriting offline progress.
+ * @param {Object} local
+ * @param {Object} cloud
+ * @returns {Object} Merged state
+ */
+export function mergeTractionStates(local, cloud) {
+  if (!local) return cloud || { ...DEFAULT_STATE };
+  if (!cloud) return local || { ...DEFAULT_STATE };
+
+  const merged = { ...DEFAULT_STATE };
+
+  // Booleans and primitives
+  merged.onboardingComplete = !!(local.onboardingComplete || cloud.onboardingComplete);
+  merged.commitmentTier = local.commitmentTier || cloud.commitmentTier || null;
+  merged.journeyStartDate = local.journeyStartDate || cloud.journeyStartDate || null;
+
+  // Simple numeric max
+  merged.practiceMinutes = Math.max(local.practiceMinutes || 0, cloud.practiceMinutes || 0);
+  merged.streak = Math.max(local.streak || 0, cloud.streak || 0);
+  merged.breathingSessions = Math.max(local.breathingSessions || 0, cloud.breathingSessions || 0);
+  merged.rhythmSessions = Math.max(local.rhythmSessions || 0, cloud.rhythmSessions || 0);
+  merged.pitchSessions = Math.max(local.pitchSessions || 0, cloud.pitchSessions || 0);
+  merged.journalEntries = Math.max(local.journalEntries || 0, cloud.journalEntries || 0);
+  merged.songsWritten = Math.max(local.songsWritten || 0, cloud.songsWritten || 0);
+  merged.xp = Math.max(local.xp || 0, cloud.xp || 0, local.totalTraction || 0, cloud.totalTraction || 0);
+  merged.pitchRoomScore = Math.max(local.pitchRoomScore || 0, cloud.pitchRoomScore || 0);
+  merged.pitchRoomBestAccuracy = Math.max(local.pitchRoomBestAccuracy || 0, cloud.pitchRoomBestAccuracy || 0);
+
+  // Arrays
+  const completedLocal = local.completedNodes || [];
+  const completedCloud = cloud.completedNodes || [];
+  merged.completedNodes = [...new Set([...completedLocal, ...completedCloud])];
+
+  const unlockedLocal = local.fretsUnlocked || [];
+  const unlockedCloud = cloud.fretsUnlocked || [];
+  merged.fretsUnlocked = [...new Set([...unlockedLocal, ...unlockedCloud])];
+  if (merged.fretsUnlocked.length === 0) {
+    merged.fretsUnlocked = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  }
+
+  // Dates/timestamps
+  if ((local.lastPracticeTimestamp || 0) >= (cloud.lastPracticeTimestamp || 0)) {
+    merged.lastPracticeDate = local.lastPracticeDate || cloud.lastPracticeDate;
+    merged.lastPracticeTimestamp = local.lastPracticeTimestamp || cloud.lastPracticeTimestamp;
+  } else {
+    merged.lastPracticeDate = cloud.lastPracticeDate || local.lastPracticeDate;
+    merged.lastPracticeTimestamp = cloud.lastPracticeTimestamp || local.lastPracticeTimestamp;
+  }
+
+  // Current node priority: use the one with more completed nodes overall
+  if (completedLocal.length >= completedCloud.length) {
+    merged.currentNodeId = local.currentNodeId || cloud.currentNodeId || 'fret-1-class-be';
+  } else {
+    merged.currentNodeId = cloud.currentNodeId || local.currentNodeId || 'fret-1-class-be';
+  }
+
+  // Settings
+  const localSettings = local.settings || {};
+  const cloudSettings = cloud.settings || {};
+  merged.settings = {
+    showNoteLabels: localSettings.showNoteLabels !== false && cloudSettings.showNoteLabels !== false,
+    showFretNumbers: localSettings.showFretNumbers !== false && cloudSettings.showFretNumbers !== false,
+    showMetronome: localSettings.showMetronome !== false && cloudSettings.showMetronome !== false,
+    showCAGEDOverlay: localSettings.showCAGEDOverlay !== false && cloudSettings.showCAGEDOverlay !== false,
+    sandboxMode: !!(localSettings.sandboxMode || cloudSettings.sandboxMode),
+    aiEnabled: localSettings.aiEnabled !== false && cloudSettings.aiEnabled !== false,
+    scaffoldingLevel: Math.min(localSettings.scaffoldingLevel ?? 1.0, cloudSettings.scaffoldingLevel ?? 1.0),
+  };
+
+  // Frets
+  const allFretIds = new Set([
+    ...Object.keys(local.frets || {}),
+    ...Object.keys(cloud.frets || {})
+  ]);
+
+  merged.frets = {};
+  allFretIds.forEach(id => {
+    const fId = parseInt(id, 10);
+    const lFret = local.frets?.[id] || {};
+    const cFret = cloud.frets?.[id] || {};
+
+    merged.frets[id] = {
+      id: fId,
+      yinCompleted: !!(lFret.yinCompleted || cFret.yinCompleted),
+      yangCompleted: !!(lFret.yangCompleted || cFret.yangCompleted),
+      breathingGateCleared: !!(lFret.breathingGateCleared || cFret.breathingGateCleared),
+      traction: Math.max(lFret.traction || 0, cFret.traction || 0),
+      pitchAccuracy: Math.max(lFret.pitchAccuracy || 0, cFret.pitchAccuracy || 0),
+      tensionScore: Math.min(lFret.tensionScore ?? 100, cFret.tensionScore ?? 100),
+      attempts: Math.max(lFret.attempts || 0, cFret.attempts || 0),
+      lastAccessed: lFret.lastAccessed && cFret.lastAccessed
+        ? (new Date(lFret.lastAccessed) >= new Date(cFret.lastAccessed) ? lFret.lastAccessed : cFret.lastAccessed)
+        : (lFret.lastAccessed || cFret.lastAccessed || null),
+      meditationSeconds: Math.max(lFret.meditationSeconds || 0, cFret.meditationSeconds || 0),
+      exercisesCompleted: [...new Set([...(lFret.exercisesCompleted || []), ...(cFret.exercisesCompleted || [])])],
+      
+      // DAG properties
+      beCompleted: !!(lFret.beCompleted || cFret.beCompleted),
+      doCompleted: !!(lFret.doCompleted || cFret.doCompleted),
+      playCompleted: !!(lFret.playCompleted || cFret.playCompleted),
+      beAttempts: Math.max(lFret.beAttempts || 0, cFret.beAttempts || 0),
+      doAttempts: Math.max(lFret.doAttempts || 0, cFret.doAttempts || 0),
+      playAttempts: Math.max(lFret.playAttempts || 0, cFret.playAttempts || 0),
+      beMastery: Math.max(lFret.beMastery || 0, cFret.beMastery || 0),
+      doMastery: Math.max(lFret.doMastery || 0, cFret.doMastery || 0),
+      playMastery: Math.max(lFret.playMastery || 0, cFret.playMastery || 0),
+      depthExplored: !!(lFret.depthExplored || cFret.depthExplored),
+      timeSpentSeconds: Math.max(lFret.timeSpentSeconds || 0, cFret.timeSpentSeconds || 0),
+      beResonance: !!(lFret.beResonance || cFret.beResonance),
+      doResonance: !!(lFret.doResonance || cFret.doResonance),
+      playResonance: !!(lFret.playResonance || cFret.playResonance),
+      beGatePassed: !!(lFret.beGatePassed || cFret.beGatePassed),
+      doGatePassed: !!(lFret.doGatePassed || cFret.doGatePassed),
+      playGatePassed: !!(lFret.playGatePassed || cFret.playGatePassed),
+    };
+  });
+
+  // Re-calculate derived values
+  const allFrets = Object.values(merged.frets);
+  const totalTraction = allFrets.reduce((sum, ch) => sum + (ch.traction || 0), 0);
+  merged.totalTraction = totalTraction;
+  merged.bardLevel = Math.max(local.bardLevel || 1, cloud.bardLevel || 1, Math.floor(totalTraction / 100) + 1);
+
+  return merged;
 }

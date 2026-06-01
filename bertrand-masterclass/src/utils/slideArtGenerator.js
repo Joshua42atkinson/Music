@@ -77,6 +77,9 @@ function svgWrap(content, defs = '') {
 }
 
 function encodeSvg(svg) {
+  if (typeof btoa === 'function') {
+    return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+  }
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 
@@ -220,6 +223,77 @@ function makeEndCelebration(cx, cy, accent, seedRand) {
     stars;
 }
 
+// ── Pythagorean Legacy monochord drawing ──
+function makePythagoreanMonochord(cx, cy, ratioStr, accent, seedRand) {
+  let monochord = '';
+  const y = cy;
+  const startX = 150;
+  const endX = 650;
+  const width = endX - startX;
+
+  // 1. Draw monochord wooden/metallic base
+  monochord += `<rect x="${startX - 20}" y="${y - 15}" width="${width + 40}" height="30" rx="6" fill="#121220" stroke="${fadeColor(accent, 0.15)}" stroke-width="1"/>`;
+  monochord += `<line x1="${startX - 20}" y1="${y}" x2="${endX + 20}" y2="${y}" stroke="${fadeColor(accent, 0.05)}" stroke-width="6"/>`;
+
+  // 2. Determine division factor from ratio string
+  let factor = 1.0;
+  try {
+    if (ratioStr) {
+      const parts = ratioStr.split(' — ')[0].split(':');
+      if (parts.length === 2) {
+        const a = parseFloat(parts[0]);
+        const b = parseFloat(parts[1]);
+        if (!isNaN(a) && !isNaN(b) && a > 0) {
+          factor = b / a;
+        }
+      } else if (ratioStr.includes('√2')) {
+        factor = 1 / Math.sqrt(2);
+      }
+    }
+  } catch (e) {
+    factor = 1.0;
+  }
+  
+  if (factor > 1.0) factor = 1.0 / factor; // limit to [0, 1]
+
+  const bridgeX = startX + width * factor;
+
+  // 3. Draw full vibrating string (faint, background harmonic)
+  monochord += `<line x1="${startX}" y1="${y - 5}" x2="${endX}" y2="${y - 5}" stroke="${fadeColor(accent, 0.15)}" stroke-dasharray="2,2"/>`;
+
+  // 4. Draw active vibrating string segment (left to bridge)
+  let d = `M ${startX},${y - 5}`;
+  for (let x = startX; x <= bridgeX; x += 10) {
+    const wave = Math.sin(((x - startX) / (bridgeX - startX)) * Math.PI) * 4;
+    d += ` L ${x},${(y - 5 + wave).toFixed(1)}`;
+  }
+  monochord += `<path d="${d}" fill="none" stroke="${accent}" stroke-width="2">` +
+    `<animate attributeName="stroke-width" values="1.5;2.5;1.5" dur="1.5s" repeatCount="indefinite"/>` +
+    `</path>`;
+
+  // 5. Draw bridges
+  // Left fixed nut
+  monochord += `<rect x="${startX - 2}" y="${y - 12}" width="4" height="14" fill="#5a6a80"/>`;
+  // Right fixed tailpiece
+  monochord += `<rect x="${endX - 2}" y="${y - 12}" width="4" height="14" fill="#5a6a80"/>`;
+  // Moveable bridge at ratio point
+  monochord += `<polygon points="${bridgeX - 6},${y + 12} ${bridgeX + 6},${y + 12} ${bridgeX},${y - 8}" fill="${accent}" stroke="#080810" stroke-width="1"/>`;
+  monochord += `<circle cx="${bridgeX}" cy="${y - 5}" r="3" fill="#ffffff"/>`;
+
+  // 6. Draw ratio text & lambda label
+  monochord += `<text x="${(startX + bridgeX) / 2}" y="${y - 20}" text-anchor="middle" font-family="monospace" font-size="12" fill="${accent}" font-weight="bold">${(factor * 100).toFixed(0)}% Length</text>`;
+  monochord += `<text x="${bridgeX}" y="${y + 30}" text-anchor="middle" font-family="serif" font-size="12" fill="${fadeColor(accent, 0.7)}" font-style="italic">Bridge: ${ratioStr?.split(' — ')[0] || '1:1'}</text>`;
+
+  // 7. Dynamic particle rings / soundwaves around the bridge
+  monochord += `<circle cx="${bridgeX}" cy="${y - 5}" r="15" fill="none" stroke="${fadeColor(accent, 0.3)}" stroke-width="0.5">` +
+    `<animate attributeName="r" values="5;30;5" dur="2.5s" repeatCount="indefinite"/>` +
+    `<animate attributeName="opacity" values="0.8;0;0.8" dur="2.5s" repeatCount="indefinite"/>` +
+    `</circle>`;
+
+  return monochord;
+}
+
+
 // ── Timeless song era motifs ──
 const ERA_MOTIFS = {
   pythagoras: (accent) => `<text x="400" y="240" text-anchor="middle" font-family="serif" font-size="80" fill="${fadeColor(accent, 0.1)}">λ</text>`,
@@ -283,10 +357,11 @@ function escapeXml(str) {
 // ═══════════════════════════════════════════════════════════
 
 const _cache = new Map();
+const _stringCache = new Map();
 
-export function generateSlideImage(slide) {
+export function generateSlideSvgString(slide) {
   const cacheKey = slide.id;
-  if (_cache.has(cacheKey)) return _cache.get(cacheKey);
+  if (_stringCache.has(cacheKey)) return _stringCache.get(cacheKey);
 
   const accent = slide.accent || '#c9a96e';
   const seed = slide.id + (slide.title?.en || slide.title || '');
@@ -312,6 +387,11 @@ export function generateSlideImage(slide) {
       // Large chapter numeral
       const numeral = slide.fretId || 1;
       content += `<text x="${cx}" y="${cy + 20}" text-anchor="middle" font-family="serif" font-size="140" fill="${fadeColor(accent, 0.08)}" font-weight="300">${numeral}</text>`;
+      break;
+    }
+
+    case 'pythagorean-legacy': {
+      content += makePythagoreanMonochord(cx, cy, slide.ratio, accent, rand);
       break;
     }
 
@@ -376,6 +456,15 @@ export function generateSlideImage(slide) {
   content += makeTextOverlay(slide.title, null, slide.ratio, accent, rand);
 
   const svg = svgWrap(content, defs);
+  _stringCache.set(cacheKey, svg);
+  return svg;
+}
+
+export function generateSlideImage(slide) {
+  const cacheKey = slide.id;
+  if (_cache.has(cacheKey)) return _cache.get(cacheKey);
+
+  const svg = generateSlideSvgString(slide);
   const dataUrl = encodeSvg(svg);
   _cache.set(cacheKey, dataUrl);
   return dataUrl;
@@ -383,6 +472,7 @@ export function generateSlideImage(slide) {
 
 export function clearSlideImageCache() {
   _cache.clear();
+  _stringCache.clear();
 }
 
 export default generateSlideImage;

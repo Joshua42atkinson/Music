@@ -231,10 +231,23 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
 
   // ── Submit emotional state + upload ──
   const submitSession = async () => {
-    if (!blobRef.current || !user) {
+    if (!blobRef.current) {
       setUploadError('No recording available. Please try again.');
       return;
     }
+
+    // Not logged in: save locally as download
+    if (!user) {
+      const url = URL.createObjectURL(blobRef.current);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `voix-vive-practice-fret${fretId}-${Date.now()}.webm`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setStage('done');
+      return;
+    }
+
     setStage('uploading');
     setUploadError(null);
 
@@ -401,13 +414,14 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
                   </div>
                 ))}
               </div>
-              {user ? (
-                <button className="spr-btn spr-btn-primary" onClick={startSession}>
-                  <Circle size={16} /> Begin Session
-                </button>
-              ) : (
-                <p style={{ fontSize: '0.8rem', color: '#cc5555' }}>Sign in to save your session to Google Drive.</p>
-              )}
+              <button className="spr-btn spr-btn-primary" onClick={startSession}>
+                <Circle size={16} /> Begin Session
+              </button>
+              <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+                {user 
+                  ? 'Saved to your Google Drive after session.' 
+                  : 'Sign in later to save to Google Drive. Local recording works now.'}
+              </p>
             </div>
           </>
         )}
@@ -507,7 +521,7 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
                 <X size={14} /> Discard
               </button>
               <button className="spr-btn spr-btn-primary" onClick={submitSession}>
-                <Send size={14} /> Save Session
+                <Send size={14} /> {user ? 'Save Session' : 'Download Recording'}
               </button>
             </div>
           </>
@@ -535,10 +549,12 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
               <CheckCircle size={40} style={{ color: '#7aaa88' }} />
             </div>
             <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.6rem', color: '#f0e6d2', margin: '0 0 8px' }}>
-              Session Saved
+              {user ? 'Session Saved' : 'Session Saved Locally'}
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6, marginBottom: 8 }}>
-              Your 15-minute guided practice has been saved to your Google Drive.
+              {user 
+                ? 'Your 15-minute guided practice has been saved to your Google Drive.'
+                : 'Your practice session was downloaded to your device. Sign in anytime to upload it to Google Drive.'}
             </p>
             {emotionalState && (
               <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem', fontStyle: 'italic', marginBottom: 8 }}>
@@ -546,7 +562,7 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1 }) {
               </p>
             )}
             <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.75rem' }}>
-              Bertrand will review within 48 hours.
+              {user ? 'Bertrand will review within 48 hours.' : 'All features work without login. Cloud sync is optional.'}
             </p>
             <button className="spr-btn spr-btn-primary" onClick={onClose} style={{ marginTop: 24 }}>
               <CheckCircle size={14} /> Done

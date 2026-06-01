@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Home, BookOpen, Guitar, X, ShieldAlert, Award } from 'lucide-react';
+import { ArrowLeft, Home, BookOpen, Guitar, X, ShieldAlert, Award, Menu } from 'lucide-react';
 import frets from '../data/chapterData';
 import SlideViewer from '../components/SlideViewer';
 import NeckMenu from '../components/NeckMenu';
-import SongwritingCompanion from '../components/SongwritingCompanion';
 import { generateSlides } from '../data/slideGenerator';
 import { getChapterProgress } from '../data/localDatabase';
 import AuthButton from '../components/AuthButton';
 import { useScaffolding } from '../components/ScaffoldingProvider';
 import { useLocale } from '../hooks/useLocale';
+import DailyCalibration from '../game/DailyCalibration';
 
 // ═══════════════════════════════════════════════════════════
 // ORIENTATION HUB — "The Neck" Landing Page
@@ -45,10 +45,14 @@ const DOUBLE_DOT_FRETS = [12];
 
 const OrientationHub = () => {
   const [activeFret, setActiveFret] = useState(null);
-  const [showQuill, setShowQuill] = useState(false);
+  const [forceCalibration, setForceCalibration] = useState(false);
+  const [showModeInfo, setShowModeInfo] = useState(false);
   const navigate = useNavigate();
-  const { traction } = useScaffolding();
+  const { traction, updateTraction, isHydrated } = useScaffolding();
   const { locale } = useLocale();
+
+  const today = new Date().toISOString().split('T')[0];
+  const isCalibrated = traction?.lastCalibrationDate === today;
   
   const sandboxMode = traction?.settings?.sandboxMode;
   const aiEnabled = traction?.settings?.aiEnabled !== false;
@@ -96,6 +100,17 @@ const OrientationHub = () => {
 
   const currentMode = getModeLabel();
 
+  if (((!isCalibrated && !sandboxMode) || forceCalibration) && isHydrated !== false) {
+    return (
+      <DailyCalibration 
+        onClose={() => {
+          setForceCalibration(false);
+          if (!isCalibrated) navigate('/');
+        }} 
+      />
+    );
+  }
+
   if (activeFret) {
     return (
       <SlideViewer
@@ -124,16 +139,7 @@ const OrientationHub = () => {
   return (
     <>
       {/* ── Navigation Bar ── */}
-      <nav style={{
-        position: 'fixed',
-        top: 0, left: 0, right: 0,
-        zIndex: 500,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '12px 16px',
-        paddingTop: 'max(12px, env(safe-area-inset-top))',
-      }}>
+      <nav className="nav-bar-container">
         <button
           onClick={() => navigate(-1)}
           style={{
@@ -154,24 +160,39 @@ const OrientationHub = () => {
           aria-label="Back"
         >
           <ArrowLeft size={14} />
-          Back
+          <span className="back-btn-text">Back</span>
         </button>
 
         {/* Centered Mode Status Pill */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2,
-          padding: '4px 12px',
-          borderRadius: 20,
-          background: currentMode.background,
-          border: `1px solid ${currentMode.borderColor}`,
-          backdropFilter: 'blur(10px)',
-          textAlign: 'center',
-          maxWidth: '260px',
-          boxShadow: `0 0 10px ${currentMode.background}`
-        }} title={currentMode.description}>
+        <div 
+          className="nav-mode-pill"
+          onClick={() => setShowModeInfo(true)}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            padding: '4px 12px',
+            borderRadius: 20,
+            background: currentMode.background,
+            border: `1px solid ${currentMode.borderColor}`,
+            backdropFilter: 'blur(10px)',
+            textAlign: 'center',
+            maxWidth: '260px',
+            boxShadow: `0 0 10px ${currentMode.background}`,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }} 
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = 'scale(1.02)';
+            e.currentTarget.style.borderColor = currentMode.color;
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.borderColor = currentMode.borderColor;
+          }}
+          title="Click to view and change study modes"
+        >
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -186,90 +207,182 @@ const OrientationHub = () => {
             {currentMode.certBadge && <Award size={10} style={{ color: currentMode.color }} />}
             {currentMode.label}
           </div>
-          <div style={{
-            fontSize: '0.5rem',
-            color: 'rgba(255, 255, 255, 0.45)',
-            fontFamily: "'Inter', sans-serif",
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            maxWidth: '240px'
-          }}>
+          <div 
+            className="nav-mode-desc"
+            style={{
+              fontSize: '0.5rem',
+              color: 'rgba(255, 255, 255, 0.45)',
+              fontFamily: "'Inter', sans-serif",
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '240px'
+            }}
+          >
             {currentMode.description}
           </div>
         </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button
-            onClick={() => navigate('/guitar/map')}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.65rem', color: '#c9a96e',
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              cursor: 'pointer',
-              background: 'rgba(201,169,110,0.06)',
-              border: '1px solid rgba(201,169,110,0.15)',
-              borderRadius: 8, padding: '8px 12px',
-              transition: 'all 0.3s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(201,169,110,0.12)';
-              e.currentTarget.style.borderColor = 'rgba(201,169,110,0.3)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'rgba(201,169,110,0.06)';
-              e.currentTarget.style.borderColor = 'rgba(201,169,110,0.15)';
-            }}
-            aria-label="Maturation Map"
-          >
-            <Guitar size={14} />
-            Map
-          </button>
-          <button
-            onClick={() => navigate('/monomyth')}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.65rem', color: '#c9a96e',
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              cursor: 'pointer',
-              background: 'rgba(201,169,110,0.06)',
-              border: '1px solid rgba(201,169,110,0.15)',
-              borderRadius: 8, padding: '8px 12px',
-              transition: 'all 0.3s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(201,169,110,0.12)';
-              e.currentTarget.style.borderColor = 'rgba(201,169,110,0.3)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'rgba(201,169,110,0.06)';
-              e.currentTarget.style.borderColor = 'rgba(201,169,110,0.15)';
-            }}
-            aria-label="Chromatic Monomyth"
-          >
-            <BookOpen size={14} />
-            Chart
-          </button>
+        {/* Minimal Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <AuthButton />
-          <button
-            onClick={() => navigate('/')}
-            style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: 36, height: 36,
-              background: 'rgba(201,169,110,0.06)',
-              border: '1px solid rgba(201,169,110,0.15)',
-              borderRadius: 8,
-              color: '#c9a96e',
-              cursor: 'pointer',
-            }}
-            aria-label="Home"
-          >
-            <Home size={16} />
-          </button>
         </div>
       </nav>
+
+      {/* ── Mode Explainer Popover ── */}
+      {showModeInfo && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 600,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(5,5,8,0.7)',
+            backdropFilter: 'blur(10px)',
+            padding: 16
+          }} 
+          onClick={() => setShowModeInfo(false)}
+        >
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, rgba(25, 20, 18, 0.98) 0%, rgba(15, 10, 8, 0.99) 100%)',
+              border: '1px solid rgba(201, 169, 110, 0.3)',
+              borderRadius: 16,
+              padding: 24,
+              maxWidth: 380,
+              width: '100%',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(201, 169, 110, 0.15)',
+              position: 'relative'
+            }} 
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: '1.6rem',
+              color: '#f0e6d2',
+              margin: '0 0 12px 0',
+              textAlign: 'center',
+              textShadow: '0 2px 10px rgba(201, 169, 110, 0.2)'
+            }}>
+              Pedagogical Attunement
+            </h3>
+            
+            <p style={{
+              fontSize: '0.8rem',
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontFamily: "'Inter', sans-serif",
+              lineHeight: 1.5,
+              marginBottom: 20,
+              textAlign: 'center'
+            }}>
+              Your active study mode determines how you interact with the 12 somatic frets. Toggle between structured alignment and open exploration.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Sandbox vs Guided */}
+              <div style={{
+                background: 'rgba(201, 169, 110, 0.04)',
+                border: '1px solid rgba(201, 169, 110, 0.15)',
+                borderRadius: 10,
+                padding: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#f0e6d2', fontFamily: "'JetBrains Mono', monospace" }}>
+                    FRET PROGRESSION
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                    {sandboxMode ? 'All 12 frets unlocked' : 'Fret-by-fret sequence'}
+                  </div>
+                </div>
+                <button
+                  onClick={() => updateTraction(prev => ({ 
+                    settings: { ...prev.settings, sandboxMode: !sandboxMode } 
+                  }))}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: sandboxMode ? 'rgba(201, 169, 110, 0.15)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${sandboxMode ? '#c9a96e' : 'rgba(255,255,255,0.1)'}`,
+                    color: sandboxMode ? '#c9a96e' : 'rgba(255,255,255,0.5)',
+                    fontSize: '0.65rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  {sandboxMode ? '🔓 Sandbox' : '🏆 Guided'}
+                </button>
+              </div>
+
+              {/* Troubadour AI vs Mute */}
+              <div style={{
+                background: 'rgba(201, 169, 110, 0.04)',
+                border: '1px solid rgba(201, 169, 110, 0.15)',
+                borderRadius: 10,
+                padding: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#f0e6d2', fontFamily: "'JetBrains Mono', monospace" }}>
+                    TROUBADOUR COMPANION
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                    {aiEnabled ? 'AI Somatic Mentorship ON' : 'AI Companion is muted'}
+                  </div>
+                </div>
+                <button
+                  onClick={() => updateTraction(prev => ({ 
+                    settings: { ...prev.settings, aiEnabled: !aiEnabled } 
+                  }))}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: aiEnabled ? 'rgba(167, 139, 250, 0.15)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${aiEnabled ? '#a78bfa' : 'rgba(255,255,255,0.1)'}`,
+                    color: aiEnabled ? '#a78bfa' : 'rgba(255,255,255,0.5)',
+                    fontSize: '0.65rem',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  {aiEnabled ? '🔮 Troubadour' : '🤫 Silent'}
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowModeInfo(false)}
+              style={{
+                marginTop: 24,
+                width: '100%',
+                padding: '10px 0',
+                borderRadius: 8,
+                background: 'rgba(201,169,110,0.12)',
+                border: '1px solid rgba(201,169,110,0.3)',
+                color: '#c9a96e',
+                fontSize: '0.75rem',
+                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,169,110,0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(201,169,110,0.12)'}
+            >
+              Confirm Attunement
+            </button>
+          </div>
+        </div>
+      )}
+
 
       <NeckMenu
         items={mappedFrets}
@@ -280,55 +393,127 @@ const OrientationHub = () => {
         showBackButton={true}
       />
 
-      {/* ── Troubadour's Quill Floating Action Button ── */}
-      <button
-        onClick={() => setShowQuill(true)}
-        aria-label="Open Troubadour's Quill"
-        style={{
-          position: 'fixed', bottom: '72px', right: '16px', zIndex: 400,
-          width: '52px', height: '52px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(201,169,110,0.4) 0%, rgba(201,169,110,0.15) 100%)',
-          border: '1px solid rgba(201,169,110,0.4)',
-          color: '#c9a96e', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(201,169,110,0.3), 0 0 30px rgba(201,169,110,0.2)',
-          transition: 'all 0.3s ease',
-          animation: 'glow 2s ease-in-out infinite',
-        }}
-      >
-        <Guitar size={22} />
-      </button>
       <style>{`
+        .nav-bar-container {
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          z-index: 500;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 16px;
+          padding-top: max(12px, env(safe-area-inset-top));
+          background: linear-gradient(180deg, rgba(13, 13, 20, 0.95) 0%, rgba(13, 13, 20, 0.7) 70%, transparent 100%);
+          backdrop-filter: blur(8px);
+          border-bottom: 1px solid rgba(201, 169, 110, 0.08);
+          transition: all 0.3s ease;
+        }
+
+        .back-btn-text {
+          display: inline;
+        }
+
+        .desktop-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .mobile-menu-btn {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          background: rgba(201,169,110,0.08);
+          border: 1px solid rgba(201,169,110,0.2);
+          border-radius: 8px;
+          color: #c9a96e;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .mobile-menu-btn:hover {
+          background: rgba(201,169,110,0.15);
+          border-color: rgba(201,169,110,0.35);
+        }
+
+        .mobile-dropdown {
+          display: none;
+          position: fixed;
+          top: 64px;
+          right: 16px;
+          background: rgba(18, 16, 14, 0.96);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(201, 169, 110, 0.25);
+          border-radius: 12px;
+          padding: 16px;
+          width: 220px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 20px rgba(201,169,110,0.1);
+          flex-direction: column;
+          gap: 12px;
+          z-index: 499;
+          animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mobile-dropdown.open {
+          display: flex;
+        }
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 10px 12px;
+          background: rgba(201,169,110,0.05);
+          border: 1px solid rgba(201,169,110,0.15);
+          border-radius: 8px;
+          color: #c9a96e;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.75rem;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-decoration: none;
+        }
+
+        .dropdown-item:hover {
+          background: rgba(201,169,110,0.12);
+          border-color: rgba(201,169,110,0.35);
+          color: #f0e6d2;
+        }
+
+        @media (max-width: 767px) {
+          .desktop-actions {
+            display: none;
+          }
+          .mobile-only-flex {
+            display: flex !important;
+          }
+          .back-btn-text {
+            display: none;
+          }
+          .nav-mode-pill {
+            max-width: 160px !important;
+          }
+          .nav-mode-desc {
+            display: none !important;
+          }
+        }
+
         @keyframes glow {
           0%, 100% { box-shadow: 0 4px 20px rgba(201,169,110,0.3), 0 0 30px rgba(201,169,110,0.2); }
           50% { box-shadow: 0 4px 20px rgba(201,169,110,0.5), 0 0 50px rgba(201,169,110,0.4); }
         }
       `}</style>
 
-      {/* ── Quill Overlay ── */}
-      {showQuill && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 600,
-          background: 'rgba(5,5,8,0.97)', backdropFilter: 'blur(12px)',
-          overflowY: 'auto',
-        }}>
-          <button
-            onClick={() => setShowQuill(false)}
-            style={{
-              position: 'sticky', top: '12px', right: '16px', float: 'right',
-              zIndex: 601, background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '50%', width: '40px', height: '40px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', color: 'rgba(255,255,255,0.5)',
-              margin: '12px 16px',
-            }}
-          >
-            <X size={18} />
-          </button>
-          <SongwritingCompanion />
-        </div>
-      )}
     </>
   );
 };
