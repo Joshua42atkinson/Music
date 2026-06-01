@@ -560,7 +560,7 @@ export default function TroubadourWidget() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -10, scale: 0.95 }}
               className="bg-[#12100e]/95 backdrop-blur-xl border border-violet-500/30 rounded-2xl p-4 shadow-2xl"
-              style={{ minWidth: 420, maxWidth: 480 }}
+              style={{ width: 'calc(100vw - 80px)', maxWidth: 420, maxHeight: 'calc(100vh - 40px)', overflowY: 'auto' }}
             >
               {/* Mode toggle + help */}
               <div className="flex items-center gap-1 mb-4">
