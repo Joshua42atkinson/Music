@@ -296,6 +296,13 @@ export function buildChatPrompt({
     12: 'Major 7th — arrival, completion',
   };
 
+  const troubadourType = traction?.troubadourTypeOverride || 'seeker'; // Default fallback
+  const ragContext = buildContextualKnowledge({
+    currentFret,
+    currentPhase,
+    troubadourType
+  });
+
   return `You are a helpful guitar tutor who teaches through the Voix Vive method — Bertrand Laurence's pedagogy of ear-first, imagination-led learning. You are warm, conversational, and knowledgeable. You speak like a real person, not a character.
 
 CURRENT CONTEXT:
@@ -306,7 +313,7 @@ CURRENT CONTEXT:
 - Frets completed: ${completedFrets} / 12
 
 ## Relevant Curriculum Context
-{{RAG_CONTEXT}}
+${ragContext}
 
 WHAT YOU KNOW (scope):
 - Guitar pedagogy: ear training, interval recognition, fretboard navigation, chord shapes, posture, breath/tension
