@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import PitchTelemetryMap from './PitchTelemetryMap';
 import { useLocale } from '../hooks/useLocale';
+import { uploadVideo } from '../lib/driveService';
 
 const DAAS_API_BASE = 'http://localhost:8080/api';
 
@@ -273,10 +274,24 @@ export default function MentorDashboard({ onClose }) {
     setRecStatus('idle');
   };
 
-  const appendRecLink = () => {
-    const simulatedLink = `\n\n📹 **[Maître Bertrand's Video Review & Somatic Feedback]**\n*Focus on physical Pling resonance, shearl neck glide, and posture.* \nLink: [View Video Feedback](https://drive.google.com/file/d/bertrand-feedback-${selectedSub.id}/view)\n`;
-    setFeedbackDraft(prev => prev + simulatedLink);
-    resetRec();
+  const uploadAndAppendRecLink = async () => {
+    if (!recBlob) return;
+    
+    setRecStatus('uploading');
+    try {
+      const driveData = await uploadVideo(recBlob, {
+        entryType: 'mentor-feedback',
+        fileName: `bertrand-feedback-${selectedSub.id}-${Date.now()}.webm`,
+      });
+
+      const realLink = `\n\n📹 **[Maître Bertrand's Video Review & Somatic Feedback]**\n*Focus on physical Pling resonance, shearl neck glide, and posture.* \nLink: [View Video Feedback](${driveData.webViewLink})\n`;
+      setFeedbackDraft(prev => prev + realLink);
+      resetRec();
+    } catch (e) {
+      console.error('Failed to upload mentor feedback video:', e);
+      alert('Failed to upload video to Google Drive. Please check your OAuth permissions.');
+      setRecStatus('recorded');
+    }
   };
 
   return (
@@ -532,13 +547,20 @@ export default function MentorDashboard({ onClose }) {
                                 <button onClick={resetRec} className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white font-mono">
                                   ↺ Retake
                                 </button>
-                                <button onClick={appendRecLink} className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-xs text-white font-mono font-bold flex items-center gap-1.5">
+                                <button onClick={uploadAndAppendRecLink} className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-xs text-white font-mono font-bold flex items-center gap-1.5">
                                   ✓ Attach Video to Somatic Review
                                 </button>
                               </>
                             )}
 
-                            {recStatus !== 'recording' && (
+                            {recStatus === 'uploading' && (
+                              <button disabled className="px-4 py-2 rounded-lg bg-green-600/50 text-xs text-white font-mono font-bold flex items-center gap-1.5 animate-pulse">
+                                <span className="w-2 h-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Uploading to Drive...
+                              </button>
+                            )}
+
+                            {(recStatus === 'idle' || recStatus === 'preview') && (
                               <button onClick={resetRec} className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/50 font-mono">
                                 Cancel
                               </button>

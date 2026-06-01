@@ -279,7 +279,7 @@ export function buildChatPrompt({
   locale = 'en',
 } = {}) {
   const streak = traction?.streak || 0;
-  const completedFrets = Object.values(traction.frets || {}).filter(f => (f.traction || 0) >= 60).length;
+  const completedFrets = Object.values(traction?.frets || {}).filter(f => (f.traction || 0) >= 60).length;
 
   const FRET_MAP = {
     1: 'Root Note — foundation',
@@ -297,7 +297,7 @@ export function buildChatPrompt({
   };
 
   const troubadourType = traction?.troubadourTypeOverride || 'seeker'; // Default fallback
-  const ragContext = buildContextualKnowledge({
+  const psychologicalContext = buildContextualKnowledge({
     currentFret,
     currentPhase,
     troubadourType
@@ -312,8 +312,11 @@ CURRENT CONTEXT:
 - Streak: ${streak} days
 - Frets completed: ${completedFrets} / 12
 
+## Active Coaching Context
+${psychologicalContext}
+
 ## Relevant Curriculum Context
-${ragContext}
+{{RAG_CONTEXT}}
 
 WHAT YOU KNOW (scope):
 - Guitar pedagogy: ear training, interval recognition, fretboard navigation, chord shapes, posture, breath/tension
