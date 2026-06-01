@@ -82,7 +82,17 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
     if (!text) return;
     
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
+    const isFrench = locale === 'fr';
+    utterance.lang = isFrench ? 'fr-FR' : 'en-US';
+    
+    const voices = synth.getVoices();
+    let voice = voices.find(v => isFrench ? v.lang.toLowerCase().includes('fr') : v.lang.toLowerCase().includes('en'));
+    if (!isFrench) {
+      const frenchAccent = voices.find(v => v.lang.toLowerCase().includes('en') && v.name.includes('French'));
+      if (frenchAccent) voice = frenchAccent;
+    }
+    if (voice) utterance.voice = voice;
+    
     utterance.rate = 0.9;
     
     utterance.onstart = () => setIsSpeaking(true);

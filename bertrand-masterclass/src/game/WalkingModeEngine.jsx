@@ -76,9 +76,11 @@ export default function WalkingModeEngine() {
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    
     // Try to find a good English/French voice
     const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v => v.lang.includes('en-GB') || v.lang.includes('en-US'));
+    const preferred = voices.find(v => v.lang.toLowerCase().includes('en'));
     if (preferred) utterance.voice = preferred;
     
     utterance.rate = 0.9; // Speak slowly and calmly

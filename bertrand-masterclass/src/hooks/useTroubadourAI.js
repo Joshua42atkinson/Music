@@ -77,9 +77,11 @@ export function useTroubadourAI() {
           return;
         }
 
-        let voice = voices.find(v => isFrench ? v.lang.startsWith('fr') : v.lang.startsWith('en'));
+        utterance.lang = isFrench ? 'fr-FR' : 'en-US';
+
+        let voice = voices.find(v => isFrench ? v.lang.toLowerCase().includes('fr') : v.lang.toLowerCase().includes('en'));
         if (!isFrench) {
-          const frenchAccent = voices.find(v => v.lang.startsWith('en') && v.name.includes('French'));
+          const frenchAccent = voices.find(v => v.lang.toLowerCase().includes('en') && v.name.includes('French'));
           if (frenchAccent) voice = frenchAccent;
         }
 
