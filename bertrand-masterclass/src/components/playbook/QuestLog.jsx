@@ -51,7 +51,7 @@ export default function QuestLog({ onOpenSlides }) {
       {/* Timeline */}
       <div style={styles.timeline}>
         {QUEST_DATA.map((quest, idx) => {
-          const fretTraction = traction.frets?.[quest.fretId] || {};
+          const fretTraction = traction?.frets?.[quest.fretId] || {};
           const tractionPct = fretTraction.traction || 0;
           const tool = TOOLS_CATALOG.find(t => t.id === quest.fretId);
           const fret = frets.find(f => f.id === quest.fretId);

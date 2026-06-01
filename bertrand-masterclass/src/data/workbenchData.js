@@ -145,20 +145,20 @@ export function getPracticeContext() {
   const pos = getCurriculumPosition();
   const suggestion = getSuggestedTool();
 
-  const fretsCompleted = Object.entries(traction.frets || {})
+  const fretsCompleted = Object.entries(traction?.frets || {})
     .filter(([_, f]) => (f.traction || 0) >= 60)
     .map(([id]) => parseInt(id));
 
   const breathStat = Math.min(20, Math.max(1, Math.floor((traction.breathingSessions || 0) / 2) + 1));
   const pitchStat = (() => {
-    const frets = Object.values(traction.frets || {});
+    const frets = Object.values(traction?.frets || {});
     const pitches = frets.map(f => f.pitchAccuracy || 0).filter(p => p > 0);
     if (pitches.length === 0) return 1;
     const avg = pitches.reduce((a, b) => a + b, 0) / pitches.length;
     return Math.min(20, Math.max(1, Math.round(avg / 5)));
   })();
   const memoryStat = (() => {
-    const frets = Object.values(traction.frets || {});
+    const frets = Object.values(traction?.frets || {});
     const tractions = frets.map(f => f.traction || 0);
     if (tractions.length === 0) return 1;
     const avg = tractions.reduce((a, b) => a + b, 0) / tractions.length;

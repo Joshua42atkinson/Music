@@ -75,7 +75,7 @@ export const CORE_STATS = [
 // ── Compute stat value from traction ──
 // Returns 1–20 (D&D ability score scale)
 export function computeStatValue(statId, traction) {
-  const frets = Object.values(traction.frets || {});
+  const frets = Object.values(traction?.frets || {});
   switch (statId) {
     case 'breath':
       return Math.min(20, Math.max(1, Math.floor((traction.breathingSessions || 0) / 2) + 1));
@@ -505,7 +505,7 @@ export function computeTroubadourProfile(traction) {
   const ear = clamp(audiation * bump * 2);
 
   // Seeker: theoretical / all-protocols practices
-  const theoretical = Object.values(traction.frets || {})
+  const theoretical = Object.values(traction?.frets || {})
     .reduce((sum, f) => sum + (f.yinCompleted ? 1 : 0), 0) / 12;
   const seeker = clamp(theoretical);
 

@@ -169,7 +169,7 @@ export function useDAGProgress() {
     if (isUsingScaffolding) {
       const node = getNodeById(nodeId);
       if (node) {
-        const fretState = scaffolding.traction.frets?.[node.fret] || {};
+        const fretState = scaffolding.traction?.frets?.[node.fret] || {};
         const phase = node.phase === 'all' ? 'be' : node.phase; // fallback if phase is 'all'
         return {
           beCompleted: !!fretState.beCompleted,

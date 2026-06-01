@@ -32,13 +32,13 @@ export default function CharacterSheet() {
   const lang = locale;
 
   const title = getBardTitle(bardLevel, lang);
-  const xpCurrent = traction.xp || 0;
+  const xpCurrent = traction?.xp || 0;
   const xpNext = getXpForNextLevel(bardLevel);
   const xpProgress = xpNext > 0 ? Math.min(1, xpCurrent / xpNext) : 1;
-  const completedFrets = Object.values(traction.frets || {}).filter(f => (f.traction || 0) >= 60).length;
+  const completedFrets = Object.values(traction?.frets || {}).filter(f => (f.traction || 0) >= 60).length;
 
   const allMilestones = Array.from({ length: 12 }, (_, i) => `fret-${i + 1}-class-milestone`);
-  const completedMilestones = allMilestones.filter(mId => traction.completedNodes?.includes(mId));
+  const completedMilestones = allMilestones.filter(mId => traction?.completedNodes?.includes(mId));
   const hasCompletedCourse = completedMilestones.length === 12;
 
   // Multi-tiered certifications status
@@ -50,8 +50,8 @@ export default function CharacterSheet() {
   const intervalMastery = useMemo(() => getIntervalMastery(), []);
   const profile = useMemo(() => computeTroubadourProfile(traction), [traction]);
   const overriddenType = useMemo(() => 
-    traction.troubadourTypeOverride ? TROUBADOUR_TYPES.find(t => t.id === traction.troubadourTypeOverride) : null
-  , [traction.troubadourTypeOverride]);
+    traction?.troubadourTypeOverride ? TROUBADOUR_TYPES.find(t => t.id === traction.troubadourTypeOverride) : null
+  , [traction?.troubadourTypeOverride]);
   const displayType = overriddenType || profile.dominantType;
 
   // Use Google user data when logged in, fallback to localStorage profile
@@ -436,7 +436,7 @@ export default function CharacterSheet() {
         </h3>
         <div style={{ textAlign: 'center', marginBottom: '16px' }}>
           <select 
-            value={traction.troubadourTypeOverride || ''}
+            value={traction?.troubadourTypeOverride || ''}
             onChange={(e) => updateTraction({ troubadourTypeOverride: e.target.value || null })}
             style={styles.typeSelector}
           >

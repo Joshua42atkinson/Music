@@ -103,7 +103,7 @@ export default function PlayerPortal() {
   const [workload, setWorkload] = useState(null);
 
   const traction = loadTraction();
-  const completedFrets = Object.entries(traction.frets || {})
+  const completedFrets = Object.entries(traction?.frets || {})
     .filter(([, f]) => (f.traction || 0) >= 60)
     .map(([id]) => parseInt(id));
 

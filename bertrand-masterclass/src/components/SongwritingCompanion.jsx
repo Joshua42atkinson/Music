@@ -80,14 +80,14 @@ export default function SongwritingCompanion() {
   // Build a rich context prompt from the student's practice data + curriculum
   const buildPrompt = useCallback(() => {
     const mood = SONG_MOODS.find(m => m.id === selectedMood);
-    const fretData = Object.values(traction.frets || {});
+    const fretData = Object.values(traction?.frets || {});
     const completedFrets = fretData.filter(f => f.traction >= 60).length;
     const avgPitch = fretData.length > 0
       ? Math.round(fretData.reduce((s, f) => s + (f.pitchAccuracy || 0), 0) / fretData.length)
       : 0;
 
     // Build curriculum context from actual chapterData
-    const curriculumSummary = buildCurriculumContext(traction.frets || {}, locale);
+    const curriculumSummary = buildCurriculumContext(traction?.frets || {}, locale);
 
     const context = [
       `The student is at Bard Level ${bardLevel}.`,
