@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Circle } from 'lucide-react';
+import { Circle, X, Compass } from 'lucide-react';
 import AuthButton from '../components/AuthButton';
 import CoachingPortal from '../components/CoachingPortal';
 import { useLocale } from '../hooks/useLocale';
