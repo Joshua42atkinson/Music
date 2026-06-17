@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>Voix Vive Academy — A Whole-Person Music Academy | 12 Frets · 12 Intervals · One Master</title>
+  <meta name="description" content="A whole-person music academy built on the Pythagorean tradition. 12 frets, 12 intervals, one transformative journey. Free AI-guided curriculum with optional mentorship from Bertrand Laurence — Passim School instructor, Thumbtack Top Pro. You are an instrument playing an instrument." />
+  <meta name="keywords" content="whole person music academy, body-centered guitar, Pythagorean music education, guitar and voice integration, somatic guitar instruction, fretboard visualization, CAGED system, online music mentorship, Bertrand Laurence, Voix Vive" />
+  <meta name="author" content="Voix Vive Academy · Pedagogy by Bertrand Laurence · Platform by Joshua Atkinson" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'wasm-unsafe-eval' blob: 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: blob:;
+    media-src 'self' blob:;
+    connect-src 'self' ws: wss: http://localhost:* https://localhost:* https://huggingface.co https://cdn.jsdelivr.net https://accounts.google.com https://www.googleapis.com;
+    worker-src 'self' blob:;
+    manifest-src 'self';
+    frame-src 'self';
+  " />
+
+  <!-- Open Graph (Facebook, LinkedIn, iMessage) -->
+  <meta property="og:title" content="Voix Vive Academy — A Whole-Person Music Academy" />
+  <meta property="og:description" content="12 frets. 12 intervals. One transformative journey. Free AI-guided curriculum with mentorship from Bertrand Laurence. You are an instrument playing an instrument." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://voix-vive.com" />
+  <meta property="og:image" content="/assets/wordmark.png" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Voix Vive Academy — 12 Frets · 12 Intervals · One Master" />
+  <meta name="twitter:description" content="A whole-person music academy built on the Pythagorean tradition. Free curriculum. Optional mentorship. You are an instrument playing an instrument." />
+
+  <!-- JSON-LD Structured Data for Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "Voix Vive Academy",
+    "alternateName": "Bertrand Laurence Guitar Studio",
+    "description": "A whole-person music academy built on the Pythagorean tradition. 12 frets, 12 intervals, one transformative journey. Free AI-guided curriculum with optional mentorship from Bertrand Laurence — body-centered guitar and voice instructor.",
+    "url": "https://voix-vive.com",
+    "image": "/assets/wordmark.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Houlton",
+      "addressRegion": "ME",
+      "addressCountry": "US"
+    },
+    "founder": [
+      {
+        "@type": "Person",
+        "name": "Bertrand Laurence",
+        "jobTitle": "Master Instructor & Pedagogy",
+        "knowsLanguage": ["English", "French"]
+      },
+      {
+        "@type": "Person",
+        "name": "Joshua Atkinson",
+        "jobTitle": "Platform Architect & Instructional Designer"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "reviewCount": "13"
+    },
+    "hasCourse": [
+      {
+        "@type": "Course",
+        "name": "The Troubadour's Journey — 12-Fret Chromatic Curriculum",
+        "description": "A free, self-paced journey through 132 lessons across 12 frets. Each fret explores a chromatic interval through body awareness, fretboard mastery, and creative expression.",
+        "provider": { "@type": "Organization", "name": "Voix Vive Academy" },
+        "isAccessibleForFree": true,
+        "numberOfCredits": 132,
+        "educationalLevel": "Beginner to Advanced",
+        "inLanguage": ["en", "fr"]
+      }
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Mentorship & Support",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "name": "12-Fret Curriculum + AI Troubadour",
+          "price": "0.00",
+          "priceCurrency": "USD",
+          "description": "Free: 132 lessons, practice tools, AI-guided coaching, journal, and game engine"
+        },
+        {
+          "@type": "Offer",
+          "name": "Quick Question — Text Feedback from Bertrand",
+          "price": "5.00",
+          "priceCurrency": "USD"
+        },
+        {
+          "@type": "Offer",
+          "name": "Private Lesson with Bertrand (Zoom)",
+          "price": "65.00",
+          "priceCurrency": "USD"
+        },
+        {
+          "@type": "Offer",
+          "name": "The Troubadour's Circle — Monthly Membership",
+          "price": "25.00",
+          "priceCurrency": "USD"
+        },
+        {
+          "@type": "Offer",
+          "name": "Bertrand Approved Capstone Audition",
+          "price": "100.00",
+          "priceCurrency": "USD",
+          "description": "20-minute audition with personalized video review, certificate, and curriculum recommendations"
+        }
+      ]
+    }
+  }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1a2332;
+      font-family: 'Inter', sans-serif;
+      color: #c8c8d0;
+    }
+
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #0a0a0f;
+      z-index: 9999;
+    }
+
+    .initial-loader {
+      width: 48px;
+      height: 48px;
+      border: 2px solid #354560;
+      border-top: 2px solid #c9a96e;
+      border-radius: 50%;
+      animation: spin 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 1.5rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.125rem;
+      font-style: italic;
+      color: #8090a8;
+      letter-spacing: 0.05em;
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <div class="loader-container">
+      <div class="initial-loader"></div>
+      <p class="loading-text">Preparing the space…</p>
+    </div>
+  </div>
+  <script type="module" src="/src/main.jsx"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister();
+          if (window.location.hostname === 'localhost') console.log('[PWA] ServiceWorker unregistered to clear cache.');
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,146 @@
+[
+    {
+        "sheet": "PROFESSIONAL FOUNDATIONS IN LDT",
+        "badge": "Sub-Badge",
+        "challenge": "Challenge",
+        "description": "Challenge Description and Evidence Examples",
+        "status": "Status of Completion/Date of Completion (e.g., Yes, 09/30/2023)",
+        "artifact": "Artifact/s Used for the Challenge (e.g., EDCI 513 research paper)"
+    },
+    {
+        "sheet": "PROFESSIONAL FOUNDATIONS IN LDT",
+        "badge": "ID PROFESSSIONAL COMMUNICATOR (2 Challenges)",
+        "challenge": "Solicit, accept, and provide constructive feedback.",
+        "description": "Criteria for successful completion of this challenge: Evidence must demonstrate asking for, providing critique and utilizing feedback to improve one\u2019s own performance or work. Reflection must address: How you have asked, utilized and provided feedback to others.",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifact: This artifact is a blog post created in Blogger, titled \"From Mindmap to Model: The Rise of AI.\" It fulfills the challenge criteria for a well-written post with clickable hyperlinks. View Artifact: Blog about blog potential https://daydream67.blogspot.com/2025/11/from-mindmap-to-model-rise-of-ai.html"
+    },
+    {
+        "sheet": "PROFESSIONAL FOUNDATIONS IN LDT",
+        "badge": "APPLYING ID RESEARCH & THEORY (1 challenges)",
+        "challenge": "Explain key concepts and principles related to instructional design.",
+        "description": "Criteria for successful completion of this challenge: Evidence must demonstrate the interpretation of instructional design concepts and principles in writing or verbal expression. Reflection must address: How you explained and interpreted key instructional design concepts and principles in their evidence.",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: This artifact is the \"Research Report: The 'Vocabulary-as-a-Mechanic' (VaaM) Model,\" a core component of the \"Daydream Initiative\" project. View Project Synthesis: Daydream 3.0: Pedagogy, Gamification, and Technical Architecture (click for link) https://notebooklm.google.com/notebook/6f884f31-62ab-41a3-8550-41c154a7c113 View VaaM Document: See \"Research Report: The \"Vocabulary-as-a-Mechanic\" (VaaM) Model\" below!https://docs.google.com/document/d/1Nlm2Q5MFzGaa3uL6Xry6gCMrtDjIKw11WIouYPBrIKY/edit?tab=t.0"
+    },
+    {
+        "sheet": "PROFESSIONAL FOUNDATIONS IN LDT",
+        "badge": "ID KNOWLEDGE, SKILLS, AND ATTITUDES (1 challenge)",
+        "challenge": "Participate in professional development activities.",
+        "description": "Criteria for successful completion of this challenge: Evidence demonstrating completion of professional development training \u2013and/or\u2014 membership in professional communities or associations. Reflection must address: How professional development opportunities have helped you grow your instructional design skill set (especially with the rapid changes that occur in the instructional design field).",
+        "status": "Joshua Atkinson Yes Feb 28, 2025",
+        "artifact": "EDCI 60001 LDT Technology Badge in Website Development"
+    },
+    {
+        "sheet": "PROFESSIONAL FOUNDATIONS IN LDT",
+        "badge": "ETHICAL, LEGAL, AND POLITICAL IMPLICATIONS OF DESIGN (1 challenge)",
+        "challenge": "Comply with organizational and professional codes of ethics.",
+        "description": "Criteria for successful completion of this challenge: Evidence of following a professional code of ethics. Reflection must address: How following a code of ethics affects your decision-making process in instructional design or other aspects of your work.",
+        "status": "Joshua Atkinson Yes Feb 14, 2025",
+        "artifact": "Responsible Conduct of Research (RCR) Training Certificate"
+    },
+    {
+        "sheet": "PLANNING AND ANALYSIS",
+        "badge": "Sub-Badge",
+        "challenge": "Challenge",
+        "description": "Challenge Description and Evidence Examples",
+        "status": "Status of Completion/Date of Completion (e.g., Yes, 09/30/2023)",
+        "artifact": "Artifact/s Used for the Challenge (e.g., EDCI 513 research paper)"
+    },
+    {
+        "sheet": "PLANNING AND ANALYSIS",
+        "badge": "GAP ANALYSIS (1 Challenge)",
+        "challenge": "Conducting a gap analysis.",
+        "description": "Criteria for successful completion of this challenge: This challenge focuses on conducting a gap analysis to describe the nature of a learning or performance problem and propose a potential instructional and/or non-instructional solutions and strategies. Gap analysis is a process of determining the gap between actual situation and desired situation as well as the root causes of this gap. Reflection must address: How did you determine or identify the learning or performance problem, including data sources you used? How did your artifact demonstrate your competence in each of the performance statements?",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifact: Daydream Initiative - ADDIE Instructional Design Document https://docs.google.com/document/d/1G9eHvMyS-UCUh2N6v5aUaFrMMEdc2M0p2TFedqGfLZE/edit?tab=t.0"
+    },
+    {
+        "sheet": "PLANNING AND ANALYSIS",
+        "badge": "TARGET POPULATION AND ENVIRONMENT (1 Challenge)",
+        "challenge": "Determine characteristics of a target population and/or environment that may impact the design and delivery of instruction.",
+        "description": "Criteria for successful completion of this challenge: Evidence of assessing, testing, or surveying a population or environment in part of a learner or content analysis. Evidence must show data collection methods (such as survey, interview, observation, research or other data). Reflection must address: How you collected your data, determined the characteristics of your target population, and how these characteristics impacted your design choices (cultural and educational background, learner skills, organizational performance factors, environmental characteristics, etc.).",
+        "status": "Yes, 11/17/2025",
+        "artifact": "https://docs.google.com/document/d/1nusS6s589cf84tu9XkY3dbwdb524A-_hCRigAM70uU0/edit?tab=t.0 Artifact: Daydream 3.0: The Unified Specification (Mentor-in-the-Loop Strategy)"
+    },
+    {
+        "sheet": "PLANNING AND ANALYSIS",
+        "badge": "ANALYSIS TECHNIQUES FOR INSTRUCTION (2 Challenge)",
+        "challenge": "Determine subordinate and prerequisite skills and knowledge.",
+        "description": "Criteria for successful completion of this challenge: Evidence of determining subordinate and prerequisite skills and knowledge. Reflection must address: How you determined subordinate and pre-req skills/knowledge for an audience (goal analysis, instructional analysis, etc.).",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: This artifact is the \"Daydream Initiative\" GitHub repository, which contains the Rust source code, technical documentation (AGENTS.md), and dependency manifests (Cargo.toml) for the project. These files document the analysis and implementation of a \"privacy-first\" architecture. View GitHub Repository: https://github.com/joshua42atkinson/day_dream View Project Synthesis: Daydream 3.0: Pedagogy, Gamification, and Technical Architecture (click for link)"
+    },
+    {
+        "sheet": "PLANNING AND ANALYSIS",
+        "badge": "ANALYZE TECHNOLOGIES (1 Challenge)",
+        "challenge": "Analyze the characteristics of existing and emerging technologies and their potential use.",
+        "description": "Criteria for successful completion of this challenge: Evidence of describing emerging technologies and evaluating the benefits and limitations of the tool\u2019s usage. Reflection must address: How you determined the use of a piece of technology and described its potential use or non-use.",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifact: Daydream Project GitHub Repository (Rust Tech Spike)"
+    },
+    {
+        "sheet": "DESIGN AND DEVELOPMENT",
+        "badge": "Sub-Badge",
+        "challenge": "Challenge",
+        "description": "Challenge Description and Evidence Examples",
+        "status": "Status of Completion/Date of Completion (e.g., Yes, 09/30/2023)",
+        "artifact": "Artifact/s Used for the Challenge (e.g., EDCI 513 research paper)"
+    },
+    {
+        "sheet": "DESIGN AND DEVELOPMENT",
+        "badge": "INSTRUCTIONAL DESIGN AND DEVELOPMENT PROCESS (1 Challenge)",
+        "challenge": "Select or create an instructional design process based the nature of the project.",
+        "description": "Criteria for successful completion of this challenge: Evidence of using an instructional design model (ADDIE, Dick and Carey, Assure, Arcs, etc.) that aligns with a project. Reflection must address: How you determined which instructional design model to use and why \u2013 list specific examples (state of development, using learning objectives as a reference point, resources available, input from your company, etc.).",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: \"Daydream Authoring Environment: Instructional Design Document\" \"Daydream Initiative: Content Synthesis\" \"Daydream\" Project Repository (Physical Development) Github Link"
+    },
+    {
+        "sheet": "DESIGN AND DEVELOPMENT",
+        "badge": "SYSTEMATIC DESIGN (1 Challenge)",
+        "challenge": "Identify and sequence instructional goals.",
+        "description": "Criteria for successful completion of this challenge: Evidence of ordering learning objectives (not course objectives) for a target audience (what an instructor will teach). Reflection must address: How learning objectives were identified and sequenced based on the project or needs assessment (e.g., performance problem identification, learning gaps, content).",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: \"Daydream Module 101: Instructional Design Document\" \"daydream_master_index.md\""
+    },
+    {
+        "sheet": "DESIGN AND DEVELOPMENT",
+        "badge": "DESIGN INSTRUCTIONAL INTERVENTIONS (2 Challenges)",
+        "challenge": "A. Identify instructional strategies that align with instructional goals and anticipated learning outcomes.",
+        "description": "Criteria for successful completion of this challenge: Evidence of utilizing the best instructional strategies (scaffolding, modeling, cooperative learning, case studies, service learning, etc.) based on the instructional goals and learning outcomes of a project. Reflection must address: How you determined the instructional strategies based on the instructional goals for the project.",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: This artifact is a comprehensive research and design project for a gamified learning platform called the \"Daydream Initiative.\" The artifacts include the NotebookLM synthesis, the core research analysis, and the unified technical specification. View Project Synthesis: Daydream 3.0: Pedagogy, Gamification, and Technical Architecture View Research Analysis: Research Analysis: A Synthesis of the Daydream Initiative's Technical, Philosophical, and Gamified Systems View Unified Specification: Daydream Unified Specification https://docs.google.com/document/d/1R5PvyeEDpI44iTFXcD7w6Y3V2ddEZN8MjwSajIft6U8/edit?tab=t.0"
+    },
+    {
+        "sheet": "DESIGN AND DEVELOPMENT",
+        "badge": "SELECT OR MODIFY EXISTING INSTRUCTIONAL MATERIALS (1 Challenge)",
+        "challenge": "Identify and select existing materials that support the content analyses proposed technologies, delivery methods, and instructional strategies.",
+        "description": "Criteria for successful completion of this challenge: Evidence of selecting existing and creating instructional materials (lectures, readings, textbooks, multimedia components, Open Educational Resources, simulations, and other resources) based on instructional strategies, delivery methods and/or content. Reflection must address: The connection between your content analysis and the instructional materials you selected \u2013 what experiences did you have to help make these decisions.",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: Daydream Instructional Design Document (Section 3.2 & References) Daydream GitHub Repository (Tech Stack Selection) TL;DR Summary: Selection: I selected established frameworks (Campbell\u2019s Hero\u2019s Journey, Jungian Archetypes) to solve the specific \"Affective Gap\" identified in my analysis. Creation: I created custom Job Aids (\"Socratic Prompting Framework\") to bridge the gap between theory and practice. Experience: My decision-making was driven by a \"creative synthesis\" approach\u2014combining privacy-law constraints with open-source technology to build a compliant, safe learning environment."
+    },
+    {
+        "sheet": "DESIGN AND DEVELOPMENT",
+        "badge": "DEVELOP INSTRUCTIONAL MATERIALS (1 Challenge)",
+        "challenge": "Produce instructional materials in a variety of delivery formats.",
+        "description": "Criteria for successful completion of this challenge: Evidence of creating instructional materials (lectures, readings, textbooks, multimedia components, Open Educational Resources, simulations, and other resources) in a variety of formats (online, eLearning, face-to-face, blended, micro learning, paper or digital, etc.). Two or more documents must be uploaded. Reflection must address: The importance of being able to create and develop instructional materials in a variety of formats.",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: \"The Daydream Initiative ADDIE\" Infographic \"How to Create an Infographic\" Screencast Tutorial (https://youtu.be/dYxmWd50xgs)"
+    },
+    {
+        "sheet": "DESIGN AND DEVELOPMENT",
+        "badge": "DESIGN LEARNING ASSESSMENT (1 Challenge)",
+        "challenge": "Identify the learning processes and outcomes to be measured.",
+        "description": "Criteria for successful completion of this challenge: Evidence of understanding the learning processes (instructional strategies) by identifying clear, measureable, specific, attainable learning outcomes. Reflection must address: How learning activities (processes) directly relate to the learning outcomes of an instructional plan (how they work together to support the learning process).",
+        "status": "Yes, 11/17/2025",
+        "artifact": "Artifacts: \"The Daydream Initiative: A Strategic Blueprint\" \"The Daydream Initiative: Instructional Design Document\" https://docs.google.com/document/d/1ojZ6v48rnNLnEHNPOcuiY6vDMabkrg3dop0GyxqEId8/edit?tab=t.0"
+    },
+    {
+        "sheet": "EVALUATION AND IMPLEMENTATION",
+        "badge": "Sub-Badge",
+        "challenge": "Challenge",
+        "description": "Challenge Description and Evidence Examples",
+        "status": "Status of Completion/Date of Completion (e.g., Yes, 09/30/2023)",
+        "artifact": "Artifact/s Used for the Challenge (e.g., EDCI 513 research paper)"
+    }
+]

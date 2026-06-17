@@ -1,0 +1,9 @@
+{
+  "short_name": "Voix Vive",
+  "name": "Voix Vive Academy",
+  "start_url": ".",
+  "background_color": "#050508",
+  "display": "standalone",
+  "theme_color": "#c9a96e",
+  "description": "Voix Vive 12-fret journey from silence to song."
+}

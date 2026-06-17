@@ -1,0 +1,13 @@
+.vercel
+.env
+.env*.local
+node_modules
+dist
+training
+.git
+*.log
+.DS_Store
+coverage
+.vite
+eslint_report.txt
+scratch/

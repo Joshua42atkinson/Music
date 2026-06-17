@@ -1,0 +1,657 @@
+
+> bertrand-masterclass@1.0.0-beta lint
+> eslint src/
+
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/App.jsx
+  172:25  error  'useScaffolding' is not defined  no-undef
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/AIDeveloperChat.jsx
+  57:14  error  'e' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/BetaGate.jsx
+  15:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/Binder.jsx
+    2:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+   70:19  error    't' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-unused-vars
+   74:5   error    'updateTraction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+   79:5   error    'currentNodeId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+   80:5   error    'completedNodes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+   81:5   error    'completePhase' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+   82:5   error    'passGate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+   93:10  error    'reviewedCount' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  101:6   warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+  109:16  error    'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  118:6   warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+  153:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  151 |
+  152 |   useEffect(() => {
+> 153 |     loadStats();
+      |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  154 |     const interval = setInterval(loadStats, 10000);
+  155 |     return () => clearInterval(interval);
+  156 |   }, [loadStats]);  react-hooks/set-state-in-effect
+  162:14  error    'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  173:6   warning  React Hook useMemo has an unnecessary dependency: 'traction'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/BiometricSanctum.jsx
+   23:11  error  'locale' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+   25:18  error  'setPreset' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  102:9   error  'presetLabels' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/BookWidget.jsx
+    9:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                               no-unused-vars
+  112:10  error    'textPrefs' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                   no-unused-vars
+  116:9   error    'updateTextPrefs' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u             no-unused-vars
+  189:6   warning  React Hook useEffect has a missing dependency: 'setOpen'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  359:47  error    'Icon' is defined but never used                                                                            no-unused-vars
+  596:42  error    'Icon' is defined but never used                                                                            no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/BreathingGate.jsx
+  44:6  warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  53:6  warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/ChromaticMonomyth.jsx
+  15:19  error  't' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/CommunityHub.jsx
+   67:11  error  'locale' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+   68:11  error  'bardLevel' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+   68:22  error  'currentFret' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   97:16  error  'err' is defined but never used                                                              no-unused-vars
+  132:16  error  'err' is defined but never used                                                              no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/CurriculumSummary.jsx
+  87:17  error  'act' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/DAGProgressBar.jsx
+  4:10  error  'isNodeUnlocked' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/FeedbackButton.jsx
+   15:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  111:13  error  Empty block statement                                                          no-empty
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/GuitarWorkbench.jsx
+  115:78  error  Empty block statement                                                                            no-empty
+  205:14  error  'e' is defined but never used                                                                    no-unused-vars
+  219:9   error  'handleHelpClick' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/HamburgerMenu.jsx
+    2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  120:11  error  'lang' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/HumanOctaveLibrary.jsx
+  111:14  error  'err' is defined but never used                                                             no-unused-vars
+  132:21  error  'uploadData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/LMStudioSubAgent.jsx
+  30:20  error  'isLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  30:66  error  'chatCompletion' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/MaturationMap.jsx
+   65:19  error  't' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                no-unused-vars
+  117:9   error  'highestUnlocked' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/MentorDashboard.jsx
+  292:32  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  290 |     setRecStatus('uploading');
+  291 |     try {
+> 292 |       const currentTimestamp = Date.now();
+      |                                ^^^^^^^^^^ Cannot call impure function
+  293 |       const driveData = await uploadVideo(recBlob, {
+  294 |         entryType: 'mentor-feedback',
+  295 |         fileName: `bertrand-feedback-${selectedSub.id}-${currentTimestamp}.webm`,  react-hooks/purity
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/MentorVideoRecorder.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  5:47  error  'submissionId' is defined but never used                                       no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/MentorshipBlog.jsx
+  159:16  error  'err' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/MentorshipGate.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/Onboarding.jsx
+  32:10  error  'breathConsent' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/OnboardingModal.jsx
+   16:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                   no-unused-vars
+  293:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/PitchRoom.jsx
+  67:6  warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  76:6  warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/PlayerPortal.jsx
+  93:83  error  'gameEnabled' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  93:96  error  'somaticDepth' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/PracticeTimer.jsx
+  84:6  warning  React Hook useEffect has missing dependencies: 'completePhase', 'fretId', and 'updateTraction'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/PrimaryNav.jsx
+  5:27  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/ResonantMirrorPOC.jsx
+  10:11  error  'isListening' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                no-unused-vars
+  96:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  94 |     // If we are listening for guitar, and we detect a solid pitch and volume spike
+  95 |     if (phase === 'LISTENING_GUITAR' && pitch > 0 && volume > 15) {
+> 96 |       triggerChoir();
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  97 |     }
+  98 |   }, [pitch, volume, phase, triggerChoir]);
+  99 |  react-hooks/set-state-in-effect
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/SlideViewer.jsx
+   13:10  error    'updateFretTraction' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                         no-unused-vars
+   13:44  error    'passSomaticGate' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                            no-unused-vars
+   42:6   warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array                      react-hooks/exhaustive-deps
+   54:6   warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array                      react-hooks/exhaustive-deps
+  139:6   warning  React Hook useEffect has missing dependencies: 'isSpeaking' and 'speakSlide'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  261:47  error    'e' is defined but never used                                                                                                     no-unused-vars
+  261:50  error    Empty block statement                                                                                                             no-empty
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/SomaticStudioPrompter.jsx
+   1:46  error    'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                     no-unused-vars
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                          no-unused-vars
+   9:10  error    'uploadBlobToR2' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                  no-unused-vars
+   9:26  error    'saveR2SubmissionMetadata' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                        no-unused-vars
+  70:6   warning  React Hook useEffect has a missing dependency: 'handleStepComplete'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/StreakToast.jsx
+  7:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/TruebadourLoom.jsx
+   3:26  error  'getMasteryStars' is defined but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+  24:21  error  'completedNodes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/TruebadourScorecard.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/TruebadourWidget.jsx
+   54:154  error    'speakWithPrefs' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                        no-unused-vars
+   58:22   error    'streak' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                no-unused-vars
+   58:30   error    'practiceMinutes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                       no-unused-vars
+   77:10   error    'detectedEmotion' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                       no-unused-vars
+  204:9    error    'sendGuideMessage' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                      no-unused-vars
+  261:9    error    'handleDownloadReview' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                  no-unused-vars
+  420:6    warning  React Hook useCallback has a missing dependency: 'AUTO_EXEC_TOOLS'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  422:9    error    'confirmToolCall' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                       no-unused-vars
+  428:9    error    'cancelToolCall' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                        no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/TutorialMenu.jsx
+   14:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u              no-unused-vars
+  194:10  error  'completed' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/VoiceSettingsPanel.jsx
+  19:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  61:3   error  'locale' is defined but never used                                             no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/Workbook.jsx
+    2:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+   70:19  error    't' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-unused-vars
+   74:5   error    'updateTraction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+   79:5   error    'currentNodeId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+   80:5   error    'completedNodes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+   81:5   error    'completePhase' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+   82:5   error    'passGate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+   93:10  error    'reviewedCount' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  101:6   warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+  109:16  error    'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  118:6   warning  React Hook useEffect has a missing dependency: 'cosyvoice'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+  153:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  151 |
+  152 |   useEffect(() => {
+> 153 |     loadStats();
+      |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  154 |     const interval = setInterval(loadStats, 10000);
+  155 |     return () => clearInterval(interval);
+  156 |   }, [loadStats]);  react-hooks/set-state-in-effect
+  162:14  error    'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  173:6   warning  React Hook useMemo has an unnecessary dependency: 'traction'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/__tests__/SlideViewer.test.jsx
+  52:36  error  'id' is defined but never used       no-unused-vars
+  52:40  error  'updates' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/__tests__/TruebadourWidget.test.jsx
+  3:37  error  'waitFor' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/playbook/CharacterSheet.jsx
+   36:9   error  'title' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u               no-unused-vars
+   44:9   error  'hasCompletedCourse' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  107:14  error  'err' is defined but never used                                                                     no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/playbook/EveningWindDown.jsx
+  16:9  error    'voiceRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                           no-unused-vars
+  71:6  warning  React Hook useEffect has missing dependencies: 'speakCurrentStep' and 'steps'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/playbook/PlaybookShell.jsx
+  44:19  error  't' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/playbook/PracticeGarden.jsx
+  29:9   warning  The 'garden' logical expression could make the dependencies of useCallback Hook (at line 80) change on every render. To fix this, wrap the initialization of 'garden' in its own useMemo() Hook                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-hooks/exhaustive-deps
+  58:37  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `traction`, but the source dependencies were [user, garden, traction?.commitmentTier]. Inferred less specific property than source.
+
+  56 |   };
+  57 |
+> 58 |   const handleCalSync = useCallback(async () => {
+     |                                     ^^^^^^^^^^^^^
+> 59 |     if (!user) return;
+     | ^^^^^^^^^^^^^^^^^^^^^^
+> 60 |     setCalSyncStatus('syncing');
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^
+> 79 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^
+> 80 |   }, [user, garden, traction?.commitmentTier]);
+     | ^^^^ Could not preserve existing manual memoization
+  81 |
+  82 |   return (
+  83 |     <div style={styles.container}>  react-hooks/preserve-manual-memoization
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/playbook/PracticeJournal.jsx
+   2:10  error  'getNodeById' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  17:53  error  'nextRecommended' is defined but never used                                         no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/truebadour/RiffChat.jsx
+  28:6  warning  React Hook useEffect has a missing dependency: 'handleSend'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  40:9  error    'fullResponse' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                   no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/truebadour/TruebadourChat.jsx
+  6:3   error  'pendingTool' is defined but never used      no-unused-vars
+  6:16  error  'confirmToolCall' is defined but never used  no-unused-vars
+  6:33  error  'cancelToolCall' is defined but never used   no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/xr/CScaleVisualizer.jsx
+  2:18  error  'useFrame' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/components/xr/CalibrationUI.jsx
+    1:27  error  'useRef' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                     no-unused-vars
+    2:10  error  'useFrame' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                   no-unused-vars
+   16:10  error  'fret12Pos' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  106:11  error  'digitalNutOffset' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/__tests__/completePhaseChain.test.js
+  3:26  error  'getNodeById' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/__tests__/tractionStore.studentFlow.test.js
+   8:44  error  'vi' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                   no-unused-vars
+  11:3   error  'saveTraction' is defined but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  16:3   error  'getDefaultFretState' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/mockStudent.js
+  11:10  error  'randInt' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/notificationEngine.js
+   14:37  error  'treeId' is defined but never used  no-unused-vars
+   56:25  error  'garden' is defined but never used  no-unused-vars
+   68:25  error  'garden' is defined but never used  no-unused-vars
+   78:25  error  'garden' is defined but never used  no-unused-vars
+  107:25  error  'garden' is defined but never used  no-unused-vars
+  116:25  error  'garden' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/playbookData.js
+  451:11  error  'accuracy' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/ragStore.js
+   19:1   warning  Unused eslint-disable directive (no problems were reported from 'no-unused-vars')
+   63:16  error    'get' is defined but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  153:35  error    'locale' is assigned a value but never used                                        no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/systemPromptInjector.js
+   20:21  error  'getFixChain' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  125:9   error  'pe' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/ttsAudioSuite.js
+  235:41  error  'sampleRate' is defined but never used                                                     no-unused-vars
+  238:9   error  'blockSize' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/data/workbenchData.js
+   10:30  error  'getSlidePosition' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  175:15  error  '_' is defined but never used                                                            no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/game/AdventurePlayer.jsx
+  58:35  error  'volume' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/game/DailyCalibration.jsx
+   14:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+   17:21  error  'playReferenceTone' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+   36:10  error  'volumeWindow' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+   36:24  error  'setVolumeWindow' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+   38:11  error  'isListening' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+   41:9   error  'stabilityTimerRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+   78:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  76 |       if (consecutiveInTuneFrames.current >= 8) {
+  77 |         playPling(target.freq);
+> 78 |         setTunedStrings(prev => {
+     |         ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  79 |           const next = [...prev];
+  80 |           next[currentStringIdx] = true;
+  81 |           return next;  react-hooks/set-state-in-effect
+  123:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  121 |       // No vocalization or too quiet
+  122 |       volumeHistory.current = [];
+> 123 |       setIsStable(true);
+      |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  124 |       setSomaticStatus('Vocalize an "A" (110Hz or octave) at a comfortable volume.');
+  125 |       return;
+  126 |     }            react-hooks/set-state-in-effect
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/game/VertiscaleEngine.jsx
+   89:11  error    'avgScore' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                            no-unused-vars
+   91:11  error    'avgHrv' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                              no-unused-vars
+   99:11  error    'avgFlow' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                             no-unused-vars
+  103:11  error    'deviations' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                          no-unused-vars
+  153:17  error    'tapProgressPct' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                      no-unused-vars
+  198:6   warning  React Hook useCallback has an unnecessary dependency: 'gameMode'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/game/WalkingModeEngine.jsx
+   43:11  error    'isListening' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+  161:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  159 |       // For the POC, we just accept any solid sung pitch as a "hit"
+  160 |       // In production, we compare `pitch` to the target interval ratio of the scene.
+> 161 |       log(`Detected Pitch: ${Math.round(pitch)}Hz!`);
+      |       ^^^ Avoid calling setState() directly within an effect
+  162 |       playPling(pitch * 1.5); // Reward chime (Perfect Fifth above their note)
+  163 |       
+  164 |       stopListening();  react-hooks/set-state-in-effect
+  171:6   warning  React Hook useEffect has a missing dependency: 'stopListening'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/game/XRGameFretboard.jsx
+   22:3   error  'breathState' is assigned a value but never used       no-unused-vars
+   23:3   error  'detectedNoteName' is assigned a value but never used  no-unused-vars
+   24:3   error  'cents' is assigned a value but never used             no-unused-vars
+   25:3   error  'pitch' is assigned a value but never used             no-unused-vars
+  132:64  error  'isTappable' is defined but never used                 no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/TruebadourProvider.jsx
+  124:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/__tests__/dagNodes.test.js
+   8:49  error  'getNodesByPillar' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   8:67  error  'getPrerequisites' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  11:1   error  'describe' is not defined                                                                no-undef
+  12:3   error  'test' is not defined                                                                    no-undef
+  13:5   error  'expect' is not defined                                                                  no-undef
+  16:3   error  'test' is not defined                                                                    no-undef
+  18:5   error  'expect' is not defined                                                                  no-undef
+  21:3   error  'test' is not defined                                                                    no-undef
+  23:7   error  'expect' is not defined                                                                  no-undef
+  24:7   error  'expect' is not defined                                                                  no-undef
+  25:7   error  'expect' is not defined                                                                  no-undef
+  26:7   error  'expect' is not defined                                                                  no-undef
+  27:7   error  'expect' is not defined                                                                  no-undef
+  28:7   error  'expect' is not defined                                                                  no-undef
+  29:7   error  'expect' is not defined                                                                  no-undef
+  30:7   error  'expect' is not defined                                                                  no-undef
+  31:7   error  'expect' is not defined                                                                  no-undef
+  32:7   error  'expect' is not defined                                                                  no-undef
+  36:3   error  'test' is not defined                                                                    no-undef
+  41:7   error  'expect' is not defined                                                                  no-undef
+  42:7   error  'expect' is not defined                                                                  no-undef
+  46:3   error  'test' is not defined                                                                    no-undef
+  49:5   error  'expect' is not defined                                                                  no-undef
+  52:3   error  'test' is not defined                                                                    no-undef
+  56:9   error  'expect' is not defined                                                                  no-undef
+  57:9   error  'expect' is not defined                                                                  no-undef
+  63:1   error  'describe' is not defined                                                                no-undef
+  64:3   error  'test' is not defined                                                                    no-undef
+  65:5   error  'expect' is not defined                                                                  no-undef
+  68:3   error  'test' is not defined                                                                    no-undef
+  73:5   error  'expect' is not defined                                                                  no-undef
+  76:5   error  'expect' is not defined                                                                  no-undef
+  80:1   error  'describe' is not defined                                                                no-undef
+  81:3   error  'test' is not defined                                                                    no-undef
+  82:5   error  'expect' is not defined                                                                  no-undef
+  85:3   error  'test' is not defined                                                                    no-undef
+  86:5   error  'expect' is not defined                                                                  no-undef
+  90:1   error  'describe' is not defined                                                                no-undef
+  91:3   error  'test' is not defined                                                                    no-undef
+  93:5   error  'expect' is not defined                                                                  no-undef
+  96:3   error  'test' is not defined                                                                    no-undef
+  98:5   error  'expect' is not defined                                                                  no-undef
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/__tests__/useVoiceInput.test.js
+  106:3  error  'afterEach' is not defined  no-undef
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useAuth.js
+  94:15  error  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useBackendBridge.js
+   91:14  error  'e' is defined but never used  no-unused-vars
+  111:14  error  'e' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useBertrandVoice.js
+   8:21  error  'setIsLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  10:9   error  'audioContextRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  16:42  error  'locale' is assigned a value but never used                                                      no-unused-vars
+  49:49  error  'locale' is assigned a value but never used                                                      no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useBevyIPC.jsx
+   38:18  error  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+   53:52  error  Error: Cannot access variable before it is declared
+
+`connect` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  51 |           const delay = Math.pow(2, retryCountRef.current) * 1000;
+  52 |           retryCountRef.current += 1;
+> 53 |           reconnectTimeoutRef.current = setTimeout(connect, delay);
+     |                                                    ^^^^^^^ `connect` accessed before it is declared
+  54 |         }
+  55 |       };
+  56 |
+
+  11 |   const MAX_RETRIES = 3;
+  12 |
+> 13 |   const connect = useCallback(() => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 14 |     if (wsRef.current?.readyState === WebSocket.OPEN) return;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 15 |     if (retryCountRef.current >= MAX_RETRIES) {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 71 |   }, [isConnected]);
+     | ^^^^^^^^^^^^^^^^^^^^^ `connect` is declared here
+  72 |
+  73 |   useEffect(() => {
+  74 |     connect();  react-hooks/immutability
+   57:21  error  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        no-unused-vars
+  111:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-refresh/only-export-components
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useDAGProgress.js
+   59:13  error  Empty block statement                                                                  no-empty
+   71:15  error  Empty block statement                                                                  no-empty
+  173:15  error  'phase' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useKokoroTTS.js
+   62:31  error    'status' is defined but never used                                                                                no-unused-vars
+   83:33  error    'status' is defined but never used                                                                                no-unused-vars
+  134:6   warning  React Hook useCallback has a missing dependency: 'speechSpeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  157:6   warning  React Hook useCallback has a missing dependency: 'speechSpeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useLMStudio.js
+  167:22  error  'e' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/usePlayerState.js
+  97:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+   95 |       const streak = streakRaw ? parseInt(streakRaw, 10) : 0;
+   96 |       if (days <= 1 && streak > 0) {
+>  97 |         setState(s => ({ ...s, currentStreak: streak }));
+      |         ^^^^^^^^ Avoid calling setState() directly within an effect
+   98 |       }
+   99 |     } catch { /* ignore */ }
+  100 |   }, []);  react-hooks/set-state-in-effect
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useSomaticModifier.js
+  65:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  63 |     }
+  64 |
+> 65 |     setFrictionModifier({
+     |     ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  66 |       frictionLevel: level,
+  67 |       difficultyClass: dc,
+  68 |       sessionTargetMins: target,  react-hooks/set-state-in-effect
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useTruebadourAI.js
+  293:5  error    Unreachable code                                                                                                             no-unreachable
+  294:6  warning  React Hook useCallback has an unnecessary dependency: 'speakTextInternal'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useTruebadourInbox.js
+  13:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  11 |       const saved = localStorage.getItem(INBOX_KEY);
+  12 |       if (saved) {
+> 13 |         setInbox(JSON.parse(saved));
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |       }
+  15 |     } catch (err) {
+  16 |       console.warn('Failed to load Truebadour inbox:', err);  react-hooks/set-state-in-effect
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useVoiceInput.js
+  19:10  error  'isAvailable' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  19:23  error  'setIsAvailable' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  39:53  error  'e' is defined but never used                                                                   no-unused-vars
+  90:53  error  'e' is defined but never used                                                                   no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useWebSpeechTTS.js
+   59:9   error  'localeRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+   64:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  62 |   useEffect(() => {
+  63 |     if (!('speechSynthesis' in window)) return;
+> 64 |     setIsAvailable(true);
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  65 |
+  66 |     const loadVoices = () => {
+  67 |       const all = window.speechSynthesis.getVoices();  react-hooks/set-state-in-effect
+  103:82  error  Empty block statement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-empty
+  108:79  error  Empty block statement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-empty
+  113:80  error  Empty block statement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-empty
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useWllamaOrpheus.js
+  230:53  error  Empty block statement  no-empty
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/hooks/useWllamaTruebadour.js
+  179:16  error  'e' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/lib/audioStreamingService.js
+  123:43  error  'fretId' is assigned a value but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/lib/calendarService.js
+  103:76  error  'studentEmail' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/lib/dataMigration.js
+  44:10  error  'readLocalPracticeLog' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/lib/driveService.js
+  192:53  error  Empty block statement  no-empty
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/pages/ArchetypePage.jsx
+  15:37  error  'result' is defined but never used  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/pages/BlueprintHub.jsx
+  12:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  10 |   useEffect(() => {
+  11 |     try {
+> 12 |       setContent(thesisRaw);
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  13 |     } catch (err) {
+  14 |       setError('Failed to load the Blueprint Thesis. Ensure the file exists in /docs/VOIX_VIVE_MASTER_THESIS.md');
+  15 |       console.error(err);  react-hooks/set-state-in-effect
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/pages/CScaleHub.jsx
+  39:10  error  'noteMatchesMidi' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/joshua/Workflow/Other/Bertrand-Masterclass/apps/companion-app/src/pages/StudentDashboard.jsx
+    1:17  error  'useState' is defined but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+  121:11  error  'traction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 263 problems (237 errors, 26 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

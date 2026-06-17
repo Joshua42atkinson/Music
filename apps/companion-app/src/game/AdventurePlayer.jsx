@@ -1,0 +1,549 @@
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
+import { TRUEBADOUR } from '../data/adventures/truebadour';
+import {
+  createSession, loadAdventure, resolvePitch,
+  resolveChoice, scoreSingingResponse, getSessionSummary,
+} from './narrativeEngine';
+import usePitchDetector from '../hooks/usePitchDetector';
+import PitchGateUI from './PitchGateUI';
+import { playReferenceTone } from '../audio/audioEngine';
+// Tavern3DVisualizer archived → _archive/vr_future/ (Android XR moonshot, revenue gate $5k/mo)
+
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { useLocale } from '../hooks/useLocale';
+import { vvSetJSON } from '../lib/storage';
+import { STORAGE_KEYS } from '../lib/storageKeys';
+
+// ═══════════════════════════════════════════════════════════
+// ADVENTURE PLAYER — Narrative game mode
+// Renders truebadour.js scenes as a playable pitch-gated
+// branching story with the PLING! protocol:
+//   Hear it → Sing it → Choose
+// ═══════════════════════════════════════════════════════════
+
+const ATMOSPHERE_COLORS = {
+  'amber-dusk':      { bg: 'rgba(180,120,40,0.08)',  accent: 'var(--cf-gold)', glow: 'rgba(var(--cf-gold-rgb),0.12)' },
+  'cool-stone':      { bg: 'rgba(80,100,140,0.08)',  accent: '#7a9ab8', glow: 'rgba(122,154,184,0.10)' },
+  'warm-gold':       { bg: 'rgba(200,160,80,0.10)',  accent: '#d4a855', glow: 'rgba(212,168,85,0.15)' },
+  'deep-violet':     { bg: 'rgba(100,60,160,0.10)',  accent: '#9b7acc', glow: 'rgba(155,122,204,0.12)' },
+  'amber-intimate':  { bg: 'rgba(180,120,40,0.12)',  accent: 'var(--cf-gold)', glow: 'rgba(var(--cf-gold-rgb),0.18)' },
+  'cool-night':      { bg: 'rgba(40,50,80,0.12)',    accent: '#6a8ab0', glow: 'rgba(106,138,176,0.10)' },
+  'red-tension':     { bg: 'rgba(160,40,40,0.08)',   accent: '#cc5555', glow: 'rgba(204,85,85,0.12)' },
+  'deep-gold':       { bg: 'rgba(180,140,40,0.10)',  accent: 'var(--cf-gold)', glow: 'rgba(var(--cf-gold-rgb),0.15)' },
+  'warm-firelight':  { bg: 'rgba(200,120,40,0.12)',  accent: '#d4a855', glow: 'rgba(212,168,85,0.18)' },
+  'ember-warm':      { bg: 'rgba(160,80,30,0.10)',   accent: '#c98a4e', glow: 'rgba(201,138,78,0.12)' },
+  'luminous-gold':   { bg: 'rgba(220,180,60,0.12)',  accent: '#e8c44a', glow: 'rgba(232,196,74,0.18)' },
+};
+
+const ACT_LABELS = { 
+  1: { en: 'ACT I · THE ARRIVAL', fr: "ACTE I · L'ARRIVÉE" }, 
+  2: { en: 'ACT II · THE TEACHING', fr: "ACTE II · L'ENSEIGNEMENT" }, 
+  3: { en: 'ACT III · THE PERFORMANCE', fr: "ACTE III · LA PERFORMANCE" } 
+};
+
+function AdventurePlayer({ onClose }) {
+  const navigate = useNavigate();
+  const { locale, t } = useLocale();
+
+  const localize = useCallback((val) => {
+    if (!val) return '';
+    if (typeof val === 'object') {
+      return val[locale] || val['en'] || '';
+    }
+    return val;
+  }, [locale]);
+
+  const {
+    isListening, pitch, noteInfo, volume: _volume, breathState,
+    startListening,
+  } = usePitchDetector();
+
+  const [session, setSession] = useState(() => {
+    const initialSession = createSession('truebadour-occitania');
+    const { session: newSession } = loadAdventure(TRUEBADOUR, initialSession);
+    return newSession;
+  });
+
+  const [scene, setScene] = useState(() => {
+    const initialSession = createSession('truebadour-occitania');
+    const { scene: firstScene } = loadAdventure(TRUEBADOUR, initialSession);
+    return firstScene;
+  });
+
+  const [phase, setPhase] = useState('intro'); // intro | listening | gate | choose | transition | singing | ending | summary
+  const [gateState, setGateState] = useState('waiting');
+  
+  const [coachingCue, setCoachingCue] = useState(() => {
+    const initialSession = createSession('truebadour-occitania');
+    const { scene: firstScene } = loadAdventure(TRUEBADOUR, initialSession);
+    return firstScene?.coachingCues?.onSceneEnter || '';
+  });
+
+  const [singingStart, setSingingStart] = useState(null);
+  const [activeChoice, setActiveChoice] = useState(null);
+
+  const [showSkipGate, setShowSkipGate] = useState(false);
+  const skipTimerRef = useRef(null);
+
+  // Auto-advance from intro to listening after delay
+  useEffect(() => {
+    if (phase === 'intro' && scene) {
+      const t = setTimeout(() => setPhase('listening'), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [phase, scene]);
+
+  // Pitch gate evaluation
+  useEffect(() => {
+    if (phase !== 'gate' || !pitch || !noteInfo || !scene) return;
+    const { passed, newStreak, coachingCue: cue } = resolvePitch(scene, noteInfo.cents, session.streak);
+    if (passed) {
+      setTimeout(() => {
+        setGateState('passed');
+        setCoachingCue(cue);
+        setSession(prev => ({
+          ...prev,
+          streak: newStreak,
+          totalPitchAttempts: prev.totalPitchAttempts + 1,
+          accuratePitchCount: prev.accuratePitchCount + 1,
+        }));
+      }, 0);
+      const t = setTimeout(() => setPhase('choose'), 1500);
+      return () => clearTimeout(t);
+    }
+  }, [phase, pitch, noteInfo, scene]); // eslint-disable-line
+
+  // Gate timeout — auto-advance after 15s even if pitch not found
+  useEffect(() => {
+    if (phase !== 'gate') return;
+    // Show skip button after 8s
+    skipTimerRef.current = setTimeout(() => setShowSkipGate(true), 8000);
+    const t = setTimeout(() => {
+      if (gateState !== 'passed') {
+        setGateState('failed');
+        setCoachingCue(scene?.coachingCues?.onPitchStruggle || '');
+        setSession(prev => ({ ...prev, streak: 0, totalPitchAttempts: prev.totalPitchAttempts + 1 }));
+        setTimeout(() => setPhase('choose'), 2000);
+      }
+    }, 15000);
+    return () => { clearTimeout(t); clearTimeout(skipTimerRef.current); setShowSkipGate(false); };
+  }, [phase, gateState, scene]);
+
+  const handleStartGate = useCallback(() => {
+    if (!isListening) startListening();
+    setGateState('open');
+    setShowSkipGate(false);
+    setPhase('gate');
+    
+    // Play the reference tone so the user knows what to sing
+    if (scene?.targetFreq) {
+      playReferenceTone(scene.targetFreq);
+    }
+  }, [isListening, startListening, scene]);
+
+  const handleSkipGate = useCallback(() => {
+    setGateState('skipped');
+    setShowSkipGate(false);
+    setCoachingCue(t('advSkipCoaching'));
+    setSession(prev => ({ ...prev, streak: 0 }));
+    setTimeout(() => setPhase('choose'), 1000);
+  }, [t]);
+
+  const executeChoice = useCallback((choice, singingScore) => {
+    setPhase('transition');
+    const result = resolveChoice(TRUEBADOUR, scene, choice, session, singingScore);
+
+    if (result.coachingCue) setCoachingCue(result.coachingCue);
+
+    setTimeout(() => {
+      setSession(result.session);
+      setScene(result.nextScene);
+      setGateState('waiting');
+      setActiveChoice(null);
+      setShowSkipGate(false);
+
+      // Save progress for resume
+      try {
+        vvSetJSON(STORAGE_KEYS.ADVENTURE_SESSION, {
+          adventureId: result.session.adventureId,
+          currentSceneId: result.nextScene?.id,
+          session: result.session,
+          timestamp: Date.now(),
+        });
+      } catch {
+        // Ignore storage errors in sandbox mode
+      }
+
+      if (result.nextScene?.isEnding) {
+        setPhase('ending');
+        setCoachingCue(result.nextScene.mentorLine);
+      } else {
+        setPhase('intro');
+        setCoachingCue(result.nextScene?.coachingCues?.onSceneEnter || '');
+      }
+    }, 1200);
+  }, [scene, session]);
+
+  const handleChoice = useCallback((choice) => {
+    if (choice.mode === 'sing') {
+      setActiveChoice(choice);
+      setSingingStart(Date.now());
+      setPhase('singing');
+      if (!isListening) startListening();
+      return;
+    }
+    // Speak mode — resolve immediately
+    executeChoice(choice, null);
+  }, [isListening, startListening, executeChoice]);
+
+  const handleSingComplete = useCallback(() => {
+    if (!activeChoice) return;
+    const duration = (Date.now() - (singingStart || Date.now())) / 1000;
+    const pitchAcc = session.totalPitchAttempts > 0
+      ? session.accuratePitchCount / session.totalPitchAttempts : 0.5;
+    const { score } = scoreSingingResponse({
+      pitchAccuracy: pitchAcc,
+      melodicContour: duration > 3 ? 'ascending' : 'static',
+      duration,
+      theme: { matched: duration > 2 },
+    });
+    executeChoice(activeChoice, score);
+  }, [activeChoice, singingStart, session, executeChoice]);
+
+  const handleFinish = useCallback(() => {
+    setPhase('summary');
+  }, []);
+
+  if (!scene) return null;
+
+  const atmo = ATMOSPHERE_COLORS[scene.atmosphere] || ATMOSPHERE_COLORS['amber-dusk'];
+  const summary = phase === 'summary' ? getSessionSummary(session) : null;
+
+  return (
+    <div className="fixed inset-0 z-[300] bg-[#030306] flex flex-col font-sans text-[#e8edf2] overflow-hidden">
+      {/* Top Bar */}
+      <div className="flex items-center justify-between px-4 pt-[max(12px,env(safe-area-inset-top))] pb-3 bg-[rgba(8,8,14,0.95)] z-10 shrink-0" style={{ borderBottom: `1px solid ${atmo.accent}20` }}>
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate(-1)} className="bg-white/[0.04] border border-white/[0.06] text-[#8090a8] rounded-lg text-[0.85rem] cursor-pointer py-2 px-3 font-mono flex items-center gap-1.5"><ArrowLeft size={14} /> {t('back')}</button>
+          <button onClick={onClose} className="bg-white/[0.04] border border-white/[0.06] text-[#8090a8] rounded-lg text-base cursor-pointer py-2 px-3.5 font-mono">{t('exit')}</button>
+        </div>
+        <span className="font-mono text-[0.85rem] tracking-[0.15em] uppercase" style={{ color: atmo.accent }}>
+          {localize(ACT_LABELS[scene.act]) || 'ADVENTURE'}
+        </span>
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate('/')} className="bg-transparent border-none cursor-pointer p-0" aria-label="Home">
+            <img src="/assets/wordmark.png" alt="Voix Vive" className="h-5 opacity-70" draggable={false} />
+          </button>
+          <span className="font-mono text-[0.85rem] text-[#5a6a80]">🔥 {session.streak}</span>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto pb-[100px]">
+        <AnimatePresence mode="wait">
+          {phase === 'summary' ? (
+            <SummaryView key="summary" summary={summary} localize={localize} t={t} onClose={onClose} />
+          ) : phase === 'transition' ? (
+            <motion.div key="transition" initial={{ opacity: 1 }} animate={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', border: `2px solid ${atmo.accent}`,
+                borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
+            </motion.div>
+          ) : (
+            <motion.div key={scene.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.6 }}
+              style={{ display: 'flex', flexDirection: 'column' }}>
+
+              {/* Scene Art + 3D Visualizer */}
+              <div style={{
+                width: '100%', aspectRatio: '16/9', position: 'relative',
+                background: `linear-gradient(135deg, ${atmo.bg}, #030306)`, overflow: 'hidden',
+              }}>
+                {/* Scene illustration as ambient background */}
+                {scene.art && (
+                  <img
+                    src={scene.art}
+                    alt=""
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                    style={{
+                      position: 'absolute', inset: 0, width: '100%', height: '100%',
+                      objectFit: 'cover', opacity: 0.35, filter: 'blur(1px)',
+                    }}
+                  />
+                )}
+                {/* Scene atmosphere placeholder — VR tavern scene is a future moonshot */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `radial-gradient(ellipse at 50% 80%, ${scene.atmosphere === 'warm' ? 'rgba(201,120,60,0.18)' : scene.atmosphere === 'mystical' ? 'rgba(100,60,180,0.18)' : 'rgba(40,80,120,0.18)'} 0%, transparent 70%)`,
+                }} />
+                {/* Gradient overlay */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `linear-gradient(transparent 40%, #030306 100%)`,
+                }} />
+                {/* Interval badge */}
+                <div style={{
+                  position: 'absolute', top: 16, left: 16, padding: '6px 14px',
+                  background: 'rgba(0,0,0,0.6)', borderRadius: 6,
+                  border: `1px solid ${atmo.accent}40`,
+                }}>
+                  <span style={{
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+                    letterSpacing: '0.12em', color: atmo.accent,
+                  }}>{localize(scene.intervalName)} · {localize(scene.pitchLabel)}</span>
+                </div>
+              </div>
+
+              {/* Scene Content */}
+              <div style={{ padding: '0 20px', maxWidth: 520, margin: '0 auto', width: '100%' }}>
+                {/* Setting */}
+                <p style={{
+                  fontFamily: 'EB Garamond, serif', fontSize: '1.05rem', lineHeight: 1.8,
+                  color: '#d0d8e0', marginTop: -20, position: 'relative', zIndex: 2,
+                }}>{localize(scene.setting)}</p>
+
+                {/* Mentor Line */}
+                <div style={{
+                  padding: '16px 20px', borderRadius: 10, marginTop: 16,
+                  background: `${atmo.accent}0a`, border: `1px solid ${atmo.accent}20`,
+                }}>
+                  <p style={{
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: '1rem',
+                    letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
+                    marginBottom: 8,
+                  }}>BERNARD DE VENTADORN</p>
+                  <p style={{
+                    fontFamily: 'EB Garamond, serif', fontSize: '1.1rem', fontStyle: 'italic',
+                    color: atmo.accent, lineHeight: 1.7, margin: 0,
+                  }}>"{localize(scene.mentorLine)}"</p>
+                </div>
+
+                {/* Coaching Cue */}
+                {coachingCue && (
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    style={{
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
+                      color: '#5a6a80', fontStyle: 'italic', marginTop: 12, textAlign: 'center',
+                    }}>— {localize(coachingCue)}</motion.p>
+                )}
+
+
+
+                {/* Phase: Listening — prompt to start gate */}
+                {phase === 'listening' && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    style={{ marginTop: 24, textAlign: 'center' }}>
+                    {!isListening && (
+                      <button onClick={startListening} style={{
+                        padding: '12px 24px', borderRadius: 8, marginBottom: 12,
+                        background: 'rgba(46,213,115,0.1)', border: '1px solid rgba(46,213,115,0.3)',
+                        color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: '0.9rem',
+                      }}>{t('enableMic')}</button>
+                    )}
+                    <button onClick={handleStartGate} style={{
+                      display: 'block', width: '100%', maxWidth: 300, margin: '0 auto',
+                      padding: '16px 24px', borderRadius: 10,
+                      background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
+                      color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                    }}>{t('advFindThe')}{scene.targetNote}</button>
+                  </motion.div>
+                )}
+
+                {/* Phase: Gate — PitchGateUI */}
+                {phase === 'gate' && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginTop: 20 }}>
+                    <PitchGateUI
+                      targetNote={{ name: scene.targetNote, freq: scene.targetFreq }}
+                      noteInfo={noteInfo}
+                      pitch={pitch}
+                      breathState={breathState}
+                      gateState={gateState}
+                      tolerance={20}
+                    />
+                    {showSkipGate && (
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        style={{ textAlign: 'center', marginTop: 16 }}>
+                        <button onClick={handleSkipGate} style={{
+                          padding: '10px 20px', borderRadius: 8,
+                          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#5a6a80', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+                          fontSize: '0.85rem',
+                        }}>{t('advSkipPitch')}</button>
+                        <p style={{ fontSize: '0.8rem', color: '#5a6a80', marginTop: 6, fontStyle: 'italic' }}>
+                          {t('advSkipNoPenalty')}
+                        </p>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* Phase: Choose */}
+                {phase === 'choose' && scene.choices && scene.choices.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
+                    <p style={{
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+                      letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
+                      textAlign: 'center', marginBottom: 4,
+                    }}>{t('yourResponse')}</p>
+                    {scene.choices.map(choice => (
+                      <button key={choice.id} onClick={() => handleChoice(choice)} style={{
+                        padding: '16px 20px', borderRadius: 10, textAlign: 'left',
+                        background: choice.mode === 'sing' ? `${atmo.accent}10` : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${choice.mode === 'sing' ? `${atmo.accent}35` : 'rgba(255,255,255,0.08)'}`,
+                        cursor: 'pointer', transition: 'all 0.2s',
+                      }}>
+                        <p style={{
+                          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+                          letterSpacing: '0.1em', color: choice.mode === 'sing' ? atmo.accent : '#8090a8',
+                          margin: '0 0 4px',
+                        }}>{localize(choice.label)}</p>
+                        <p style={{ fontSize: '1rem', color: '#8090a8', margin: 0 }}>{localize(choice.description)}</p>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Phase: Singing */}
+                {phase === 'singing' && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    style={{ marginTop: 24, textAlign: 'center' }}>
+                    <div style={{
+                      width: 80, height: 80, borderRadius: '50%', margin: '0 auto 16px',
+                      background: `radial-gradient(circle, ${atmo.accent}30, transparent)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      animation: 'breathe 3s ease-in-out infinite',
+                    }}>
+                      <span style={{ fontSize: '2rem' }}>🎵</span>
+                    </div>
+                    <p style={{
+                      fontFamily: 'EB Garamond, serif', fontSize: '1rem', fontStyle: 'italic',
+                      color: atmo.accent, marginBottom: 16,
+                    }}>{t('singResponse')}</p>
+                    {isListening && pitch && (
+                      <p style={{
+                        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.9rem',
+                        color: '#2ed573',
+                      }}>♪ {noteInfo?.name} ({Math.round(pitch)} Hz)</p>
+                    )}
+                    <button onClick={handleSingComplete} style={{
+                      marginTop: 20, padding: '14px 28px', borderRadius: 8,
+                      background: 'rgba(46,213,115,0.15)', border: '1px solid rgba(46,213,115,0.4)',
+                      color: '#2ed573', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                    }}>{t('advCompleteResponse')}</button>
+                  </motion.div>
+                )}
+
+                {/* Phase: Ending */}
+                {phase === 'ending' && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    style={{ marginTop: 24, textAlign: 'center' }}>
+                    <p style={{
+                      fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+                      letterSpacing: '0.2em', color: atmo.accent, textTransform: 'uppercase',
+                      marginBottom: 16,
+                    }}>{scene.endingType === 'commission' ? t('advTheCommission') : t('advThePatronage')}</p>
+                    <p style={{
+                      fontFamily: 'EB Garamond, serif', fontSize: '1.1rem', lineHeight: 1.7,
+                      color: '#d0d8e0',
+                    }}>{localize(scene.setting)}</p>
+                    <button onClick={handleFinish} style={{
+                      marginTop: 24, padding: '14px 28px', borderRadius: 8,
+                      background: `${atmo.accent}18`, border: `1px solid ${atmo.accent}40`,
+                      color: atmo.accent, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: '1rem', letterSpacing: '0.1em',
+                    }}>{t('viewSummary')}</button>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes breathe {
+          0%, 100% { transform: scale(1); opacity: 0.7; }
+          50% { transform: scale(1.15); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ── Summary View ──
+function SummaryView({ summary, localize, t, onClose }) {
+  if (!summary) return null;
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        gap: 20, padding: '40px 20px',
+      }}>
+      <p style={{
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+        letterSpacing: '0.2em', color: '#5a6a80', textTransform: 'uppercase',
+      }}>{t('advAdventureComplete')}</p>
+
+      <h2 style={{
+        fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem',
+        fontWeight: 300, color: '#e8edf2', textAlign: 'center',
+      }}>{localize(TRUEBADOUR.title)}</h2>
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', maxWidth: 300 }}>
+        <StatBox label={t('advPitchAccuracy')} value={`${summary.accuracy}%`} />
+        <StatBox label={t('advScenes')} value={summary.scenesCompleted} />
+        <StatBox label={t('advBonusPaths')} value={summary.bonusBranches} />
+        <StatBox label={t('advSungResponses')} value={summary.sungResponses} />
+      </div>
+
+      {/* Impression */}
+      <div style={{
+        padding: '16px 20px', borderRadius: 12, maxWidth: 300, width: '100%',
+        background: 'rgba(var(--cf-gold-rgb),0.06)', border: '1px solid rgba(var(--cf-gold-rgb),0.12)',
+      }}>
+        <p style={{
+          fontFamily: 'EB Garamond, serif', fontSize: '1rem', fontStyle: 'italic',
+          color: 'var(--cf-gold)', lineHeight: 1.7, margin: 0,
+        }}>"{localize(summary.impression)}"</p>
+        <p style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem',
+          color: '#5a6a80', marginTop: 8, letterSpacing: '0.1em',
+        }}>— BERNARD DE VENTADORN</p>
+      </div>
+
+      <button onClick={onClose} style={{
+        padding: '14px 28px', borderRadius: 8, marginTop: 8,
+        background: 'rgba(var(--cf-gold-rgb),0.12)', border: '1px solid rgba(var(--cf-gold-rgb),0.3)',
+        color: 'var(--cf-gold)', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace',
+        fontSize: '0.9rem',
+      }}>{t('advReturnToMenu')}</button>
+    </motion.div>
+  );
+}
+
+function StatBox({ label, value }) {
+  return (
+    <div style={{
+      padding: '12px', borderRadius: 8, textAlign: 'center',
+      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+    }}>
+      <p style={{
+        fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+        color: '#5a6a80', letterSpacing: '0.12em', marginBottom: 4,
+      }}>{label}</p>
+      <p style={{ fontSize: '1.1rem', color: '#e8edf2', fontWeight: 300, margin: 0 }}>{value}</p>
+    </div>
+  );
+}
+
+export default AdventurePlayer;
