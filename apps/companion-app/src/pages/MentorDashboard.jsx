@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ═══════════════════════════════════════════════════════════
 // MENTOR DASHBOARD — Bertrand's submission review center
 // Shows all student video submissions with Google Drive links.
@@ -15,6 +16,7 @@ import {
 import { useTruebadourAI } from '../hooks/useTruebadourAI';
 import MentorVideoRecorder from '../components/MentorVideoRecorder';
 import { sendReviewEmail } from '../lib/notificationService';
+import { devError } from '../lib/devLog';
 
 export default function MentorDashboard() {
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ export default function MentorDashboard() {
       setSubmissions(subs);
       setWorkload(wl);
     } catch (err) {
-      console.error('[MentorDashboard] Load failed:', err);
+      devError('[MentorDashboard] Load failed:', err);
       setError(err.message || 'Failed to load submissions');
     } finally {
       setLoading(false);
@@ -75,10 +77,10 @@ export default function MentorDashboard() {
       
       const sub = submissions.find(s => s.id === subId);
       if (sub) {
-        sendReviewEmail(sub, sub.profiles, notes, mentorVideoLink).catch(e => console.warn('Email stub failed:', e));
+        sendReviewEmail(sub, sub.profiles, notes, mentorVideoLink).catch(e => devWarn('Email stub failed:', e));
       }
     } catch (err) {
-      console.error('[MentorDashboard] Review failed:', err);
+      devError('[MentorDashboard] Review failed:', err);
     }
   };
 
@@ -112,7 +114,7 @@ export default function MentorDashboard() {
       );
       setAiInsights(insightText || "Students are progressing well through the early chapters. Consider offering a group review session on Chapter 2 mechanics.");
     } catch (err) {
-      console.warn('AI Insights failed:', err);
+      devWarn('AI Insights failed:', err);
       setAiInsights("AI Insight generation failed or is offline. Please review notes manually.");
     } finally {
       setGeneratingInsights(false);

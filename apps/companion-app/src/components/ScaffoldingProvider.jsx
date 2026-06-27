@@ -23,6 +23,7 @@ import { useScaffoldingActions } from '../hooks/useScaffoldingActions';
 import { getNodeById } from '../data/dag/dagNodes';
 import { getNextRecommendedNode } from '../data/dag/dagEdges';
 import { indexCurriculum } from '../data/curriculumIndexer';
+import { analytics, logEvent } from '../lib/firebase';
 import { devWarn } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
@@ -91,9 +92,11 @@ export function ScaffoldingProvider({ children }) {
 
   const updateTraction = useCallback((updater) => {
     setTraction(prev => {
-      const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
-      persistTraction(next, userId);
-      return next;
+      const nextState = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
+      // Fire side effect safely inside the updater or in a separate useEffect.
+      // Since persistTraction is idempotent and debounced, it's safe here.
+      persistTraction(nextState, userId);
+      return nextState;
     });
   }, [userId]);
 

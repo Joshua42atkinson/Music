@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { db } from '../data/localDatabase';
 import { devLog, devWarn } from './devLog';
+import { devError } from './devLog';
 
 /**
  * Request a pre-signed PUT upload URL from the Supabase Edge Function.
@@ -141,7 +142,7 @@ export async function syncOutboxToR2(userId) {
         syncedCount++;
 
       } catch (err) {
-        console.error(`[R2Service] Failed to sync outbox item ${item.id}:`, err);
+        devError(`[R2Service] Failed to sync outbox item ${item.id}:`, err);
         // Revert status to queued for next retry
         await db.outbox.update(item.id, { status: 'queued' });
       }
@@ -150,7 +151,7 @@ export async function syncOutboxToR2(userId) {
     return { success: true, syncedCount };
 
   } catch (err) {
-    console.error('[R2Service] Error syncing outbox:', err);
+    devError('[R2Service] Error syncing outbox:', err);
     return { success: false, syncedCount: 0 };
   }
 }

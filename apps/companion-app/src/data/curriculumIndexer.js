@@ -13,6 +13,7 @@ import { STORAGE_KEYS } from '../lib/storageKeys';
 
 // ── Import curriculum data ─────────────────────────────────────
 import { dagNodes } from './dag/dagNodes';
+import { devError } from '../lib/devLog';
 
 const INDEX_VERSION = 'v1';
 const INDEX_VERSION_KEY = STORAGE_KEYS.RAG_VERSION;
@@ -130,7 +131,7 @@ export async function indexCurriculum(force = false) {
     devLog('[RAG] Curriculum indexed successfully.');
     return { indexed: true, version: INDEX_VERSION };
   } catch (err) {
-    console.error('[RAG] Indexing failed:', err);
+    devError('[RAG] Indexing failed:', err);
     return { indexed: false, error: err.message };
   }
 }

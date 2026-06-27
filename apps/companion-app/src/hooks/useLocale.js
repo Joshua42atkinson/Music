@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { vvSet } from '../lib/storage';
 import { STORAGE_KEYS } from '../lib/storageKeys';
 import '../i18n'; // Ensure i18n is initialized
+import { devError } from '../lib/devLog';
 
 const SOMATIC_TERMS = {
   en: {
@@ -47,7 +48,7 @@ export function useLocale() {
       const activeSomatic = SOMATIC_TERMS[locale] || SOMATIC_TERMS.en;
       return activeSomatic[term] || SOMATIC_TERMS.en[term] || term;
     } catch (error) {
-      console.error('[useLocale] Somatic translation error:', error);
+      devError('[useLocale] Somatic translation error:', error);
       return term;
     }
   }, [locale]);

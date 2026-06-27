@@ -33,7 +33,7 @@ For the 14-85 demographic. This is the front door.
 ### Track 2: The Somatic Masterclass (The Depth)
 For the artist who wants more. This is an advanced, opt-in track for users ready to dive deep into the mind-body connection of music.
 - **The 12 Chapters:** A developmental arc that treats the 12 frets of the guitar as 12 stages of a hero's journey.
-- **The Troubadour AI:** A Socratic AI mentor that doesn't just ask "Did you practice?" but asks "What did you feel in your body when you played that tritone?"
+- **The Truebadour AI:** A Socratic AI mentor that doesn't just ask "Did you practice?" but asks "What did you feel in your body when you played that tritone?"
 - **BE / DO / PLAY:** A structured practice routine encompassing somatic awareness (BE), disciplined technique (DO), and creative freedom (PLAY).
 
 **You can stay in the AR Fretboard forever. But when you are ready to find your true voice, the Masterclass is waiting.**

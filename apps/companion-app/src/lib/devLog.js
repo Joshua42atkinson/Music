@@ -13,3 +13,7 @@ export function devWarn(...args) {
 export function devInfo(...args) {
   if (import.meta.env.DEV) console.info(...args);
 }
+
+export function devError(...args) {
+  if (import.meta.env.DEV) console.error(...args);
+}

@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════════════════
+   VOIX VIVE — Design System Tokens
+   Built on the Conscious Framework palette with Arcane-specific aliases
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* Core Palette — AR Optimized (True Black for Holographic Transparency) */
+  --cf-void: #000000;
+  --cf-deep: #000000;
+  --cf-surface: rgba(10, 10, 15, 0.4);
+  --cf-surface-raised: rgba(20, 20, 30, 0.6);
+  --cf-border: #354560;
+  --cf-border-light: #455878;
+
+  /* Accent Colors */
+  --cf-gold: #c9a96e;
+  --cf-gold-rgb: 201, 169, 110;
+  --cf-gold-dim: #8b7d5a;
+  --cf-gold-dim-rgb: 139, 125, 90;
+  --cf-gold-glow: rgba(201, 169, 110, 0.15);
+  --cf-sage: #7aaa88;
+  --cf-sage-dim: #5a8a68;
+  --cf-meditation: #7b6aaa;
+  --cf-meditation-dim: #5d4e88;
+  --cf-breath: #5a90a0;
+  --cf-red: #cc3333;
+
+  /* Text */
+  --cf-ink: #d0d8e0;
+  --cf-ink-bright: #e8edf2;
+  --cf-whisper: #8090a8;
+  --cf-muted: #5a6a80;
+
+  /* Typography */
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-quote: 'EB Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* ── Minimum Font Standards (readability on all devices) ── */
+  --min-body: 1rem;        /* 16px — body, instructions, descriptions */
+  --min-label: 0.8rem;     /* 12.8px — uppercase mono labels */
+  --min-button: 0.9rem;    /* 14.4px — button text */
+  --min-meta: 0.85rem;     /* 13.6px — metadata, timestamps */
+  --min-game-note: 0.7rem; /* 11.2px — fretboard note labels (constrained) */
+  --min-stat: 1.1rem;      /* 17.6px — score numbers, stat values */
+
+  /* ── Hover State Variables ── */
+  --hover-transform: translateY(-2px);
+  --hover-shadow: 0 8px 25px rgba(201, 169, 110, 0.2);
+  --hover-border: rgba(201, 169, 110, 0.5);
+  --hover-bg: rgba(201, 169, 110, 0.1);
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Bard-specific aliases (pointing to --cf-* tokens) */
+  --bard-void: var(--cf-void);
+  --bard-surface: var(--cf-surface);
+  --bard-gold: var(--cf-gold);
+  --bard-gold-dim: var(--cf-gold-dim);
+  --bard-sage: var(--cf-sage);
+  --bard-yin: var(--cf-meditation);
+  --bard-yang: var(--cf-gold);
+  --bard-text: var(--cf-ink);
+  --bard-text-bright: var(--cf-ink-bright);
+  --bard-muted: var(--cf-muted);
+  --bard-whisper: var(--cf-whisper);
+  --bard-red: var(--cf-red);
+
+  /* ── C Scale Hub Palette ── */
+  --vv-cream: #f0e6d2;
+  --vv-gold: #c9a96e;
+  --vv-blue: #3498db;
+  --vv-green: #2ecc71;
+  --vv-red: #e74c3c;
+  --vv-yellow: #f1c40f;
+  --vv-orange: #e67e22;
+  --vv-purple: #9b59b6;
+  --vv-teal: #1abc9c;
+  --vv-deep-purple: #8e44ad;
+  --vv-text: #e8dcc8;
+}

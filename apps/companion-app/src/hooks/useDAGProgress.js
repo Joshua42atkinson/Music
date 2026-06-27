@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : useDAGProgress.js                                   ║
 // ║ WHAT    : React hook for DAG traversal state                 ║
@@ -44,7 +45,7 @@ function saveProgress(progress) {
   try {
     vvSetJSON(DAG_PROGRESS_KEY, progress);
   } catch (e) {
-    console.warn('[useDAGProgress] Failed to save:', e);
+    devWarn('[useDAGProgress] Failed to save:', e);
   }
 }
 

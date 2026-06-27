@@ -1,3 +1,4 @@
+import { devWarn } from '../../lib/devLog';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
@@ -9,6 +10,7 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { vvGet, vvSetJSON } from '../../lib/storage';
 import { STORAGE_KEYS } from '../../lib/storageKeys';
+import { devError } from '../../lib/devLog';
 
 const PROMPT_STEPS = [
   { word: "Be: Somatic Centering", duration: 120, description: "Focus on deep breathing, release neck and shoulder tension.", color: "var(--cf-gold)" }, // Gold
@@ -127,7 +129,7 @@ export default function SomaticStudioPrompter({ onClose }) {
       setIsPausedForTransition(false);
 
     } catch (err) {
-      console.error('[SomaticPrompter] Error starting camera:', err);
+      devError('[SomaticPrompter] Error starting camera:', err);
       setUploadError('Camera and microphone access are required to record a somatic session.');
     }
   };
@@ -179,6 +181,25 @@ export default function SomaticStudioPrompter({ onClose }) {
     }
   };
 
+  // ── Unmount Cleanup ──
+  useEffect(() => {
+    return () => {
+      clearInterval(timerRef.current);
+      clearInterval(durationTimerRef.current);
+      
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        try { mediaRecorderRef.current.stop(); } catch (e) {}
+      }
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => {
+          try { track.stop(); } catch (e) {}
+        });
+        streamRef.current = null;
+      }
+    };
+  }, []);
+
   // ── Upload Submission ──
   const submitSession = async () => {
     if (!blobRef.current) return;
@@ -229,7 +250,7 @@ export default function SomaticStudioPrompter({ onClose }) {
 
       // 2. Trigger background R2 sync (fire and forget to prevent UI block)
       import('../../lib/r2Service').then(({ syncOutboxToR2 }) => {
-        syncOutboxToR2(user.id).catch(err => console.warn('[Background R2 Sync] Failed:', err));
+        syncOutboxToR2(user.id).catch(err => devWarn('[Background R2 Sync] Failed:', err));
       });
 
       // 3. Save placeholder to local storage for instant UI updates (DigitalBinder)
@@ -250,7 +271,7 @@ export default function SomaticStudioPrompter({ onClose }) {
 
       setStage('done');
     } catch (err) {
-      console.error('[SomaticPrompter] Save failed:', err);
+      devError('[SomaticPrompter] Save failed:', err);
       setUploadError(err.message || 'Save failed. Make sure you have local storage space.');
       setStage('preview');
     }

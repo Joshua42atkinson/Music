@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useStudioAudio } from './useStudioAudio';
+import { devError } from '../lib/devLog';
 
 const PIPER_SERVER = import.meta.env.VITE_PIPER_API_URL || 'http://localhost:8001';
 
@@ -40,7 +41,7 @@ export function useBertrandVoice() {
 
       return playStudioAudio(audioData, sampleRate);
     } catch (err) {
-      console.error('[BertrandVoice] Server speak failed:', err);
+      devError('[BertrandVoice] Server speak failed:', err);
       return false;
     }
   }, [playStudioAudio]);
@@ -57,7 +58,7 @@ export function useBertrandVoice() {
       // Return Blob directly — caller must manage URL lifecycle
       return await res.blob();
     } catch (err) {
-      console.error('[BertrandVoice] Server generateBlob failed:', err);
+      devError('[BertrandVoice] Server generateBlob failed:', err);
       return null;
     }
   }, []);

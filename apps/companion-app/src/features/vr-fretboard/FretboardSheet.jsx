@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import FretboardExplorer from './FretboardExplorer';
+import { TONAL_SCALES } from './scales';
+import VRFretboardEngine from './VRFretboardEngine';
 import { useLocale } from '../../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
@@ -58,6 +60,7 @@ const FretboardSheet = ({
   const { locale } = useLocale();
   const localize = (val) => (val && typeof val === 'object' ? (val[locale] || val['en']) : val);
   const [sheetState, setSheetState] = useState('peek');
+  const [vrMode, setVrMode] = useState(false);
   const dragControls = useDragControls();
   const sheetRef = useRef(null);
 
@@ -263,6 +266,13 @@ const FretboardSheet = ({
             <div className="fbs-title">🎸 Fretboard Explorer</div>
           </div>
           <div className="flex items-center gap-2">
+            <button 
+              className="fbs-preset-tag" 
+              style={{ cursor: 'pointer', background: 'rgba(231,76,60,0.15)', color: '#e74c3c', borderColor: 'rgba(231,76,60,0.3)' }}
+              onClick={() => setVrMode(true)}
+            >
+              <span className="mr-1">🥽</span> VR MODE
+            </button>
             <button className="fbs-expand-btn" onClick={toggleExpand}>
               {sheetState === 'full' ? '▾' : '▴'}
             </button>
@@ -300,6 +310,15 @@ const FretboardSheet = ({
           />
         </div>
       </motion.div>
+
+      {/* VR Overlay Mode */}
+      {vrMode && (
+        <VRFretboardEngine 
+          onClose={() => setVrMode(false)}
+          presetRoot={rootNote}
+          presetScale={TONAL_SCALES?.[scaleName]?.tonalName || scaleName}
+        />
+      )}
     </>
   );
 };

@@ -43,29 +43,15 @@ const FRET_INTERVALS = [
   'TT', 'P5', 'm6', 'M6', 'm7', 'M7',
 ];
 
-const HERO_STAGES = [
-  'Call to Adventure',
-  'Refusal of the Call',
-  'Meeting the Mentor',
-  'Crossing the Threshold',
-  'Tests, Allies, Enemies',
-  'Approach to the Cave',
-  'The Ordeal',
-  'The Reward',
-  'The Road Back',
-  'The Resurrection',
-  'Return with the Elixir',
-  'Master of Two Worlds',
-];
+
 
 export default function MaturationMap() {
   const navigate = useNavigate();
   const { bardLevel, streak, practiceMinutes, traction, voice = 0, resonance = 0 } = useScaffolding();
   const { progress, getFretProgress, currentFret } = useDAGProgress();
   const { locale, t } = useLocale();
-  const lang = locale;
 
-  const bardTitle = useMemo(() => getBardTitle(bardLevel, lang), [bardLevel, lang]);
+  const bardTitle = useMemo(() => t(`bardLevel_${Math.min(Math.max(bardLevel, 1), 10)}`), [bardLevel, t]);
   const sandboxMode = traction?.settings?.sandboxMode;
 
   const currentMode = useMemo(() => {
@@ -99,7 +85,7 @@ export default function MaturationMap() {
       return {
         fret,
         interval: FRET_INTERVALS[i],
-        heroStage: HERO_STAGES[i],
+        heroStage: t(`heroStage_${i}`),
         color: FRET_COLORS[i],
         meta,
         totalNodes: nodes.length,
@@ -111,7 +97,7 @@ export default function MaturationMap() {
         pillars,
       };
     });
-  }, [progress, getFretProgress, currentFret, sandboxMode]);
+  }, [progress, getFretProgress, currentFret, sandboxMode, t]);
 
   // Find the highest unlocked fret
   const _highestUnlocked = useMemo(() => {

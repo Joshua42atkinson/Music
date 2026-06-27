@@ -7,11 +7,15 @@ import { devWarn } from './devLog';
 
 const CALENDAR_ID = import.meta.env.VITE_MENTOR_CALENDAR_ID || 'primary';
 
+import { vvGetJSON } from './storage';
+import { STORAGE_KEYS } from './storageKeys';
+
 async function getGoogleToken() {
-  const { supabase } = await import('./supabase.js');
-  if (!supabase) return null;
-  const { data: { session } } = await supabase.auth.getSession();
-  return session?.provider_token || null;
+  const tokenData = vvGetJSON(STORAGE_KEYS.GOOGLE_TOKEN, null);
+  if (tokenData?.access_token && tokenData?.expires_at > Date.now()) {
+    return tokenData.access_token;
+  }
+  return null;
 }
 
 async function calendarFetch(endpoint, options = {}) {

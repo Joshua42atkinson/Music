@@ -10,8 +10,12 @@ import PitchDetectorHUD from '../features/c-scale/PitchDetectorHUD';
 import usePitchDetector from '../hooks/usePitchDetector';
 import { useConversationalPracticeEngine } from '../features/somatic-masterclass/truebadour/useConversationalPracticeEngine';
 import { droneEngine } from '../lib/audio/GenerativeDroneEngine';
-import { useBevyIPC } from '../hooks/useBevyIPC';
 import PracticeRecorder from '../components/PracticeRecorder';
+import { useExportState } from '../hooks/useExportState';
+import { Save } from 'lucide-react';
+
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+function midiToName(midi) { return NOTE_NAMES[midi % 12]; }
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -37,7 +41,33 @@ export default function StudentDashboard() {
   const { isListening, noteInfo, volume, startListening, stopListening } = usePitchDetector();
   const { isEyesFree, engineState, toggleEyesFree } = useConversationalPracticeEngine({ activeFretId });
   const [resonanceMode, setResonanceMode] = useState(false);
-  const { isConnected, sendCommand } = useBevyIPC();
+  const { exportState } = useExportState();
+
+  // ── DO phase: target note validation ──
+  const [doMatchedNotes, setDoMatchedNotes] = useState(() => new Set());
+  const doTargetSequence = activeChapter?.doPhase?.targetSequence || [];
+
+  useEffect(() => {
+    if (currentPillar !== 'DO' || !isListening || !noteInfo?.name || noteInfo.name === '--') return;
+    const playedMidi = noteInfo.midi;
+    if (playedMidi == null) return;
+    const playedPitchClass = playedMidi % 12;
+
+    setDoMatchedNotes((prev) => {
+      const next = new Set(prev);
+      doTargetSequence.forEach((targetMidi, idx) => {
+        if (!next.has(idx) && (targetMidi % 12) === playedPitchClass) {
+          next.add(idx);
+        }
+      });
+      return next;
+    });
+  }, [currentPillar, isListening, noteInfo, doTargetSequence]);
+
+  // Reset matched notes when chapter changes
+  useEffect(() => {
+    setDoMatchedNotes(new Set());
+  }, [activeFretId]);
 
   // Handle Drone Engine state when stage changes or resonance mode toggles
   useEffect(() => {
@@ -105,13 +135,25 @@ export default function StudentDashboard() {
               );
             })}
           </div>
+          <button 
+            onClick={exportState}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 transition-colors font-mono text-[0.7rem] uppercase tracking-wider"
+            title="Export Profile for VR"
+          >
+            <Save size={14} />
+            <span>VR Sync</span>
+          </button>
         </div>
 
         {/* ── PILLAR 1: BE (Instruction & Culture) ── */}
         {currentPillar === 'BE' && (
           <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="rounded-2xl border border-cf-gold/20 bg-gradient-to-b from-cf-gold/[0.05] to-transparent overflow-hidden glass-card p-8">
-              <span className="text-[3rem] mb-4 block">{activeChapter.icon || '🎵'}</span>
+              <span className="text-[3rem] mb-4 block">
+                {activeChapter.icon
+                  ? React.createElement(activeChapter.icon, { size: 48, className: 'text-cf-gold' })
+                  : '🎵'}
+              </span>
               <h2 className="m-0 mb-2 text-[1.8rem] font-heading text-vv-text">{activeChapter.bePhase?.title || activeChapter.subtitle}</h2>
               <p className="m-0 mb-6 text-[1.1rem] text-white/80 leading-[1.6]">{activeChapter.bePhase?.content || activeChapter.desc}</p>
               <div className="bg-black/40 border border-white/10 p-4 rounded-xl border-l-4 border-l-cf-gold">
@@ -169,22 +211,13 @@ export default function StudentDashboard() {
               <Mic className="text-[#4a8fe0] mb-4" size={48} />
               <h2 className="m-0 mb-2 text-[1.8rem] font-heading text-vv-text">Active Imagination</h2>
               <p className="m-0 mb-6 text-[1.1rem] text-white/80 leading-[1.6]">
-                Before touching the strings, you must hear the pitch in your mind and sing it. Engage the Truebadour loop for a hands-free somatic check.
+                {activeChapter.doPhase?.instruction || 'Hear the pitch in your mind, then play it.'}
               </p>
               
-              <div className="flex flex-col gap-4">
-                <button
-                  onClick={toggleEyesFree}
-                  className={`w-full py-4 rounded-xl font-mono font-bold uppercase tracking-widest transition-all ${isEyesFree ? 'bg-[#34d399] text-black shadow-[0_0_20px_rgba(52,211,153,0.3)]' : 'bg-black/50 border border-[#4a8fe0]/50 text-[#4a8fe0] hover:bg-[#4a8fe0]/10'}`}
-                >
-                  {isEyesFree ? `🎙️ Eyes-Free: ${engineState}` : '🎙️ Activate Truebadour Loop'}
-                </button>
-
-                <div className="bg-black/40 border border-white/10 p-6 rounded-xl flex items-center justify-between">
-                  <div>
-                    <p className="m-0 font-mono text-white/50 text-[0.8rem] uppercase mb-1">Manual Pitch Check</p>
-                    <p className="m-0 text-white/90">Sing the target note for Chapter {activeFretId}</p>
-                  </div>
+              {/* Target note validation */}
+              <div className="bg-black/40 border border-white/10 p-6 rounded-xl mb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="m-0 font-mono text-white/50 text-[0.8rem] uppercase">Play the target notes</p>
                   <PitchDetectorHUD
                     isListening={isListening}
                     noteInfo={noteInfo}
@@ -192,12 +225,71 @@ export default function StudentDashboard() {
                     onToggle={() => isListening ? stopListening() : startListening()}
                   />
                 </div>
+
+                {isListening && doTargetSequence.length > 0 && (
+                  <div className="flex items-center gap-2 mb-3">
+                    {doTargetSequence.map((midi, idx) => {
+                      const isMatched = doMatchedNotes.has(idx);
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-center w-12 h-12 rounded-lg font-mono text-[0.9rem] font-bold transition-all duration-200"
+                          style={{
+                            background: isMatched ? 'rgba(46,204,113,0.15)' : 'rgba(255,255,255,0.05)',
+                            border: `1px solid ${isMatched ? 'rgba(46,204,113,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                            color: isMatched ? '#2ecc71' : 'rgba(255,255,255,0.4)',
+                          }}
+                        >
+                          {isMatched ? '✓' : midiToName(midi)}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {isListening && (
+                  <p className="m-0 font-mono text-[0.75rem] text-white/40">
+                    {doMatchedNotes.size}/{doTargetSequence.length} notes matched
+                    {noteInfo?.name && noteInfo.name !== '--' && ` · Hearing: ${noteInfo.name}${noteInfo.octave}`}
+                  </p>
+                )}
+
+                {!isListening && (
+                  <p className="m-0 text-white/40 text-[0.85rem]">
+                    Enable the microphone and play the notes above on your guitar.
+                  </p>
+                )}
               </div>
+
+              {/* Eyes-free Truebadour option */}
+              <button
+                onClick={toggleEyesFree}
+                className={`w-full py-4 rounded-xl font-mono font-bold uppercase tracking-widest transition-all ${isEyesFree ? 'bg-[#34d399] text-black shadow-[0_0_20px_rgba(52,211,153,0.3)]' : 'bg-black/50 border border-[#4a8fe0]/50 text-[#4a8fe0] hover:bg-[#4a8fe0]/10'}`}
+              >
+                {isEyesFree ? `🎙️ Eyes-Free: ${engineState}` : '🎙️ Activate Truebadour Loop (Optional)'}
+              </button>
             </div>
 
-            <button onClick={handleAdvance} className="mt-4 w-full py-5 rounded-xl bg-[#4a8fe0] text-black font-mono font-bold uppercase tracking-widest text-lg hover:bg-[#5aa0f0] transition-colors shadow-[0_0_20px_rgba(74,143,224,0.2)]">
-              I Hear It. Proceed to PLAY.
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleAdvance}
+                disabled={doMatchedNotes.size < doTargetSequence.length}
+                className="flex-1 py-5 rounded-xl font-mono font-bold uppercase tracking-widest text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{
+                  background: doMatchedNotes.size >= doTargetSequence.length ? '#4a8fe0' : 'rgba(255,255,255,0.05)',
+                  color: doMatchedNotes.size >= doTargetSequence.length ? 'black' : 'rgba(255,255,255,0.3)',
+                  boxShadow: doMatchedNotes.size >= doTargetSequence.length ? '0 0 20px rgba(74,143,224,0.2)' : 'none',
+                }}
+              >
+                {doMatchedNotes.size >= doTargetSequence.length ? 'I Hear It. Proceed to PLAY.' : `Match ${doTargetSequence.length - doMatchedNotes.size} more note${doTargetSequence.length - doMatchedNotes.size === 1 ? '' : 's'}`}
+              </button>
+              <button
+                onClick={handleAdvance}
+                className="py-5 px-6 rounded-xl border border-white/15 text-white/40 hover:text-white/60 hover:border-white/25 transition-all font-mono text-[0.7rem] uppercase tracking-widest"
+              >
+                Skip
+              </button>
+            </div>
           </div>
         )}
 
@@ -217,18 +309,6 @@ export default function StudentDashboard() {
                   className={`w-full py-4 rounded-xl font-mono font-bold uppercase tracking-widest transition-all border ${resonanceMode ? 'bg-[#34d399]/10 border-[#34d399] text-[#34d399] shadow-[0_0_20px_rgba(52,211,153,0.2)]' : 'bg-black/50 border-white/20 text-white/70 hover:border-white/50'}`}
                 >
                   {resonanceMode ? '〰️ Resonance Drone Active' : '〰️ Activate Freestyle Resonance'}
-                </button>
-
-                <button
-                  onClick={() => sendCommand('LAUNCH_C_SCALE', { 
-                    friction: 1,
-                    chapterId: activeChapter.id,
-                    targetSequence: activeChapter.doPhase?.targetSequence,
-                    instruction: activeChapter.doPhase?.instruction
-                  })}
-                  className="w-full py-4 rounded-xl font-mono font-bold uppercase tracking-widest transition-all bg-black/50 border border-[#2ecc71]/50 text-[#2ecc71] hover:bg-[#2ecc71]/10"
-                >
-                  {isConnected ? 'Launch XR Stream (Connected)' : 'Launch XR Stream'}
                 </button>
               </div>
 
@@ -251,7 +331,7 @@ export default function StudentDashboard() {
               <UploadCloud className="text-[#9b59b6] mb-4" size={48} />
               <h2 className="m-0 mb-2 text-[1.8rem] font-heading text-vv-text">Share Your Resonance</h2>
               <p className="m-0 mb-6 text-[1.1rem] text-white/80 leading-[1.6]">
-                Upload your practice video to Bertrand for async review, or enter the Riff Lounge to jam with the community.
+                Record your practice session to review your progress, or enter the Riff Lounge to jam with the community.
               </p>
               
               <div className="flex flex-col gap-4">

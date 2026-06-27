@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageSquare, Mic, MicOff, Paperclip, Play, Video, File, X, Image as ImageIcon } from 'lucide-react';
 import { searchChunks, buildContextBlock } from '../../../data/ragStore';
+import { devError } from '../../../lib/devLog';
 
 export default function StudyChat({
   locale,
@@ -87,7 +88,7 @@ export default function StudyChat({
          setMessages(prev => [...prev, { role: 'assistant', content: locale === 'fr' ? 'Désolé, erreur de réponse.' : 'Sorry, response error.' }]);
       }
     } catch (err) {
-      console.error(err);
+      devError(err);
       setMessages(prev => [...prev, { role: 'assistant', content: 'Network Error.' }]);
     } finally {
       setIsStreaming(false);

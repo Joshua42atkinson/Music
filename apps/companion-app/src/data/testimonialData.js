@@ -117,41 +117,61 @@ export const FAQ = [
   {
     q: 'What do I need for online lessons?',
     a: 'A guitar, a computer or phone with a camera, and a Zoom account (free). Bertrand provides all teaching materials digitally.',
+    qFr: 'De quoi ai-je besoin pour les cours en ligne ?',
+    aFr: 'Une guitare, un ordinateur ou un téléphone avec caméra, et un compte Zoom (gratuit). Bertrand fournit tout le matériel pédagogique numériquement.',
   },
   {
     q: 'Do I need any musical experience?',
     a: 'Absolutely not. Bertrand teaches complete beginners through advanced players. Every lesson is tailored to your level and goals.',
+    qFr: 'Ai-je besoin d\'expérience musicale ?',
+    aFr: 'Absolument pas. Bertrand enseigne aux débutants complets comme aux joueurs avancés. Chaque cours est adapté à votre niveau et vos objectifs.',
   },
   {
     q: 'What styles does Bertrand teach?',
     a: 'Blues, Folk, Swing, Classical, Rock, Songwriter Arrangements, elements of Jazz, Accompaniment, and Electric guitar. You choose songs and styles you love.',
+    qFr: 'Quels styles Bertrand enseigne-t-il ?',
+    aFr: 'Blues, Folk, Swing, Classique, Rock, Arrangements Auteur-Compositeur, éléments de Jazz, Accompagnement, et Guitare Électrique. Vous choisissez les chansons et styles que vous aimez.',
   },
   {
     q: 'What ages do you teach?',
     a: 'All ages — from young children (using Ukulele as a starting instrument) to seniors. Guitar is for everyone.',
+    qFr: 'Quels âges enseignez-vous ?',
+    aFr: 'Tous les âges — des jeunes enfants (utilisant le Ukulélé comme instrument de départ) aux seniors. La guitare est pour tout le monde.',
   },
   {
     q: 'What is the cancellation policy?',
     a: '24-hour notice is required for cancellations. If you cancel within 24 hours, the session fee is still owed. As Bertrand notes: "Illness is the most heeded of doctors."',
+    qFr: 'Quelle est la politique d\'annulation ?',
+    aFr: 'Un préavis de 24 heures est requis pour les annulations. Si vous annulez dans les 24 heures, les frais de séance sont dus. Comme Bertrand le note : « La maladie est le plus écouté des médecins. »',
   },
   {
     q: 'How much does a private lesson cost?',
     a: 'A single 60-minute lesson is $65 (walk-in rate). Save with the "Onward" 5-lesson pack at $55/session ($275 total), or the "Onward Forward" 10-lesson pack at $50/session ($500 total). Tips are always welcome via Venmo.',
+    qFr: 'Combien coûte un cours privé ?',
+    aFr: 'Un cours individuel de 60 minutes est à $65 (tarif régulier). Économisez avec le forfait « Onward » de 5 cours à $55/séance ($275 total), ou le forfait « Onward Forward » de 10 cours à $50/séance ($500 total). Les pourboires via Venmo sont toujours appréciés.',
   },
   {
     q: 'Do you offer lessons in French?',
     a: 'Oui! Bertrand is bilingual and offers full instruction in French — guitar, voice, theory, and his signature Atelier-Chanson (Song Workshop) for French-speaking classes and communities.',
+    qFr: 'Offrez-vous des cours en français ?',
+    aFr: 'Oui ! Bertrand est bilingue et offre un enseignement complet en français — guitare, voix, théorie, et son Atelier-Chanson signature pour les classes et communautés francophones.',
   },
   {
     q: 'Does Bertrand teach voice as well as guitar?',
     a: 'Yes — his "Guitar & Voice Integrated" course is one of his signature offerings: "The guitar becomes your voice coach and the voice your guitar instructor. The act of playing and singing will become one thing and second nature."',
+    qFr: 'Bertrand enseigne-t-il le chant en plus de la guitare ?',
+    aFr: 'Oui — son cours « Guitare & Voix Intégrées » est l\'une de ses offres signature : « La guitare devient votre coach vocal et la voix votre instructeur de guitare. Le fait de jouer et de chanter deviendra une seule chose et une seconde nature. »',
   },
   {
     q: 'How does async video coaching work?',
     a: 'Record yourself practicing (30–90 seconds), submit it through the app, and receive a personalized video critique from Bertrand. Great for checking form, posture, or a tricky passage between live sessions.',
+    qFr: 'Comment fonctionne le coaching vidéo asynchrone ?',
+    aFr: 'Enregistrez-vous en train de pratiquer (30–90 secondes), soumettez-le via l\'application, et recevez une critique vidéo personnalisée de Bertrand. Idéal pour vérifier la forme, la posture, ou un passage difficile entre les séances en direct.',
   },
   {
     q: 'Can I buy lessons as a gift?',
     a: 'Yes! Bertrand offers gift certificates for lessons. Contact him directly at BertLarryMusic@gmail.com or 617-447-5575.',
+    qFr: 'Puis-je acheter des cours comme cadeau ?',
+    aFr: 'Oui ! Bertrand offre des certificats-cadeaux pour des cours. Contactez-le directement à BertLarryMusic@gmail.com ou au 617-447-5575.',
   },
 ];

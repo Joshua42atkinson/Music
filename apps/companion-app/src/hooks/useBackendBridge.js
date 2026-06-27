@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { devError } from '../lib/devLog';
 
 const DAAS_API_BASE = typeof window !== 'undefined'
   ? `http://${window.location.hostname}:8080/api`
@@ -56,7 +57,7 @@ export function useBackendBridge() {
         setAvailableBackends(data.backends || []);
       }
     } catch (e) {
-      console.error('Failed to load DaaS inference status:', e);
+      devError('Failed to load DaaS inference status:', e);
     }
   }, []);
 
@@ -141,7 +142,7 @@ export function useBackendBridge() {
         }
       }
     } catch (e) {
-      console.error('Failed to switch backend:', e);
+      devError('Failed to switch backend:', e);
     }
     setLoading(false);
     return false;
@@ -163,7 +164,7 @@ export function useBackendBridge() {
         return true;
       }
     } catch (e) {
-      console.error('Failed to detect LLM backends:', e);
+      devError('Failed to detect LLM backends:', e);
     }
     setLoading(false);
     return false;
@@ -207,7 +208,7 @@ export function useBackendBridge() {
           return await resp.json();
         }
       } catch (e) {
-        console.error('StepAudio R1.1 query failed:', e);
+        devError('StepAudio R1.1 query failed:', e);
       }
     }
 
@@ -243,7 +244,7 @@ export function useBackendBridge() {
         return await resp.json();
       }
     } catch (e) {
-      console.error('DaaS Ask Bertrand query failed:', e);
+      devError('DaaS Ask Bertrand query failed:', e);
     }
 
     return {
@@ -266,7 +267,7 @@ export function useBackendBridge() {
         return data.profiles || [];
       }
     } catch (e) {
-      console.error('Failed to fetch student profiles from SQLite:', e);
+      devError('Failed to fetch student profiles from SQLite:', e);
     }
     return [];
   }, [isDaaSConnected]);
@@ -281,7 +282,7 @@ export function useBackendBridge() {
         return data.profile;
       }
     } catch (e) {
-      console.error('Failed to get student profile from SQLite:', e);
+      devError('Failed to get student profile from SQLite:', e);
     }
     return null;
   }, [isDaaSConnected]);
@@ -296,7 +297,7 @@ export function useBackendBridge() {
       });
       return resp.ok;
     } catch (e) {
-      console.error('Failed to upsert student profile to SQLite:', e);
+      devError('Failed to upsert student profile to SQLite:', e);
     }
     return false;
   }, [isDaaSConnected]);
@@ -312,7 +313,7 @@ export function useBackendBridge() {
         return data.logs || [];
       }
     } catch (e) {
-      console.error('Failed to fetch practice logs from SQLite:', e);
+      devError('Failed to fetch practice logs from SQLite:', e);
     }
     return [];
   }, [isDaaSConnected]);
@@ -327,7 +328,7 @@ export function useBackendBridge() {
       });
       return resp.ok;
     } catch (e) {
-      console.error('Failed to insert practice log into SQLite:', e);
+      devError('Failed to insert practice log into SQLite:', e);
     }
     return false;
   }, [isDaaSConnected]);

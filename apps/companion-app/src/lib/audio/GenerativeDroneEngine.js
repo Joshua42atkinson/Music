@@ -6,6 +6,7 @@
 // ╚═══════════════════════════════════════════════════════════════╝
 
 import { getHarmonicData } from '../../data/harmonicData';
+import { getAudioContext } from '../../audio/audioEngine';
 
 class GenerativeDroneEngine {
   constructor() {
@@ -18,7 +19,7 @@ class GenerativeDroneEngine {
 
   init() {
     if (this.ctx) return;
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    this.ctx = getAudioContext();
     this.masterGain = this.ctx.createGain();
     // Default low volume to keep it as a background drone
     this.masterGain.gain.value = 0.15;

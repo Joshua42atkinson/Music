@@ -1,0 +1,82 @@
+name: 'Publish Multi-Platform'
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'apps/companion-app/package-lock.json'
+          
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+          
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: Install dependencies
+        run: npm ci
+        working-directory: apps/companion-app
+        
+      - name: Build Android App
+        run: npx tauri android build
+        working-directory: apps/companion-app
+        
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: apps/companion-app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'apps/companion-app/package-lock.json'
+          
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios, x86_64-apple-ios, aarch64-apple-ios-sim
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: apps/companion-app
+        
+      - name: Initialize iOS Target
+        run: npx tauri ios init
+        working-directory: apps/companion-app
+        
+      - name: Build iOS App
+        run: npx tauri ios build
+        working-directory: apps/companion-app
+        
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-ipa
+          path: apps/companion-app/src-tauri/gen/apple/build/Build/Products/Release-iphoneos/*.ipa

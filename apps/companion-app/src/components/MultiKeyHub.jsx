@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useLocale } from '../hooks/useLocale';
 import { Scale, Interval } from '@tonaljs/tonal';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
@@ -108,6 +109,7 @@ const MiniNeck = ({ rootIdx, scaleType, color, onPlay }) => {
 };
 
 const MultiKeyHub = () => {
+  const { t } = useLocale();
   const [scaleType, setScaleType] = useState('pentatonicMinor');
   const [selectedKey, setSelectedKey] = useState(null);
 
@@ -144,13 +146,13 @@ const MultiKeyHub = () => {
       {/* Header */}
       <div className="mb-5">
         <p className="text-[0.8rem] text-[#7b6aaa] font-mono tracking-[0.15em] uppercase mb-2">
-          ©FHEAL · Multi-Key Fluency
+          {t('multiKeySubtitle')}
         </p>
         <h2 className="font-heading text-[1.6rem] text-[#e8edf2] mb-1">
-          Multi-Key Hub
+          {t('multiKeyTitle')}
         </h2>
         <p className="text-[0.85rem] text-white/45 leading-[1.6]">
-          See any scale across all 12 keys at once. Tap a key to explore its full pattern.
+          {t('multiKeyDesc')}
         </p>
       </div>
 
@@ -167,7 +169,7 @@ const MultiKeyHub = () => {
               color: scaleType === s.key ? s.color : 'rgba(255,255,255,0.4)',
             }}
           >
-            {s.label}
+            {t(`scale_${s.key}`)}
           </button>
         ))}
       </div>
@@ -222,7 +224,7 @@ const MultiKeyHub = () => {
             style={{ background: `${color}12`, border: `1px solid ${color}40` }}
           >
             <p className="text-[0.75rem] font-mono tracking-[0.15em] uppercase mb-2" style={{ color }}>
-              {NOTE_NAMES[selectedKey]} {currentScale?.label}
+              {NOTE_NAMES[selectedKey]} {t(`scale_${currentScale?.key}`)}
             </p>
             <div className="flex gap-2 flex-wrap">
               {getScaleNotes(selectedKey).map((n, i) => (

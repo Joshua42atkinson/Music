@@ -12,7 +12,7 @@
   <meta name="author" content="Voix Vive Academy · Pedagogy by Bertrand Laurence · Platform by Joshua Atkinson" />
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'wasm-unsafe-eval' blob: 'unsafe-inline';
+    script-src 'self' 'wasm-unsafe-eval' blob: 'unsafe-inline' https://accounts.google.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: blob:;
@@ -20,7 +20,7 @@
     connect-src 'self' ws: wss: http://localhost:* https://localhost:* https://huggingface.co https://cdn.jsdelivr.net https://accounts.google.com https://www.googleapis.com;
     worker-src 'self' blob:;
     manifest-src 'self';
-    frame-src 'self';
+    frame-src 'self' https://accounts.google.com;
   " />
 
   <!-- Open Graph (Facebook, LinkedIn, iMessage) -->
@@ -28,9 +28,13 @@
   <meta property="og:description" content="12 frets. 12 intervals. One transformative journey. Free AI-guided curriculum with mentorship from Bertrand Laurence. You are an instrument playing an instrument." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://voix-vive.com" />
-  <meta property="og:image" content="/assets/wordmark.png" />
+  <meta property="og:image" content="/assets/bertrand_profile.jpg" />
+  <meta property="og:image:alt" content="Bertrand Laurence — Guitar & Voice Instructor" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="fr_FR" />
   
   <!-- Twitter Card -->
+  <meta name="twitter:image" content="/assets/bertrand_profile.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Voix Vive Academy — 12 Frets · 12 Intervals · One Master" />
   <meta name="twitter:description" content="A whole-person music academy built on the Pythagorean tradition. Free curriculum. Optional mentorship. You are an instrument playing an instrument." />
@@ -83,39 +87,48 @@
     ],
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
-      "name": "Mentorship & Support",
+      "name": "Mentorship Subscriptions & Services",
       "itemListElement": [
         {
           "@type": "Offer",
-          "name": "12-Fret Curriculum + AI Troubadour",
+          "name": "12-Chapter Curriculum + AI Troubadour",
           "price": "0.00",
           "priceCurrency": "USD",
           "description": "Free: 132 lessons, practice tools, AI-guided coaching, journal, and game engine"
         },
         {
           "@type": "Offer",
-          "name": "Quick Question — Text Feedback from Bertrand",
+          "name": "Community Subscription",
           "price": "5.00",
-          "priceCurrency": "USD"
+          "priceCurrency": "USD",
+          "description": "Monthly: Cloud AI (Gemini), community hub, mentorship blog, progress sync"
+        },
+        {
+          "@type": "Offer",
+          "name": "Apprentice Mentorship",
+          "price": "100.00",
+          "priceCurrency": "USD",
+          "description": "Monthly: Access to Bertrand's video reviews (up to 4/mo), AI pre-screened"
+        },
+        {
+          "@type": "Offer",
+          "name": "Journeyman Mentorship",
+          "price": "500.00",
+          "priceCurrency": "USD",
+          "description": "Monthly: 4 live Zoom sessions + 4 async reviews. Accountability tier."
+        },
+        {
+          "@type": "Offer",
+          "name": "Master Mentorship",
+          "price": "1000.00",
+          "priceCurrency": "USD",
+          "description": "Monthly: 8 live sessions (2/week) + direct messaging + quarterly assessment"
         },
         {
           "@type": "Offer",
           "name": "Private Lesson with Bertrand (Zoom)",
           "price": "65.00",
           "priceCurrency": "USD"
-        },
-        {
-          "@type": "Offer",
-          "name": "The Troubadour's Circle — Monthly Membership",
-          "price": "25.00",
-          "priceCurrency": "USD"
-        },
-        {
-          "@type": "Offer",
-          "name": "Bertrand Approved Capstone Audition",
-          "price": "100.00",
-          "priceCurrency": "USD",
-          "description": "20-minute audition with personalized video review, certificate, and curriculum recommendations"
         }
       ]
     }

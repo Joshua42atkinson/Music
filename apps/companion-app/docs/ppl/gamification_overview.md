@@ -9,7 +9,7 @@ date: 2026-06-14
 > **ZEN LAW (governing principle for every decision):**  
 > What the LEARNER sees: `12 frets. BE → DO → PLAY. That's it.`  
 > What the ENGINE does: `Coal/Steam/Archetype/Shadow/Friction` — all invisible.  
-> What the TROUBADOUR says: `One right question at the right moment.`  
+> What the TRUEBADOUR says: `One right question at the right moment.`  
 > **If a learner can't understand it in 5 seconds, it belongs in the engine — not the UI.**
 
 ---
@@ -65,7 +65,7 @@ Voix Vive's unique power is the **same isomorphic structure** operating at 4 sim
 
 | Iron Road Concept | Jungian | SDT Need | Voix Vive Hook |
 |---|---|---|---|
-| **Intelligence / Sage** | Analysis, planning | Competence | Troubadour Socratic questions |
+| **Intelligence / Sage** | Analysis, planning | Competence | Truebadour Socratic questions |
 | **Courage / Hero** | Will, action | Autonomy | Player streaks, adventure sessions |
 | **Eloquence / Jester** | Communication, story | Relatedness | RIFF community (coming) |
 | **Empathy / Caregiver** | Connection, healing | Relatedness | Somatic check-ins (BE phase) |
@@ -80,7 +80,7 @@ Voix Vive's unique power is the **same isomorphic structure** operating at 4 sim
 | Understand | DC 10 | Fret 3-4 tools | OK |
 | Apply | DC 15 (Moderate grade) | Practice tools + PLING! | OK |
 | Analyze | DC 20 | Interval Visualizer | ⚠️ Underused |
-| Evaluate | DC 25 (Steep) | Troubadour Socratic | ⚠️ AI-dependent |
+| Evaluate | DC 25 (Steep) | Truebadour Socratic | ⚠️ AI-dependent |
 | Create | DC 30 (Summit) | RIFF free play + Submission | ⚠️ Not yet scored/celebrated |
 
 ---
@@ -90,9 +90,9 @@ Voix Vive's unique power is the **same isomorphic structure** operating at 4 sim
 ### SOFT SPOT #1 — No Friction/Anxiety System
 **What Iron Road has:** The Friction Penalty reduces the Logistics Check. Extraneous cognitive load, anxiety, and "The Static" are game mechanics with measurable cost.
 
-**What Voix Vive needs:** The somatic BE check-in data should **modify the session difficulty**. If a student checks in as "anxious/overwhelmed" → lower Traction DC, shorter session target, Troubadour switches to supportive mode. If "focused/energized" → higher DC, challenge mode unlocked.
+**What Voix Vive needs:** The somatic BE check-in data should **modify the session difficulty**. If a student checks in as "anxious/overwhelmed" → lower Traction DC, shorter session target, Truebadour switches to supportive mode. If "focused/energized" → higher DC, challenge mode unlocked.
 
-**Component to build:** `somaticModifier.js` — reads BE check-in → emits a `frictionLevel` (0-3) → injected into Troubadour system prompt + adjusts Player session difficulty.
+**Component to build:** `somaticModifier.js` — reads BE check-in → emits a `frictionLevel` (0-3) → injected into Truebadour system prompt + adjusts Player session difficulty.
 
 ---
 
@@ -100,7 +100,7 @@ Voix Vive's unique power is the **same isomorphic structure** operating at 4 sim
 **What Iron Road has:** Character creation maps the learner's Jungian archetype (Sage/Hero/Jester/Caregiver) to their mechanical stats. Your archetype determines your natural strengths and weaknesses.
 
 **What Voix Vive needs:** A **one-time 4-question archetype discovery** (during onboarding or first session) that assigns a Bard Archetype. This archetype:
-- Colors the Troubadour's language style (Sage = analytical, Jester = playful, Caregiver = gentle)
+- Colors the Truebadour's language style (Sage = analytical, Jester = playful, Caregiver = gentle)
 - Gives a permanent "+2" to the matching protocol (Sage → FHEAL depth, Hero → PLING! speed, Jester → RIFF creativity, Caregiver → SHEARL somatic)
 - Displays on the Character Sheet as the player's "Guitar Voice"
 
@@ -111,14 +111,14 @@ Voix Vive's unique power is the **same isomorphic structure** operating at 4 sim
 ### SOFT SPOT #3 — No Shadow Status / Ghost Train Detection
 **What Iron Road has:** When a player gives negative feedback 3 times in a row, Pete detects the Ghost Train and enters Maintenance Mode. The only way forward is through reflection.
 
-**What Voix Vive needs:** The Troubadour should detect negative emotional spiral patterns:
+**What Voix Vive needs:** The Truebadour should detect negative emotional spiral patterns:
 - 3+ "overwhelmed/frustrated" BE check-ins in a week
 - Streak broken after 7+ day run
 - Session abandoned before completion 2+ times
 
-**Response:** Troubadour shifts to "Maintenance Mode" — stops asking practice questions, starts asking: *"What does the guitar feel like right now? Not as an instrument — as a mirror."* Unlocks the Kintsugi Journal entry (cracks filled with gold).
+**Response:** Truebadour shifts to "Maintenance Mode" — stops asking practice questions, starts asking: *"What does the guitar feel like right now? Not as an instrument — as a mirror."* Unlocks the Kintsugi Journal entry (cracks filled with gold).
 
-**Component to build:** `troubadourMoodDetector.js` → integrated with `useTroubadourAI.js`
+**Component to build:** `truebadourMoodDetector.js` → integrated with `useTruebadourAI.js`
 
 ---
 
@@ -148,7 +148,7 @@ The **12 frets = 12 chromatic intervals = 12 somatic states** is the isomorphic 
 | 11 | Major 7th | Yearning / Beauty | The Return |
 | 12 | Octave | Unity / Completion | The Master |
 
-**This table should be the spine of the Troubadour's Socratic script.** Every fret transition is a narrative event. The player isn't just learning Fret 6 — they're entering the Ordeal, the most unstable interval, the one that requires the most courage to play and hold.
+**This table should be the spine of the Truebadour's Socratic script.** Every fret transition is a narrative event. The player isn't just learning Fret 6 — they're entering the Ordeal, the most unstable interval, the one that requires the most courage to play and hold.
 
 ---
 
@@ -160,7 +160,7 @@ The 120B parameter model is perfectly sized for:
 
 2. **Archetype-colored Socratic prompts** — Sage student gets analytical follow-ups. Jester gets playful provocations. Caregiver gets reflective depth. Same curriculum, different rendering engine.
 
-3. **Ghost Train detection** — reads 7-day behavioral pattern (check-ins, completions, streak) → determines Shadow Status → adjusts Troubadour mode.
+3. **Ghost Train detection** — reads 7-day behavioral pattern (check-ins, completions, streak) → determines Shadow Status → adjusts Truebadour mode.
 
 4. **Narrative event recognition** — when a student completes Fret 6 (the Tritone / Ordeal), Nemotron generates a personalized "You have survived the Ordeal" narrative marker that gets stored in their journal. Permanent lore, unique to their voice.
 
@@ -172,8 +172,8 @@ The 120B parameter model is perfectly sized for:
 |---|---|---|---|
 | **P0** | `somaticModifier.js` — BE check-in → Friction level → session difficulty | Friction Penalty | High |
 | **P0** | `ArchetypeQuiz.jsx` — 4-question Jungian type → Bard archetype | Locomotive Profile | High |
-| **P1** | `troubadourMoodDetector.js` — Ghost Train detection → Maintenance Mode | Shadow Status | High |
-| **P1** | Fret → Somatic signature table in `troubadourPrompt.js` | Narrative mechanics | Medium |
+| **P1** | `truebadourMoodDetector.js` — Ghost Train detection → Maintenance Mode | Shadow Status | High |
+| **P1** | Fret → Somatic signature table in `truebadourPrompt.js` | Narrative mechanics | Medium |
 | **P1** | Flow State moment — ★ mastery achievement = Nat 20 celebration | Flow State (Nat 20) | Medium |
 | **P2** | Interval-to-emotion visualization in the Maturation Map | Gradient Scale visual | Medium |
 | **P2** | Kintsugi Journal — "cracks filled with gold" reflection entry | Maintenance Shed | High |

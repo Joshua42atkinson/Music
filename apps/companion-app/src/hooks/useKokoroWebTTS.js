@@ -17,6 +17,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { KokoroTTS } from 'kokoro-js';
 import { getAudioContext, resumeAudio } from '../audio/audioEngine';
+import { devError } from '../lib/devLog';
 
 export function useKokoroWebTTS() {
   const [isReady, setIsReady]     = useState(false);
@@ -42,7 +43,7 @@ export function useKokoroWebTTS() {
       setIsReady(true);
       setProgress(100);
     } catch (e) {
-      console.error('[Kokoro] Failed to init:', e);
+      devError('[Kokoro] Failed to init:', e);
     } finally {
       isLoadingRef.current = false;
       setIsLoading(false);
@@ -118,7 +119,7 @@ export function useKokoroWebTTS() {
         source.start(0);
       });
     } catch (e) {
-      console.error('[Kokoro] Speech generation failed:', e);
+      devError('[Kokoro] Speech generation failed:', e);
       setIsSpeaking(false);
       return false;
     }
@@ -136,7 +137,7 @@ export function useKokoroWebTTS() {
       // Return Blob directly — caller must manage URL lifecycle
       return new Blob([wavBuffer], { type: 'audio/wav' });
     } catch (e) {
-      console.error('[Kokoro] generateBlob failed:', e);
+      devError('[Kokoro] generateBlob failed:', e);
       return null;
     }
   }, [init]);

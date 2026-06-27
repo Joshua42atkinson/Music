@@ -17,17 +17,17 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ScrollToTop from './components/ScrollToTop';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
-import { migrateStorage, vvGet } from './lib/storage';
-import { STORAGE_KEYS } from './lib/storageKeys';
+import { migrateStorage } from './lib/storage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ScaffoldingProvider, useScaffolding } from './components/ScaffoldingProvider';
 import { TruebadourProvider } from './hooks/TruebadourProvider';
 const TruebadourWidget = React.lazy(() => import('./features/somatic-masterclass/TruebadourWidget'));
 const BookWidget       = React.lazy(() => import('./components/BookWidget'));
-
+const UnifiedAssistantMenu = React.lazy(() => import('./components/UnifiedAssistantMenu'));
 
 // ── Eagerly loaded: first paint ──
 import LandingScreen from './pages/LandingScreen';
+const FirstSession = React.lazy(() => import('./pages/FirstSession'));
 
 // ── Lazy loaded: per-route chunks ──
 const OrientationHub = React.lazy(() => import('./pages/OrientationHub'));
@@ -41,28 +41,24 @@ const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = React.lazy(() => import('./pages/TermsOfService'));
 const AIDeveloperChat = React.lazy(() => import('./components/AIDeveloperChat'));
 const CurriculumSummary = React.lazy(() => import('./components/CurriculumSummary'));
-const VertiscaleEngine = React.lazy(() => import('./game/VertiscaleEngine'));
-const AdventurePlayer = React.lazy(() => import('./game/AdventurePlayer'));
 const ChromaticMonomyth = React.lazy(() => import('./features/somatic-masterclass/ChromaticMonomyth'));
 const MentorDashboard = React.lazy(() => import('./pages/MentorDashboard'));
 const MaturationMap = React.lazy(() => import('./components/MaturationMap'));
 const StudentDashboard = React.lazy(() => import('./pages/StudentDashboard'));
 const FeedbackButton = React.lazy(() => import('./components/FeedbackButton'));
 const StreakToast    = React.lazy(() => import('./components/StreakToast'));
-const OnboardingModal = React.lazy(() => import('./components/OnboardingModal'));
 
 const ResonantMirrorPOC = React.lazy(() => import('./components/ResonantMirrorPOC'));
-const WalkingModeEngine = React.lazy(() => import('./game/WalkingModeEngine'));
 const SomaticStudioPrompter = React.lazy(() => import('./features/somatic-masterclass/SomaticStudioPrompter'));
 const HumanOctaveLibrary = React.lazy(() => import('./components/HumanOctaveLibrary'));
 const CommunityHub = React.lazy(() => import('./components/CommunityHub'));
 const MentorshipBlog = React.lazy(() => import('./features/somatic-masterclass/MentorshipBlog'));
 const Bible12M = React.lazy(() => import('./pages/Bible12M'));
 const RiffHub  = React.lazy(() => import('./pages/RiffHub'));
-const AITestPage = React.lazy(() => import('./pages/AITestPage'));
 const BlueprintHub = React.lazy(() => import('./pages/BlueprintHub'));
 const ArchetypePage = React.lazy(() => import('./pages/ArchetypePage'));
 import PrimaryNav from './components/PrimaryNav';
+import InstallPrompt from './components/InstallPrompt';
 
 // ── On-brand loading fallback ──
 function LoadingScreen() {
@@ -93,28 +89,10 @@ function NotFound() {
 
 function FreePlayGuard({ children }) {
   const { traction } = useScaffolding();
-  const [showOnboarding, setShowOnboarding] = React.useState(false);
 
-  // Check if onboarding is needed — shown as overlay widget, never blocks
-  React.useEffect(() => {
-    const onboardingComplete = vvGet(STORAGE_KEYS.ONBOARDED);
-    if (!onboardingComplete) {
-      setShowOnboarding(true);
-    }
-  }, []);
-  
   if (traction?.gameMode !== false) return <Navigate to="/dashboard" replace />;
-  
-  return (
-    <>
-      {children}
-      {showOnboarding && (
-        <React.Suspense fallback={null}>
-          <OnboardingModal onClose={() => setShowOnboarding(false)} />
-        </React.Suspense>
-      )}
-    </>
-  );
+
+  return <>{children}</>;
 }
 
 function MentorAuthGuard({ children }) {
@@ -144,7 +122,6 @@ function App() {
 }
 
 function RootRedirector() {
-  // Auth disabled — always show landing
   return <LandingScreen />;
 }
 
@@ -176,12 +153,16 @@ function AppContent() {
     <div className="min-h-[100svh] bg-cf-void text-[#f0e6d2] relative nav-app-root">
         {/* Scroll to top on every route change */}
         <ScrollToTop />
+        {/* PWA Install Prompt */}
+        <InstallPrompt />
         {/* 5-destination persistent navigation */}
         <PrimaryNav />
         {/* 🔴 Riff — Practice & Play (top-left) */}
         {aiEnabled && <Suspense fallback={null}><TruebadourWidget /></Suspense>}
         {/* 📘 Binder — Study & Learn (top-right) */}
         <Suspense fallback={null}><BookWidget /></Suspense>
+        {/* 💬 Unified Assistant Menu (replaces the individual floaters) */}
+        {aiEnabled && <Suspense fallback={null}><UnifiedAssistantMenu /></Suspense>}
         {/* Beta feedback pill */}
         <Suspense fallback={null}><FeedbackButton /></Suspense>
         {/* Streak protect toast */}
@@ -192,7 +173,8 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<RootRedirector />} />
             <Route path="/dashboard" element={<ErrorBoundary><StudentDashboard /></ErrorBoundary>} />
-            <Route path="/onboarding" element={<ErrorBoundary><OnboardingModal onClose={() => window.history.back()} /></ErrorBoundary>} />
+            <Route path="/onboarding" element={<Navigate to="/" replace />} />
+            <Route path="/start" element={<ErrorBoundary><FirstSession /></ErrorBoundary>} />
 
             <Route path="/c-scale" element={<ErrorBoundary><CScaleHub /></ErrorBoundary>} />
             <Route path="/contemplative" element={<OrientationHub />} />
@@ -220,8 +202,8 @@ function AppContent() {
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/studio" element={<ErrorBoundary><StudioPage /></ErrorBoundary>} />
             <Route path="/studio/prompter" element={<ErrorBoundary><SomaticStudioPrompter /></ErrorBoundary>} />
-            <Route path="/game" element={<ErrorBoundary><FreePlayGuard><VertiscaleEngine /></FreePlayGuard></ErrorBoundary>} />
-            <Route path="/adventure" element={<ErrorBoundary><FreePlayGuard><AdventurePlayer /></FreePlayGuard></ErrorBoundary>} />
+            <Route path="/game" element={<Navigate to="/c-scale" replace />} />
+            <Route path="/adventure" element={<Navigate to="/c-scale" replace />} />
             <Route path="/mentor" element={<ErrorBoundary><MentorAuthGuard><MentorDashboard /></MentorAuthGuard></ErrorBoundary>} />
             <Route path="/community" element={<ErrorBoundary><CommunityHub /></ErrorBoundary>} />
             <Route path="/12m" element={<ErrorBoundary><Bible12M /></ErrorBoundary>} />
@@ -229,10 +211,9 @@ function AppContent() {
             {/* ── Dev-only routes (hidden from nav) ────────────── */}
             <Route path="/ai-developer" element={<ErrorBoundary><FreePlayGuard><AIDeveloperChat /></FreePlayGuard></ErrorBoundary>} />
             <Route path="/poc" element={<ErrorBoundary><FreePlayGuard><ResonantMirrorPOC /></FreePlayGuard></ErrorBoundary>} />
-            <Route path="/walking" element={<ErrorBoundary><FreePlayGuard><WalkingModeEngine /></FreePlayGuard></ErrorBoundary>} />
+            <Route path="/walking" element={<Navigate to="/c-scale" replace />} />
             <Route path="/monomyth" element={<ErrorBoundary><FreePlayGuard><ChromaticMonomyth /></FreePlayGuard></ErrorBoundary>} />
             <Route path="/human-octave" element={<ErrorBoundary><FreePlayGuard><HumanOctaveLibrary /></FreePlayGuard></ErrorBoundary>} />
-            <Route path="/ai-test" element={<FreePlayGuard><AITestPage /></FreePlayGuard>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>

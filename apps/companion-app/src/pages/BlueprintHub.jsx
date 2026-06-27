@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { BookOpen, AlertTriangle } from 'lucide-react';
 import thesisRaw from '../../../../docs/VOIX_VIVE_MASTER_THESIS.md?raw';
+import { devError } from '../lib/devLog';
 
 export default function BlueprintHub() {
   const [content, setContent] = useState('');
@@ -12,7 +13,7 @@ export default function BlueprintHub() {
       setContent(thesisRaw);
     } catch (err) {
       setError('Failed to load the Blueprint Thesis. Ensure the file exists in /docs/VOIX_VIVE_MASTER_THESIS.md');
-      console.error(err);
+      devError(err);
     }
   }, []);
 

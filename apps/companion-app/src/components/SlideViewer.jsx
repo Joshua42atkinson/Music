@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +17,7 @@ import { getFretState, getDefaultFretState } from '../data/tractionStore';
 import { useCosyVoice } from '../hooks/useCosyVoice';
 import { getVoicePrompt } from '../data/voicePrompts';
 import './SlideViewer.css';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // SLIDE VIEWER — Phone-native swipeable chapter reader
@@ -255,7 +257,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
       };
 
       recognition.onerror = (event) => {
-        console.error('Speech recognition error', event.error);
+        devError('Speech recognition error', event.error);
         setIsListeningForCommands(false);
       };
 
@@ -311,7 +313,7 @@ const SlideViewer = ({ fretId = 1, onBack, onFretChange }) => {
                   alt=""
                   draggable={false}
                   onError={() => {
-                    console.warn('Slide image failed to load:', slide.image);
+                    devWarn('Slide image failed to load:', slide.image);
                     setImageErrors(prev => {
                       const next = new Set(prev);
                       next.add(slide.id);

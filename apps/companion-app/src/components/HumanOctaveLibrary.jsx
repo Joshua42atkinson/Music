@@ -1,12 +1,15 @@
+import { devWarn } from '../lib/devLog';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Square, Play, Pause, ArrowLeft, UploadCloud, RefreshCw, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useLocale } from '../hooks/useLocale';
 
 const MAX_DURATION = 60; // 60 seconds max for the feed
 
 export default function HumanOctaveLibrary() {
   const navigate = useNavigate();
+  const { t } = useLocale();
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,7 +48,7 @@ export default function HumanOctaveLibrary() {
         setTracks(data || []);
       }
     } catch (err) {
-      console.warn('Could not fetch tracks (mock mode):', err);
+      devWarn('Could not fetch tracks (mock mode):', err);
       setTracks([]);
     } finally {
       setLoading(false);
@@ -109,7 +112,7 @@ export default function HumanOctaveLibrary() {
       }, 1000);
 
     } catch {
-      setError('Microphone access denied or not found.');
+      setError(t('octaveMicError'));
     }
   };
 
@@ -157,7 +160,7 @@ export default function HumanOctaveLibrary() {
       setStage('browse');
       fetchTracks();
     } catch (err) {
-      console.warn('Upload failed (this is expected if Supabase bucket/table is not fully set up):', err);
+      devWarn('Upload failed (this is expected if Supabase bucket/table is not fully set up):', err);
       // Mock success for demonstration
       alert('Mock Mode: Your track was recorded, but Supabase tables/buckets are not fully configured yet to save it. Set up "human_octave_audio" bucket and "human_octave_tracks" table.');
       setStage('browse');
@@ -180,8 +183,8 @@ export default function HumanOctaveLibrary() {
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1 text-center">
-          <h1 className="m-0 font-heading text-[1.4rem] text-vv-text">The Human Octave</h1>
-          <p className="m-0 font-mono text-[0.65rem] text-cf-gold tracking-[0.1em] uppercase">Sound speaks for itself.</p>
+          <h1 className="m-0 font-heading text-[1.4rem] text-vv-text">{t('octaveTitle')}</h1>
+          <p className="m-0 font-mono text-[0.65rem] text-cf-gold tracking-[0.1em] uppercase">{t('octaveSubtitle')}</p>
         </div>
         <button onClick={fetchTracks} className="w-10 h-10 rounded-xl bg-white/5 border-none text-cf-gold flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors" disabled={loading}>
           <RefreshCw size={18} className={loading ? 'opacity-50' : 'opacity-100'} />
@@ -194,12 +197,12 @@ export default function HumanOctaveLibrary() {
       {stage === 'browse' && (
         <div className="flex-1 p-5 flex flex-col gap-4 overflow-y-auto">
           {loading ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-white/40 font-quote text-[1.2rem] gap-2">Listening to the void...</div>
+            <div className="flex-1 flex flex-col items-center justify-center text-white/40 font-quote text-[1.2rem] gap-2">{t('octaveListening')}</div>
           ) : tracks.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-white/40 font-quote text-[1.2rem] gap-2">
               <div className="text-[2rem]">🌌</div>
-              <p>The library is silent.</p>
-              <p className="text-[0.7rem] opacity-50">Be the first to push a frequency.</p>
+              <p>{t('octaveSilent')}</p>
+              <p className="text-[0.7rem] opacity-50">{t('octavePushFirst')}</p>
             </div>
           ) : (
             tracks.map(track => (
@@ -248,7 +251,7 @@ export default function HumanOctaveLibrary() {
       {stage === 'preview' && (
         <div className="flex-1 flex flex-col items-center justify-center bg-cf-void p-5">
           <div className="w-full max-w-[400px] flex flex-col items-center">
-            <h2 className="font-heading text-[#e8edf2]">Preview Track</h2>
+            <h2 className="font-heading text-[#e8edf2]">{t('octavePreview')}</h2>
 
             <audio ref={audioPreviewRef} controls className="w-full mt-5 mb-10" />
 
@@ -257,7 +260,7 @@ export default function HumanOctaveLibrary() {
                 <RefreshCw size={24} />
               </button>
               <button className="py-0 px-6 h-[50px] rounded-[25px] bg-cf-gold text-cf-void border-none flex gap-2 items-center justify-center cursor-pointer font-body font-semibold hover:bg-cf-gold/90 transition-colors" onClick={uploadRecording} disabled={uploading}>
-                {uploading ? 'Pushing...' : <><UploadCloud size={20} /> Push to Octave</>}
+                {uploading ? t('octavePushing') : <><UploadCloud size={20} /> {t('octavePush')}</>}
               </button>
             </div>
           </div>

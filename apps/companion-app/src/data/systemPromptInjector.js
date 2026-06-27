@@ -140,7 +140,7 @@ THE PLATFORM:
 
 THE ARCHETYPE SYSTEM: Four learner types (Storyteller, Craftsman, Ear, Seeker) derived from practice patterns. The AI adapts its coaching style to each.
 
-THE BUSINESS: A la carte services ($5-$65) + Inner Circle ($25/mo). No subscriptions that charge for free content. Gift certificates built in.
+THE BUSINESS: Free curriculum (no gate) + subscriptions (Community $5/mo, Apprentice $100/mo, Journeyman $500/mo, Master $1000/mo) + à la carte services ($5-$65). 100% revenue to Bertrand. AI pre-screens video reviews.
 
 THE TECH: React PWA + Rust/Axum backend + in-browser LLM (wllama) + neural TTS (Kokoro) + Web Audio pitch detection.
 

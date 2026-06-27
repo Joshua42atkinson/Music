@@ -6,6 +6,7 @@
 import { supabase } from './supabase';
 import { vvGet, vvSet } from './storage';
 import { STORAGE_KEYS } from './storageKeys';
+import { devError } from './devLog';
 
 const MIGRATION_KEY = STORAGE_KEYS.MIGRATED_V1;
 
@@ -146,7 +147,7 @@ export async function loadCloudData(userId) {
       journal: journalRows || [],
     };
   } catch (err) {
-    console.error('loadCloudData failed:', err);
+    devError('loadCloudData failed:', err);
     return null;
   }
 }

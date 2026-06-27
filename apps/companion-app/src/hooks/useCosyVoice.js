@@ -1,5 +1,7 @@
+import { devLog, devWarn } from '../lib/devLog';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStudioAudio } from './useStudioAudio';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // useCosyVoice — Bertrand's Living Voice (CosyVoice2 0.5B)
@@ -58,7 +60,7 @@ export function useCosyVoice() {
       .then(res => res.arrayBuffer())
       .then(data => setReferenceAudio(data))
       .catch(err => {
-        if (import.meta.env.DEV) console.warn("[CosyVoice] No reference audio:", err);
+        if (import.meta.env.DEV) devWarn("[CosyVoice] No reference audio:", err);
       });
   }, []);
 
@@ -72,12 +74,12 @@ export function useCosyVoice() {
       setMode('server');
       setLoadProgress(100);
       setIsReady(true);
-      if (import.meta.env.DEV) console.log('[CosyVoice] Server mode active');
+      if (import.meta.env.DEV) devLog('[CosyVoice] Server mode active');
       return;
     }
 
     // Strategy 2: WebGPU ONNX worker (requires model download)
-    if (import.meta.env.DEV) console.log('[CosyVoice] No server, trying WebGPU worker...');
+    if (import.meta.env.DEV) devLog('[CosyVoice] No server, trying WebGPU worker...');
     try {
       workerRef.current = new Worker(
         new URL('../workers/cosyVoiceWorker.js', import.meta.url),
@@ -97,11 +99,11 @@ export function useCosyVoice() {
             clearTimeout(timeout);
             setMode('webgpu');
             setIsReady(true);
-            if (import.meta.env.DEV) console.log('[CosyVoice] WebGPU mode active');
+            if (import.meta.env.DEV) devLog('[CosyVoice] WebGPU mode active');
             resolve();
           } else if (status === 'error') {
             clearTimeout(timeout);
-            console.error('[CosyVoice] WebGPU error:', error);
+            devError('[CosyVoice] WebGPU error:', error);
             reject(new Error(error));
           }
         };
@@ -109,7 +111,7 @@ export function useCosyVoice() {
         workerRef.current.postMessage({ type: 'load' });
       });
     } catch (err) {
-      console.warn('[CosyVoice] WebGPU init failed:', err);
+      devWarn('[CosyVoice] WebGPU init failed:', err);
       // Neither server nor WebGPU available — cascade will fall through to Kokoro
     }
   }, [isReady, checkServer]);
@@ -150,7 +152,7 @@ export function useCosyVoice() {
 
       return playStudioAudio(audioData, sampleRate);
     } catch (err) {
-      console.warn('[CosyVoice] Server speak failed:', err);
+      devWarn('[CosyVoice] Server speak failed:', err);
       // Mark server as unavailable so next call tries WebGPU
       serverAvailableRef.current = false;
       return false;
@@ -169,7 +171,7 @@ export function useCosyVoice() {
           playStudioAudio(audio, sampling_rate).then(resolve);
         } else if (status === 'error') {
           workerRef.current.removeEventListener('message', onMessage);
-          console.warn('[CosyVoice] Worker generation error:', error);
+          devWarn('[CosyVoice] Worker generation error:', error);
           resolve(false);
         }
       };
@@ -187,7 +189,7 @@ export function useCosyVoice() {
   // ── Main speak function — routes to best available ───────
   const speak = useCallback(async (text, locale = 'en') => {
     if (!isReady) {
-      if (import.meta.env.DEV) console.warn("[CosyVoice] Not ready yet");
+      if (import.meta.env.DEV) devWarn("[CosyVoice] Not ready yet");
       return false;
     }
 
@@ -228,7 +230,7 @@ export function useCosyVoice() {
         // Return Blob directly — caller must manage URL lifecycle
         return blob;
       } catch (err) {
-        console.warn('[CosyVoice] Server generateBlob failed:', err);
+        devWarn('[CosyVoice] Server generateBlob failed:', err);
         return null;
       }
     }

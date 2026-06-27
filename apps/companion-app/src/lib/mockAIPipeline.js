@@ -1,23 +1,15 @@
+import { devWarn } from './devLog';
+import { getAudioContext } from './audioEngine';
+
 export async function processRecordingWithTruebadour(blob) {
   // Simulate processing time so the user feels the "slow web" contemplation
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   try {
     const arrayBuffer = await blob.arrayBuffer();
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) {
-      throw new Error('Web Audio API not supported in this environment');
-    }
-
-    const audioCtx = new AudioContextClass();
-    let audioBuffer;
-    try {
-      audioBuffer = await new Promise((resolve, reject) => {
-        audioCtx.decodeAudioData(arrayBuffer, resolve, reject);
-      });
-    } finally {
-      audioCtx.close().catch(() => {});
-    }
+    const audioCtx = getAudioContext();
+    
+    let audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
     const channelData = audioBuffer.getChannelData(0);
     const totalSamples = channelData.length;
@@ -146,7 +138,7 @@ export async function processRecordingWithTruebadour(blob) {
     };
 
   } catch (error) {
-    if (import.meta.env.DEV) console.warn('[Truebadour AI Scoring] Decoding failed, using somatic fallback:', error.message);
+    if (import.meta.env.DEV) devWarn('[Truebadour AI Scoring] Decoding failed, using somatic fallback:', error.message);
     // Deterministic yet random-looking fallback based on blob size
     const hash = blob.size || 12345;
     const pitch = Math.floor((Math.sin(hash) * 0.5 + 0.5) * (95 - 75 + 1) + 75);

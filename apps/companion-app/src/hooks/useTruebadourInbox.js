@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 import { useState, useEffect } from 'react';
 import { vvGet, vvSetJSON, vvRemove } from '../lib/storage';
 import { STORAGE_KEYS } from '../lib/storageKeys';
@@ -15,7 +16,7 @@ export function useTruebadourInbox() {
         setInbox(JSON.parse(saved));
       }
     } catch (err) {
-      console.warn('Failed to load Truebadour inbox:', err);
+      devWarn('Failed to load Truebadour inbox:', err);
     }
   }, []);
 
@@ -24,7 +25,7 @@ export function useTruebadourInbox() {
     try {
       vvSetJSON(INBOX_KEY, inbox);
     } catch (err) {
-      console.warn('Failed to save Truebadour inbox:', err);
+      devWarn('Failed to save Truebadour inbox:', err);
     }
   }, [inbox]);
 

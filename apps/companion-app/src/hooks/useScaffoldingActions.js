@@ -47,6 +47,19 @@ export function useScaffoldingActions(traction, updateTraction) {
       let newState = completeDAGPhase(prev, fretId, phase);
       if (typeof nodeId === 'string' && nodeId.startsWith('fret-')) {
         newState = completeNode(newState, nodeId);
+        
+        // --- Firebase Analytics ---
+        try {
+          import('../lib/firebase').then(({ analytics, logEvent }) => {
+            if (analytics) {
+              logEvent(analytics, 'node_completed', {
+                node_id: nodeId,
+                fret_id: fretId,
+                phase: phase
+              });
+            }
+          });
+        } catch (e) { /* ignore async import error */ }
       }
       return newState;
     });
@@ -55,6 +68,17 @@ export function useScaffoldingActions(traction, updateTraction) {
   const advanceNode = useCallback((nodeId) => {
     const newState = completeNode(traction, nodeId);
     updateTraction(() => newState);
+    
+    // --- Firebase Analytics ---
+    try {
+      import('../lib/firebase').then(({ analytics, logEvent }) => {
+        if (analytics) {
+          logEvent(analytics, 'node_advanced', {
+            node_id: nodeId
+          });
+        }
+      });
+    } catch (e) { /* ignore */ }
   }, [traction, updateTraction]);
 
   const navigateToNode = useCallback((nodeId) => {

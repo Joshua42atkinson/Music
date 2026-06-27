@@ -1,3 +1,4 @@
+import { devWarn } from '../../lib/devLog';
 import React, { useState, useEffect, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
@@ -72,7 +73,7 @@ export default function PlaybookShell({ onOpenSlides, onBack }) {
           }
         }
       } catch (e) {
-        console.warn('Failed to poll submissions in PlaybookShell:', e);
+        devWarn('Failed to poll submissions in PlaybookShell:', e);
       }
     };
 

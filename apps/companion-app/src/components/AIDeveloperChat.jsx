@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, Terminal, FileCode, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // AI Developer Chat
@@ -121,7 +122,7 @@ export default function AIDeveloperChat() {
         }]);
       }
     } catch (e) {
-      console.error('Approval failed:', e);
+      devError('Approval failed:', e);
     }
     checkServerStatus();
   };
@@ -137,7 +138,7 @@ export default function AIDeveloperChat() {
         timestamp: Date.now(),
       }]);
     } catch (e) {
-      console.error('Rejection failed:', e);
+      devError('Rejection failed:', e);
     }
     checkServerStatus();
   };

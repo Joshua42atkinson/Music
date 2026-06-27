@@ -410,11 +410,7 @@ const DigitalBinder = () => {
             </div>
           ) : (
             <p className="text-xs text-white/40 leading-relaxed">
-              {locale === 'fr' ? (
-                "Fonctionne en mode aperçu. Lancez l'application de bureau Voix Vive Masterclass pour débloquer le stockage local SQLite, la détection des modèles IA locaux (LM Studio / Ollama), et la synchronisation DaaS complète."
-              ) : (
-                "Running in preview mode. Launch the Voix Vive Masterclass Desktop App on your computer to unlock SQLite local storage, auto-detected local AI models (LM Studio / Ollama), and full DaaS sync."
-              )}
+              {t('desktopAppPreviewText')}
             </p>
           )}
         </div>

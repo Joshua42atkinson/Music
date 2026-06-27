@@ -55,7 +55,7 @@ export default defineConfig({
           'assets/bertrand_ref*',
           'assets/home_audio*',
         ],
-        maximumFileSizeToCacheInBytes: 3_000_000, // 3 MB — blocks Kokoro WASM from precache
+        maximumFileSizeToCacheInBytes: 10_000_000, // 10 MB — allow WebLLM (6MB) to be precached, block massive models
         runtimeCaching: [
           {
             // Audio: cache-first, max 20 entries, 30 days
@@ -71,6 +71,9 @@ export default defineConfig({
     })
   ],
   base: '/',
+  optimizeDeps: {
+    entries: ['index.html'],
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -82,7 +85,7 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
           // Heavy ML/AI libs — only loaded when AI features are triggered
           'ai-transformers': ['@huggingface/transformers', 'onnxruntime-web'],
-          'ai-wllama': ['@wllama/wllama'],
+          'ai-webllm': ['@mlc-ai/web-llm'],
           'ai-kokoro': ['kokoro-js'],
           // Music theory utilities
           'music-theory': ['@tonaljs/tonal'],
@@ -96,10 +99,10 @@ export default defineConfig({
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
       // Content Security Policy (mirrors index.html meta tag)
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self';",
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self';",
     },
     watch: {
-      ignored: ['**/training/**', '**/llama_cpp/**', '**/.venv/**', '**/scratch/**'],
+      ignored: ['**/training/**', '**/llama_cpp/**', '**/.venv/**', '**/scratch/**', '**/.f5venv/**'],
     },
     fs: {
       allow: ['../..']

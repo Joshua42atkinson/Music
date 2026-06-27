@@ -1,21 +1,23 @@
+import { devWarn } from '../lib/devLog';
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useTruebadourAI } from './useTruebadourAI';
-import { useWllamaTruebadour } from './useWllamaTruebadour';
 import { useVoiceInput } from './useVoiceInput';
 import { useKokoroWebTTS } from './useKokoroWebTTS';
 import { useVoicePreferences } from './useVoicePreferences';
 import { useAuth } from './useAuth';
 import { usePlayerState } from './usePlayerState';
+import { vvGet, vvSet } from '../lib/storage';
+import { STORAGE_KEYS } from '../lib/storageKeys';
+import { devError } from '../lib/devLog';
 
 const TruebadourContext = createContext(null);
 
 export function TruebadourProvider({ children }) {
   const ai          = useTruebadourAI();
-  const wllama      = useWllamaTruebadour();
   const kokoro      = useKokoroWebTTS();
   const voiceInput  = useVoiceInput();
   const { user }    = useAuth();
-  const player      = usePlayerState(); // ← guitar economy engine
+  const player      = usePlayerState();
 
   // ── Voice preferences (persisted + Supabase-synced) ──────────
   const voicePrefs = useVoicePreferences({ user });
@@ -39,7 +41,6 @@ export function TruebadourProvider({ children }) {
   // Wire refs so useTruebadourAI can call back into the engines
   useEffect(() => { ai.bertrandRef.current = kokoro;     }, [kokoro,     ai.bertrandRef]);
   useEffect(() => { ai.kokoroRef.current   = kokoro;     }, [kokoro,     ai.kokoroRef]);
-  useEffect(() => { ai.wllamaRef.current   = wllama;     }, [wllama,     ai.wllamaRef]);
   useEffect(() => { ai.voiceRef.current    = voiceInput; }, [voiceInput, ai.voiceRef]);
 
   // ── Centralized "Load AI Brain" ───────────────────────────────
@@ -47,44 +48,25 @@ export function TruebadourProvider({ children }) {
     if (voixLoading || voixReady) return;
     setVoixLoading(true);
     try {
-      // Load LLM and TTS in parallel — don't let one block the other
       const results = await Promise.allSettled([
-        wllama.initEngine(),
         kokoro.init(),
       ]);
-      // Log individual results
       if (results[0].status === 'rejected') {
-        console.error('[VoixVive] LLM load failed:', results[0].reason);
+        devWarn('[VoixVive] Kokoro TTS load failed:', results[0].reason);
       }
-      if (results[1].status === 'rejected') {
-        console.warn('[VoixVive] Kokoro TTS load failed (text chat still works):', results[1].reason);
-      }
-      // LLM is enough for text chat — TTS is a bonus layer
-      if (results[0].status === 'fulfilled') {
-        setVoixReady(true);
-      }
+      // AI Backend via Firebase doesn't need to 'load' locally
+      setVoixReady(true);
     } catch (err) {
-      console.error('[VoixVive] Voice load failed:', err);
+      devError('[VoixVive] Voice load failed:', err);
     } finally {
       setVoixLoading(false);
     }
-  }, [voixLoading, voixReady, kokoro, wllama]);
+  }, [voixLoading, voixReady, kokoro]);
 
   const unloadVoix = useCallback(() => {
-    if (wllama.unload) wllama.unload();
     kokoro.cancel();
     setVoixReady(false);
-  }, [wllama, kokoro]);
-
-  // Track readiness — LLM alone is enough for text chat
-  // Re-detect backend when Wllama comes online so chatStream routes to it
-  useEffect(() => {
-    if (wllama.isReady) {
-      setVoixReady(true);
-      ai.detectBackend(); // critical: update backend from 'loading' → 'wllama'
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wllama.isReady]);
+  }, [kokoro]);
 
   // ── Convenience speak — uses prefs automatically ──────────────
   const speak = useCallback(async (text) => {
@@ -100,11 +82,11 @@ export function TruebadourProvider({ children }) {
 
   const cancelSpeech = useCallback(() => kokoro.cancel(), [kokoro]);
 
-  const loadProgress = wllama.loadProgress || kokoro.progress || 0;
+  const loadProgress = kokoro.progress || 0;
 
   return (
     <TruebadourContext.Provider value={{
-      ai, kokoro, wllama, voiceInput,
+      ai, kokoro, voiceInput,
       voixLoading, voixReady, loadVoix, unloadVoix, loadProgress,
       activeWidget, openRift, openBinder, closeAll,
       // Voice preferences

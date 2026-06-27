@@ -33,19 +33,24 @@ export function useConversationalPracticeEngine({ activeFretId }) {
     setEngineState('SPEAKING');
     if (pitchDetector.isListening) pitchDetector.stopListening();
     if (voiceInput.isListening) voiceInput.stopListening();
-    
-    return new Promise((resolve) => {
-      // Simulate speech duration if Kokoro doesn't provide a perfect callback
-      // or use Kokoro.speak
-      const duration = Math.max(2000, text.length * 60);
-      kokoro.speak(text, {
-        voice: voicePrefs?.voice || 'af_bella',
+
+    if (kokoro.isReady) {
+      await kokoro.speak(text, {
+        voice: voicePrefs?.voiceId || 'af_bella',
         speed: voicePrefs?.speed || 1.0,
       });
-      setTimeout(() => {
-        resolve();
-      }, duration);
-    });
+    } else {
+      // Web Speech fallback — returns a promise that resolves when speech ends
+      await new Promise((resolve) => {
+        if (!window.speechSynthesis) { resolve(); return; }
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        utterance.onend = resolve;
+        utterance.onerror = resolve;
+        window.speechSynthesis.speak(utterance);
+      });
+    }
   }, [kokoro, pitchDetector, voiceInput, voicePrefs]);
 
   const triggerNextStep = useCallback(async () => {
@@ -62,8 +67,8 @@ export function useConversationalPracticeEngine({ activeFretId }) {
 
   // Monitor pitch
   useEffect(() => {
-    if (engineState === 'LISTENING_PITCH' && pitchDetector.noteInfo?.note) {
-      const played = pitchDetector.noteInfo.note;
+    if (engineState === 'LISTENING_PITCH' && pitchDetector.noteInfo?.name && pitchDetector.noteInfo.name !== '--') {
+      const played = pitchDetector.noteInfo.name;
       // Debounce and check
       if (played === currentGoalRef.current) {
         pitchDetector.stopListening();

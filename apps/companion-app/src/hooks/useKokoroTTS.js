@@ -1,5 +1,7 @@
+import { devWarn } from '../lib/devLog';
 import { useState, useCallback, useRef } from 'react';
 import { getAudioContext, resumeAudio } from '../audio/audioEngine';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════════════
 // useKokoroTTS — In-browser neural TTS via Kokoro-82M
@@ -69,7 +71,7 @@ export function useKokoroTTS() {
       ttsRef.current = tts;
       setIsReady(true);
     } catch (err) {
-      console.error('[KokoroTTS] Init failed:', err);
+      devError('[KokoroTTS] Init failed:', err);
       // Try WASM fallback if WebGPU failed
       try {
         const { KokoroTTS } = await import('kokoro-js');
@@ -89,7 +91,7 @@ export function useKokoroTTS() {
         ttsRef.current = tts;
         setIsReady(true);
       } catch (fallbackErr) {
-        console.error('[KokoroTTS] WASM fallback also failed:', fallbackErr);
+        devError('[KokoroTTS] WASM fallback also failed:', fallbackErr);
         setError(fallbackErr.message);
       }
     } finally {
@@ -126,7 +128,7 @@ export function useKokoroTTS() {
 
       return true;
     } catch (err) {
-      console.error('[KokoroTTS] Speak failed:', err);
+      devError('[KokoroTTS] Speak failed:', err);
       return false;
     }
   }, [speechSpeed]);
@@ -148,7 +150,7 @@ export function useKokoroTTS() {
       // Return Blob directly — caller must manage URL lifecycle
       return audioToWav(audio.audio, audio.sampling_rate);
     } catch (err) {
-      console.error('[KokoroTTS] Generate failed:', err);
+      devError('[KokoroTTS] Generate failed:', err);
       return null;
     }
   }, [speechSpeed]);
@@ -173,7 +175,7 @@ export function useKokoroTTS() {
     }
 
     if (!ttsRef.current) {
-      console.warn('[KokoroTTS] Timeout waiting for TTS initialization');
+      devWarn('[KokoroTTS] Timeout waiting for TTS initialization');
       return false;
     }
 

@@ -7,6 +7,7 @@ import {
 import { uploadVideo, saveVideoMetadata } from '../lib/driveService';
 import { useAuth } from '../hooks/useAuth';
 import { useLocale } from '../hooks/useLocale';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // STRUCTURED PRACTICE RECORDER — 15-minute guided session
@@ -155,7 +156,7 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1, comple
       setTotalTimeLeft(TOTAL_DURATION);
       setPromptIndex(0);
     } catch (err) {
-      console.error('[SPR] Camera error:', err);
+      devError('[SPR] Camera error:', err);
       alert('Camera access needed for structured practice recording. Please allow access.');
     }
   };
@@ -261,7 +262,7 @@ export default function StructuredPracticeRecorder({ onClose, fretId = 1, comple
       if (typeof completePhase === 'function') completePhase(fretId, 'play');
       setStage('done');
     } catch (err) {
-      console.error('[SPR] Upload failed:', err);
+      devError('[SPR] Upload failed:', err);
       const msg = err.message || '';
       if (msg.includes('No Google Drive token')) {
         setUploadError('Google Drive access needed. Sign out and sign in again to grant permission.');

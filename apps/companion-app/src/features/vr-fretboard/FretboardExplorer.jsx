@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Scale, Interval } from '@tonaljs/tonal';
 import { resumeAudio } from '../../audio/audioEngine';
+import { TONAL_SCALES } from './scales';
 
 // ═══════════════════════════════════════════════════════════
 // FULL 12-FRET FRETBOARD EXPLORER
@@ -39,17 +40,7 @@ const CAGED_SHAPES = {
   D: { label: 'D Shape', color: '#9b59b6', positions: [[-1,0],[3,1],[2,2],[0,3],[-1,4],[-1,5]] },
 };
 
-// Scale patterns powered by @tonaljs/tonal
-const TONAL_SCALES = {
-  major:            { label: 'Major', tonalName: 'major', color: '#3498db' },
-  minor:            { label: 'Natural Minor', tonalName: 'minor', color: '#e74c3c' },
-  pentatonicMajor:  { label: 'Major Pentatonic', tonalName: 'major pentatonic', color: '#2ecc71' },
-  pentatonicMinor:  { label: 'Minor Pentatonic', tonalName: 'minor pentatonic', color: '#f39c12' },
-  blues:            { label: 'Blues', tonalName: 'minor blues', color: '#9b59b6' },
-  dorian:           { label: 'Dorian', tonalName: 'dorian', color: '#1abc9c' },
-  mixolydian:       { label: 'Mixolydian', tonalName: 'mixolydian', color: '#e67e22' },
-  chromatic:        { label: 'Chromatic', tonalName: 'chromatic', color: '#95a5a6' },
-};
+
 
 const FretboardExplorer = ({ maxFret, fretLimit, compact = false, presetRoot, presetScale }) => {
   const [activeNote, setActiveNote] = useState(null);
@@ -162,12 +153,18 @@ const FretboardExplorer = ({ maxFret, fretLimit, compact = false, presetRoot, pr
     <div className={`fretboard-explorer-v2 ${compact ? 'fb-compact' : ''} ${isVertical ? 'fb-vertical' : 'fb-horizontal'}`}>
       <style>{`
         .fretboard-explorer-v2 {
-          background: rgba(10, 10, 15, 0.97);
-          border-radius: 16px; padding: 2rem;
-          border: 1px solid rgba(201, 169, 110, 0.1);
-          font-family: 'Inter', sans-serif; color: #e0e0ff;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          background: rgba(20, 20, 25, 0.45);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border-radius: 20px; 
+          padding: max(1.5rem, 2vw);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-top: 1px solid rgba(255, 255, 255, 0.15);
+          font-family: 'Inter', sans-serif; 
+          color: #e0e0ff;
+          box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
           overflow-x: auto;
+          transition: all 0.3s ease;
         }
         .fb-compact {
           padding: 0.75rem 0.5rem;
@@ -190,7 +187,10 @@ const FretboardExplorer = ({ maxFret, fretLimit, compact = false, presetRoot, pr
         .fb-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
         .fb-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 1.8rem; color: #e8edf2; font-weight: 400;
+          font-size: clamp(1.5rem, 3vw, 2.2rem); 
+          color: #e8edf2; 
+          font-weight: 400;
+          text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         .fb-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
         .fb-select, .fb-toggle {
@@ -258,10 +258,12 @@ const FretboardExplorer = ({ maxFret, fretLimit, compact = false, presetRoot, pr
           border-color: rgba(var(--cf-gold-rgb),0.4);
         }
         .fb-neck {
-          position: relative; background: linear-gradient(180deg, #3d2b1a, #2c1e14, #3d2b1a);
-          border-radius: 6px; padding: 12px 0;
-          border: 1px solid rgba(74, 51, 36, 0.6);
-          box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
+          position: relative; 
+          background: linear-gradient(to right, rgba(61, 43, 26, 0.95), rgba(44, 30, 20, 0.8), rgba(61, 43, 26, 0.95));
+          border-radius: 8px; 
+          padding: 12px 0;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 25px rgba(0,0,0,0.5);
           min-width: fit-content;
         }
         .fb-fret-markers {
@@ -283,20 +285,28 @@ const FretboardExplorer = ({ maxFret, fretLimit, compact = false, presetRoot, pr
           border-bottom: 2px solid; z-index: 0;
         }
         .fb-note-cell {
-          width: 52px; height: 38px; display: flex; align-items: center;
+          width: clamp(48px, 6vw, 64px); 
+          height: clamp(34px, 4vw, 44px);
+          display: flex; align-items: center;
           justify-content: center; position: relative; z-index: 1; flex-shrink: 0;
-          border-right: 2px solid rgba(212, 175, 55, 0.15);
+          border-right: 1px solid rgba(255, 255, 255, 0.08);
         }
         .fb-note-cell:first-child {
-          width: 40px; border-right: 4px solid rgba(212, 175, 55, 0.6);
+          width: clamp(36px, 4vw, 48px); 
+          border-right: 4px solid rgba(255, 255, 255, 0.25);
         }
         .fb-note {
-          width: 28px; height: 28px; border-radius: 50%;
+          width: clamp(26px, 3.5vw, 32px);
+          height: clamp(26px, 3.5vw, 32px);
+          border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.8rem; font-weight: 700; cursor: pointer;
-          transition: all 0.15s ease; position: relative;
+          font-size: clamp(0.75rem, 1vw, 0.85rem);
+          font-weight: 700; cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
           font-family: 'JetBrains Mono', monospace;
-          border: 1.5px solid transparent;
+          border: 1px solid rgba(255,255,255,0.1);
+          backdrop-filter: blur(8px);
         }
         .fb-note.in-scale {
           background: rgba(201, 169, 110, 0.2);
@@ -333,24 +343,30 @@ const FretboardExplorer = ({ maxFret, fretLimit, compact = false, presetRoot, pr
           display: flex; padding-left: 28px; margin-top: 8px;
         }
         .fb-dot-cell {
-          width: 52px; display: flex; justify-content: center; flex-shrink: 0;
+          width: clamp(48px, 6vw, 64px); 
+          display: flex; justify-content: center; flex-shrink: 0;
         }
-        .fb-dot-cell:first-child { width: 40px; }
+        .fb-dot-cell:first-child { width: clamp(36px, 4vw, 48px); }
         .fb-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: rgba(201, 169, 110, 0.25);
+          width: 8px; height: 8px; border-radius: 50%;
+          background: rgba(255, 255, 255, 0.15);
+          box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
         }
-        .fb-dot.double { width: 6px; height: 6px; box-shadow: -8px 0 0 rgba(var(--cf-gold-rgb),0.25); }
+        .fb-dot.double { width: 8px; height: 8px; box-shadow: -12px 0 0 rgba(255, 255, 255, 0.15), inset 0 1px 2px rgba(0,0,0,0.5); }
         .fb-fret-num {
-          width: 52px; text-align: center; font-size: 0.85rem;
+          width: clamp(48px, 6vw, 64px); text-align: center; font-size: 0.85rem;
           color: #5a6a80; font-family: 'JetBrains Mono', monospace;
           flex-shrink: 0;
         }
-        .fb-fret-num:first-child { width: 40px; }
+        .fb-fret-num:first-child { width: clamp(36px, 4vw, 48px); }
         .fb-status {
           margin-top: 1.5rem; display: flex; justify-content: space-between;
           align-items: center; flex-wrap: wrap; gap: 1rem;
-          padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;
+          padding: 1rem 1.25rem; 
+          background: rgba(0,0,0,0.15); 
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.04);
+          border-radius: 12px;
         }
         .fb-playing-label {
           font-size: 1.1rem; font-weight: 600;

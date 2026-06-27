@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +11,7 @@ import { useLocale } from '../hooks/useLocale';
 import { uploadVideo } from '../lib/driveService';
 import { sendReviewEmail } from '../lib/notificationService';
 import { useAuth } from '../hooks/useAuth';
+import { devError } from '../lib/devLog';
 
 const DAAS_API_BASE = import.meta.env.VITE_DAAS_API_BASE || 'http://localhost:8080/api';
 const getTimestamp = () => Date.now();
@@ -61,7 +63,7 @@ export default function MentorDashboard({ onClose }) {
         setSubmissions(data.submissions || []);
       }
     } catch (e) {
-      console.error('Failed to load mentor submissions:', e);
+      devError('Failed to load mentor submissions:', e);
     }
     setLoading(false);
   };
@@ -119,7 +121,7 @@ export default function MentorDashboard({ onClose }) {
         }
       }
     } catch (e) {
-      console.error('Failed to load student profiles:', e);
+      devError('Failed to load student profiles:', e);
     }
   };
 
@@ -143,7 +145,7 @@ export default function MentorDashboard({ onClose }) {
         }
       }
     } catch (e) {
-      console.error('AI evaluation failed:', e);
+      devError('AI evaluation failed:', e);
     }
     setEvaluating(false);
   };
@@ -197,12 +199,12 @@ export default function MentorDashboard({ onClose }) {
             const studentUser = found || { display_name: selectedSub.student_name };
             await sendReviewEmail(selectedSub, studentUser, feedbackDraft, null);
           } catch (mailErr) {
-            console.warn('Failed to send review email notification:', mailErr);
+            devWarn('Failed to send review email notification:', mailErr);
           }
         }
       }
     } catch (e) {
-      console.error('Failed to submit review:', e);
+      devError('Failed to submit review:', e);
     }
     setLoading(false);
   };
@@ -210,15 +212,9 @@ export default function MentorDashboard({ onClose }) {
   // Somatic Stamps
   const injectMacro = (metaphor) => {
     const stamps = {
-      pling: locale === 'fr'
-        ? `\n\n🎸 Métaphore du ${somatic('PLING')} : 'Assurez-vous d'écouter la résonance absolue du PLING—ressentez la note résonner pleinement sans aucune crispation somatique.'`
-        : `\n\n🎸 ${somatic('PLING')} Metaphor: 'Ensure you listen for the absolute PLING! resonance—feel the note ring out fully with zero somatic grip.'`,
-      shearl: locale === 'fr'
-        ? `\n\n🕊️ Métaphore du ${somatic('SHEARL')} : 'Appliquez le glissement du CISAILLEMENT ici—laissez vos doigts glisser horizontalement comme une plume, en contournant les frettes sans friction du manche.'`
-        : `\n\n🕊️ ${somatic('SHEARL')} Metaphor: 'Apply the SHEARL glide here—let your fingers glide horizontally like a feather, bypassing frets without neck friction.'`,
-      fheal: locale === 'fr'
-        ? `\n\n🕯️ Métaphore de la ${somatic('FHEAL')} : 'Essayez la récupération de la GUÉRISON—relâchez votre épaule gauche, laissez la main respirer et laissez votre mémoire musculaire s'exprimer.'`
-        : `\n\n🕯️ ${somatic('FHEAL')} Metaphor: 'Try the FHEAL recovery—drop your left shoulder down, let the hand breathe, and allow your muscle memory to speak.'`
+      pling: t('stampPlingText', { somaticPling: somatic('PLING') }),
+      shearl: t('stampShearlText', { somaticShearl: somatic('SHEARL') }),
+      fheal: t('stampFhealText', { somaticFheal: somatic('FHEAL') })
     };
     if (stamps[metaphor]) {
       setFeedbackDraft(prev => prev + stamps[metaphor]);
@@ -251,7 +247,7 @@ export default function MentorDashboard({ onClose }) {
         }
       }, 50);
     } catch (e) {
-      console.warn('Camera/Screen access denied:', e);
+      devWarn('Camera/Screen access denied:', e);
       alert('Access is needed for video feedback recording. Please allow and try again.');
     }
   };
@@ -320,7 +316,7 @@ export default function MentorDashboard({ onClose }) {
       setFeedbackDraft(prev => prev + realLink);
       resetRec();
     } catch (e) {
-      console.error('Failed to upload mentor feedback video:', e);
+      devError('Failed to upload mentor feedback video:', e);
       alert('Failed to upload video to Google Drive. Please check your OAuth permissions.');
       setRecStatus('recorded');
     }

@@ -1,12 +1,12 @@
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : MentorshipBlog.jsx                                   ║
 // ║ WHAT    : The Inner Circle — Bertrand's mentor blog feed       ║
-// ║ WHY     : $5/mo subscribers get daily reflections, guitar      ║
-// ║           history, meditation prompts, and philosophy          ║
-// ║ WHO     : Students with inner_circle tier                      ║
-// ║ OWNS    : Blog feed, article view, category filter             ║
-// ║ NEEDS   : MentorshipGate, supabase, useLocale                  ║
-// ║ ROUTE   : /inner-circle                                        ║
+// ║ WHY     : Community+ subscribers get daily reflections, guitar  ║
+// ║           history, meditation prompts, and philosophy           ║
+// ║ WHO     : Students with community tier or higher                ║
+// ║ OWNS    : Blog feed, article view, category filter              ║
+// ║ NEEDS   : MentorshipGate, supabase, useLocale                   ║
+// ║ ROUTE   : /inner-circle                                         ║
 // ║ STAGE   : IMPLEMENT                                            ║
 // ╚═══════════════════════════════════════════════════════════════╝
 
@@ -183,7 +183,7 @@ export default function MentorshipBlog() {
   // ── Article View ──
   if (selectedPost) {
     return (
-      <MentorshipGate requiredTier="inner_circle">
+      <MentorshipGate requiredTier="community">
         <div className="min-h-[100svh] bg-[#050508] text-[#e8edf2] font-sans pb-10">
           <div className="py-4 px-5" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
             <button onClick={() => setSelectedPost(null)} className="flex items-center gap-1 bg-transparent border-none text-cf-gold cursor-pointer text-[0.85rem] font-sans">
@@ -222,7 +222,7 @@ export default function MentorshipBlog() {
 
   // ── Feed View ──
   return (
-    <MentorshipGate requiredTier="inner_circle">
+    <MentorshipGate requiredTier="community">
       <div className="min-h-[100svh] bg-[#050508] text-[#e8edf2] font-sans pb-10">
         {/* Header */}
         <div className="flex items-center py-4 px-5 pb-3 gap-3" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>

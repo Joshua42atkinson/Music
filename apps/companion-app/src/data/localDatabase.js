@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : localDatabase.js                                   ║
 // ║ WHAT    : Durable IndexedDB backup — 10 tables via Dexie.js  ║
@@ -78,7 +79,7 @@ export async function saveProgress(tractionState) {
       value: JSON.stringify(tractionState),
     });
   } catch (e) {
-    console.warn('[VoixVive] IndexedDB saveProgress failed:', e);
+    devWarn('[VoixVive] IndexedDB saveProgress failed:', e);
   }
 }
 
@@ -94,7 +95,7 @@ export async function getProgress() {
     if (!record) return null;
     return JSON.parse(record.value);
   } catch (e) {
-    console.warn('[VoixVive] IndexedDB getProgress failed:', e);
+    devWarn('[VoixVive] IndexedDB getProgress failed:', e);
     return null;
   }
 }
@@ -111,7 +112,7 @@ export function saveSlidePosition(fretId, slideIndex) {
   try {
     vvSet(`vv_slide_${fretId}`, String(slideIndex));
   } catch (e) {
-    console.warn('[VoixVive] saveSlidePosition failed:', e);
+    devWarn('[VoixVive] saveSlidePosition failed:', e);
   }
 }
 

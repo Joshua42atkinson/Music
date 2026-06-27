@@ -13,13 +13,16 @@ if (!MENTOR_EMAIL) {
 }
 const DRIVE_FOLDER_NAME = 'Voix Vive Submissions';
 
-// ── Get Google access token from Supabase session ──
+import { vvGetJSON } from './storage';
+import { STORAGE_KEYS } from './storageKeys';
+
+// ── Get Google access token from local storage ──
 async function getGoogleToken() {
-  const { supabase } = await import('./supabase.js');
-  if (!supabase) return null;
-  const { data: { session } } = await supabase.auth.getSession();
-  // provider_token is the Google OAuth access token
-  return session?.provider_token || null;
+  const tokenData = vvGetJSON(STORAGE_KEYS.GOOGLE_TOKEN, null);
+  if (tokenData?.access_token && tokenData?.expires_at > Date.now()) {
+    return tokenData.access_token;
+  }
+  return null;
 }
 
 // ── Generic Drive API fetch wrapper ──

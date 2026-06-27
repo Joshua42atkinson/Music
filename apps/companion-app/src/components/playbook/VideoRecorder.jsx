@@ -1,3 +1,4 @@
+import { devWarn } from '../../lib/devLog';
 // ═══════════════════════════════════════════════════════════
 // VIDEO RECORDER — Browser-based practice recording
 // Uses MediaRecorder API. Records from webcam/mic.
@@ -8,6 +9,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { uploadVideo, saveVideoMetadata } from '../../lib/driveService';
+import { devError } from '../../lib/devLog';
 
 export default function VideoRecorder({ fretId, onRecordingComplete }) {
   const { user } = useAuth();
@@ -30,7 +32,7 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
       }
       setStatus('preview');
     } catch (err) {
-      console.warn('[VideoRecorder] Camera access denied:', err);
+      devWarn('[VideoRecorder] Camera access denied:', err);
       alert('Camera access is needed for video recording. Please allow camera access and try again.');
     }
   }, []);
@@ -97,7 +99,7 @@ export default function VideoRecorder({ fretId, onRecordingComplete }) {
       setStatus('done');
       onRecordingComplete?.(driveData.webViewLink, driveData.fileName);
     } catch (err) {
-      console.error('[VideoRecorder] Upload failed:', err);
+      devError('[VideoRecorder] Upload failed:', err);
       const msg = err.message || '';
       if (msg.includes('No Google Drive token')) {
         setUploadError(

@@ -128,6 +128,7 @@ export function semitoneDifference(midiA, midiB) {
 import frets from './chapterData';
 
 export function getFretContext(fretId) {
+  if (!frets || !Array.isArray(frets)) return null;
   return frets.find(f => f.id === fretId) || null;
 }
 
@@ -135,11 +136,15 @@ export function getFretContext(fretId) {
 export function getCognitivePrime(fretId) {
   const fret = getFretContext(fretId);
   if (!fret) return null;
+  const philosophy = fret.yin?.philosophy;
+  const philosophyStr = Array.isArray(philosophy)
+    ? philosophy.join(' ')
+    : (typeof philosophy === 'string' ? philosophy : '');
   return {
     quote: fret.yin?.quote,
     intervalLabel: fret.interval,
-    harmonicData: getHarmonicData(fretId - 1), // fretId 1 = 0 semitones, fretId 7 = 6 semitones etc
+    harmonicData: getHarmonicData(fretId - 1),
     coreMessage: fret.coreMessage,
-    philosophyExcerpt: fret.yin?.philosophy?.slice(0, 180) + '…',
+    philosophyExcerpt: philosophyStr ? philosophyStr.slice(0, 180) + '…' : null,
   };
 }

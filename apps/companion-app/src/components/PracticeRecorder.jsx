@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Video, Square, Download, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { devError } from '../lib/devLog';
 
 export default function PracticeRecorder({ chapterId, onComplete }) {
   const [isRecording, setIsRecording] = useState(false);
@@ -21,7 +22,7 @@ export default function PracticeRecorder({ chapterId, onComplete }) {
         }
         setHasPermission(true);
       } catch (err) {
-        console.error("Error accessing media devices.", err);
+        devError("Error accessing media devices.", err);
         setHasPermission(false);
       }
     };

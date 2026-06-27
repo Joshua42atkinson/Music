@@ -11,3 +11,6 @@ coverage
 .vite
 eslint_report.txt
 scratch/
+_archive/
+.f5venv/
+middleware/

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import usePitchDetector from '../hooks/usePitchDetector';
 import { getAudioContext, resumeAudio } from '../audio/audioEngine';
+import { devError } from '../lib/devLog';
 
 export default function ResonantMirrorPOC() {
   const [phase, setPhase] = useState('IDLE'); // IDLE -> RECORDING_HUM -> LISTENING_GUITAR -> PLAYING
@@ -39,7 +40,7 @@ export default function ResonantMirrorPOC() {
           // Now turn on the pitch detector to wait for the guitar pluck
           startListening();
         } catch (err) {
-          console.error("Failed to decode audio:", err);
+          devError("Failed to decode audio:", err);
           setPhase('IDLE');
         }
       };
@@ -54,7 +55,7 @@ export default function ResonantMirrorPOC() {
       }, 2000);
       
     } catch (err) {
-      console.error("Mic access denied for recording:", err);
+      devError("Mic access denied for recording:", err);
       setPhase('IDLE');
     }
   };

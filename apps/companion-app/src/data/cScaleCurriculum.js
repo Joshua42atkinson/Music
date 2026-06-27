@@ -3,6 +3,29 @@ import { Compass, Music, Zap, Layers, Activity, Eye, Focus, Shield, TriangleAler
 /** 20 consecutive pitch-matches within ±25 cents constitutes exercise completion. */
 export const PITCH_DETECTION_THRESHOLD = 20;
 
+export const FIVE_PILLARS = [
+  { id: 'theory', label: 'Theory', labelFr: 'Théorie', desc: 'Western Harmony, C Scale, intervals, formulas' },
+  { id: 'fretboard', label: 'Fretboard Logic', labelFr: 'Logique de la Touche', desc: 'String relationships, CAGED, maps, vertiscales' },
+  { id: 'ear', label: 'Ear Training', labelFr: 'Oreille', desc: 'Name that tune, audiation, FHEAL — Hear/See/Play/Feel' },
+  { id: 'body', label: 'Body Mechanics', labelFr: 'Mécanique Corporelle', desc: 'Holding/releasing, fascia, breath, posture, Qigong' },
+  { id: 'performance', label: 'Performance', labelFr: 'Performance', desc: 'Silent Protocol, 3x clean, improvise, proclaim yourself a musician' },
+];
+
+export const PROTOCOLS = {
+  silentProtocol: {
+    label: 'Silent Protocol',
+    desc: 'Perform 3x without a single mistake. Practice before bed for best neuropathways. Visualize a perfect, easy stage performance before sleep.',
+  },
+  gimmeABuzz: {
+    label: 'Protocol #1: Gimme a Buzz',
+    desc: 'Proper fretting. Buzz is information. Listen to what the string tells you about your finger pressure and placement.',
+  },
+  fingerStylePluck: {
+    label: 'Protocol #2: Finger-style Pluck & Release',
+    desc: 'Pluck and release. Rest vs. free stroke. The hand must be relaxed. Tension is the enemy of tone.',
+  },
+};
+
 export const C_SCALE_CHAPTERS = [
   {
     id: 'chapter-1',
@@ -14,7 +37,7 @@ export const C_SCALE_CHAPTERS = [
     color: '#3498db',
     bePhase: {
       title: 'The Foundation of Harmony',
-      content: 'The 1-3-5 are the supporting beams of Western Harmony. Most people know the 1-3-5 because they are doing chords. We are meeting you where you are. This is your protein, your greens, and your starch. It is the core of everything we do.',
+      content: 'The 1-3-5 are the supporting beams of Western Harmony. Most people know the 1-3-5 because they are doing chords. We are meeting you where you are. This is your protein, your greens, and your starch — there is no flavor yet, but it is the core of everything we do. From this basic triad, we increase complexity at the student\'s pace.',
       action: 'Visualize placing the 1, 3, and 5 together. Hear the fundamental triad in your inner ear.',
       audioSnippet: '/assets/audio/bertrand_supporting_beams.mp3'
     },
@@ -23,7 +46,9 @@ export const C_SCALE_CHAPTERS = [
       type: 'sequence',
       targetSequence: [48, 52, 55] // C3, E3, G3
     },
-    truebadourPrompt: "The user is exploring the foundational 1-3-5 triad. Emphasize that these are the supporting beams of harmony. Ask them to audiate the chord and tell you: what is the color of this chord?"
+    truebadourPrompt: "The user is exploring the foundational 1-3-5 triad. Emphasize that these are the supporting beams of harmony. Ask them to audiate the chord and tell you: what is the color of this chord?",
+    pillar: 'theory',
+    protocol: 'gimmeABuzz'
   },
   {
     id: 'chapter-2',
@@ -44,7 +69,8 @@ export const C_SCALE_CHAPTERS = [
       type: 'sequence',
       targetSequence: [48, 55, 53, 52, 50, 60, 55] // C G F E D C(octave) G
     },
-    truebadourPrompt: "The user just played the Star Wars theme using numbers. Validate how empowering it is to bypass academic dogma and play real music instantly."
+    truebadourPrompt: "The user just played the Star Wars theme using numbers. Validate how empowering it is to bypass academic dogma and play real music instantly.",
+    pillar: 'theory'
   },
   {
     id: 'chapter-3',
@@ -85,7 +111,8 @@ export const C_SCALE_CHAPTERS = [
       type: 'sequence',
       targetSequence: [59, 60] // B3, C4
     },
-    truebadourPrompt: "The user is exploring the Major 7th (B) resolving to the Root (C). Ask them: What is the story of this tension? What is the color of the sky if this interval was a movie scene?"
+    truebadourPrompt: "The user is exploring the Major 7th (B) resolving to the Root (C). Ask them: What is the story of this tension? What is the color of the sky if this interval was a movie scene?",
+    pillar: 'ear'
   },
   {
     id: 'chapter-5',
@@ -98,7 +125,8 @@ export const C_SCALE_CHAPTERS = [
     bePhase: {
       title: 'The Body is the First Instrument',
       content: 'Before you can tune the strings, you must tune yourself. Notice any tension in your shoulders, your jaw, your breath. The open strings represent the un-fretted void. Understand standard tuning: E, A, D, G, B, E.',
-      action: 'Close your eyes. Take a deep breath. Picture the 6 strings vibrating freely.'
+      action: 'Close your eyes. Take a deep breath. Picture the 6 strings vibrating freely.',
+      audioSnippet: '/assets/audio/bertrand_body_first_instrument.mp3'
     },
     doPhase: {
       instruction: 'Play all 6 open strings, one by one. Maintain completely relaxed shoulders.',
@@ -116,7 +144,8 @@ export const C_SCALE_CHAPTERS = [
     bePhase: {
       title: 'The Perfect 4th Overlap',
       content: 'Standard tuning is mostly in Perfect 4ths. This means that pressing the 5th fret of the Low E string creates the exact same pitch as the open A string below it. Visualize this geometric relationship.',
-      action: 'Imagine pressing the 5th fret on the thickest string. Hear the pitch in your head. Now imagine the next string ringing openly. They are the same.'
+      action: 'Imagine pressing the 5th fret on the thickest string. Hear the pitch in your head. Now imagine the next string ringing openly. They are the same.',
+      audioSnippet: '/assets/audio/bertrand_tuning_anchor.mp3'
     },
     doPhase: {
       instruction: 'Play Fret 5 on the Low E string, then play the Open A string. Listen to the unison.',
@@ -135,7 +164,8 @@ export const C_SCALE_CHAPTERS = [
     bePhase: {
       title: 'The Foundation of Harmony',
       content: 'The Root is "home". Every other note pushes or pulls towards the root. On the guitar, C is located on the 3rd Fret of the A string. This is our anchor for everything that follows.',
-      action: 'Sing a strong, grounded note. Call it "C". Now visualize your finger landing on the 3rd fret of the A string.'
+      action: 'Sing a strong, grounded note. Call it "C". Now visualize your finger landing on the 3rd fret of the A string.',
+      audioSnippet: '/assets/audio/bertrand_root_note.mp3'
     },
     doPhase: {
       instruction: 'Play the C on the A string, Fret 3. Let it ring out.',
@@ -143,6 +173,7 @@ export const C_SCALE_CHAPTERS = [
       targetMidi: 48 // C3
     },
     truebadourPrompt: "The user is finding the Root note C. Encourage them to feel grounded. Explain that this is the center of gravity, the home base for all other notes.",
+    pillar: 'fretboard',
     droneConfig: { fretId: 1 }
   },
   {
@@ -194,7 +225,8 @@ export const C_SCALE_CHAPTERS = [
     bePhase: {
       title: 'The Emotional Pivot',
       content: 'The Major 3rd dictates whether a chord sounds happy (major) or sad (minor). From C, a whole step up from D brings us to E. You can find E on the D string, 2nd Fret. Notice the diagonal relationship to the root.',
-      action: 'Audiate the brightness of a major third. Hum "Root... Third".'
+      action: 'Audiate the brightness of a major third. Hum "Root... Third".',
+      audioSnippet: '/assets/audio/bertrand_major_third.mp3'
     },
     doPhase: {
       instruction: 'Play C (A string, Fret 3), then play E (D string, Fret 2). Hear the brightness.',
@@ -202,6 +234,7 @@ export const C_SCALE_CHAPTERS = [
       targetSequence: [48, 52] // C3, E3
     },
     truebadourPrompt: "The user is exploring the Major 3rd (E). Emphasize the emotional quality of this interval. It is the color of brightness and the defining interval of major chords.",
+    pillar: 'ear',
     droneConfig: { fretId: 5 }
   },
   {
@@ -215,7 +248,8 @@ export const C_SCALE_CHAPTERS = [
     bePhase: {
       title: 'The Diatonic Network',
       content: 'The C Major Scale is completely laid out across the first five frets of your guitar. There are no sharps and no flats. Just pure diatonic movement.',
-      action: 'Visualize the full grid from low E to high E. Your fingers know where to go.'
+      action: 'Visualize the full grid from low E to high E. Your fingers know where to go.',
+      audioSnippet: '/assets/audio/bertrand_diatonic_map.mp3'
     },
     doPhase: {
       instruction: 'Play any 5 notes in the C Major scale to prove you know the map.',
@@ -235,7 +269,8 @@ export const C_SCALE_CHAPTERS = [
     bePhase: {
       title: 'Transposition',
       content: 'The shape you just played for C Major can be slid up the neck. To do this, your index finger must act as the "nut" of the guitar (a barre chord). This is the secret of the CAGED system.',
-      action: 'Visualize taking the open C shape, shifting it two frets up, and barring the 2nd fret. You just played a D Major chord.'
+      action: 'Visualize taking the open C shape, shifting it two frets up, and barring the 2nd fret. You just played a D Major chord.',
+      audioSnippet: '/assets/audio/bertrand_caged_seed.mp3'
     },
     doPhase: {
       instruction: 'Play a C chord. You have completed the C Scale journey.',

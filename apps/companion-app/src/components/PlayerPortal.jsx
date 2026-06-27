@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : PlayerPortal.jsx                                     ║
 // ║ WHAT    : The Player's Sanctum — mentor connection hub          ║
@@ -123,7 +124,7 @@ export default function PlayerPortal() {
           const { syncOutboxToR2 } = await import('../lib/r2Service.js');
           await syncOutboxToR2(user.id);
         } catch (e) {
-          console.warn('[PlayerPortal] Outbox sync to R2 failed:', e);
+          devWarn('[PlayerPortal] Outbox sync to R2 failed:', e);
         }
       }
 
@@ -131,7 +132,7 @@ export default function PlayerPortal() {
       // 2. Local recordings
       try {
         recs = await db.recordings.orderBy('timestamp').reverse().toArray();
-      } catch (e) { console.warn('[PlayerPortal] No recordings table:', e); }
+      } catch (e) { devWarn('[PlayerPortal] No recordings table:', e); }
 
       // 3. Legacy fallback
       if (recs.length === 0) {
@@ -145,7 +146,7 @@ export default function PlayerPortal() {
             reviewed: s.status === 'reviewed',
             feedback: s.feedback || null,
           }));
-        } catch (e) { console.warn('[PlayerPortal] Legacy submissions parse error:', e); }
+        } catch (e) { devWarn('[PlayerPortal] Legacy submissions parse error:', e); }
       }
 
       // 4. Cloud submissions from Google Drive (cross-device)
@@ -169,7 +170,7 @@ export default function PlayerPortal() {
           const localIds = new Set(recs.map(r => r.id));
           recs = [...recs, ...cloudRecs.filter(c => !localIds.has(c.id))];
         }
-      } catch (e) { console.warn('[PlayerPortal] Cloud submissions load failed:', e); }
+      } catch (e) { devWarn('[PlayerPortal] Cloud submissions load failed:', e); }
 
       // 5. Cloud submissions from Cloudflare R2 (cross-device)
       try {
@@ -198,7 +199,7 @@ export default function PlayerPortal() {
             recs = [...recs, ...r2Recs.filter(r => !existingIds.has(r.id))];
           }
         }
-      } catch (e) { console.warn('[PlayerPortal] Cloud R2 submissions load failed:', e); }
+      } catch (e) { devWarn('[PlayerPortal] Cloud R2 submissions load failed:', e); }
 
       // Sort unified list newest first
       recs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -207,13 +208,13 @@ export default function PlayerPortal() {
       try {
         const entries = await db.journal.orderBy('timestamp').reverse().limit(20).toArray();
         setJournalEntries(entries);
-      } catch (e) { console.warn('[PlayerPortal] No journal:', e); }
+      } catch (e) { devWarn('[PlayerPortal] No journal:', e); }
 
       // Check mentor workload
       try {
         const wl = await checkSubmissionAvailability();
         setWorkload(wl);
-      } catch (e) { console.warn('[PlayerPortal] Workload check failed:', e); }
+      } catch (e) { devWarn('[PlayerPortal] Workload check failed:', e); }
     };
     load();
   }, [showRecorder, showStructuredRecorder, user?.id]);
@@ -259,7 +260,7 @@ export default function PlayerPortal() {
       try {
         const recs = await db.recordings.orderBy('timestamp').reverse().toArray();
         setSubmissions(recs);
-      } catch (e) { console.warn('[PlayerPortal] Reload recordings error:', e); }
+      } catch (e) { devWarn('[PlayerPortal] Reload recordings error:', e); }
     };
     load();
   }, []);
@@ -270,7 +271,7 @@ export default function PlayerPortal() {
       try {
         const recs = await db.recordings.orderBy('timestamp').reverse().toArray();
         setSubmissions(recs);
-      } catch (e) { console.warn('[PlayerPortal] Reload error:', e); }
+      } catch (e) { devWarn('[PlayerPortal] Reload error:', e); }
     };
     load();
   }, []);
@@ -291,7 +292,7 @@ export default function PlayerPortal() {
         alert('Local recording video/audio blob not found in IndexedDB outbox.');
       }
     } catch (e) {
-      console.warn('[PlayerPortal] Failed to play recording:', e);
+      devWarn('[PlayerPortal] Failed to play recording:', e);
     }
   };
 
@@ -378,9 +379,7 @@ export default function PlayerPortal() {
             </div>
           </div>
           <p className="m-0 mb-4 text-[0.85rem] text-white/50 leading-normal">
-            {lang === 'fr'
-              ? "Enregistrez votre pratique. Bertrand l'écoute et vous envoie un retour personnalisé."
-              : "Record your practice. Bertrand listens and sends you personalized feedback."}
+            {t('recordYourPracticeBertrand')}
           </p>
           <button onClick={() => setShowRecorder(true)} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[rgba(var(--cf-gold-rgb),0.15)] border border-[rgba(var(--cf-gold-rgb),0.3)] text-[var(--cf-gold)] text-[0.85rem] font-semibold cursor-pointer font-sans">
             <Mic size={16} /> Start Recording
@@ -399,9 +398,7 @@ export default function PlayerPortal() {
             </div>
           </div>
           <p className="m-0 mb-4 text-[0.85rem] text-white/50 leading-normal">
-            {lang === 'fr'
-              ? "Une session structurée : respiration, échauffement, pratique, jeu libre, et capture émotionnelle."
-              : "A structured session: breathing, warm-up, practice, free play, and emotional capture."}
+            {t('aStructuredSessionBreathing')}
           </p>
           <button
             onClick={() => setShowStructuredRecorder(true)}

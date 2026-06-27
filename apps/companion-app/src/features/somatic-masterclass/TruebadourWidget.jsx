@@ -1,3 +1,4 @@
+import { devLog, devWarn } from '../../lib/devLog';
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : TruebadourWidget.jsx                                 ║
 // ║ WHAT    : The Red Pill — AI Truebadour (chat + voice)          ║
@@ -20,6 +21,7 @@ import { useScaffolding } from '../../components/ScaffoldingProvider';
 import { buildRiftPrompt } from '../../data/truebadourPrompt';
 import { searchChunks, buildContextBlock } from '../../data/ragStore';
 import { useTruebadourInbox } from '../../hooks/useTruebadourInbox';
+import { useAcousticMemory } from '../../hooks/useAcousticMemory';
 import HelpMenu from '../../components/HelpMenu';
 import { vvGet } from '../../lib/storage';
 import { STORAGE_KEYS } from '../../lib/storageKeys';
@@ -50,6 +52,9 @@ function ServerLight({ connected, label, color }) {
 // RED GUITAR WIDGET — AI Truebadour
 // ═══════════════════════════════════════════════════════════
 
+import ErrorBoundary from '../../components/ErrorBoundary';
+import { devError } from '../../lib/devLog';
+
 // Navigation tools auto-execute immediately (hands-free)
 // Audio/metronome tools still require confirmation (safety)
 const AUTO_EXEC_TOOLS = new Set([
@@ -58,13 +63,13 @@ const AUTO_EXEC_TOOLS = new Set([
   'NAVIGATE_NEXT', 'START_MEDITATION',
 ]);
 
-export default function TruebadourWidget() {
+function TruebadourWidgetInner() {
   const navigate = useNavigate();
   const { locale } = useLocale();
 
   // ── AI wiring ──────────────────────────────────────────────
   const { ai, player, bertrand, kokoro, voiceInput, voixLoading, voixReady, loadVoix, loadProgress, activeWidget, openRift, closeAll, voicePrefs } = useTruebadour();
-  const { chatStream } = ai;
+  const { chatStream, webLLMProgress, backend } = ai;
   const {
     traction, bardLevel, currentFret, currentPhase,
     nextRecommended, streak: _streak, practiceMinutes: _practiceMinutes,
@@ -102,6 +107,12 @@ export default function TruebadourWidget() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  useEffect(() => {
+    const handleOpen = () => openRift();
+    window.addEventListener('voixvive:open_truebadour', handleOpen);
+    return () => window.removeEventListener('voixvive:open_truebadour', handleOpen);
+  }, [openRift]);
+
   const showNav = !['/', '/onboarding'].includes(location.pathname);
 
   // ── Chat / Inbox state ─────────────────────────────────────
@@ -110,6 +121,7 @@ export default function TruebadourWidget() {
   const [guideStreaming, setGuideStreaming] = useState(false);
   const guideEndRef   = useRef(null);
   const guideInputRef = useRef(null);
+  const acousticMemory = useAcousticMemory(15000);
 
   // ── Voice state ────────────────────────────────────────────
   const [voiceRecording, setVoiceRecording] = useState(false);
@@ -160,7 +172,7 @@ export default function TruebadourWidget() {
     if (lastMessage?.event === 'FUSION_SCORE') {
       const tension = lastMessage.score;
       if (tension === "Aggressive Strike" || tension === "Muted Strike") {
-        console.log('[Truebadour] Hardware detected tension:', tension);
+        if (import.meta.env.DEV) devLog('[Truebadour] Hardware detected tension:', tension);
         setOpen(true);
         // Automatically inject a system reflection prompt into the user input
         // and let them send it (or we could auto-send, but putting it in the input 
@@ -171,35 +183,6 @@ export default function TruebadourWidget() {
     }
   }, [lastMessage, setOpen]);
 
-  // ── Notifications ──────────────────────────────────────────
-  const notifications = useMemo(() => {
-    const items = [];
-    const now = new Date();
-    const lastPractice = traction.lastPracticeDate ? new Date(traction.lastPracticeDate) : null;
-    const daysSince = lastPractice
-      ? Math.floor((now - lastPractice) / (1000 * 60 * 60 * 24))
-      : Infinity;
-
-    if (daysSince >= 2) {
-      items.push({
-        id: 'practice-reminder', icon: '🎸',
-        title: locale === 'fr' ? 'Temps de pratique' : 'Practice Time',
-        message: daysSince === Infinity
-          ? (locale === 'fr' ? 'Commencez votre parcours.' : 'Begin your musical journey.')
-          : (locale === 'fr' ? `Pas de pratique depuis ${daysSince} jours.` : `${daysSince} days since last practice.`),
-        action: () => navigate('/guitar'),
-      });
-    }
-    if (!traction.onboardingComplete && daysSince === Infinity) {
-      items.push({
-        id: 'orientation', icon: '🧭',
-        title: locale === 'fr' ? 'Orientation guidée' : 'Guided Orientation',
-        message: locale === 'fr' ? 'Un parcours de 2 minutes.' : 'A 2-minute walkthrough to set your pace.',
-        action: () => navigate('/onboarding'),
-      });
-    }
-    return items;
-  }, [traction, locale, navigate]);
 
   // loadVoix is now provided by TruebadourProvider
 
@@ -241,8 +224,10 @@ export default function TruebadourWidget() {
       const messages = [
         { role: 'system', content: buildSystemPrompt(ragContext) },
         ...history,
-        { role: 'user', content: text }
+        { role: 'user', content: acousticMemory.getMemoryString() ? `${acousticMemory.getMemoryString()}\n\n${text}` : text }
       ];
+
+      acousticMemory.clearMemory();
 
       // Request stream, but tell it not to auto-play audio
       const result = await chatStream(
@@ -263,7 +248,7 @@ export default function TruebadourWidget() {
       // (The inbox UI will automatically show the "Play Review" button).
 
     } catch (err) {
-      console.error("Review generation failed:", err);
+      devError("Review generation failed:", err);
       completeReview(submissionId, locale === 'fr'
         ? "Je suis hors ligne. L'évaluation n'a pas pu être générée."
         : "I'm offline. Could not generate evaluation.");
@@ -274,7 +259,7 @@ export default function TruebadourWidget() {
 
   const _handleDownloadReview = async (text) => {
     if (!bertrand.isReady) {
-      console.warn('[Truebadour] Bertrand Voice not ready. Please load the Brain first.');
+      devWarn('[Truebadour] Bertrand Voice not ready. Please load the Brain first.');
       return;
     }
     const blob = await bertrand.generateBlob(text, locale);
@@ -357,7 +342,7 @@ export default function TruebadourWidget() {
       await svc.startRecording();
       setVoiceRecording(true);
     } catch (err) {
-      console.warn('[Truebadour] All voice methods failed:', err);
+      devWarn('[Truebadour] All voice methods failed:', err);
       setVoiceRecording(false);
     }
   };
@@ -377,7 +362,7 @@ export default function TruebadourWidget() {
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 2.5);
       osc.connect(gain); gain.connect(ctx.destination);
       osc.start(); osc.stop(ctx.currentTime + 2.6);
-    } catch (e) { console.warn('Pitch play failed', e); }
+    } catch (e) { devWarn('Pitch play failed', e); }
   }, []);
 
   const executeToolAction = useCallback((toolName) => {
@@ -393,7 +378,7 @@ export default function TruebadourWidget() {
         window.dispatchEvent(new CustomEvent('ambient:open', { detail: { mode: 'meditation' } }));
         break;
       case 'NAVIGATE_NEXT':
-        if (nextRecommended) navigate(`/class/${nextRecommended}`);
+        navigate('/dashboard');
         break;
       // ── Hands-free slide navigation ──
       case 'NEXT_SLIDE':
@@ -441,64 +426,12 @@ export default function TruebadourWidget() {
   const BG      = '#12100e';
 
   const activeProfile = vvGet(STORAGE_KEYS.ACTIVE_PROFILE);
-  const hasNotifications = notifications.length > 0;
 
   return (
     <>
       <div role="complementary" aria-label="Truebadour AI Companion" className="fixed top-4 left-4 z-[2001] flex items-start gap-2">
 
-        {/* ── Floating red button ── */}
-        {!(isMobile && showNav) && (
-        <button
-          id="truebadour-widget-toggle"
-          onClick={() => setOpen(v => !v)}
-          style={{
-            width: open ? 'auto' : 44, height: 44, borderRadius: open ? 22 : '50%',
-            padding: open ? '0 16px' : 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            background: open ? `rgba(204,51,51,0.22)` : `${BG}cc`,
-            border: `2px solid ${open ? 'rgba(204,51,51,0.75)' : 'rgba(204,51,51,0.38)'}`,
-            boxShadow: open
-              ? `0 0 22px ${RED_DIM}, 0 0 8px ${RED_DIM}`
-              : `0 0 0 0 transparent`,
-            cursor: 'pointer',
-            backdropFilter: 'blur(12px)',
-            transition: 'all 0.25s',
-            flexShrink: 0,
-            position: 'relative',
-          }}
-          title={locale === 'fr' ? 'Le Mentor IA' : 'AI Mentor'}
-          aria-label="Open AI Mentor"
-        >
-          {activeProfile ? (
-            <div style={{
-              width: 28, height: 28, borderRadius: '50%',
-              background: `linear-gradient(135deg, ${RED}, #991111)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontFamily: "'Cormorant Garamond', serif",
-              fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase',
-            }}>
-              {activeProfile.charAt(0)}
-            </div>
-          ) : (
-            <Guitar size={22} style={{ color: open ? RED_LT : 'rgba(204,51,51,0.75)' }} />
-          )}
-          {open && <X size={18} color="#4a8fe0" strokeWidth={3} />}
-          {/* Notification badge */}
-          {hasNotifications && (
-            <span style={{
-              position: 'absolute', top: -3, right: -3,
-              width: 16, height: 16, borderRadius: '50%',
-              background: 'var(--cf-gold)', border: '2px solid #050508',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.5rem', fontWeight: 700, color: '#050508',
-              fontFamily: "'JetBrains Mono', monospace",
-            }}>
-              {notifications.length}
-            </span>
-          )}
-        </button>
-        )}
+        {/* ── Floating red button removed in favor of UnifiedAssistantMenu ── */}
 
         {/* ── Expanded panel ── */}
         <AnimatePresence>
@@ -553,7 +486,9 @@ export default function TruebadourWidget() {
                   {locale === 'fr' ? 'Votre Mentor IA' : 'Your AI Mentor'}
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => setShowSettings(!showSettings)}
                     style={{
                       padding: '5px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
@@ -562,31 +497,59 @@ export default function TruebadourWidget() {
                       fontFamily: "'JetBrains Mono', monospace", fontSize: '0.6rem',
                       letterSpacing: '0.08em', textTransform: 'uppercase',
                       display: 'flex', alignItems: 'center', gap: 5,
-                      transition: 'all 0.2s',
+                      transition: 'background 0.2s, color 0.2s',
                     }}
                     title="Voice Settings"
                   >
                     <Settings size={14} />
                     {locale === 'fr' ? 'Voix' : 'Voice'}
-                  </button>
+                  </motion.button>
 
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.15, color: 'rgba(255,255,255,0.8)' }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => setIsFullScreen(!isFullScreen)}
                     style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.25)', cursor: 'pointer', padding: 4 }}
                     aria-label="Toggle Fullscreen"
                   >
                     {isFullScreen ? <Minimize size={15} /> : <Maximize size={15} />}
-                  </button>
+                  </motion.button>
 
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.1, background: 'rgba(224, 131, 74, 0.25)' }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => { setOpen(false); setIsFullScreen(false); }}
-                    style={{ background: 'rgba(224, 131, 74, 0.15)', border: '1px solid rgba(224, 131, 74, 0.4)', color: '#e0834a', cursor: 'pointer', padding: 4, width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                    style={{ background: 'rgba(224, 131, 74, 0.15)', border: '1px solid rgba(224, 131, 74, 0.4)', color: '#e0834a', cursor: 'pointer', padding: 4, width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     aria-label="Close"
                   >
                     <X size={16} strokeWidth={2.5} />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
+
+              {/* ── WebLLM Download Progress ── */}
+              {webLLMProgress && webLLMProgress.progress < 1 && (
+                <div style={{ marginBottom: 16, padding: '12px 16px', background: 'rgba(204,51,51,0.05)', borderRadius: 12, border: '1px solid rgba(204,51,51,0.2)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', color: '#ff8888', textTransform: 'uppercase' }}>
+                      Synching Neural Weights...
+                    </span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)' }}>
+                      {Math.round(webLLMProgress.progress * 100)}%
+                    </span>
+                  </div>
+                  <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${webLLMProgress.progress * 100}%` }}
+                      style={{ height: '100%', background: RED, boxShadow: `0 0 10px ${RED_LT}` }}
+                    />
+                  </div>
+                  <div style={{ marginTop: 6, fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {webLLMProgress.text}
+                  </div>
+                </div>
+              )}
 
               {/* ── Voice Settings Panel ── */}
               <AnimatePresence>
@@ -606,109 +569,6 @@ export default function TruebadourWidget() {
                   />
                 )}
               </AnimatePresence>
-
-              {/* ── Notifications ── */}
-              {hasNotifications && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
-                  {notifications.map(n => (
-                    <button
-                      key={n.id}
-                      onClick={() => { n.action?.(); setOpen(false); }}
-                      style={{
-                        display: 'flex', alignItems: 'flex-start', gap: 8,
-                        padding: '9px 12px', borderRadius: 10, cursor: 'pointer',
-                        background: 'rgba(var(--cf-gold-rgb),0.07)', border: '1px solid rgba(var(--cf-gold-rgb),0.2)',
-                        textAlign: 'left',
-                      }}
-                    >
-                      <span style={{ fontSize: '0.9rem', flexShrink: 0 }}>{n.icon}</span>
-                      <div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--cf-gold)', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, marginBottom: 1 }}>{n.title}</div>
-                        <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.4 }}>{n.message}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* ── Voice Status ── */}
-              <div style={{ marginBottom: 12 }}>
-                {voixReady ? (
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '6px 12px', borderRadius: 10,
-                    background: 'rgba(122,170,136,0.1)', border: '1px solid rgba(122,170,136,0.2)',
-                  }}>
-                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', color: '#7aaa88', letterSpacing: '0.1em' }}>✓ Voice Active</span>
-                  </div>
-                ) : voixLoading ? (
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '6px 12px', borderRadius: 10,
-                    background: 'rgba(var(--cf-gold-rgb),0.08)', border: '1px solid rgba(var(--cf-gold-rgb),0.15)',
-                  }}>
-                    <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⏳</span>
-                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.6rem', color: 'rgba(var(--cf-gold-rgb),0.6)', letterSpacing: '0.08em' }}>Loading Voice… {loadProgress}%</span>
-                  </div>
-                ) : (
-                  <button
-                    onClick={loadVoix}
-                    style={{
-                      width: '100%', padding: '8px 0', borderRadius: 10, cursor: 'pointer',
-                      background: 'rgba(204,51,51,0.12)', border: '1px solid rgba(204,51,51,0.25)',
-                      color: RED_LT, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.6rem',
-                      letterSpacing: '0.08em', textTransform: 'uppercase',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    }}
-                    title="Download local voice models for offline responses"
-                  >
-                    <Download size={12} /> Load Offline Voice System
-                  </button>
-                )}
-              </div>
-
-
-
-              {/* ── Quick Tools Sandbox ── */}
-              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 8 }}>
-                <button
-                  onClick={toggleEyesFree}
-                  style={{
-                    padding: '4px 10px', borderRadius: 12, background: isEyesFree ? 'rgba(52,211,153,0.1)' : 'rgba(204,51,51,0.1)', border: `1px solid ${isEyesFree ? 'rgba(52,211,153,0.3)' : 'rgba(204,51,51,0.2)'}`,
-                    color: isEyesFree ? '#34d399' : RED_LT, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', whiteSpace: 'nowrap', cursor: 'pointer',
-                    boxShadow: isEyesFree ? '0 0 10px rgba(52,211,153,0.2)' : 'none'
-                  }}
-                >
-                  {isEyesFree ? `🎙️ Eyes-Free: ${engineState}` : '🎙️ Eyes-Free Mode'}
-                </button>
-                <button
-                  onClick={() => executeToolAction('PLAY_PITCH')}
-                  style={{
-                    padding: '4px 10px', borderRadius: 12, background: 'rgba(204,51,51,0.1)', border: '1px solid rgba(204,51,51,0.2)',
-                    color: RED_LT, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', whiteSpace: 'nowrap', cursor: 'pointer'
-                  }}
-                >
-                  🎵 Play Pitch
-                </button>
-                <button
-                  onClick={() => executeToolAction('NAVIGATE_PRACTICE')}
-                  style={{
-                    padding: '4px 10px', borderRadius: 12, background: 'rgba(var(--cf-gold-rgb),0.1)', border: '1px solid rgba(var(--cf-gold-rgb),0.2)',
-                    color: 'var(--cf-gold)', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', whiteSpace: 'nowrap', cursor: 'pointer'
-                  }}
-                >
-                  🎸 Go to Practice
-                </button>
-                <button
-                  onClick={() => executeToolAction('START_METRONOME')}
-                  style={{
-                    padding: '4px 10px', borderRadius: 12, background: 'rgba(122,170,136,0.1)', border: '1px solid rgba(122,170,136,0.2)',
-                    color: '#7aaa88', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', whiteSpace: 'nowrap', cursor: 'pointer'
-                  }}
-                >
-                  ⏱️ Metronome
-                </button>
-              </div>
 
               {/* ── AI Chat Area ── */}
               <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingRight: 4 }}>
@@ -754,5 +614,13 @@ export default function TruebadourWidget() {
       `}</style>
 
     </>
+  );
+}
+
+export default function TruebadourWidget(props) {
+  return (
+    <ErrorBoundary fallbackMessage="The Truebadour voice engine encountered an error. Reverting to text-only mode.">
+      <TruebadourWidgetInner {...props} />
+    </ErrorBoundary>
   );
 }

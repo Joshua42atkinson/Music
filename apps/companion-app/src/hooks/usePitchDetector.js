@@ -13,28 +13,13 @@
 // ═══════════════════════════════════════════════════════════
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { getAudioContext, resumeAudio } from '../audio/audioEngine';
+import { getAudioContext, initMicrophone, closeMicrophone } from '../audio/audioEngine';
 import { emitNotePlayed } from '../lib/bevyEventBus';
-
-// ── Shared singleton mic stream (module-level) ──
-// We keep the stream and analyser shared to avoid multiple mic prompts.
-// The AudioContext itself is managed by audioEngine.js.
-let _sharedAnalyser = null;
-let _sharedStream = null;
-let _refCount = 0;
+import { devError } from '../lib/devLog';
 
 // ── MIDI throttle state (replaces window.__LAST_SENT_MIDI / __MIDI_RESET) ──
 let _lastSentMidi = null;
 let _midiResetTimeout = null;
-
-function acquireContext() {
-  const ctx = getAudioContext();
-  if (_sharedAnalyser && ctx.state !== 'closed') {
-    _refCount++;
-    return { ctx, analyser: _sharedAnalyser };
-  }
-  return null;
-}
 
 // ── Pitch math helpers ──
 
@@ -126,7 +111,6 @@ export default function usePitchDetector() {
   const ctxRef      = useRef(null);
   const analyserRef = useRef(null);
   const rafIdRef    = useRef(null);
-  const ownedCtx    = useRef(false); // true if we created the ctx (not borrowed)
 
   // Breath hold tracking
   const breathLowSince = useRef(null);
@@ -217,43 +201,26 @@ export default function usePitchDetector() {
       // resume requires a user gesture (caller must trigger from a click handler).
       const ctx = getAudioContext();
       if (ctx && ctx.state === 'suspended') {
-        try { await ctx.resume(); } catch (e) {
+        try { await ctx.resume(); } catch {
           setError('Click to enable pitch detection — browser autoplay policy requires a user gesture.');
           return;
         }
       }
 
-      // Try to reuse an existing shared context first
-      const existing = acquireContext();
-      if (existing) {
-        ctxRef.current      = existing.ctx;
-        analyserRef.current = existing.analyser;
-        ownedCtx.current    = false;
-      } else {
-        // Create a fresh stream and analyser
-        const stream   = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const resumedCtx = resumeAudio();
-        const analyser = ctx.createAnalyser();
-        analyser.fftSize = 2048;
-
-        const source = ctx.createMediaStreamSource(stream);
-        source.connect(analyser);
-
-        // Register as singleton
-        _sharedAnalyser = analyser;
-        _sharedStream  = stream;
-        _refCount      = 1;
-
-        ctxRef.current      = ctx;
-        analyserRef.current = analyser;
-        ownedCtx.current    = true;
+      // Try to acquire the shared engine stream
+      const micData = await initMicrophone();
+      if (!micData) {
+        throw new Error('initMicrophone failed');
       }
+
+      ctxRef.current      = getAudioContext();
+      analyserRef.current = micData.analyser;
 
       setIsListening(true);
       setError(null);
       rafIdRef.current = requestAnimationFrame(tick);
     } catch (err) {
-      console.error('[usePitchDetector] Mic access failed:', err);
+      devError('[usePitchDetector] Mic access failed:', err);
       setError('Please allow microphone access to use this feature.');
     }
   }, [tick]);
@@ -262,18 +229,10 @@ export default function usePitchDetector() {
     cancelAnimationFrame(rafIdRef.current);
     rafIdRef.current = null;
 
-    _refCount = Math.max(0, _refCount - 1);
-
-    if (ownedCtx.current && _refCount === 0) {
-      // We created it and no one else is using it — close the stream
-      _sharedStream?.getTracks().forEach(t => t.stop());
-      _sharedAnalyser = null;
-      _sharedStream = null;
-    }
+    closeMicrophone(); // Decrement the shared ref counter
 
     ctxRef.current      = null;
     analyserRef.current = null;
-    ownedCtx.current    = false;
 
     setIsListening(false);
     setPitch(null);

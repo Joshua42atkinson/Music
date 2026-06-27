@@ -69,6 +69,10 @@ export const STORAGE_KEYS = {
   GOOGLE_TOKEN:       'vv_google_token',       // access token + expiry
   GOOGLE_USER:        'vv_google_user',        // profile cache
   CLOUD_ENABLED:      'vv_cloud_enabled',      // user opted into cloud sync
+  SUBSCRIPTION_TIER:  'vv_subscription_tier',  // current subscription level (free/community/apprentice/journeyman/master)
+  EMAIL_CAPTURE:      'vv_email_capture',      // launch notification sign-up
+  CLOUD_SYNC:         'vv_cloud_sync',         // was: voixvive_cloud_sync
+  USE_CLOUD_AI:       'vv_use_cloud_ai',       // was: voixvive_use_cloud_ai
 
   // ── Slide positions (per-fret, dynamic) ──
   // Pattern: vv_slide_{fretId} — was: voixvive-slide-{fretId}
@@ -110,4 +114,6 @@ export const LEGACY_KEY_MAP = {
   voixvive_beta_unlocked:      STORAGE_KEYS.BETA_UNLOCKED,
   voixvive_archetype:          STORAGE_KEYS.ARCHETYPE,
   active_student_profile:      STORAGE_KEYS.ACTIVE_PROFILE,
+  voixvive_cloud_sync:         STORAGE_KEYS.CLOUD_SYNC,
+  voixvive_use_cloud_ai:       STORAGE_KEYS.USE_CLOUD_AI,
 };

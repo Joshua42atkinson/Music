@@ -7,3 +7,6 @@ import playbookData from '../../public/data/playbookData.json';
 import dagNodes from '../../public/data/dagNodes.json';
 
 __setCache({ slideDecks, chapterData, timelessSongSlides, playbookData, dagNodes });
+
+// Prevent @pmndrs/xr -> iwer from crashing tests due to missing WebGL in jsdom
+global.WebGL2RenderingContext = class {};

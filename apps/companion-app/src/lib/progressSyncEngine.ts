@@ -16,8 +16,10 @@ import {
   migrateTractionState,
 } from '../data/tractionStore';
 import { saveProgress, getProgress } from '../data/localDatabase';
-import { getTractionState, saveTractionState, migrateLocalToCloud } from './supabase';
+import { getTractionState, saveTractionState, migrateLocalToCloud } from './firebase';
 import { devLog, devWarn } from './devLog';
+import { vvGet } from './storage';
+import { STORAGE_KEYS } from './storageKeys';
 
 /**
  * Hydrate traction state — IndexedDB is the source of truth.
@@ -74,17 +76,27 @@ export async function hydrateFromIndexedDB(): Promise<TractionState | null> {
  * @returns The merged traction state, or null.
  */
 export async function syncWithCloud(userId: string): Promise<TractionState | null> {
+  const isCloudSyncEnabled = (() => {
+    try { return vvGet(STORAGE_KEYS.CLOUD_SYNC) === 'true'; }
+    catch { return false; }
+  })();
+
+  if (!isCloudSyncEnabled) {
+    devInfo('[VoixVive] Cloud sync is disabled. Remaining in Sovereign Default mode.');
+    return null;
+  }
+
   try {
     const cloudTractionRaw = await getTractionState(userId);
     const currentLocal = loadTraction();
 
     if (cloudTractionRaw) {
-      console.info('[VoixVive] Merging local state with Supabase cloud...');
+      devInfo('[VoixVive] Merging local state with Supabase cloud...');
       const cloudTraction = migrateTractionState(cloudTractionRaw);
       const merged = mergeTractionStates(currentLocal, cloudTraction);
       saveTraction(merged);
       await saveTractionState(userId, merged);
-      console.info('[VoixVive] Cloud state synchronized successfully.');
+      devInfo('[VoixVive] Cloud state synchronized successfully.');
       return merged;
     }
 
@@ -123,10 +135,15 @@ export async function persistTraction(state: TractionState, userId: string | nul
   // 2. Fast localStorage — synchronous read cache
   saveTraction(stamped);
 
-  // 3. Cloud Supabase — async, non-blocking, only if logged in
-  if (userId) {
+  // 3. Cloud Firebase — async, non-blocking, only if logged in AND opted-in
+  const isCloudSyncEnabled = (() => {
+    try { return vvGet(STORAGE_KEYS.CLOUD_SYNC) === 'true'; }
+    catch { return false; }
+  })();
+
+  if (userId && isCloudSyncEnabled) {
     saveTractionState(userId, stamped).catch((err: Error) => {
-      devWarn('[VoixVive] Background Supabase sync failed:', err);
+      devWarn('[VoixVive] Background Firebase sync failed:', err);
     });
   }
 }

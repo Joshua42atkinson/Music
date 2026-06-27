@@ -127,7 +127,7 @@ const PHASE_COLORS = {
 
 export default function VideoLibrary() {
   const { traction } = useScaffolding();
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const lang = locale;
   const [activeVideo, setActiveVideo] = useState(null);
 
@@ -167,7 +167,7 @@ export default function VideoLibrary() {
       {/* Header */}
       <div className="mb-5">
         <h2 className="font-heading text-[1.4rem] font-semibold text-[#f0e6d2] mb-1">
-          {lang === 'fr' ? 'Les Archives de Bertrand' : "Bertrand's Archives"}
+          {t('bertrandsArchives')}
         </h2>
         <p className="font-mono text-[0.6rem] text-[rgba(var(--cf-gold-rgb),0.5)] tracking-[0.1em] uppercase m-0">
           {lang === 'fr'
@@ -182,7 +182,7 @@ export default function VideoLibrary() {
           <div key={group.fret} className="mb-6">
             {group.fret !== currentFret && (
               <p className="font-mono text-[0.6rem] text-[rgba(var(--cf-gold-rgb),0.4)] tracking-[0.12em] uppercase mb-2.5">
-                {lang === 'fr' ? 'Fondamentaux (Frette 1)' : 'Fundamentals (Fret 1)'}
+                {t('fundamentalsFret1')}
               </p>
             )}
             <div className="flex flex-col gap-3">
@@ -241,7 +241,7 @@ export default function VideoLibrary() {
 
                       {isPlaceholder ? (
                         <span className="font-mono text-[0.65rem] text-white/30 tracking-[0.06em]">
-                          {lang === 'fr' ? '📽️ Bientôt disponible' : '📽️ Coming soon'}
+                          {t('comingSoon_')}
                         </span>
                       ) : (
                         <button
@@ -250,8 +250,8 @@ export default function VideoLibrary() {
                           style={{ background: phase.bg, borderColor: phase.border, color: phase.text }}
                         >
                           {activeVideo === clip.id
-                            ? (lang === 'fr' ? 'Fermer' : 'Close')
-                            : (lang === 'fr' ? '▶ Regarder' : '▶ Watch')}
+                            ? (t('close'))
+                            : (t('watch'))}
                         </button>
                       )}
                     </div>
@@ -265,9 +265,7 @@ export default function VideoLibrary() {
         <div className="py-12 px-6 text-center bg-white/[0.02] rounded-2xl border border-white/[0.04]">
           <span className="text-[2.5rem] opacity-40">📽️</span>
           <p className="text-white/35 text-[0.85rem] mt-3 font-body">
-            {lang === 'fr'
-              ? 'Les archives vidéo pour cette frette arrivent bientôt.'
-              : 'Video archives for this fret are coming soon.'}
+            {t('videoArchivesForThis')}
           </p>
         </div>
       )}
@@ -275,9 +273,9 @@ export default function VideoLibrary() {
       {/* Archive Stats */}
       <div className="text-center mt-6 p-3">
         <span className="font-mono text-[0.55rem] text-white/20 tracking-[0.06em]">
-          {totalAvailable} {lang === 'fr' ? 'clips dans les archives' : 'clips in archives'}
+          {totalAvailable} {t('clipsInArchives')}
           {' · '}
-          {lang === 'fr' ? 'Plus ajoutés chaque semaine' : 'More added weekly'}
+          {t('moreAddedWeekly')}
         </span>
       </div>
     </div>

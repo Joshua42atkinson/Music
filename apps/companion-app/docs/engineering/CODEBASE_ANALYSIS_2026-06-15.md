@@ -450,6 +450,7 @@ Zero ARIA landmarks means screen readers see the app as an undifferentiated blob
    - 🎤 Voice coaching ($65/session)
    - ❓ Quick Question ($5/text reply)
    - 📹 Mini Critique ($15/video review)
+   - 📋 Subscription tiers: Community $5/mo, Apprentice $100/mo, Journeyman $500/mo, Master $1000/mo (defined in `pricingData.js`, rendered by `MentorshipGate`)
 
 **What they DON'T see (but should):**
 - A game mode tutorial (onboarding flow exists but only triggers as overlay widget in FreePlayGuard, never blocks landing)
@@ -478,11 +479,12 @@ Zero ARIA landmarks means screen readers see the app as an undifferentiated blob
    - DaaS API integration for AI-assisted review
 
 2. **Coaching Portal** — Their service menu with real pricing:
+   - Subscriptions: Community $5, Apprentice $100, Journeyman $500, Master $1000 (recurring monthly)
    - Private lessons: $65/single, $275/5-pack, $500/10-pack
    - Voice coaching: $65/session
    - Quick questions: $5/reply
    - Mini critiques: $15/video
-   - Payment via Stripe, Venmo, PayPal
+   - Payment via Stripe (mock URLs currently — need real Stripe Payment Links)
 
 **What they DON'T see (but need):**
 - A real queue management system — submissions go to IndexedDB outbox but never reach a server

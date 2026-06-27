@@ -1,5 +1,7 @@
+import { devLog, devWarn } from '../lib/devLog';
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { onNotePlayed } from '../lib/bevyEventBus';
+import { devError } from '../lib/devLog';
 
 const BevyIPCContext = createContext(null);
 
@@ -15,7 +17,7 @@ export function BevyIPCProvider({ children }) {
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
     if (retryCountRef.current >= MAX_RETRIES) {
-      console.warn('[BevyIPC] Max connection retries reached. Spatial Engine is likely offline.');
+      devWarn('[BevyIPC] Max connection retries reached. Spatial Engine is likely offline.');
       return;
     }
 
@@ -23,7 +25,7 @@ export function BevyIPCProvider({ children }) {
       const ws = new WebSocket('ws://127.0.0.1:8765/ws');
 
       ws.onopen = () => {
-        console.log('[BevyIPC] Connected to Spatial Engine');
+        if (import.meta.env.DEV) devLog('[BevyIPC] Connected to Spatial Engine');
         setIsConnected(true);
         retryCountRef.current = 0; // reset retries on success
         if (reconnectTimeoutRef.current) {
@@ -36,15 +38,15 @@ export function BevyIPCProvider({ children }) {
         try {
           const data = JSON.parse(event.data);
           setLastMessage(data);
-          console.log('[BevyIPC] Received:', data);
+          if (import.meta.env.DEV) devLog('[BevyIPC] Received:', data);
         } catch {
-          console.error('[BevyIPC] Error parsing message:', event.data);
+          devError('[BevyIPC] Error parsing message:', event.data);
         }
       };
 
       ws.onclose = () => {
         if (isConnected) {
-          console.log('[BevyIPC] Disconnected from Spatial Engine');
+          if (import.meta.env.DEV) devLog('[BevyIPC] Disconnected from Spatial Engine');
           setIsConnected(false);
         }
         wsRef.current = null;
@@ -63,7 +65,7 @@ export function BevyIPCProvider({ children }) {
 
       wsRef.current = ws;
     } catch (e) {
-      console.error('[BevyIPC] Connection error:', e);
+      devError('[BevyIPC] Connection error:', e);
       if (retryCountRef.current < MAX_RETRIES) {
         const delay = Math.pow(2, retryCountRef.current) * 1000;
         retryCountRef.current += 1;
@@ -93,10 +95,10 @@ export function BevyIPCProvider({ children }) {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({ event, ...payload });
       wsRef.current.send(message);
-      console.log('[BevyIPC] Sent:', message);
+      if (import.meta.env.DEV) devLog('[BevyIPC] Sent:', message);
       return true;
     } else {
-      console.warn('[BevyIPC] Cannot send command, not connected:', event);
+      devWarn('[BevyIPC] Cannot send command, not connected:', event);
       return false;
     }
   }, []);

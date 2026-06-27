@@ -18,6 +18,7 @@ import { db } from './localDatabase';
 import { exportRagData, importRagData } from './ragStore';
 import { vvGet, vvSet } from '../lib/storage';
 import { STORAGE_KEYS } from '../lib/storageKeys';
+import { devError } from '../lib/devLog';
 
 /**
  * Export all localStorage state and IndexedDB tables to a single .voixvive file
@@ -56,7 +57,7 @@ export async function exportVoixViveFile(studentName = 'adventurer') {
     URL.revokeObjectURL(url);
     return true;
   } catch (err) {
-    console.error("[VoixVive] Export failed:", err);
+    devError("[VoixVive] Export failed:", err);
     return false;
   }
 }
@@ -107,7 +108,7 @@ export async function importVoixViveFile(file) {
         
         resolve(true);
       } catch (err) {
-        console.error("[VoixVive] Import failed:", err);
+        devError("[VoixVive] Import failed:", err);
         reject(err);
       }
     };

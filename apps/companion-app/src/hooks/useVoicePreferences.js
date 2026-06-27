@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ════════════════════════════════════════════════════╗
 // ║ FILE    : useVoicePreferences.js                               ║
 // ║ WHAT    : Manages all Kokoro TTS voice settings with           ║
@@ -177,7 +178,7 @@ export function useVoicePreferences({ user } = {}) {
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id' });
       } catch (e) {
-        console.warn('[VoicePrefs] Supabase sync failed:', e);
+        devWarn('[VoicePrefs] Supabase sync failed:', e);
       } finally {
         setSaving(false);
       }

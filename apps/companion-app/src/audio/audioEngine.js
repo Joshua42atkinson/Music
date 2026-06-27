@@ -1,3 +1,5 @@
+import { devWarn } from '../lib/devLog';
+import { devError } from '../lib/devLog';
 /**
  * Voix Vive Audio Engine
  * Centralized Web Audio API manager to prevent "Hardware Context Exhaustion".
@@ -79,7 +81,7 @@ export function playPling(freq) {
     osc.start();
     osc.stop(ctx.currentTime + 1);
   } catch (e) {
-    console.warn('playPling failed', e);
+    devWarn('playPling failed', e);
   }
 }
 
@@ -106,7 +108,7 @@ export function playReferenceTone(freq) {
     osc.start();
     osc.stop(ctx.currentTime + 2.5);
   } catch (e) {
-    console.warn('playReferenceTone failed', e);
+    devWarn('playReferenceTone failed', e);
   }
 }
 
@@ -147,7 +149,7 @@ export function playPluckedString(freq, time) {
     osc.stop(t + 1.0);
     osc2.stop(t + 1.0);
   } catch (e) {
-    console.warn('playPluckedString failed', e);
+    devWarn('playPluckedString failed', e);
   }
 }
 
@@ -176,7 +178,7 @@ export function playMetronomeClick(isDownbeat, time, volume = 1.0) {
     osc.start(t);
     osc.stop(t + 0.05);
   } catch (e) {
-    console.warn('playMetronomeClick failed', e);
+    devWarn('playMetronomeClick failed', e);
   }
 }
 
@@ -187,6 +189,7 @@ export function playMetronomeClick(isDownbeat, time, volume = 1.0) {
 let micStream = null;
 let micSource = null;
 let micAnalyser = null;
+let micRefCount = 0;
 
 /**
  * Initializes the microphone and returns an AnalyserNode.
@@ -198,26 +201,33 @@ export async function initMicrophone() {
     await ctx.resume();
   }
   
-  if (!micAnalyser) {
+  if (!micStream) {
     try {
-      micStream = await navigator.mediaDevices.getUserMedia({ 
+      micStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
           autoGainControl: false,
           noiseSuppression: false
-        } 
+        }
       });
       micSource = ctx.createMediaStreamSource(micStream);
       micAnalyser = ctx.createAnalyser();
-      micAnalyser.fftSize = 2048; 
+      micAnalyser.fftSize = 2048;
       micSource.connect(micAnalyser);
-      return micAnalyser;
     } catch (err) {
-      console.error("[AudioEngine] Microphone access failed:", err);
+      devError("[AudioEngine] Microphone access failed:", err);
       return null;
     }
   }
-  return micAnalyser;
+
+  // Each caller gets its own analyser so multiple consumers (pitch detector,
+  // hands-free VAD, etc.) can read the microphone independently.
+  const callerAnalyser = ctx.createAnalyser();
+  callerAnalyser.fftSize = 2048;
+  micSource.connect(callerAnalyser);
+
+  micRefCount++;
+  return { stream: micStream, analyser: callerAnalyser };
 }
 
 /**
@@ -228,20 +238,34 @@ export function getMicrophoneAnalyser() {
 }
 
 /**
- * Closes the microphone stream to save hardware resources and remove the red recording dot.
+ * Returns the active MediaStream if initialized.
  */
-export function closeMicrophone() {
-  if (micStream) {
-    micStream.getTracks().forEach(t => t.stop());
-    micStream = null;
+export function getMicrophoneStream() {
+  return micStream;
+}
+
+/**
+ * Decrements the reference count and closes the microphone stream if no consumers remain.
+ */
+export function closeMicrophone(force = false) {
+  if (!force && micRefCount > 0) {
+    micRefCount--;
   }
-  if (micSource) {
-    micSource.disconnect();
-    micSource = null;
-  }
-  if (micAnalyser) {
-    micAnalyser.disconnect();
-    micAnalyser = null;
+  
+  if (force || micRefCount === 0) {
+    if (micStream) {
+      micStream.getTracks().forEach(t => t.stop());
+      micStream = null;
+    }
+    if (micSource) {
+      micSource.disconnect();
+      micSource = null;
+    }
+    if (micAnalyser) {
+      micAnalyser.disconnect();
+      micAnalyser = null;
+    }
+    micRefCount = 0;
   }
 }
 

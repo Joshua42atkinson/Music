@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ════════════════════════════════════════════════════╗
 // ║ FILE    : useTruebadourAI.js                                   ║
 // ║ WHAT    : React hook managing AI chat state, TTS, voice input, ║
@@ -19,6 +20,7 @@ import { useAudioQueue } from './useAudioQueue';
 import { useTruebadourChat } from './useTruebadourChat';
 import { vvGet, vvSet } from '../lib/storage';
 import { STORAGE_KEYS } from '../lib/storageKeys';
+import { isWebLLMReady, getWebLLMEngine, subscribeToWebLLMProgress } from '../lib/webllmEngine';
 
 // ═══════════════════════════════════════════════════════════════════
 // useTruebadourAI — Unified AI hook for the Truebadour
@@ -28,26 +30,16 @@ import { STORAGE_KEYS } from '../lib/storageKeys';
 // The voice IS the product. "Voix Vive" = "Living Voice."
 // ═══════════════════════════════════════════════════════════════════
 
-const REMOTE_URL   = import.meta.env.VITE_TRUEBADOUR_API_URL;
-
 export function useTruebadourAI() {
   const [isReady, setIsReady]   = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]       = useState(null);
-  const [backend, setBackend]   = useState(null); // 'remote' | 'local' | 'wllama' | 'offline'
+  const [backend, setBackend]   = useState(null); // 'google' | 'offline' | 'webgpu' | 'nano'
+  const [webLLMProgress, setWebLLMProgress] = useState(null);
   const abortRef    = useRef(null);
-  const wllamaRef   = useRef(null);
   const kokoroRef   = useRef(null);
   const voiceRef    = useRef(null);
   const bertrandRef = useRef(null);
-  // LM Studio / OpenAI-compatible local endpoint
-  const lmStudioRef = useRef({
-    url: import.meta.env.VITE_LM_STUDIO_URL
-      ? `${import.meta.env.VITE_LM_STUDIO_URL}/v1`
-      : 'http://localhost:1234/v1',
-    connected: false,
-    model: null,
-  });
 
   // ── Voice Preferences ─────────────────────────────────────────
   const [voiceId] = useState(() => vvGet(STORAGE_KEYS.VOICE_ID) || 'am_adam');
@@ -61,6 +53,14 @@ export function useTruebadourAI() {
     vvSet(STORAGE_KEYS.TTS_SPEED, ttsSpeed.toString());
   }, [ttsSpeed]);
 
+  // Subscribe to WebLLM download progress
+  useEffect(() => {
+    const unsubscribe = subscribeToWebLLMProgress((progress) => {
+      setWebLLMProgress(progress);
+    });
+    return unsubscribe;
+  }, []);
+
   // ── Internal TTS implementation ────────────────────────────────
   const speakTextInternal = useCallback(async (text, locale = 'en') => {
     if (kokoroRef.current?.isReady) {
@@ -68,7 +68,7 @@ export function useTruebadourAI() {
         const spoke = await kokoroRef.current.speak(text, { voice: voiceId, speed: ttsSpeed });
         if (spoke) return true;
       } catch (e) {
-        console.warn('[VoixVive] Kokoro TTS failed, falling back to Web Speech', e);
+        devWarn('[VoixVive] Kokoro TTS failed, falling back to Web Speech', e);
       }
     }
 
@@ -130,33 +130,51 @@ export function useTruebadourAI() {
       }
     } catch { /* proceed */ }
 
-    // ── 1. Try LM Studio (localhost:1234) ────────────────────────
+    // ── 1. Try Google Gemini Nano (Local Edge via window.ai) ─────
     try {
-      const res = await fetch(`${lmStudioRef.current.url}/models`, { signal: AbortSignal.timeout(2000) });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.data?.length > 0) {
-          lmStudioRef.current.connected = true;
-          lmStudioRef.current.model = data.data[0].id;
+      if (typeof window !== 'undefined' && window.ai) {
+        // Quick readiness check for Nano
+        const canCreate = await window.ai.canCreateTextSession();
+        if (canCreate === 'readily' || canCreate === 'after-download') {
           setIsReady(true);
-          setBackend('lmstudio');
-          return { connected: true, backend: 'lmstudio', model: data.data[0] };
+          setBackend('nano');
+          return { connected: true, backend: 'nano', model: { id: 'gemini-nano-local' } };
         }
       }
-    } catch { /* LM Studio not running */ }
-
-    // ── 2. Try wllama (in-browser GGUF) ─────────────────────────
-    if (wllamaRef.current?.isReady) {
-      setIsReady(true); setBackend('wllama');
-      return { connected: true, backend: 'wllama', model: { id: wllamaRef.current.modelId || 'LFM2.5-1.2B-Q4' } };
+    } catch (err) {
+      devWarn('[VoixVive] Nano check failed, falling back to WebGPU/Cloud', err);
     }
+
+    // ── 1.5 Try WebGPU (WebLLM - Llama 3.2 3B) ───────────────────
+    try {
+      if (typeof navigator !== 'undefined' && navigator.gpu) {
+        // Only set backend if we already initialized or user consents
+        // We will do a lazy initialization here to allow the WebGPU hook
+        // Since we want this to be the primary tier 2, we will set it if WebGPU is available
+        setIsReady(true);
+        setBackend('webgpu');
+        return { connected: true, backend: 'webgpu', model: { id: 'Llama-3.2-3B-Instruct' } };
+      }
+    } catch (err) {
+      devWarn('[VoixVive] WebGPU not supported, falling back to cloud', err);
+    }
+
+    // ── 2. Fallback to Firebase Vertex AI (Google Gemini Cloud) ──
+    try {
+      const { isAiAvailable } = await import('../lib/firebaseAI');
+      if (isAiAvailable) {
+        setIsReady(true);
+        setBackend('google');
+        return { connected: true, backend: 'google', model: { id: 'gemini-2.5-flash-latest' } };
+      }
+    } catch { /* Firebase AI not available */ }
 
     setIsReady(false); setBackend('loading');
     return { connected: false, backend: 'loading', model: null };
   }, []);
 
   const { chatStream } = useTruebadourChat({
-    backend, lmStudioRef, wllamaRef, speakText, setIsLoading,
+    backend, speakText, setIsLoading,
   });
 
   const cancel = useCallback(() => {
@@ -177,9 +195,9 @@ export function useTruebadourAI() {
     chatStream,
     speakText,
     cancel,
-    wllamaRef,
     kokoroRef,
     voiceRef,
     bertrandRef,
+    webLLMProgress,
   };
 }

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Mic, MicOff, Paperclip, Play, Video, File, X, Image as ImageIcon } from 'lucide-react';
+import { devError } from '../../../lib/devLog';
 
 export default function RiffChat({
   locale, chatStream, buildSystemPrompt,
@@ -67,7 +68,7 @@ export default function RiffChat({
         { autoPlay: false, max_tokens: 300, temperature: 0.8, mode: 'chat', locale, traction, bardLevel, currentFret, currentPhase, playerModifier }
       );
     } catch (err) {
-      console.error(err);
+      devError(err);
       setMessages(prev => {
         const next = [...prev];
         next[next.length - 1].content = "Riff connection lost. Try again.";

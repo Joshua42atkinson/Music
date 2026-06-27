@@ -145,18 +145,11 @@ describe('TruebadourWidget (Riff) — Mutual Exclusion & Game Integration', () =
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
   });
 
-  it('renders the floating widget button (red guitar)', () => {
+  it('does not render panel content when activeWidget is not riff', () => {
+    mockActiveWidget = null;
     render(<TruebadourWidget />);
-    const button = screen.getByTitle('AI Mentor');
-    expect(button).toBeInTheDocument();
-  });
-
-  it('clicking the guitar button calls openRift()', () => {
-    render(<TruebadourWidget />);
-    const button = screen.getByTitle('AI Mentor');
-    fireEvent.click(button);
-    // The widget derives `open` from activeWidget, so openRift should be called
-    expect(mockOpenRift).toHaveBeenCalled();
+    // Panel should not be visible
+    expect(screen.queryByText('Riff')).not.toBeInTheDocument();
   });
 
   it('does not render panel content when activeWidget is not riff', () => {

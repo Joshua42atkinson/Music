@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Feather, BookOpen, Sparkles, Save, Star, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useBackendBridge } from '../hooks/useBackendBridge';
@@ -5,6 +6,7 @@ import { useScaffolding } from './ScaffoldingProvider';
 import { useLocale } from '../hooks/useLocale';
 import { db } from '../data/localDatabase';
 import frets from '../data/chapterData';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // TRUEBADOUR'S QUILL — AI Songwriting Companion (Fret 4)
@@ -60,7 +62,7 @@ export default function SongwritingCompanion() {
       const songs = await db.songs.orderBy('timestamp').reverse().toArray();
       setSavedSongs(songs);
     } catch (e) {
-      console.warn('[Quill] Failed to load songs:', e);
+      devWarn('[Quill] Failed to load songs:', e);
     }
   };
 
@@ -71,7 +73,7 @@ export default function SongwritingCompanion() {
         const songs = await db.songs.orderBy('timestamp').reverse().toArray();
         setSavedSongs(songs);
       } catch (e) {
-        console.warn('[Quill] Failed to load songs:', e);
+        devWarn('[Quill] Failed to load songs:', e);
       }
     };
     init();
@@ -145,7 +147,7 @@ ${locale === 'fr' ? '- Write the lyrics in French.' : '- Write the lyrics in Eng
       const firstLine = content.split('\n').find(l => l.trim() && !l.startsWith('['));
       setSongTitle(firstLine?.trim()?.slice(0, 50) || t('untitled'));
     } catch (e) {
-      console.error('[Quill] Generation failed:', e);
+      devError('[Quill] Generation failed:', e);
       setEditableLyrics(t('generationError'));
     }
     setIsGenerating(false);
@@ -168,7 +170,7 @@ ${locale === 'fr' ? '- Write the lyrics in French.' : '- Write the lyrics in Eng
       await loadSongs();
       setTimeout(() => setSaveConfirm(false), 3000);
     } catch (e) {
-      console.error('[Quill] Failed to save song:', e);
+      devError('[Quill] Failed to save song:', e);
     }
   };
 
@@ -178,7 +180,7 @@ ${locale === 'fr' ? '- Write the lyrics in French.' : '- Write the lyrics in Eng
       await db.songs.delete(id);
       await loadSongs();
     } catch (e) {
-      console.error('[Quill] Failed to delete song:', e);
+      devError('[Quill] Failed to delete song:', e);
     }
   };
 
@@ -190,7 +192,7 @@ ${locale === 'fr' ? '- Write the lyrics in French.' : '- Write the lyrics in Eng
         await loadSongs();
       }
     } catch (e) {
-      console.error('[Quill] Failed to toggle favorite:', e);
+      devError('[Quill] Failed to toggle favorite:', e);
     }
   };
 

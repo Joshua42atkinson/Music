@@ -22,7 +22,7 @@ date: 2026-06-14
 
 ## Platform Features
 - **Persistent Widget**: Corner tool — metronome, ambient music, language swap (FR/EN), AI assistant.
-- **Troubadour AI**: 33B local model, voice-to-voice, tracks DAG location, provides feedback. NO cloud servers.
+- **Truebadour AI**: 33B local model, voice-to-voice, tracks DAG location, provides feedback. NO cloud servers.
 - **Interactive Fretboard (Vertiscale)**: Keep SECONDARY. Maximum focus on physical instrument.
 - **Biometric/Breathing Tools**: Square breathing timers embedded in workbook.
 

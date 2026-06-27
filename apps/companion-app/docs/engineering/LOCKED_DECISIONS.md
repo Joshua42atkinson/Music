@@ -12,20 +12,21 @@ date: 2026-06-14
 
 ---
 
-## AI Model
-- **In-browser (wllama):** Liquid AI LFM2.5 8B GGUF (primary) — already in `useWllamaTroubadour.js`
-  - Fallback: LFM2.5-1.2B-Instruct (already configured)
-  - Fallback: LFM2.5-350M (already configured)
-- **Local sidecar:** LFM2.5 8B on Android minitrinity app
-- **Dev/testing:** LM Studio localhost:1234 (nemotron, gemma, g3-storyteller available)
-- **Context window target:** 100K+ tokens — load full student journal + notes + curriculum
+## AI Model Architecture (Zero-Overhead Mentor Monetization)
+- **Primary Browser Engine (Edge):** WebGPU (via `@mlc-ai/web-llm` or `window.ai`) for real-time, hardware-accelerated local inference.
+- **Primary Models (Reasoning-First SLMs):** 
+  - *Phi-4-mini (3.8B)* or *Llama 3.2 (3B)* running at Q4 quantization. (The ban on non-LFMs is lifted. Reasoning and Socratic nuance are the priority).
+  - *Gemini Nano* (via `window.ai` on compatible Android/Chrome devices) for zero-download native edge inference.
+- **Cloud Fallback (Tier 2):** Firebase Vertex AI (Gemini Flash) when local hardware cannot support WebGPU/Nano.
+- **Audio-Native Horizon (Phase 2):** Architecture must be prepared to swap Text-LLMs for Audio-Native models (e.g., Gemma 4 E4B) to eliminate STT/TTS transcription latency and allow direct ingestion of guitar distortion/tone.
+- **Context window target:** 100K+ tokens — load full student journal + notes + curriculum.
 
 ## Hosting & Business Model
 - **Hosting:** Webapp only (Vite/React, deployed static)
 - **Cost to student:** Free forever (AI + curriculum)
 - **Revenue:** Human mentorship tiers only (Bertrand's time)
   - Tip Jar $5 / Quick Question / Video Review $35 / Live Zoom $65 / Capstone $100
-- **No Bertrand server:** Zero backend cost. localStorage → IndexedDB → Supabase (optional sync)
+- **No Bertrand server:** Zero backend cost. localStorage → IndexedDB → Firebase Firestore (optional, opt-in sync via `voixvive_cloud_sync` flag + Google OAuth). Supabase was removed; its `src/lib/supabase.js` is now a null stub.
 - **LMS parallel:** Brightspace/Blackboard via xAPI + LTI 1.3 (future sprint)
 
 ## Pedagogy (from 12M Bible)
@@ -42,9 +43,9 @@ date: 2026-06-14
 - **Buzz** — friction (drops on completion, rises on abandonment)
 - **Voice** — long-horizon mastery (never resets)
 - **Distortion** — signal health: `clean → breaking up → distorted → dialed in`
-- Engine: `usePlayerState.js` — wired into TroubadourProvider
+- Engine: `usePlayerState.js` — wired into TruebadourProvider
 
-## Troubadour Behavior (from 12M Bible)
+## Truebadour Behavior (from 12M Bible)
 - **Not a chatbot.** A Socratic sonic midwife.
 - **Never lectures.** Only asks questions.
 - **3-sentence limit + "Over."** — contemplative container.
@@ -55,9 +56,9 @@ date: 2026-06-14
 
 ## Branding & Naming
 - **App name:** Voix Vive ("Living Voice")
-- **AI companion:** Troubadour (red guitar widget)
+- **AI companion:** Truebadour (red guitar widget) — **canonical spelling is "Truebadour"** (matches all code). Never "Troubadour". Env var is `VITE_TRUEBADOUR_API_KEY` (currently unused/removed).
 - **Tool hub:** Binder (blue book widget)
-- **Widgets:** openRift() = Troubadour, openBinder() = Binder
+- **Widgets:** openRift() = Truebadour, openBinder() = Binder
 - **NO Trinity terms in UI:** No Coal/Steam/Shadow/Dissonance. Guitar terms only.
 - **Feedback email:** joshua42atkinson@gmail.com
 
@@ -68,8 +69,8 @@ date: 2026-06-14
 4. `docs/product/roadmap.md` — The living to-do list and execution phases.
 
 ## What NOT to do
-- ❌ Do NOT re-discuss model choice
-- ❌ Do NOT suggest Qwen, Phi, Llama, or other models
+- ❌ Do NOT use CPU-bound WebAssembly (e.g., `wllama`) for primary local inference. WebGPU is mandatory.
+- ❌ Do NOT lock the architecture to a single model family. The best-in-class SLM (Small Language Model) wins.
 - ❌ Do NOT add Trinity/Coal/Steam/Shadow terminology to UI
 - ❌ Do NOT add complexity to the learner-facing layer
 - ❌ Do NOT drift into planning when execution is needed

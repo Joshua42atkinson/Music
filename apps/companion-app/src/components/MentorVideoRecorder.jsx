@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Video, Square, X, CheckCircle, Send, RotateCcw } from 'lucide-react';
 import { useLocale } from '../hooks/useLocale';
+import { devError } from '../lib/devLog';
 
 export default function MentorVideoRecorder({ submissionId, onCancel, onSave }) {
   const { t } = useLocale();
@@ -51,7 +52,7 @@ export default function MentorVideoRecorder({ submissionId, onCancel, onSave }) 
       recorder.start(1000);
       setStage('recording');
     } catch (err) {
-      console.error(err);
+      devError(err);
       alert(t('cameraAccessDenied'));
     }
   };

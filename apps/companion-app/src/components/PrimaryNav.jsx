@@ -90,19 +90,6 @@ export default function PrimaryNav() {
         )}
 
         <div className={navContainerClass}>
-          {/* Guide */}
-          <button
-            onClick={riftActive ? closeAll : openRift}
-            onKeyDown={(e) => e.key === 'Enter' && (riftActive ? closeAll() : openRift())}
-            style={widgetBtn('#e0834a', riftActive)}
-          >
-            <div className="flex items-center gap-1">
-              <span className="text-[1.2rem]">🎸</span>
-              {riftActive && <X size={16} color="#4a8fe0" strokeWidth={3} />}
-            </div>
-            {isDesktop && <span>{t('aiMentor')}</span>}
-          </button>
-
           {/* Compass / Home Trigger */}
           <button
             onClick={handleNavToDashboard}
@@ -114,19 +101,6 @@ export default function PrimaryNav() {
             }}
           >
             <Compass size={isDesktop ? 24 : 22} />
-          </button>
-
-          {/* Binder */}
-          <button
-            onClick={binderActive ? closeAll : openBinder}
-            onKeyDown={(e) => e.key === 'Enter' && (binderActive ? closeAll() : openBinder())}
-            style={widgetBtn('#4a8fe0', binderActive)}
-          >
-            {isDesktop && <span>{t('navBinder')}</span>}
-            <div className="flex items-center gap-1">
-              <span className="text-[1.2rem]">📘</span>
-              {binderActive && <X size={16} color="#e0834a" strokeWidth={3} />}
-            </div>
           </button>
           
           {/* Beta Button (Inside Pill on Desktop) */}

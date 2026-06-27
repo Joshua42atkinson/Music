@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Activity } from 'lucide-react';
+import { useLocale } from '../hooks/useLocale';
+import { devError } from '../lib/devLog';
 
 const NOTE_STRINGS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -61,6 +63,7 @@ function autoCorrelate(buf, sampleRate) {
 }
 
 export default function PlingTrainer() {
+  const { t } = useLocale();
   const [isListening, setIsListening] = useState(false);
   const [pitch, setPitch] = useState(null);
   const [noteInfo, setNoteInfo] = useState({ name: "--", cents: 0, octave: 0 });
@@ -85,8 +88,8 @@ export default function PlingTrainer() {
       setError(null);
       updatePitch();
     } catch (err) {
-      console.error("Microphone access denied:", err);
-      setError("Please allow microphone access to use the PLING! trainer.");
+      devError("Microphone access denied:", err);
+      setError(t('plingMicError'));
     }
   };
 
@@ -154,10 +157,10 @@ export default function PlingTrainer() {
       <div className="relative z-10">
         <h3 className="text-xl font-cormorant font-bold mb-2 flex items-center justify-center gap-2">
           <Activity size={20} className={isListening ? "animate-pulse text-cf-gold" : "text-white/50"} />
-          The PLING! Trainer
+          {t('plingTitle')}
         </h3>
         <p className="text-sm text-white/70 mb-6 font-inter">
-          Sing a note. Let the Living Voice respond.
+          {t('plingDesc')}
         </p>
 
         {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
@@ -168,8 +171,8 @@ export default function PlingTrainer() {
           {/* Volume Meter */}
           <div className="w-full">
             <div className="flex justify-between text-[10px] text-white/40 mb-1 font-mono uppercase">
-              <span>Mic Input</span>
-              {volume > 5 ? <span className="text-cf-gold animate-pulse">Detecting...</span> : <span>Waiting</span>}
+              <span>{t('plingMicInput')}</span>
+              {volume > 5 ? <span className="text-cf-gold animate-pulse">{t('plingDetecting')}</span> : <span>{t('plingWaiting')}</span>}
             </div>
             <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
               <div 
@@ -186,16 +189,16 @@ export default function PlingTrainer() {
             'border-cf-gold bg-cf-gold/20'
           }`}>
             <span className="text-5xl font-bold font-inter text-white">{noteInfo.name}</span>
-            <span className="text-sm text-white/60">{pitch ? `Octave ${noteInfo.octave}` : '--'}</span>
+            <span className="text-sm text-white/60">{pitch ? `${t('plingOctave')} ${noteInfo.octave}` : '--'}</span>
           </div>
 
           {/* Horizontal Tuning Bar */}
           <div className="w-full relative">
             {/* The scale markers */}
             <div className="flex justify-between w-full text-[10px] text-white/40 mb-2 font-mono">
-              <span>-50 Flat</span>
-              <span>In Tune</span>
-              <span>+50 Sharp</span>
+              <span>{t('plingFlat50')}</span>
+              <span>{t('plingInTune')}</span>
+              <span>{t('plingSharp50')}</span>
             </div>
             
             {/* The bar background */}
@@ -221,11 +224,11 @@ export default function PlingTrainer() {
           <div className="h-6">
             {pitch ? (
               <span className={`text-sm font-bold tracking-widest uppercase transition-colors ${isTuned ? 'text-green-400' : 'text-cf-gold'}`}>
-                {isTuned ? 'Perfect Pitch' : noteInfo.cents < 0 ? 'FLAT' : 'SHARP'} 
-                {!isTuned && <span className="ml-2 opacity-70">({centsDisplay} cents)</span>}
+                {isTuned ? t('plingPerfect') : noteInfo.cents < 0 ? t('plingFlat') : t('plingSharp')} 
+                {!isTuned && <span className="ml-2 opacity-70">({centsDisplay} {t('plingCents')})</span>}
               </span>
             ) : (
-              <span className="text-sm text-white/40 tracking-widest uppercase">Waiting for pitch...</span>
+              <span className="text-sm text-white/40 tracking-widest uppercase">{t('plingWaitingPitch')}</span>
             )}
           </div>
         </div>
@@ -239,7 +242,7 @@ export default function PlingTrainer() {
           }`}
         >
           {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-          {isListening ? 'Stop Listening' : 'Activate Microphone'}
+          {isListening ? t('plingStopMic') : t('plingStartMic')}
         </button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : notificationEngine.js                              ║
 // ║ WHAT    : Evaluates the Practice Garden state to trigger     ║
@@ -6,6 +7,7 @@
 // ╚═══════════════════════════════════════════════════════════════╝
 
 import { loadTraction, saveTraction } from './tractionStore';
+import { devError } from '../lib/devLog';
 
 /**
  * Check if a specific garden tree action has been completed today.
@@ -158,7 +160,7 @@ export function evaluateNotifications() {
         return notification;
       }
     } catch (e) {
-      console.warn(`[NotificationEngine] Error evaluating rule ${rule.id}:`, e);
+      devWarn(`[NotificationEngine] Error evaluating rule ${rule.id}:`, e);
     }
   }
   return null;
@@ -169,7 +171,7 @@ export function evaluateNotifications() {
  */
 export async function setupPushNotifications() {
   if (!('Notification' in window)) {
-    console.warn('[NotificationEngine] This browser does not support notifications.');
+    devWarn('[NotificationEngine] This browser does not support notifications.');
     return false;
   }
   
@@ -180,7 +182,7 @@ export async function setupPushNotifications() {
         await navigator.serviceWorker.register('/sw.js');
         return true;
       } catch (e) {
-        console.error('[NotificationEngine] Service Worker registration failed:', e);
+        devError('[NotificationEngine] Service Worker registration failed:', e);
       }
     }
     return true;

@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "voix-vive",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.voixvive.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "Voix Vive Masterclass",
         "width": 800,
         "height": 600,
@@ -21,6 +22,11 @@
     ],
     "security": {
       "csp": null
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "domains": ["com.voixvive.app"]
     }
   },
   "bundle": {
@@ -34,11 +40,10 @@
       "icons/icon.ico"
     ],
     "android": {
-      "debugApplicationIdSuffix": ".debug"
+      "minSdkVersion": 24
     },
-    "externalBin": [
-      "binaries/llama-server",
-      "binaries/voix-vive-xr"
-    ]
+    "iOS": {
+      "minimumSystemVersion": "13.0"
+    }
   }
 }

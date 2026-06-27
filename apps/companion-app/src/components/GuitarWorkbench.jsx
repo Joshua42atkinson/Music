@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : GuitarWorkbench.jsx                                  ║
 // ║ WHAT    : Guided practice hub providing ONE suggested practice ║
@@ -112,7 +113,7 @@ function SuggestedPractice({ suggestion, onOpenTool, lang }) {
   const isCScale = suggestion.type === 'c-scale';
   const colors = PROTOCOL_COLORS[tool.protocol] || PROTOCOL_COLORS['SHEARL'];
   const Icon = isCScale ? Music : (ICON_MAP[tool.id] || Wind);
-  const invitation = getInvitation(suggestion.fretId || tool.id, lang);
+  const invitation = t(`chapter_${suggestion.fretId || tool.id}_invitation`);
 
   const handleDismiss = () => {
     try { vvSet(STORAGE_KEYS.CSCALE_DISMISSED, 'true'); } catch { /* ignore */ }
@@ -171,7 +172,6 @@ function SuggestedPractice({ suggestion, onOpenTool, lang }) {
 export default function GuitarWorkbench() {
   const navigate = useNavigate();
   const { locale, t } = useLocale();
-  const lang = locale;
   const { bardLevel, practiceMinutes, streak, traction } = useScaffolding();
   const isKidMode = traction?.settings?.kidMode === true;
   const [activeTool, setActiveTool] = useState(null);
@@ -185,7 +185,7 @@ export default function GuitarWorkbench() {
       try {
         const entries = await db.journal.orderBy('timestamp').reverse().limit(5).toArray();
         setJournalEntries(entries);
-      } catch (e) { console.warn('[Workbench] No journal:', e); }
+      } catch (e) { devWarn('[Workbench] No journal:', e); }
     };
     load();
   }, []);
@@ -222,14 +222,7 @@ export default function GuitarWorkbench() {
     catch { return 'Student'; }
   })();
 
-  const getBardTitle = (level) => {
-    const titles = {
-      en: ['Wandering Bard', 'Apprentice Truebadour', 'Journeyman Minstrel', 'Skilled Rhapsode', 'Master Voix'],
-      fr: ['Barde Errant', 'Truebadour Apprenti', 'Ménestrel Compagnon', 'Rhapsode Habile', 'Maître Voix'],
-    };
-    const idx = Math.min(level - 1, (titles[lang] || titles.en).length - 1);
-    return (titles[lang] || titles.en)[idx];
-  };
+
 
   const completedFrets = practiceCtx?.fretsCompleted || [];
   const suggestion = practiceCtx?.suggestion;
@@ -255,7 +248,7 @@ export default function GuitarWorkbench() {
       <div className="flex items-center justify-center gap-0 py-3.5 px-4 border-b border-white/[0.04] flex-wrap">
         <div className="flex flex-col items-center px-3.5 min-w-[60px]">
           <span className="text-[0.85rem] font-semibold text-[#f0e6d2] font-heading">{studentName}</span>
-          <span className="text-[0.5rem] text-white/30 font-mono tracking-[0.06em] uppercase mt-0.5">Lv.{bardLevel} {getBardTitle(bardLevel)}</span>
+          <span className="text-[0.5rem] text-white/30 font-mono tracking-[0.06em] uppercase mt-0.5">Lv.{bardLevel} {t(`bardLevel_${Math.min(Math.max(bardLevel, 1), 10)}`)}</span>
         </div>
         <div className="w-px h-[22px] bg-white/[0.08]" />
         <div className="flex flex-col items-center px-3.5 min-w-[60px]">
@@ -284,7 +277,7 @@ export default function GuitarWorkbench() {
                 {suggestion.type === 'somatic' ? 'Suggested first' : 'Your next step'}
               </span>
             </div>
-            <SuggestedPractice suggestion={suggestion} onOpenTool={handleOpenTool} lang={lang} />
+            <SuggestedPractice suggestion={suggestion} onOpenTool={handleOpenTool} />
           </>
         )}
       </div>

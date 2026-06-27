@@ -1,3 +1,4 @@
+import { devWarn } from '../../lib/devLog';
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useScaffolding } from '../ScaffoldingProvider';
 import { useLocale } from '../../hooks/useLocale';
@@ -64,8 +65,8 @@ export default function CharacterSheet() {
       if (videoRef.current) videoRef.current.srcObject = stream;
       setShowCamera(true);
     } catch (err) {
-      console.warn('[CharacterSheet] Camera denied:', err);
-      alert(lang === 'fr' ? 'Accès à la caméra refusé.' : 'Camera access denied.');
+      devWarn('[CharacterSheet] Camera denied:', err);
+      alert(t('cameraAccessDenied_'));
     }
   };
 
@@ -131,7 +132,7 @@ export default function CharacterSheet() {
           }
         }
       } catch (e) {
-        console.warn('Failed to load profile tier in CharacterSheet:', e);
+        devWarn('Failed to load profile tier in CharacterSheet:', e);
       }
     };
     if (studentName) {
@@ -312,7 +313,7 @@ export default function CharacterSheet() {
         await navigator.share({ files: [file], title: 'My Voix Vive Journey', text });
         return;
       } catch (err) {
-        if (err.name !== 'AbortError') console.warn('Share failed:', err);
+        if (err.name !== 'AbortError') devWarn('Share failed:', err);
       }
     }
 
@@ -326,9 +327,9 @@ export default function CharacterSheet() {
 
     try {
       await navigator.clipboard.writeText(text);
-      alert(lang === 'fr' ? 'Image téléchargée + texte copié dans le presse-papiers.' : 'Image downloaded + text copied to clipboard.');
+      alert(t('imageDownloadedTextCopied'));
     } catch {
-      alert(lang === 'fr' ? 'Image téléchargée.' : 'Image downloaded.');
+      alert(t('imageDownloaded'));
     }
   };
 
@@ -340,7 +341,7 @@ export default function CharacterSheet() {
       await importVoixViveFile(file);
       window.location.reload();
     } catch {
-      alert(lang === 'fr' ? 'Fichier de sauvegarde invalide.' : 'Invalid save file.');
+      alert(t('invalidSaveFile'));
     }
     
     // Reset file input so same file can be uploaded again if needed
@@ -358,7 +359,7 @@ export default function CharacterSheet() {
       <div className="p-6 rounded-2xl mb-6 text-center text-[#f3e5c8]" style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(167,139,250,0.15))', border: '2px double #d4af37', boxShadow: '0 0 30px rgba(212,175,55,0.25)' }}>
         <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🎓 🏆 📜</div>
         <h3 className="font-heading text-[1.4rem] text-[#d4af37] m-0 mb-2.5 font-bold uppercase tracking-[0.05em]">
-          {lang === 'fr' ? 'DEGRÉS ACADÉMIQUES & PARCHEMINS' : 'ACADEMY DEGREES & CERTIFICATIONS'}
+          {t('academyDegreesCertifications')}
         </h3>
         <p className="font-sans text-[0.8rem] text-[rgba(243,229,200,0.85)] leading-[1.5] m-0 mb-5">
           {lang === 'fr' 
@@ -394,9 +395,7 @@ export default function CharacterSheet() {
                 <span>{isApprenticeUnlocked ? '⭐' : '🔒'}</span>
               </div>
               <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
-                {lang === 'fr' 
-                  ? 'Déverrouillé après 4 modules complétés. Aucun examen requis.' 
-                  : 'Unlocked at Fret 1–4 completed. No audition required.'}
+                {t('unlockedAtFret14')}
               </p>
             </div>
             {isApprenticeUnlocked ? (
@@ -404,7 +403,7 @@ export default function CharacterSheet() {
                 onClick={() => { setSelectedCert('apprentice'); setShowCertModal(true); }}
                 className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, #d4af37, #aa7c11)', color: '#1a120b', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
               >
-                📜 {lang === 'fr' ? 'Parchemin' : 'View Scroll'}
+                📜 {t('viewScroll')}
               </button>
             ) : (
               <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', padding: '8px 0' }}>
@@ -432,9 +431,7 @@ export default function CharacterSheet() {
                 <span>{isJourneymanUnlocked ? '🌟' : '🔒'}</span>
               </div>
               <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
-                {lang === 'fr' 
-                  ? 'Exige 8 modules et l\'évaluation d\'audition de Bertrand ($45).' 
-                  : 'Requires Fret 1–8 complete + Bertrand\'s Capstone audition ($45).'}
+                {t('requiresFret18Complete_')}
               </p>
             </div>
             {isJourneymanUnlocked ? (
@@ -442,7 +439,7 @@ export default function CharacterSheet() {
                 onClick={() => { setSelectedCert('journeyman'); setShowCertModal(true); }}
                 className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, var(--cf-gold), #8a6f3e)', color: '#1a120b', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
               >
-                📜 {lang === 'fr' ? 'Parchemin' : 'View Scroll'}
+                📜 {t('viewScroll')}
               </button>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -455,7 +452,7 @@ export default function CharacterSheet() {
                   rel="noopener noreferrer"
                   className="w-full py-1.5 px-2 rounded-lg font-mono text-[0.65rem] font-bold tracking-[0.05em] uppercase cursor-pointer text-center no-underline" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
                 >
-                  🎸 {lang === 'fr' ? 'Audition ($45)' : 'Book Audition ($45)'}
+                  🎸 {t('bookAudition45')}
                 </a>
               </div>
             )}
@@ -480,9 +477,7 @@ export default function CharacterSheet() {
                 <span>{isMasterUnlocked ? '👑' : '🔒'}</span>
               </div>
               <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
-                {lang === 'fr' 
-                  ? 'Exige les 12 modules et l\'évaluation de Bertrand ($100).' 
-                  : 'Requires all 12 modules + Bertrand\'s Capstone master approval ($100).'}
+                {t('requiresAll12Modules_')}
               </p>
             </div>
             {isMasterUnlocked ? (
@@ -490,7 +485,7 @@ export default function CharacterSheet() {
                 onClick={() => { setSelectedCert('master'); setShowCertModal(true); }}
                 className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, #d4af37, #aa7c11)', color: '#1a120b', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
               >
-                📜 {lang === 'fr' ? 'Parchemin' : 'View Scroll'}
+                📜 {t('viewScroll')}
               </button>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -503,7 +498,7 @@ export default function CharacterSheet() {
                   rel="noopener noreferrer"
                   className="w-full py-1.5 px-2 rounded-lg font-mono text-[0.65rem] font-bold tracking-[0.05em] uppercase cursor-pointer text-center no-underline" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
                 >
-                  🎸 {lang === 'fr' ? 'Master review' : 'Book Master Review'}
+                  🎸 {t('bookMasterReview')}
                 </a>
               </div>
             )}
@@ -533,7 +528,7 @@ export default function CharacterSheet() {
           </div>
           <button
             onClick={startCamera}
-            title={lang === 'fr' ? 'Prendre une photo' : 'Take photo'}
+            title={t('takePhoto')}
             style={{
               position: 'absolute',
               bottom: -4,
@@ -585,7 +580,7 @@ export default function CharacterSheet() {
             gap: 6,
           }}
         >
-          📤 {lang === 'fr' ? 'Partager' : 'Share'}
+          📤 {t('share')}
         </button>
       </div>
 
@@ -627,7 +622,7 @@ export default function CharacterSheet() {
       {/* Commitment Tier Section */}
       <div className="mb-5">
         <h3 className="font-mono text-[0.65rem] text-[rgba(var(--cf-gold-rgb),0.5)] tracking-[0.25em] uppercase text-center mb-4">
-          {lang === 'fr' ? 'Votre Chemin' : 'Your Path'}
+          {t('yourPath')}
         </h3>
         <p className="text-center mb-4 opacity-60 text-[0.75rem] font-mono">
           {lang === 'fr' 
@@ -738,7 +733,7 @@ export default function CharacterSheet() {
             onChange={(e) => updateTraction({ truebadourTypeOverride: e.target.value || null })}
             className="bg-black/30 text-[#e0d0aa] border border-cf-gold/30 py-1.5 px-3 rounded-lg font-mono text-[0.75rem] outline-none cursor-pointer appearance-none"
           >
-            <option value="">{lang === 'fr' ? 'Détection automatique' : 'Auto-detect'}</option>
+            <option value="">{t('autodetect')}</option>
             {TRUEBADOUR_TYPES.map(type => (
               <option key={type.id} value={type.id}>
                 {type.icon} {type.name[lang]}
@@ -749,7 +744,7 @@ export default function CharacterSheet() {
         {displayType && (
           <p className="font-heading text-[1.3rem] font-normal text-[#e0d0aa] text-center mb-4 italic">
             {displayType.icon} {displayType.name[lang]}
-            {overriddenType && <span className="text-[0.75rem] not-italic text-white/40 font-mono">{lang === 'fr' ? ' (Choisi)' : ' (Chosen)'}</span>}
+            {overriddenType && <span className="text-[0.75rem] not-italic text-white/40 font-mono">{t('chosen')}</span>}
           </p>
         )}
         <div className="flex flex-col gap-2.5">
@@ -784,26 +779,24 @@ export default function CharacterSheet() {
       {/* Memory Card System */}
       <div className="mb-5 mt-8">
         <h3 className="font-mono text-[0.65rem] text-[rgba(var(--cf-gold-rgb),0.5)] tracking-[0.25em] uppercase text-center mb-4">
-          {lang === 'fr' ? 'Le Journal du Truebadour' : "The Truebadour's Journal"}
+          {t('theTruebadoursJournal')}
         </h3>
         <p className="text-center mb-4 opacity-60 text-[0.65rem] normal-case tracking-normal font-sans">
-          {lang === 'fr' 
-            ? "Vous êtes le seul propriétaire de vos données. Sauvegardez votre journal localement pour ne pas perdre votre progression."
-            : "You are the sole owner of your data. Download your journal to safely backup your progress."}
+          {t('youAreTheSole')}
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button 
             onClick={handleExport}
             className="py-2.5 px-4 rounded-lg font-mono text-[0.75rem] cursor-pointer transition-all duration-200" style={{ background: 'rgba(var(--cf-gold-rgb),0.1)', border: '1px solid rgba(var(--cf-gold-rgb),0.3)', color: '#e0d0aa' }}
           >
-            💾 {lang === 'fr' ? 'Sceller le Journal' : 'Seal the Journal'}
+            💾 {t('sealTheJournal')}
           </button>
           
           <button 
             onClick={() => fileInputRef.current?.click()}
             className="py-2.5 px-4 rounded-lg font-mono text-[0.75rem] cursor-pointer transition-all duration-200" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
           >
-            📜 {lang === 'fr' ? 'Présenter le Journal' : 'Present your Journal'}
+            📜 {t('presentYourJournal')}
           </button>
           <input 
             type="file" 
@@ -860,7 +853,7 @@ export default function CharacterSheet() {
                 cursor: 'pointer',
               }}
             >
-              📸 {lang === 'fr' ? 'Capturer' : 'Capture'}
+              📸 {t('capture')}
             </button>
             <button
               onClick={cancelCamera}
@@ -875,7 +868,7 @@ export default function CharacterSheet() {
                 cursor: 'pointer',
               }}
             >
-              {lang === 'fr' ? 'Annuler' : 'Cancel'}
+              {t('cancel')}
             </button>
           </div>
         </div>
@@ -975,10 +968,10 @@ export default function CharacterSheet() {
                 textTransform: 'uppercase' 
               }}>
                 {selectedCert === 'master' 
-                  ? (lang === 'fr' ? "Grand Parchemin de Maître Truebadour" : "Bertrand Approved Truebadour Master Scroll")
+                  ? (t('bertrandApprovedTruebadourMaster'))
                   : selectedCert === 'journeyman'
-                  ? (lang === 'fr' ? "Brevet de Truebadour Compagnon" : "Truebadour Journeyman Certificate")
-                  : (lang === 'fr' ? "Certificat d'Apprenti Truebadour" : "Truebadour Apprentice Certificate")
+                  ? (t('truebadourJourneymanCertificate'))
+                  : (t('truebadourApprenticeCertificate'))
                 }
               </h2>
               
@@ -990,11 +983,11 @@ export default function CharacterSheet() {
                 letterSpacing: '0.15em', 
                 marginBottom: 24 
               }}>
-                {lang === 'fr' ? "ACADÉMIE DE MUSIQUE VOIX VIVE" : "VOIX VIVE MUSIC ACADEMY"}
+                {t('voixViveMusicAcademy')}
               </div>
               
               <p style={{ fontStyle: 'italic', fontSize: '0.9rem', margin: '0 0 15px', color: 'rgba(255,255,255,0.7)' }}>
-                {lang === 'fr' ? "Ce document atteste officiellement que" : "This is to certify that"}
+                {t('thisIsToCertify')}
               </p>
               
               {/* Student Name */}
@@ -1021,17 +1014,11 @@ export default function CharacterSheet() {
                 color: 'rgba(255,255,255,0.85)'
               }}>
                 {selectedCert === 'master' ? (
-                  lang === 'fr' 
-                    ? "a atteint une maîtrise somatique absolue des 12 frettes de la guitare, démontrant une résonance acoustique parfaite (©PLING!), des glissements fluides (©CISAILLEMENT) et une parfaite géométrie physique des intervalles pythagoriciens sous le mentorat de Bertrand Laurence."
-                    : "has successfully demonstrated absolute somatic mastery of all 12 frets of the guitar, integrating pure PLING sonic resonance, frictionless SHEARL finger-gliding mechanics, and precise interval ratios under the personal supervision and endorsement of Bertrand Laurence."
+                  t('hasSuccessfullyDemonstratedAbsolute')
                 ) : selectedCert === 'journeyman' ? (
-                  lang === 'fr' 
-                    ? "a complété avec succès l'initiation somatique des Frettes 1 à 8 et a démontré une compétence mécanique professionnelle validée par l'évaluation d'audition de Maître Bertrand Laurence."
-                    : "has completed somatic guitar modules 1 through 8, establishing beautiful tone geometry, hand balance, and somatic recovery metrics validated by Bertrand Laurence's official Capstone review."
+                  t('hasCompletedSomaticGuitar')
                 ) : (
-                  lang === 'fr' 
-                    ? "a complété avec succès l'initiation somatique des Frettes 1 à 4, démontrant une intégration rigoureuse de la résonance absolue du PLING et du confort physique."
-                    : "has successfully unlocked somatic guitar modules 1 through 4, establishing strong foundational physical balance, CAGED fretboard visualization, and basic somatic tone mechanics."
+                  t('hasSuccessfullyUnlockedSomatic')
                 )}
               </p>
               
@@ -1039,10 +1026,10 @@ export default function CharacterSheet() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 35, padding: '0 20px' }}>
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontSize: '0.8rem', fontFamily: "'Cormorant Garamond', serif", borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: 4, width: '140px', fontStyle: 'italic' }}>
-                    {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
+                    {new Date().toLocaleDateString(t('enus'))}
                   </div>
                   <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
-                    {lang === 'fr' ? "Date d'obtention" : "Date of Award"}
+                    {t('dateOfAward')}
                   </div>
                 </div>
                 
@@ -1056,7 +1043,7 @@ export default function CharacterSheet() {
                     </text>
                   </svg>
                   <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
-                    {lang === 'fr' ? "Sceau Officiel" : "Official Seal"}
+                    {t('officialSeal')}
                   </span>
                 </div>
                 
@@ -1074,7 +1061,7 @@ export default function CharacterSheet() {
                     Bertrand Laurence
                   </div>
                   <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
-                    {lang === 'fr' ? "Sceau du Mentorat" : "Mentorship Seal"}
+                    {t('mentorshipSeal')}
                   </div>
                 </div>
               </div>
@@ -1085,13 +1072,13 @@ export default function CharacterSheet() {
                 onClick={() => window.print()}
                 className="py-2.5 px-5 rounded-lg font-mono text-[0.7rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: '#ffffff', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
               >
-                🖨️ {lang === 'fr' ? 'Imprimer / PDF' : 'Print / Save PDF'}
+                🖨️ {t('printSavePdf')}
               </button>
               <button 
                 onClick={() => { setShowCertModal(false); setSelectedCert(null); }}
                 className="py-2.5 px-5 rounded-lg font-mono text-[0.7rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
               >
-                {lang === 'fr' ? 'Fermer' : 'Close'}
+                {t('close')}
               </button>
             </div>
           </div>

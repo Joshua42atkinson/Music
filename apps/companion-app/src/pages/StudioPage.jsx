@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Star, ExternalLink, Play, Gift, Users, Video, BookOpen, Mic, MessageCircle, ArrowLeft } from 'lucide-react';
-import { SERVICES, PAYMENT_METHODS, CREDENTIALS, STYLES } from '../data/pricingData';
+import { ChevronDown, ChevronUp, Star, ExternalLink, Play, Gift, Users, Video, BookOpen, Mic, MessageCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { SERVICES, PAYMENT_METHODS, CREDENTIALS, STYLES, SUBSCRIPTION_TIERS } from '../data/pricingData';
 import { TESTIMONIALS, FAQ } from '../data/testimonialData';
+import { useLocale } from '../hooks/useLocale';
 
 // ═══════════════════════════════════════════════════════════
 // STUDIO PAGE — Bertrand's Business Landing Page
@@ -26,6 +27,7 @@ const SERVICE_ICONS = {
 
 export default function StudioPage() {
   const navigate = useNavigate();
+  const { t, isFrench } = useLocale();
   const [expandedService, setExpandedService] = useState(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [expandedFaq, setExpandedFaq] = useState(null);
@@ -42,7 +44,7 @@ export default function StudioPage() {
   const handlePayment = (stripeLink) => {
     if (stripeLink) {
       if (stripeLink.includes('mock_')) {
-        alert("This Stripe link is in MOCK mode for the Silent Beta. Bertrand has not yet provided the live Stripe Payment URLs.");
+        alert(t('studio.mockAlert'));
       } else {
         window.open(stripeLink, '_blank');
       }
@@ -62,7 +64,7 @@ export default function StudioPage() {
           aria-label="Back"
         >
           <ArrowLeft size={14} />
-          Back
+          {t('studio.back')}
         </button>
         <button
           onClick={() => navigate('/')}
@@ -556,7 +558,7 @@ export default function StudioPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          Body-centered guitar & voice instruction for all ages and styles
+          {t('studio.heroSubtitle')}
         </motion.p>
 
         <motion.div
@@ -591,10 +593,10 @@ export default function StudioPage() {
           className="mt-6 py-3.5 px-5 rounded-xl bg-[rgba(122,170,136,0.06)] border border-[rgba(122,170,136,0.2)] max-w-[440px] mx-auto"
         >
           <p className="font-[EB_Garamond] italic text-[0.95rem] text-[#7aaa88] m-0 mb-1.5">
-            The 12-chapter curriculum, the Truebadour AI coach, and all tools are free.
+            {t('studio.freeBanner')}
           </p>
           <p className="font-mono text-[0.55rem] text-[rgba(122,170,136,0.5)] tracking-[0.08em] uppercase m-0">
-            No login · No paywall · Start playing now
+            {t('studio.freeBannerSub')}
           </p>
         </motion.div>
       </section>
@@ -602,18 +604,18 @@ export default function StudioPage() {
       {/* ═══ TRIAL CTA ═══ */}
       <section className="studio-section pt-0">
         <div className="cta-banner">
-          <h3>🎸 Ready for the Next Step?</h3>
-          <p>"Give you everything in bites... just enough to bring you to that next step."</p>
+          <h3>{t('studio.trialCtaTitle')}</h3>
+          <p>"{t('studio.trialCtaQuote')}"</p>
           <button className="cta-button" onClick={() => handlePayment(null)}>
-            Book a Trial Lesson — $45
+            {t('studio.trialCtaButton')}
           </button>
         </div>
       </section>
 
       {/* ═══ SERVICES ═══ */}
       <section className="studio-section">
-        <h2 className="studio-section-title">Support & Mentorship</h2>
-        <p className="studio-section-subtitle">The curriculum is free. Deep work with Bertrand is a human investment.</p>
+        <h2 className="studio-section-title">{t('studio.servicesTitle')}</h2>
+        <p className="studio-section-subtitle">{t('studio.servicesSubtitle')}</p>
 
         {SERVICES.map(service => {
           const isExpanded = expandedService === service.id;
@@ -633,7 +635,7 @@ export default function StudioPage() {
                   <p className="service-subtitle">{service.subtitle}</p>
                 </div>
                 <span className="service-from-price">
-                  {minPrice < Infinity ? `$${minPrice}` : 'Custom'}
+                  {minPrice < Infinity ? `$${minPrice}` : t('studio.custom')}
                 </span>
                 {isExpanded ? (
                   <ChevronUp size={18} className="service-expand-icon" />
@@ -682,7 +684,7 @@ export default function StudioPage() {
                               <span className="pricing-badge">{option.badge}</span>
                             )}
                             <span className="pricing-amount">
-                              {option.price !== null ? `$${option.price}` : 'Contact'}
+                              {option.price !== null ? `$${option.price}` : t('studio.contact')}
                             </span>
                           </div>
                         </div>
@@ -696,11 +698,84 @@ export default function StudioPage() {
         })}
       </section>
 
+      {/* ═══ SUBSCRIPTION TIERS ═══ */}
+      <section className="studio-section">
+        <h2 className="studio-section-title">{t('studio.subscriptionsTitle')}</h2>
+        <p className="studio-section-subtitle">{t('studio.subscriptionsSubtitle')}</p>
+
+        <style>{`
+          .tier-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(var(--cf-gold-rgb),0.12);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+          }
+          .tier-card.featured {
+            border-color: rgba(var(--cf-gold-rgb),0.3);
+            background: rgba(var(--cf-gold-rgb),0.05);
+          }
+          .tier-card:hover {
+            border-color: rgba(var(--cf-gold-rgb),0.2);
+          }
+          .tier-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px;
+          }
+          .tier-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem; color: #f0e6d2; margin: 0;
+          }
+          .tier-price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem; color: var(--cf-gold); font-weight: 600;
+          }
+          .tier-tagline {
+            font-size: 0.8rem; color: #6a7a8a; margin: 0 0 12px;
+            font-family: 'EB Garamond', serif; font-style: italic;
+          }
+          .tier-features { list-style: none; padding: 0; margin: 0 0 16px; }
+          .tier-features li {
+            font-size: 0.82rem; color: #8a9aaa; padding: 3px 0;
+            display: flex; align-items: flex-start; gap: 8px;
+          }
+          .tier-cta {
+            display: block; width: 100%; padding: 12px;
+            border-radius: 10px; border: 1px solid rgba(var(--cf-gold-rgb),0.2);
+            background: rgba(var(--cf-gold-rgb),0.08);
+            color: var(--cf-gold); font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; cursor: pointer; transition: all 0.2s;
+            text-align: center;
+          }
+          .tier-cta:hover { background: rgba(var(--cf-gold-rgb),0.15); }
+        `}</style>
+
+        {SUBSCRIPTION_TIERS.filter(tier => tier.price > 0).map(tier => (
+          <div key={tier.id} className={`tier-card ${tier.badge === 'Most Popular' ? 'featured' : ''}`}>
+            <div className="tier-header">
+              <h3 className="tier-name">{tier.icon} {tier.name}</h3>
+              <span className="tier-price">${tier.price}{t('studio.perMonth')}</span>
+            </div>
+            <p className="tier-tagline">{tier.tagline}</p>
+            <ul className="tier-features">
+              {tier.features.slice(0, 4).map((f, i) => (
+                <li key={i}><CheckCircle2 size={14} color="#7aaa88" style={{ flexShrink: 0, marginTop: 2 }} /> {f}</li>
+              ))}
+            </ul>
+            <button className="tier-cta" onClick={() => handlePayment(tier.stripeLink)}>
+              {t('studio.chooseTier')} {tier.name}
+            </button>
+          </div>
+        ))}
+      </section>
+
       {/* ═══ TESTIMONIALS ═══ */}
       <section className="studio-section">
-        <h2 className="studio-section-title">What Students Say</h2>
+        <h2 className="studio-section-title">{t('studio.testimonialsTitle')}</h2>
         <p className="studio-section-subtitle">
-          {TESTIMONIALS.length} reviews from private students and Passim School of Music
+          {TESTIMONIALS.length} {t('studio.testimonialsSubtitle')}
         </p>
 
         <AnimatePresence mode="wait">
@@ -741,8 +816,8 @@ export default function StudioPage() {
 
       {/* ═══ PAYMENT METHODS ═══ */}
       <section className="studio-section" id="payment-methods">
-        <h2 className="studio-section-title">Ways to Pay</h2>
-        <p className="studio-section-subtitle">Choose whichever method is easiest for you</p>
+        <h2 className="studio-section-title">{t('studio.paymentTitle')}</h2>
+        <p className="studio-section-subtitle">{t('studio.paymentSubtitle')}</p>
 
         <div className="payment-grid">
           {PAYMENT_METHODS.filter(m => m.id !== 'wire').map(method => (
@@ -757,8 +832,8 @@ export default function StudioPage() {
 
       {/* ═══ FREE DOWNLOADS ═══ */}
       <section className="studio-section" id="free-resources">
-        <h2 className="studio-section-title">Free Resources</h2>
-        <p className="studio-section-subtitle">Download Bertrand's teaching materials — yours to keep</p>
+        <h2 className="studio-section-title">{t('studio.downloadsTitle')}</h2>
+        <p className="studio-section-subtitle">{t('studio.downloadsSubtitle')}</p>
 
         <style>{`
           .downloads-group { margin-bottom: 24px; }
@@ -813,7 +888,7 @@ export default function StudioPage() {
         `}</style>
 
         <div className="downloads-group">
-          <div className="downloads-group-label">🎵 Song Sheets</div>
+          <div className="downloads-group-label">{t('studio.songSheets')}</div>
           {[
             { name: 'Allegro — Classical Guitar Piece', file: 'allegro-classical-piece.pdf', type: 'PDF' },
             { name: 'Auld Lang Syne — TAB', file: 'auld-lang-syne-tab.pdf', type: 'PDF' },
@@ -831,7 +906,7 @@ export default function StudioPage() {
         </div>
 
         <div className="downloads-group">
-          <div className="downloads-group-label">🗺️ Theory Maps</div>
+          <div className="downloads-group-label">{t('studio.theoryMaps')}</div>
           {[
             { name: 'E Vertiscales — Full Chart', file: 'e-vertiscales.pdf', type: 'PDF' },
             { name: 'Modes in A', file: 'modes-in-a.pdf', type: 'PDF' },
@@ -848,7 +923,7 @@ export default function StudioPage() {
         </div>
 
         <div className="downloads-group">
-          <div className="downloads-group-label">📊 Reference Charts</div>
+          <div className="downloads-group-label">{t('studio.referenceCharts')}</div>
           {[
             { name: 'CAGED System Introduction', file: 'caged-system-intro.png', type: 'PNG' },
             { name: 'E Vertiscales — Visual Chart', file: 'e-vertiscales-chart.png', type: 'PNG' },
@@ -867,8 +942,8 @@ export default function StudioPage() {
         <div className="venmo-block">
           <img src="/assets/downloads/venmo-qr.jpg" alt="Bertrand's Venmo QR" className="venmo-qr" />
           <div className="venmo-text">
-            <strong>Pay via Venmo</strong>
-            <span>Scan or search @Bertrand-Laurence on Venmo</span>
+            <strong>{t('studio.payViaVenmo')}</strong>
+            <span>{t('studio.venmoScan')}</span>
           </div>
         </div>
       </section>
@@ -878,21 +953,21 @@ export default function StudioPage() {
         <div className="french-section">
           <div className="french-flag">🇫🇷</div>
           <h2 className="studio-section-title mb-3">
-            Éducation Francophone
+            {t('studio.frenchSectionTitle')}
           </h2>
           <p className="text-[#8a9aaa] text-base leading-[1.7] font-[EB_Garamond] italic mb-4">
-            Bertrand enseigne en français ! Cours de guitare, coaching vocal, théorie musicale, et l'Atelier Chanson — tout est disponible dans votre langue maternelle.
+            {t('studio.frenchSectionFr')}
           </p>
           <p className="text-[#6a7a8a] text-base">
-            Guitar, voice, theory, and the signature Atelier Chanson — all available in French.
+            {t('studio.frenchSectionEn')}
           </p>
         </div>
       </section>
 
       {/* ═══ FAQ ═══ */}
       <section className="studio-section">
-        <h2 className="studio-section-title">Questions?</h2>
-        <p className="studio-section-subtitle">Everything you need to know before your first lesson</p>
+        <h2 className="studio-section-title">{t('studio.faqTitle')}</h2>
+        <p className="studio-section-subtitle">{t('studio.faqSubtitle')}</p>
 
         {FAQ.map((item, i) => (
           <div key={i} className="faq-item">
@@ -900,7 +975,7 @@ export default function StudioPage() {
               className="faq-question"
               onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
             >
-              <span>{item.q}</span>
+              <span>{isFrench && item.qFr ? item.qFr : item.q}</span>
               {expandedFaq === i ? (
                 <ChevronUp size={16} className="text-cf-gold shrink-0" />
               ) : (
@@ -916,7 +991,7 @@ export default function StudioPage() {
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {item.a}
+                  {isFrench && item.aFr ? item.aFr : item.a}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -927,10 +1002,10 @@ export default function StudioPage() {
       {/* ═══ BOTTOM CTA ═══ */}
       <section className="studio-section">
         <div className="cta-banner">
-          <h3>Ready to Start?</h3>
-          <p>"Play from the heart."</p>
+          <h3>{t('studio.bottomCtaTitle')}</h3>
+          <p>"{t('studio.bottomCtaQuote')}"</p>
           <button className="cta-button" onClick={() => handlePayment(null, 'trial')}>
-            Book Your First Lesson
+            {t('studio.bottomCtaButton')}
           </button>
         </div>
       </section>
@@ -939,16 +1014,16 @@ export default function StudioPage() {
       <footer className="max-w-[600px] mx-auto pt-10 px-5 pb-6 text-center border-t border-white/[0.06]">
         <div className="flex justify-center gap-6 mb-4 flex-wrap">
           <a href="/privacy" className="font-mono text-[0.65rem] text-[#5a6a7a] no-underline tracking-[0.06em] uppercase">
-            Privacy Policy
+            {t('studio.privacyPolicy')}
           </a>
           <a href="/terms" className="font-mono text-[0.65rem] text-[#5a6a7a] no-underline tracking-[0.06em] uppercase">
-            Terms of Service
+            {t('studio.termsOfService')}
           </a>
         </div>
         <p className="font-[EB_Garamond] text-[0.8rem] text-[#3a4a5a] italic m-0">
-          © 2026 Bertrand Laurence Guitar Studio. All rights reserved.
+          {t('studio.copyright')}
           <br />
-          Platform developed by Joshua Atkinson.
+          {t('studio.platformBy')}
         </p>
       </footer>
     </div>

@@ -6,6 +6,8 @@
 // ═══════════════════════════════════════════════════════════
 
 import { devLog } from './devLog';
+import { getAudioContext, initMicrophone, getMicrophoneStream, closeMicrophone } from '../audio/audioEngine';
+import { devError } from './devLog';
 
 const STEP_MIDDLEWARE_URL = import.meta.env.VITE_STEP_MIDDLEWARE_URL || 'ws://localhost:8081/ws/truebadour';
 
@@ -57,7 +59,7 @@ class AudioStreamingService {
         };
 
         this.ws.onerror = (err) => {
-          console.error('[AudioStreaming] WebSocket error:', err);
+          devError('[AudioStreaming] WebSocket error:', err);
           this.onError?.(err);
           reject(err);
         };
@@ -84,12 +86,15 @@ class AudioStreamingService {
   async startRecording() {
     if (this.isRecording) return;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      const micData = await initMicrophone();
+      if (!micData) throw new Error('Microphone access denied by AudioEngine.');
+      
+      this.stream = getMicrophoneStream();
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
         ? 'audio/webm;codecs=opus'
         : 'audio/webm';
 
-      this.mediaRecorder = new MediaRecorder(stream, { mimeType });
+      this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
       this.mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0 && this.ws?.readyState === WebSocket.OPEN) {
           this.ws.send(e.data);
@@ -98,7 +103,7 @@ class AudioStreamingService {
       this.mediaRecorder.start(100); // 100ms chunks for low latency
       this.isRecording = true;
     } catch (err) {
-      console.error('[AudioStreaming] Mic access denied:', err);
+      devError('[AudioStreaming] Mic access denied:', err);
       this.onError?.(err);
     }
   }
@@ -106,7 +111,10 @@ class AudioStreamingService {
   stopRecording() {
     if (!this.isRecording) return;
     this.mediaRecorder?.stop();
-    this.mediaRecorder?.stream?.getTracks().forEach(t => t.stop());
+    if (this.stream) {
+      closeMicrophone(); // Decrement the reference counter
+      this.stream = null;
+    }
     this.mediaRecorder = null;
     this.isRecording = false;
   }
@@ -170,7 +178,7 @@ class AudioStreamingService {
           break;
         default:
           // Unhandled event types — log for debugging
-          // console.log('[AudioStreaming] Event:', msg.type);
+          // devLog('[AudioStreaming] Event:', msg.type);
       }
     } catch {
       // Not JSON — treat as raw text
@@ -184,14 +192,14 @@ class AudioStreamingService {
       this.onAudioReceived?.(blob);
       await this.playAudio(blob);
     } catch (err) {
-      console.error('[AudioStreaming] Audio decode error:', err);
+      devError('[AudioStreaming] Audio decode error:', err);
     }
   }
 
   // ── Audio playback ──
   async playAudio(blob) {
     if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      this.audioContext = getAudioContext();
     }
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();

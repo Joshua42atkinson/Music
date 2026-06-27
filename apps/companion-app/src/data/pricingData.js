@@ -1,12 +1,167 @@
 // ═══════════════════════════════════════════════════════════
 // PRICING & REVENUE DATA — Bertrand's Income Streams
 //
-// STRATEGY: The 12-chapter Living Textbook is 100% FREE.
-// It's the culture-building marketing funnel that creates
-// long-term students. Revenue comes from live coaching,
-// async feedback, community membership, and the future
-// VR/AI Masterclass product.
+// STRATEGY: MENTORSHIP MONETIZATION
+// AI makes content free. Human attention is the premium.
+// The 12-chapter Living Textbook is 100% FREE — no content gate.
+// Revenue comes from monthly subscriptions that buy ACCESS to
+// Bertrand's judgment — not a quota of reviews.
+//
+// THE FUNNEL (Google-style engagement model):
+//   Chapter completion (free) → emotional peak → upgrade prompt
+//   AI coaching (free/$5) → daily habit → "this needs human eyes"
+//   Mentorship review ($100+) → Bertrand confirms/corrects AI
+//   Student feels seen → stays subscribed → next chapter → cycle
+//
+// KEY INSIGHT: Students don't practice every day. They don't submit
+// videos every day. They pay for ACCESS — the option to get
+// Bertrand's eyes on their work when they're ready. Like a gym
+// membership: you don't go daily, but you keep paying because you MIGHT.
+//
+// AI PRE-SCREENING: Gemini analyzes every video submission first —
+// flags timing, pitch, posture issues, generates a draft review with
+// timestamps. Bertrand reviews the AI analysis, adds his judgment,
+// records 2-3 min of personalized feedback. His time drops from
+// 12 min to ~5 min per review. This is the scale solution.
+//
+// The model:
+//   Free     = Content + offline AI (the funnel — habit formation)
+//   $5/mo    = Cloud AI + community + blog (daily engagement)
+//   $100/mo  = Access to Bertrand's reviews when ready (mentorship entry)
+//   $500/mo  = Scheduled live sessions + async (accountability tier)
+//   $1000/mo = Bertrand is your mentor — relationship, not service
+//
+// REVENUE: 100% to Bertrand. Joshua builds for free.
+// Joshua's income comes from his own projects (daydream, Trinity,
+// phonethagoras.com). Voix Vive is a gift to Bertrand.
+// If Bertrand chooses to pay Joshua after it's working, that's
+// between them — not encoded in the pricing structure.
+//
+// This is a template for keeping any human SME working in the AI era.
 // ═══════════════════════════════════════════════════════════
+
+// ── Subscription Tiers ──
+// Free = funnel. Community = daily habit. Mentorship = access + accountability.
+export const SUBSCRIPTION_TIERS = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    unit: 'forever',
+    icon: '🎵',
+    color: 'var(--vv-cream, #f0e6d2)',
+    tagline: 'The whole curriculum. No credit card.',
+    features: [
+      'All 12 chapters — full curriculum, no gate',
+      'Truebadour AI (offline wllama mode)',
+      'All tools: pitch detector, fretboard, journal',
+      'Progress tracking on-device',
+      'Bilingual EN/FR',
+    ],
+    videoReviewsPerMonth: 0,
+    liveSessionsPerMonth: 0,
+    aiMode: 'wllama',
+  },
+  {
+    id: 'community',
+    name: 'Community',
+    price: 5,
+    unit: 'month',
+    icon: '�️',
+    color: '#6a8a6a',
+    tagline: 'Cloud AI + community + mentorship blog',
+    stripeLink: 'https://buy.stripe.com/mock_community_monthly',
+    recurring: true,
+    features: [
+      'Everything in Free, plus:',
+      'Truebadour AI (Gemini cloud — unlimited, instant)',
+      'The Guild — community hub & discussion boards',
+      'The Inner Circle — Bertrand\'s mentorship blog',
+      'Progress sync across devices (Firebase)',
+      'Support the platform — keep Voix Vive alive',
+    ],
+    videoReviewsPerMonth: 0,
+    liveSessionsPerMonth: 0,
+    aiMode: 'gemini',
+  },
+  {
+    id: 'apprentice',
+    name: 'Apprentice',
+    price: 100,
+    unit: 'month',
+    icon: '🎸',
+    color: 'var(--vv-gold, #c9a96e)',
+    tagline: 'Access to Bertrand\'s reviews — submit when you\'re ready',
+    stripeLink: 'https://buy.stripe.com/mock_apprentice_monthly',
+    recurring: true,
+    badge: 'Most Popular',
+    features: [
+      'Everything in Community, plus:',
+      'Submit practice demos whenever you\'re ready (up to 4/month)',
+      'AI pre-screens your video → Bertrand adds his judgment + personalized feedback',
+      'Bertrand responds within 48 hours',
+      'Priority Q&A — Bertrand answers your questions first',
+      'Personalized practice plan after each review',
+      'Cheaper than weekly in-person lessons ($260/mo at $65/lesson)',
+    ],
+    videoReviewsPerMonth: 4,
+    liveSessionsPerMonth: 0,
+    aiMode: 'gemini',
+    aiPreScreening: true,
+    bertrandTimePerMonth: '~20 min (4 × 5 min with AI pre-screening)',
+    bertrandEffectiveRate: '$300/hr',
+  },
+  {
+    id: 'journeyman',
+    name: 'Journeyman',
+    price: 500,
+    unit: 'month',
+    icon: '⭐',
+    color: '#7b6aaa',
+    tagline: 'Scheduled live sessions — the accountability tier',
+    stripeLink: 'https://buy.stripe.com/mock_journeyman_monthly',
+    recurring: true,
+    features: [
+      'Everything in Apprentice, plus:',
+      '4 live 1-on-1 Zoom sessions with Bertrand every month (45 min each)',
+      'Use them or lose them — scheduled accountability keeps you practicing',
+      'Unlimited async questions between sessions',
+      'Bertrand watches you play in real time — corrects technique instantly',
+      'Personalized weekly practice plan + session recordings',
+    ],
+    videoReviewsPerMonth: 4,
+    liveSessionsPerMonth: 4,
+    aiMode: 'gemini',
+    aiPreScreening: true,
+    bertrandTimePerMonth: '~3.3 hrs (4×45min live + 4×5min async with AI + 30min Q&A)',
+    bertrandEffectiveRate: '$150/hr',
+  },
+  {
+    id: 'master',
+    name: 'Master',
+    price: 1000,
+    unit: 'month',
+    icon: '👑',
+    color: '#d4a84b',
+    tagline: 'Bertrand is your mentor — a relationship, not a service',
+    stripeLink: 'https://buy.stripe.com/mock_master_monthly',
+    recurring: true,
+    features: [
+      'Everything in Journeyman, plus:',
+      '8 live 1-on-1 sessions with Bertrand every month (2/week, 45 min)',
+      'Direct messaging — Bertrand is on call for you',
+      'Quarterly assessment (in-person if geography allows, or extended video)',
+      'Early access to new chapters & features',
+      'For serious students, professionals, and guitar teachers studying with Bertrand',
+    ],
+    videoReviewsPerMonth: 8,
+    liveSessionsPerMonth: 8,
+    aiMode: 'gemini',
+    aiPreScreening: true,
+    bertrandTimePerMonth: '~7.3 hrs (8×45min live + 8×5min async with AI + 60min messaging)',
+    bertrandEffectiveRate: '$137/hr',
+  },
+];
 
 // ── Payment Methods ──
 // Bertrand accepts multiple payment options for maximum flexibility
@@ -166,8 +321,8 @@ export const SERVICES = [
   {
     id: 'mini-critique',
     name: 'Mini Critique',
-    subtitle: 'Level 2 — Quick Video Feedback',
-    description: 'Record a short clip (up to 3 minutes) and I will send back a focused video with one key thing to work on. Quick, affordable, and encouraging.',
+    subtitle: 'Quick Video Feedback (À la carte)',
+    description: 'Record a short clip (up to 3 minutes) and I will send back a focused video with one key thing to work on. Quick, affordable, and encouraging. Included in Apprentice+ subscriptions.',
     icon: '🎬',
     duration: '3-5 min feedback video',
     delivery: 'In-App Submission → Video Response',
@@ -182,13 +337,14 @@ export const SERVICES = [
       'Encouraging, low-pressure format',
       'Great for checking form, posture, or a tricky passage',
       'Response within 48 hours',
+      'Free for Apprentice subscribers (1/mo), Journeyman (4/mo), Master (8/mo)',
     ],
   },
   {
     id: 'full-review',
     name: 'Full Video Review',
-    subtitle: 'Level 3 — Deep Critique',
-    description: 'Play for 15 minutes. I will watch the entire session and record myself reacting in real time — giving you a detailed video of my recommendations, corrections, and encouragement. Like having me in the room.',
+    subtitle: 'Deep Critique (À la carte)',
+    description: 'Play for 15 minutes. I will watch the entire session and record myself reacting in real time — giving you a detailed video of my recommendations, corrections, and encouragement. Like having me in the room. Included in Journeyman+ subscriptions.',
     icon: '📹',
     duration: '15-min watch + detailed reaction video',
     delivery: 'In-App Submission → Video Response',
@@ -205,44 +361,7 @@ export const SERVICES = [
       'Personalized practice plan for what to work on next',
       'The closest thing to a private lesson — without scheduling',
       'Response within 48 hours',
-    ],
-  },
-  {
-    id: 'guild-membership',
-    name: 'The Guild',
-    subtitle: 'Online Community Hub',
-    description: 'The curriculum, tools, and AI coach are free. Join The Guild to connect with a community of fellow learners, share your recordings, and practice in a safe, encouraging environment.',
-    icon: '⭐',
-    duration: 'Monthly recurring',
-    delivery: 'In-App Community Hub Access',
-    color: '#d4a84b',
-    pricing: [
-      { label: 'Monthly Subscription', price: 1.00, unit: 'month', stripeLink: 'https://buy.stripe.com/mock_community_1', recurring: true },
-    ],
-    features: [
-      'Access to the online community hub & discussion boards',
-      'Share practice recordings & progress with fellow students',
-      'Find virtual jam partners and learning buddies',
-      'Structured accountability challenges & community feedback',
-    ],
-  },
-  {
-    id: 'inner-circle-membership',
-    name: 'The Inner Circle',
-    subtitle: 'Mentorship Blog & Insights',
-    description: 'Direct access to Bertrand\'s daily mentorship feed. Get interesting daily guitar news, historical context, practice meditations, and exclusive technique videos directly from Bertrand.',
-    icon: '👑',
-    duration: 'Monthly recurring',
-    delivery: 'Mentorship Blog Feed + Q&A Priority',
-    color: '#7b6aaa',
-    pricing: [
-      { label: 'Monthly Subscription', price: 5.00, unit: 'month', stripeLink: 'https://buy.stripe.com/mock_inner_circle_5', recurring: true },
-    ],
-    features: [
-      'Daily blog feed with guitar history, theory, and advice',
-      'Daily practice reflections and somatic meditations',
-      'Exclusive bite-sized video lessons & technique checks',
-      'Priority comment Q&A directly with Bertrand on the feed',
+      'Free for Journeyman subscribers (4/mo), Master (8/mo)',
     ],
   },
 

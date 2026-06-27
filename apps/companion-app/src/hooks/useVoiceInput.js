@@ -1,4 +1,6 @@
+import { devWarn } from '../lib/devLog';
 import { useState, useCallback, useRef } from 'react';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════════════
 // useVoiceInput — Hands-free voice input for the Truebadour
@@ -64,7 +66,7 @@ export function useVoiceInput() {
         setIsListening(false);
         return;
       }
-      console.warn('[VoiceInput] Error:', event.error);
+      devWarn('[VoiceInput] Error:', event.error);
       setError(event.error);
       setIsListening(false);
     };
@@ -79,7 +81,7 @@ export function useVoiceInput() {
     try {
       recognition.start();
     } catch (err) {
-      console.error('[VoiceInput] Start failed:', err);
+      devError('[VoiceInput] Start failed:', err);
       setError(err.message);
     }
   }, [supported]);

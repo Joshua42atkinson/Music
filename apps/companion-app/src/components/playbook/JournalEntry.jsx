@@ -1,3 +1,4 @@
+import { devLog, devWarn } from '../../lib/devLog';
 import React, { useState, useEffect } from 'react';
 import { useLocale } from '../../hooks/useLocale';
 import { useAuth } from '../../hooks/useAuth';
@@ -58,16 +59,16 @@ export default function JournalEntry({ fretId, toolId, onClose, onSave }) {
             created_at: entry.timestamp,
           });
           if (error) throw error;
-          console.log('[JournalEntry] Synced to Supabase cloud');
+          if (import.meta.env.DEV) devLog('[JournalEntry] Synced to Supabase cloud');
         } catch (cloudErr) {
-          console.warn('[JournalEntry] Cloud sync failed (saved locally):', cloudErr);
+          devWarn('[JournalEntry] Cloud sync failed (saved locally):', cloudErr);
         }
       }
 
       setSaved(true);
       setTimeout(() => { onSave?.(); onClose?.(); }, 1200);
     } catch (e) {
-      console.warn('[Playbook] Failed to save journal entry:', e);
+      devWarn('[Playbook] Failed to save journal entry:', e);
       onClose?.();
     }
   };

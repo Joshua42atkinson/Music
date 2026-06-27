@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocale } from '../hooks/useLocale';
+import { devError } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // ERROR BOUNDARY — Prevents a single component crash from
@@ -40,7 +41,7 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('[Voix Vive] Component error:', error, errorInfo);
+    devError('[Voix Vive] Component error:', error, errorInfo);
   }
 
   render() {

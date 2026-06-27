@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import { Lock, Crown, Users, Sparkles, LogIn, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Lock, Crown, Users, Sparkles, LogIn, CheckCircle2, ArrowRight, Star } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { SUBSCRIPTION_TIERS } from '../../data/pricingData';
+
+const TIER_ICONS = {
+  'free': Lock,
+  'community': Users,
+  'apprentice': Sparkles,
+  'journeyman': Star,
+  'master': Crown,
+};
 
 export default function MentorshipGate({ children, requiredTier = 'community' }) {
   const { user, subscriptionTier, upgradeTier, signInWithGoogle, loading } = useAuth();
@@ -17,12 +26,14 @@ export default function MentorshipGate({ children, requiredTier = 'community' })
     );
   }
 
-  // Tier Hierarchy Logic
+  // Tier hierarchy: free < community < apprentice < journeyman < master
+  const TIER_RANK = { free: 0, community: 1, apprentice: 2, journeyman: 3, master: 4 };
+
   const hasAccess = () => {
     if (!user) return false;
-    if (subscriptionTier === 'inner_circle') return true; // Has everything
-    if (requiredTier === 'community' && subscriptionTier === 'community') return true;
-    return false;
+    const userRank = TIER_RANK[subscriptionTier] ?? 0;
+    const requiredRank = TIER_RANK[requiredTier] ?? 0;
+    return userRank >= requiredRank;
   };
 
   if (hasAccess()) {
@@ -35,8 +46,7 @@ export default function MentorshipGate({ children, requiredTier = 'community' })
       return;
     }
     setUpgrading(true);
-    // In Production, this routes to a Stripe Checkout Session
-    // For local testing, we immediately patch the Supabase profile
+    // In production, this routes to Stripe Checkout
     await upgradeTier(tier);
     setUpgrading(false);
   };
@@ -54,70 +64,68 @@ export default function MentorshipGate({ children, requiredTier = 'community' })
           <h1 className="font-heading text-[3rem] text-vv-text m-0 mb-4 font-normal tracking-tight">The Human Element</h1>
           <p className="text-[1.1rem] text-white/60 leading-[1.6] m-0">
             The curriculum is free forever. But mastery requires community and mentorship.
-            Join the inner circle to unlock this space.
+            Choose your path below.
           </p>
         </div>
 
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8 w-full">
-          {/* COMMUNITY TIER */}
-          <div className="bg-white/[0.02] border border-white/[0.05] rounded-3xl py-12 px-8 flex flex-col relative overflow-hidden">
-            <div className="flex items-center gap-3 mb-6">
-              <Users size={24} style={{ color: '#5a90a0' }} />
-              <h2 className="m-0 text-[1.5rem] text-[#a0a0c0] font-heading">The Guild</h2>
-            </div>
-            <div className="flex items-baseline mb-4">
-              <span className="text-[1.5rem] text-white/50 font-semibold">$</span>
-              <span className="text-[4rem] text-white font-mono font-bold tracking-tight">1</span>
-              <span className="text-base text-white/40 ml-1">/mo</span>
-            </div>
-            <p className="text-[0.9rem] text-white/40 leading-[1.6] mb-8 min-h-[60px]">
-              Access the private community hub. Share your progress, find accountability partners, and jam with other students.
-            </p>
-            <ul className="list-none p-0 m-0 mb-12 flex flex-col gap-3 flex-1">
-              <li className="flex items-start gap-2.5 text-[0.9rem] text-white/60 leading-[1.4]"><CheckCircle2 size={16} color="#5a90a0" /> Global Community Forums</li>
-              <li className="flex items-start gap-2.5 text-[0.9rem] text-white/60 leading-[1.4]"><CheckCircle2 size={16} color="#5a90a0" /> Accountability Groups</li>
-              <li className="flex items-start gap-2.5 text-[0.9rem] text-white/60 leading-[1.4]"><CheckCircle2 size={16} color="#5a90a0" /> Share Audio/Video Practice</li>
-            </ul>
-            <button
-              onClick={() => handleUpgrade('community')}
-              disabled={upgrading || subscriptionTier === 'inner_circle'}
-              className="w-full py-4 rounded-xl border border-transparent text-base font-semibold cursor-pointer font-mono uppercase tracking-wide transition-all duration-300 ease-out disabled:opacity-50"
-              style={{ background: 'rgba(90, 144, 160, 0.1)', color: '#5a90a0', borderColor: 'rgba(90, 144, 160, 0.3)' }}
-            >
-              {user ? (upgrading ? 'Unlocking...' : 'Join The Guild') : 'Sign In to Join'}
-            </button>
-          </div>
-
-          {/* INNER CIRCLE TIER */}
-          <div className="bg-cf-gold/[0.03] border border-cf-gold/15 rounded-3xl py-12 px-8 flex flex-col relative overflow-hidden -translate-y-2.5 shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150px] h-[150px] bg-[radial-gradient(circle,rgba(var(--cf-gold-rgb),0.15)_0%,transparent_70%)] pointer-events-none" />
-            <div className="flex items-center gap-3 mb-6">
-              <Crown size={24} style={{ color: 'var(--cf-gold)' }} />
-              <h2 className="m-0 text-[1.5rem] text-vv-text font-heading">The Inner Circle</h2>
-            </div>
-            <div className="flex items-baseline mb-4">
-              <span className="text-[1.5rem] text-cf-gold font-semibold">$</span>
-              <span className="text-[4rem] text-vv-text font-mono font-bold tracking-tight">5</span>
-              <span className="text-base text-white/40 ml-1">/mo</span>
-            </div>
-            <p className="text-[0.9rem] text-white/70 leading-[1.6] mb-8 min-h-[60px]">
-              Direct mentorship from Bertrand. Daily meditations, guitar history, and personalized video feedback on your playing.
-            </p>
-            <ul className="list-none p-0 m-0 mb-12 flex flex-col gap-3 flex-1">
-              <li className="flex items-start gap-2.5 text-[0.9rem] text-white/60 leading-[1.4]"><Sparkles size={16} color="var(--cf-gold)" /> <strong className="text-cf-gold font-medium">Everything in The Guild</strong></li>
-              <li className="flex items-start gap-2.5 text-[0.9rem] text-white/60 leading-[1.4]"><CheckCircle2 size={16} color="var(--cf-gold)" /> Bertrand's Daily Mentorship Blog</li>
-              <li className="flex items-start gap-2.5 text-[0.9rem] text-white/60 leading-[1.4]"><CheckCircle2 size={16} color="var(--cf-gold)" /> Submit Videos for Mentor Review</li>
-              <li className="flex items-start gap-2.5 text-[0.9rem] text-white/60 leading-[1.4]"><CheckCircle2 size={16} color="var(--cf-gold)" /> Exclusive History & Meditation Feeds</li>
-            </ul>
-            <button
-              onClick={() => handleUpgrade('inner_circle')}
-              disabled={upgrading}
-              className="w-full py-4 rounded-xl border text-base font-semibold cursor-pointer font-mono uppercase tracking-wide transition-all duration-300 ease-out disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, rgba(var(--cf-gold-rgb),0.2), rgba(var(--cf-gold-rgb),0.05))', color: 'var(--cf-gold)', borderColor: 'rgba(var(--cf-gold-rgb),0.5)', boxShadow: '0 0 20px rgba(var(--cf-gold-rgb),0.2)' }}
-            >
-              {user ? (upgrading ? 'Unlocking...' : 'Enter the Inner Circle') : 'Sign In to Join'}
-            </button>
-          </div>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 w-full">
+          {SUBSCRIPTION_TIERS.filter(t => t.price > 0).map(tier => {
+            const Icon = TIER_ICONS[tier.id] || Lock;
+            const isFeatured = tier.badge === 'Most Popular';
+            return (
+              <div
+                key={tier.id}
+                className={`rounded-3xl py-10 px-6 flex flex-col relative overflow-hidden ${isFeatured ? '-translate-y-2.5 shadow-[0_20px_40px_rgba(0,0,0,0.4)]' : ''}`}
+                style={{
+                  background: isFeatured ? `${tier.color}10` : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${isFeatured ? tier.color + '40' : 'rgba(255,255,255,0.05)'}`,
+                }}
+              >
+                {isFeatured && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150px] h-[150px] pointer-events-none"
+                    style={{ background: `radial-gradient(circle, ${tier.color}30 0%, transparent 70%)` }}
+                  />
+                )}
+                {tier.badge && (
+                  <span className="absolute top-4 right-4 text-[0.65rem] font-mono uppercase tracking-wider px-2 py-1 rounded-full"
+                    style={{ background: `${tier.color}20`, color: tier.color }}
+                  >
+                    {tier.badge}
+                  </span>
+                )}
+                <div className="flex items-center gap-3 mb-6">
+                  <Icon size={24} style={{ color: tier.color }} />
+                  <h2 className="m-0 text-[1.5rem] text-vv-text font-heading">{tier.name}</h2>
+                </div>
+                <div className="flex items-baseline mb-4">
+                  <span className="text-[1.5rem] font-semibold" style={{ color: tier.color }}>$</span>
+                  <span className="text-[4rem] text-vv-text font-mono font-bold tracking-tight">{tier.price}</span>
+                  <span className="text-base text-white/40 ml-1">/{tier.unit}</span>
+                </div>
+                <p className="text-[0.85rem] text-white/50 leading-[1.6] mb-6 min-h-[50px]">{tier.tagline}</p>
+                <ul className="list-none p-0 m-0 mb-10 flex flex-col gap-2.5 flex-1">
+                  {tier.features.slice(0, 5).map((f, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-[0.85rem] text-white/60 leading-[1.4]">
+                      <CheckCircle2 size={16} style={{ color: tier.color, flexShrink: 0 }} />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleUpgrade(tier.id)}
+                  disabled={upgrading}
+                  className="w-full py-4 rounded-xl border text-base font-semibold cursor-pointer font-mono uppercase tracking-wide transition-all duration-300 ease-out disabled:opacity-50"
+                  style={{
+                    background: isFeatured ? `linear-gradient(135deg, ${tier.color}30, ${tier.color}10)` : `${tier.color}15`,
+                    color: tier.color,
+                    borderColor: `${tier.color}50`,
+                  }}
+                >
+                  {user ? (upgrading ? 'Unlocking...' : `Choose ${tier.name}`) : 'Sign In to Join'}
+                </button>
+              </div>
+            );
+          })}
         </div>
       </motion.div>
     </div>

@@ -1,0 +1,7 @@
+_archive/
+.f5venv/
+middleware/
+scripts/
+*.md
+*.test.*
+__tests__/

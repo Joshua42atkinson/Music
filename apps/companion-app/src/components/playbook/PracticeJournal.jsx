@@ -1,3 +1,4 @@
+import { devWarn } from '../../lib/devLog';
 import React, { useState, useEffect, useCallback } from 'react';
 import { FRET_METADATA } from '../../data/dag/dagNodes';
 import { generateDailySession } from '../../data/practiceEngine';
@@ -71,7 +72,7 @@ export default function PracticeJournal({ traction, nextRecommended: _nextRecomm
     
     // Sync to Drive Archive in background
     syncJournalToDrive(entry).catch(err => {
-      console.warn('Background sync failed:', err);
+      devWarn('Background sync failed:', err);
     });
   };
 

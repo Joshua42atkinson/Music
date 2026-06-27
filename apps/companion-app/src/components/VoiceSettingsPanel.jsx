@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ════════════════════════════════════════════════════╗
 // ║ FILE    : VoiceSettingsPanel.jsx                               ║
 // ║ WHAT    : Full audio settings panel — voice, speed, pitch,     ║
@@ -58,7 +59,7 @@ export default function VoiceSettingsPanel({
       const text = PREVIEW_TEXTS[prefs.language] || PREVIEW_TEXTS.en;
       await onPreview(text, prefs.voiceId, prefs.speed);
     } catch (e) {
-      console.warn('[VoiceSettings] Preview failed:', e);
+      devWarn('[VoiceSettings] Preview failed:', e);
     } finally {
       setPreviewing(false);
     }

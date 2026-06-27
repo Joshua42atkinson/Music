@@ -15,13 +15,13 @@ date: 2026-06-14
 *What we just built needs to connect to what already exists.*
 
 - [x] `usePlayerState.js` — Tone · Resonance · Buzz · Voice · Distortion engine
-- [x] `TroubadourProvider.jsx` — `player` wired into context
+- [x] `TruebadourProvider.jsx` — `player` wired into context
 - [ ] **Wire BE check-in → `recordBECheckIn()`**
   - `BEWorkbook.jsx` already exists. Find where user picks their state and call `player.recordBECheckIn(answer)`
   - Also check `SomaticStudioPrompter.jsx` and `OnboardingModal.jsx` step 1
-- [ ] **Inject `getTroubadourModifier()` into Troubadour system prompt**
-  - `troubadourPrompt.js` — add `playerModifier` param to `buildChatPrompt()` and `buildCompressedPrompt()`
-  - `TroubadourWidget.jsx` — pass `player.getTroubadourModifier()` when calling `chatStream()`
+- [ ] **Inject `getTruebadourModifier()` into Truebadour system prompt**
+  - `truebadourPrompt.js` — add `playerModifier` param to `buildChatPrompt()` and `buildCompressedPrompt()`
+  - `TruebadourWidget.jsx` — pass `player.getTruebadourModifier()` when calling `chatStream()`
 - [ ] **Wire session complete → `recordSessionComplete()`**
   - Trigger when student reaches PLAY phase or closes a completed session
   - `PracticeJournal.jsx` / `PlaybookShell.jsx` — find session end event
@@ -41,7 +41,7 @@ date: 2026-06-14
 - [ ] **BE check-in screen** — session start gate
   - `BEWorkbook.jsx` exists but may not be the session entry point
   - Should be: simple, 3–5 mood options, takes 10 seconds, sets Tone
-  - Wire: answer → `recordBECheckIn()` → Troubadour greeting adjusts automatically
+  - Wire: answer → `recordBECheckIn()` → Truebadour greeting adjusts automatically
 - [ ] **DO phase tracker** — fret practice with clear completion signal
   - `PlingTrainer.jsx` exists — audit if it marks DO complete
   - Add completion callback → feeds Resonance
@@ -49,10 +49,10 @@ date: 2026-06-14
   - `GuitarWorkbench.jsx` or `PracticeRecorder.jsx` — audit for free play mode
   - UI should say "This is yours. No grade. Just play." — one line
 - [ ] **Session summary screen** — what happened today
-  - Brief: which fret, how you felt, one sentence from Troubadour
+  - Brief: which fret, how you felt, one sentence from Truebadour
   - Trigger: `recordSessionComplete()` + brief animation
 - [ ] **Distortion intervention** — when signal is `distorted`
-  - Troubadour shifts to reflection mode automatically via `getTroubadourModifier()`
+  - Truebadour shifts to reflection mode automatically via `getTruebadourModifier()`
   - Optional: gentle UI indicator (no alarm, no red, just softer colors)
 
 ---
@@ -71,11 +71,11 @@ date: 2026-06-14
   - Should be: one clean table or visual, printable
 - [ ] **Guitar Economy legend** — engine made visible (once, in Binder only)
   - Tone · Resonance · Buzz · Voice · Distortion — plain English, one line each
-  - "Your tone today was low — so your Troubadour went gentle."
+  - "Your tone today was low — so your Truebadour went gentle."
   - Lives in Binder, not in the main session flow
 - [ ] **Practice Journal** — `PracticeJournal.jsx` exists
   - Wire: `recordReflection()` on save
-  - Add: one-line Troubadour response after save (acknowledgment, not evaluation)
+  - Add: one-line Truebadour response after save (acknowledgment, not evaluation)
 - [ ] **MaturationMap** — `MaturationMap.jsx` exists
   - Audit: does it show Voice (long-horizon progress) clearly?
   - Should show: 12 frets, which are ○◐●★, overall arc
@@ -94,7 +94,7 @@ date: 2026-06-14
 - [ ] **Streak display enhancement** — `StreakToast.jsx` exists ✅
   - Link streak → Resonance visually (high streak = warmer UI, subtle)
 - [ ] **Fret 6 Ordeal moment** — special treatment for the tritone
-  - When student enters Fret 6, Troubadour delivers a special message
+  - When student enters Fret 6, Truebadour delivers a special message
   - "You're entering the hardest interval. The Tritone. This is The Ordeal."
   - One-time event, stored in `localStorage voixvive_ordeal_seen`
 
@@ -122,7 +122,7 @@ date: 2026-06-14
     1. `Actor attempted Activity` — session start (BE check-in)
     2. `Actor completed Activity` — session complete (PLAY phase done)
     3. `Actor progressed` — fret mastery star gained (○→◐→●→★)
-    4. `Actor experienced` — Troubadour interaction (response received)
+    4. `Actor experienced` — Truebadour interaction (response received)
     5. `Actor mastered` — fret fully ★ complete
   - Each includes: actor (student ID), verb (xAPI verb), object (fret ID), result (score/completion), context (Voix Vive course ID)
 - [ ] **LTI 1.3 launch handler** — `src/utils/ltiLaunch.js` (NEW)
@@ -146,10 +146,10 @@ date: 2026-06-14
 *Must be done before public beta.*
 
 - [ ] **Mobile touch targets** — all interactive elements ≥ 44px
-  - Audit: `PrimaryNav.jsx`, `TroubadourWidget.jsx`, all modal buttons
+  - Audit: `PrimaryNav.jsx`, `TruebadourWidget.jsx`, all modal buttons
 - [ ] **Offline mode** — what works without internet?
   - wllama fallback ✅ exists — test it
-  - Troubadour offline message is clear and kind
+  - Truebadour offline message is clear and kind
 - [ ] **Error boundaries** — `ErrorBoundary.jsx` exists ✅
   - Audit: is it wrapped around all major views?
 - [ ] **Loading states** — no "AI loading" fallback text visible
@@ -164,7 +164,7 @@ date: 2026-06-14
 
 ## BACKLOG (future sprints)
 
-- [ ] Archetype quiz — 4 questions → Sage/Hero/Caregiver/Jester → shapes Troubadour voice
+- [ ] Archetype quiz — 4 questions → Sage/Hero/Caregiver/Jester → shapes Truebadour voice
 - [ ] Interval visualizer tied to somatic legend — `IntervalVisualizer.jsx` exists, audit
 - [ ] Fret → somatic → Hero's Journey chapter mapping rendered in Binder
 - [ ] Kintsugi Journal — when Distortion hits `distorted`, offer a special journal entry: "cracks filled with gold"
@@ -178,7 +178,7 @@ date: 2026-06-14
 ## NEMOTRON QUEUE
 *Tasks handed directly to Nemotron for strategic analysis or code generation.*
 
-- [ ] **Analyze `troubadourPrompt.js`** — propose exact modification to inject `playerModifier`
+- [ ] **Analyze `truebadourPrompt.js`** — propose exact modification to inject `playerModifier`
 - [ ] **Audit `BEWorkbook.jsx`** — identify exact event where check-in answer is captured
 - [ ] **Draft `courseManifest.js`** — 12-module structure with Bloom's objectives per fret
 - [ ] **Draft `xapi.js`** — 5 statement templates with exact xAPI 1.0.3 data shapes

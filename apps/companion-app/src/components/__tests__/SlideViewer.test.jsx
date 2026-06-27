@@ -2,16 +2,31 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import SlideViewer from '../SlideViewer';
 
+global.WebGL2RenderingContext = class {};
+
+vi.mock('three', () => ({
+  WebGLRenderer: class {
+    constructor() {}
+    setSize() {}
+    render() {}
+  },
+  Scene: class {},
+  PerspectiveCamera: class {},
+  Color: class {},
+}));
+
 // Mocks
 vi.mock('../../hooks/useCosyVoice', () => ({
   useCosyVoice: () => ({
-    isReady: false,
-    loadProgress: 0,
-    mode: null,
-    initTTS: vi.fn(),
+    isReady: true,
     speak: vi.fn(),
     cancel: vi.fn(),
-  }),
+    initTTS: vi.fn()
+  })
+}));
+
+vi.mock('../../features/vr-fretboard/FretboardSheet', () => ({
+  default: () => <div data-testid="mock-fretboard-sheet" />
 }));
 
 vi.mock('../../hooks/useLocale', () => ({
@@ -55,6 +70,34 @@ vi.mock('../../data/tractionStore', () => ({
 
 vi.mock('../FretboardSheet', () => ({
   default: () => <div data-testid="fretboard-sheet">Fretboard</div>,
+}));
+
+vi.mock('../../data/curriculumIndexer', () => ({
+  default: {},
+}));
+
+vi.mock('@react-three/fiber', () => ({
+  Canvas: ({ children }) => <div data-testid="mock-canvas">{children}</div>,
+  useFrame: vi.fn(),
+  useThree: vi.fn(() => ({ camera: {}, scene: {}, gl: {} })),
+}));
+
+vi.mock('@react-three/drei', () => ({
+  OrbitControls: () => <div data-testid="mock-orbit-controls" />,
+  Environment: () => <div data-testid="mock-environment" />,
+  Text: () => <div data-testid="mock-text" />,
+}));
+
+vi.mock('@pmndrs/xr', () => ({
+  XR: ({ children }) => <div data-testid="mock-xr">{children}</div>,
+  Controllers: () => null,
+  Hands: () => null,
+  useXR: vi.fn(() => ({ isPresenting: false })),
+}));
+
+vi.mock('iwer', () => ({}));
+vi.mock('@iwer/devui', () => ({
+  DevUI: class {}
 }));
 
 vi.mock('../PlingTrainer', () => ({

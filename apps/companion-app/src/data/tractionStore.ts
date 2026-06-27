@@ -1,3 +1,4 @@
+import { devWarn } from '../lib/devLog';
 // ╔══ VOIX VIVE ══════════════════════════════════════════════════╗
 // ║ FILE    : tractionStore.ts                                   ║
 // ║ WHAT    : Read/write student progress in localStorage        ║
@@ -275,7 +276,7 @@ export function saveTraction(state: TractionState): void {
     const stamped = { ...state, _persistedAt: Date.now() };
     vvSetJSON(STORAGE_KEYS.TRACTION, stamped);
   } catch (e) {
-    console.warn('[TractionStore] Failed to save:', e);
+    devWarn('[TractionStore] Failed to save:', e);
   }
 }
 
