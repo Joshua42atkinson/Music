@@ -16,9 +16,10 @@ import { setupPushNotifications, evaluateNotifications } from './data/notificati
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import { AnimatePresence } from 'framer-motion';
-import { useAuth } from './hooks/useAuth';
+// import { useAuth } from './hooks/useAuth';
 import { migrateStorage } from './lib/storage';
 import ErrorBoundary from './components/ErrorBoundary';
+import { AIFallbackBoundary } from './components/AIFallbackBoundary';
 import { ScaffoldingProvider, useScaffolding } from './components/ScaffoldingProvider';
 import { TruebadourProvider } from './hooks/TruebadourProvider';
 const TruebadourWidget = React.lazy(() => import('./features/somatic-masterclass/TruebadourWidget'));
@@ -158,7 +159,13 @@ function AppContent() {
         {/* 5-destination persistent navigation */}
         <PrimaryNav />
         {/* 🔴 Riff — Practice & Play (top-left) */}
-        {aiEnabled && <Suspense fallback={null}><TruebadourWidget /></Suspense>}
+        {aiEnabled && (
+          <Suspense fallback={null}>
+            <AIFallbackBoundary>
+              <TruebadourWidget />
+            </AIFallbackBoundary>
+          </Suspense>
+        )}
         {/* 📘 Binder — Study & Learn (top-right) */}
         <Suspense fallback={null}><BookWidget /></Suspense>
         {/* 💬 Unified Assistant Menu (replaces the individual floaters) */}

@@ -133,6 +133,8 @@ export function ScaffoldingProvider({ children }) {
 
     // Convenience: somatic depth and stats
     somaticDepth: traction.somaticDepth || 1,
+    bardLevel: traction.bardLevel || 1,
+    streak: traction.streak || 0,
     practiceMinutes: traction.practiceMinutes || 0,
     resonanceCycles: traction.resonanceCycles || 0,
     breathingSessions: traction.breathingSessions || 0,

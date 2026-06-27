@@ -32,7 +32,7 @@ export default function StudentDashboard() {
   }, [traction]);
 
   const activeChapter = useMemo(() => {
-    return C_SCALE_CHAPTERS.find(c => c.id === activeFretId) || C_SCALE_CHAPTERS[0];
+    return C_SCALE_CHAPTERS.find(c => c.id === activeFretId || c.id === `chapter-${activeFretId}`) || C_SCALE_CHAPTERS[0];
   }, [activeFretId]);
 
   const cognitivePrime = useMemo(() => getCognitivePrime(activeFretId), [activeFretId]);
@@ -118,7 +118,7 @@ export default function StudentDashboard() {
         {/* HEADER: GATED FOCUS */}
         <div className="flex justify-between items-center mb-10 border-b border-white/10 pb-6 gap-10 flex-wrap">
           <div>
-            <h1 className="m-0 font-heading text-[2.5rem] font-normal text-vv-text">Chapter {activeChapter.id}: {activeChapter.title}</h1>
+            <h1 className="m-0 font-heading text-[2.5rem] font-normal text-vv-text">Chapter {activeFretId}: {activeChapter.title}</h1>
             <p className="mt-2 font-mono text-[0.85rem] tracking-[0.1em] uppercase text-cf-gold">
               Phase: {currentPillar}
             </p>

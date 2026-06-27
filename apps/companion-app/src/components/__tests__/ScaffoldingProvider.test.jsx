@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { ScaffoldingProvider, useScaffolding } from '../ScaffoldingProvider';
 
 // Mock all dependencies
@@ -89,7 +89,9 @@ describe('ScaffoldingProvider', () => {
     const { result } = renderHook(() => useScaffolding(), { wrapper });
     await waitFor(() => expect(result.current.isHydrated).toBe(true));
 
-    result.current.updateTraction({ totalTraction: 25 });
+    act(() => {
+      result.current.updateTraction({ totalTraction: 25 });
+    });
 
     await waitFor(() => expect(result.current.traction.totalTraction).toBe(25));
     expect(persistTraction).toHaveBeenCalledWith(

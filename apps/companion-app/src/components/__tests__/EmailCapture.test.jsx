@@ -80,6 +80,11 @@ describe('EmailCapture — Launch Notification Form', () => {
         email: 'test@example.com',
       }));
     });
+
+    // Wait for the simulated network request to finish so we don't update state after unmount
+    await waitFor(() => {
+      expect(screen.getByText(/Thank you/)).toBeTruthy();
+    });
   });
 
   test('shows no spam disclaimer', () => {

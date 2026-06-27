@@ -178,7 +178,7 @@ export default function WorkbookTab({ handleOpenTool, setActiveSlideFretId, setA
             {suggestion.tool.name}
           </h3>
           <p className="font-[EB_Garamond] text-[1.05rem] leading-normal text-white/[0.65] italic m-0 mx-auto mb-5 max-w-[480px]">
-            "{t(`chapter_${suggestion.fretId || suggestion.tool.id}_invitation`) || suggestion.tool.telemetry}"
+            "{t(`chapter_${suggestion.fretId || suggestion.tool.id}_invitation`) === `chapter_${suggestion.fretId || suggestion.tool.id}_invitation` ? suggestion.tool.telemetry : t(`chapter_${suggestion.fretId || suggestion.tool.id}_invitation`)}"
           </p>
           <button
             onClick={() => handleOpenTool(suggestion.tool)}
