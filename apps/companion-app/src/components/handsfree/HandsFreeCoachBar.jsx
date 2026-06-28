@@ -20,13 +20,14 @@ const STATE_LABELS = {
   error: { en: 'Error', fr: 'Erreur' },
 };
 
-export default function HandsFreeCoachBar({ handlers, onActiveChange }) {
+export default function HandsFreeCoachBar({ handlers, onActiveChange, onUnhandledTranscript }) {
   const { locale } = useLocale();
   const { speak: ttsSpeak } = useTruebadour();
   const { isActive, state, lastCommand, error, start, stop } = useHandsFreeCoach({
     handlers,
     locale,
     ttsSpeak,
+    onUnhandledTranscript,
   });
 
   // Notify parent when active state changes

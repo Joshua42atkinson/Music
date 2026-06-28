@@ -23,8 +23,9 @@ export default function CScaleHub() {
   const [practiceMode, setPracticeMode] = useState(false);
   const { progress, markComplete } = useCScaleProgress();
   const navigate = useNavigate();
-  const { speak: ttsSpeak } = useTruebadour();
+  const { speak: ttsSpeak, ai } = useTruebadour();
   const handsFreeActiveRef = useRef(false);
+  const aiBusyRef = useRef(false);
 
   const { isListening, noteInfo, volume, error, startListening, stopListening } = usePitchDetector();
 
@@ -69,6 +70,29 @@ export default function CScaleHub() {
     }
   }, [activeStage, currentChapter, currentStageIndex, ttsSpeak]);
 
+  // ── Map AI [TOOL:XXX] tags to UI actions ─────────────────────
+  const TOOL_MAP = {
+    PLAY_PITCH: 'play',
+    START_METRONOME: 'play',
+    START_MEDITATION: 'practice',
+    NAVIGATE_NEXT: 'next',
+    NEXT_SLIDE: 'next',
+    PREV_SLIDE: 'previous',
+    NAVIGATE_SONG: 'menu',
+    NAVIGATE_PRACTICE: 'practice',
+    NAVIGATE_HOME: 'home',
+  };
+
+  const executeTool = useCallback((toolName) => {
+    const action = TOOL_MAP[toolName];
+    if (action) {
+      devLog('[CScaleHub] Executing AI tool:', toolName, '→ action:', action);
+      window.dispatchEvent(new CustomEvent('voixvive:ai_command', { detail: { action } }));
+    } else {
+      devLog('[CScaleHub] Unknown AI tool:', toolName);
+    }
+  }, []);
+
   // ── Listen for AI-driven UI commands (Truebadour → UI) ──────
   useEffect(() => {
     const handleAICommand = (e) => {
@@ -83,12 +107,68 @@ export default function CScaleHub() {
         case 'stop': stopListening(); droneEngine.stopAll(); setResonanceMode(false); break;
         case 'read': readChapterAloud(currentChapter); break;
         case 'complete': markComplete(currentChapter.id); break;
+        case 'home': navigate('/dashboard'); break;
+        case 'menu': navigate('/dashboard'); break;
         default: break;
       }
     };
     window.addEventListener('voixvive:ai_command', handleAICommand);
     return () => window.removeEventListener('voixvive:ai_command', handleAICommand);
-  }, [goToChapter, startListening, stopListening, readChapterAloud, markComplete, currentChapter]);
+  }, [goToChapter, startListening, stopListening, readChapterAloud, markComplete, currentChapter, navigate]);
+
+  // ── AI intent interpretation for unhandled transcripts ──────
+  // When no keyword matches, pipe the transcript to the Truebadour AI
+  // with full context (current chapter, pitch state, practice mode).
+  // The AI can respond conversationally AND emit [TOOL:XXX] tags to
+  // drive the UI — true hands-free AI-driven navigation.
+  const handleUnhandledTranscript = useCallback(async (transcript) => {
+    if (aiBusyRef.current) {
+      devLog('[CScaleHub] AI busy, skipping unhandled transcript');
+      return;
+    }
+    if (!ai.chatStream) {
+      devLog('[CScaleHub] No AI backend available, falling back to unknown response');
+      return;
+    }
+
+    aiBusyRef.current = true;
+    devLog('[CScaleHub] AI interpreting transcript:', transcript);
+
+    const chapterNum = currentStageIndex + 1;
+    const chapterTitle = currentChapter?.title || 'Unknown';
+    const phase = practiceMode ? 'PLAY' : 'BE';
+    const pitchState = isListening ? `Pitch detector active. Current note: ${noteInfo?.note || 'detecting...'}` : 'Pitch detector off';
+
+    const contextMsg = `[HANDS-FREE CONTEXT] Student is on Chapter ${chapterNum}: ${chapterTitle}. Phase: ${phase}. ${pitchState}. Practice mode: ${practiceMode ? 'on' : 'off'}.\n\nStudent said: "${transcript}"`;
+
+    const messages = [
+      { role: 'user', content: contextMsg },
+    ];
+
+    try {
+      const result = await ai.chatStream(messages, null, {
+        mode: 'chat',
+        currentFret: chapterNum,
+        currentPhase: phase.toLowerCase(),
+        autoPlay: true,
+        onToolCall: (toolName) => executeTool(toolName),
+      });
+
+      const responseText = result?.choices?.[0]?.message?.content || '';
+      devLog('[CScaleHub] AI responded:', responseText.substring(0, 100));
+
+      // Also parse any tools that weren't caught by onToolCall
+      const toolMatches = responseText.match(/\[TOOL:([A-Z_]+)\]/g) || [];
+      toolMatches.forEach((m) => {
+        const toolName = m.replace(/\[TOOL:|\]/g, '');
+        executeTool(toolName);
+      });
+    } catch (err) {
+      devLog('[CScaleHub] AI interpretation failed:', err);
+    } finally {
+      aiBusyRef.current = false;
+    }
+  }, [ai, currentStageIndex, currentChapter, practiceMode, isListening, noteInfo, executeTool]);
 
   const voiceHandlers = useMemo(() => ({
     next: () => goToChapter(1),
@@ -229,6 +309,7 @@ export default function CScaleHub() {
       <HandsFreeCoachBar
         handlers={voiceHandlers}
         onActiveChange={(active) => { handsFreeActiveRef.current = active; }}
+        onUnhandledTranscript={handleUnhandledTranscript}
       />
     </div>
   );

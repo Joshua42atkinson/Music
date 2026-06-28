@@ -60,7 +60,7 @@ const RESPONSES = {
   unknown: { en: 'I did not understand. Say help for commands.', fr: 'Je n\'ai pas compris. Dites aide pour les commandes.' },
 };
 
-export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = null } = {}) {
+export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = null, onUnhandledTranscript = null } = {}) {
   const [isActive, setIsActive] = useState(false);
   const [state, setState] = useState('idle'); // idle | listening | processing | speaking | error
   const [lastCommand, setLastCommand] = useState(null);
@@ -73,10 +73,15 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
   const isSpeechDetectedRef = useRef(false);
   const stateRef = useRef('idle');
   const handlersRef = useRef(handlers);
+  const onUnhandledRef = useRef(onUnhandledTranscript);
 
   useEffect(() => {
     handlersRef.current = handlers;
   }, [handlers]);
+
+  useEffect(() => {
+    onUnhandledRef.current = onUnhandledTranscript;
+  }, [onUnhandledTranscript]);
 
   const updateState = useCallback((newState) => {
     stateRef.current = newState;
@@ -135,7 +140,13 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
     }
 
     if (!matched) {
-      speak('unknown');
+      const aiHandler = onUnhandledRef.current;
+      if (aiHandler) {
+        devLog('[useHandsFreeCoach] No keyword match — piping to AI:', transcript);
+        aiHandler(transcript);
+      } else {
+        speak('unknown');
+      }
     }
   }, [locale, speak, updateState]);
 
