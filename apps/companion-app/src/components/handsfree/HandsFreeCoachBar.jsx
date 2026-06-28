@@ -13,7 +13,7 @@ import { useLocale } from '../../hooks/useLocale';
 import { useTruebadour } from '../../hooks/TruebadourProvider';
 
 const STATE_LABELS = {
-  idle: { en: 'Tap to start hands-free', fr: 'Appuyez pour le mode mains libres' },
+  idle: { en: 'Hands-free paused (tap to resume)', fr: 'Mains libres en pause (appuyez pour reprendre)' },
   listening: { en: 'Listening...', fr: 'J\'écoute...' },
   processing: { en: 'Processing...', fr: 'Traitement...' },
   speaking: { en: 'Speaking...', fr: 'Je parle...' },
@@ -35,7 +35,19 @@ export default function HandsFreeCoachBar({ handlers, onActiveChange, onUnhandle
     onActiveChange?.(isActive);
   }, [isActive, onActiveChange]);
 
-  const label = STATE_LABELS[state]?.[locale] || STATE_LABELS.idle[locale];
+  // Auto-start hands free
+  useEffect(() => {
+    if (!isActive && state === 'idle' && !error) {
+      start();
+    }
+  }, [isActive, state, error, start]);
+
+  let label = STATE_LABELS[state]?.[locale] || STATE_LABELS.idle[locale];
+  if (isActive && state === 'idle') {
+    label = locale === 'fr' ? 'À l\'écoute...' : 'Listening for "Truebadour"...';
+  } else if (!isActive && state === 'idle') {
+    label = STATE_LABELS.idle[locale];
+  }
 
   const icons = {
     idle: <Mic size={28} className="text-cf-gold" />,

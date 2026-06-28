@@ -130,6 +130,14 @@ export function useTruebadourAI({ accessToken = null } = {}) {
       }
     } catch { /* proceed */ }
 
+    // ── -1. Direct API Key (Vite env) ──
+    if (import.meta.env.VITE_GEMINI_API_KEY) {
+      setIsReady(true);
+      setBackend('gemini-api');
+      devLog('[VoixVive] Using direct Gemini API key from environment.');
+      return { connected: true, backend: 'gemini-api', model: { id: 'gemini-2.5-flash-api' } };
+    }
+
     // ── 0. Student Google OAuth Gemini — best path for logged-in students ──
     // When a student logs in with Google, their OAuth token can call the Gemini API
     // directly. The student's own Google AI quota pays for the request — zero API

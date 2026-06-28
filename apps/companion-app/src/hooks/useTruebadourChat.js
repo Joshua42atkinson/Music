@@ -36,6 +36,55 @@ export function useTruebadourChat({ backend, speakText, setIsLoading, accessToke
           playerModifier: options.playerModifier,
         });
 
+    // ── -1. Direct Gemini API Key ──────────────────────────────────
+    if (backend === 'gemini-api') {
+      try {
+        setIsLoading(true);
+        const { GoogleGenAI } = await import('@google/genai');
+        const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+        
+        const contents = messages.filter(m => m.role !== 'system').map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }],
+        }));
+
+        const result = await ai.models.generateContentStream({
+          model: 'gemini-2.5-flash',
+          contents,
+          config: {
+            systemInstruction: systemMsg,
+            temperature: 0.7,
+          }
+        });
+
+        let fullText = '';
+        for await (const chunk of result) {
+          const delta = chunk.text;
+          fullText += delta;
+          onChunk?.(fullText, delta);
+        }
+
+        if (autoPlay) {
+          speakText(fullText, options.locale || 'en');
+        }
+
+        const toolMatches = fullText.match(/\[TOOL:([A-Z_]+)\]/g) || [];
+        if (toolMatches.length > 0 && options.onToolCall) {
+          toolMatches.forEach(m => options.onToolCall(m.replace(/\[TOOL:|\]/g, '')));
+        }
+
+        setIsLoading(false);
+        return { choices: [{ message: { role: 'assistant', content: fullText } }] };
+      } catch (err) {
+        devWarn('[VoixVive] Gemini API generation failed.', err);
+        setIsLoading(false);
+        const errMsg = "My mind is clouded. The API encountered an error.";
+        speakText(errMsg, options.locale || 'en');
+        onChunk?.(errMsg, errMsg);
+        return { choices: [{ message: { role: 'assistant', content: errMsg } }] };
+      }
+    }
+
     // ── 0. Student Google OAuth Gemini (student's own quota) ─────
     if (backend === 'google-oauth' && accessToken) {
       try {
