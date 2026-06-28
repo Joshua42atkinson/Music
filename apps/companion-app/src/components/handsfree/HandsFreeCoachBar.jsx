@@ -35,12 +35,7 @@ export default function HandsFreeCoachBar({ handlers, onActiveChange, onUnhandle
     onActiveChange?.(isActive);
   }, [isActive, onActiveChange]);
 
-  // Auto-start hands free
-  useEffect(() => {
-    if (!isActive && state === 'idle' && !error) {
-      start();
-    }
-  }, [isActive, state, error, start]);
+
 
   let label = STATE_LABELS[state]?.[locale] || STATE_LABELS.idle[locale];
   if (isActive && state === 'idle') {
