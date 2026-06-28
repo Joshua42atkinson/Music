@@ -63,6 +63,35 @@ export function useTruebadourAI({ accessToken = null } = {}) {
 
   // ── Internal TTS implementation ────────────────────────────────
   const speakTextInternal = useCallback(async (text, locale = 'en') => {
+    // 0. ElevenLabs High-Fidelity Voice Clone (Bertrand)
+    if (import.meta.env.VITE_ELEVENLABS_API_KEY && import.meta.env.VITE_ELEVENLABS_VOICE_ID) {
+      try {
+        const { fetchElevenLabsAudio } = await import('../lib/elevenLabs');
+        const blob = await fetchElevenLabsAudio(text);
+        if (blob) {
+          return new Promise((resolve) => {
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audio.onended = () => {
+              URL.revokeObjectURL(url);
+              resolve(true);
+            };
+            audio.onerror = () => {
+              URL.revokeObjectURL(url);
+              resolve(false);
+            };
+            audio.play().catch(e => {
+              devWarn('[VoixVive] ElevenLabs playback prevented', e);
+              URL.revokeObjectURL(url);
+              resolve(false);
+            });
+          });
+        }
+      } catch (e) {
+        devWarn('[VoixVive] ElevenLabs failed, falling back to local TTS', e);
+      }
+    }
+
     if (kokoroRef.current?.isReady) {
       try {
         const spoke = await kokoroRef.current.speak(text, { voice: voiceId, speed: ttsSpeed });

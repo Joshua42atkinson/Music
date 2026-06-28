@@ -157,6 +157,9 @@ export default defineConfig({
           'ai-kokoro': ['kokoro-js'],
           // Music theory utilities
           'music-theory': ['@tonaljs/tonal'],
+          // 3D and Icons
+          'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
+          'vendor-icons': ['lucide-react'],
         },
       },
     },

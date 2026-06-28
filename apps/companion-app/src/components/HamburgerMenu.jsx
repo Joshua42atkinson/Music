@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, BookOpen, PenTool, Layout, FolderKanban, Shield } from 'lucide-react';
+import { Menu, X, BookOpen, PenTool, Layout, FolderKanban, Shield, Award } from 'lucide-react';
 import { useScaffolding } from './ScaffoldingProvider';
 import { useLocale } from '../hooks/useLocale';
+import { initiateStripeCheckout, PLAN_PRICES } from '../lib/stripeService';
 
 
 const TABS = [
@@ -71,6 +72,16 @@ export default function HamburgerMenu({ activeTab, setActiveTab }) {
                     </button>
                   );
                 })}
+              </div>
+
+              <div className="mt-6 mb-auto">
+                <button 
+                  onClick={() => initiateStripeCheckout(PLAN_PRICES.PREMIUM_MONTHLY)}
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cf-gold to-[#e0d0aa] text-cf-ink font-mono font-bold text-sm py-3 rounded-xl cursor-pointer hover:shadow-[0_0_15px_rgba(201,169,110,0.4)] transition-all"
+                >
+                  <Award size={16} />
+                  Upgrade to Premium
+                </button>
               </div>
 
               <div className="mt-auto pt-5 border-t border-white/10">
