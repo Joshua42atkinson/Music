@@ -37,7 +37,7 @@ export async function getWebLLMEngine() {
 
   isInitializing = true;
   
-  initPromise = new Promise(async (resolve, reject) => {
+  initPromise = (async () => {
     try {
       devLog(`[WebLLM] Initializing engine with ${MODEL_ID}...`);
       const engine = await CreateMLCEngine(
@@ -50,13 +50,13 @@ export async function getWebLLMEngine() {
       );
       engineInstance = engine;
       isInitializing = false;
-      resolve(engine);
+      return engine;
     } catch (err) {
       devError('[WebLLM] Failed to initialize engine:', err);
       isInitializing = false;
-      reject(err);
+      throw err;
     }
-  });
+  })();
 
   return initPromise;
 }

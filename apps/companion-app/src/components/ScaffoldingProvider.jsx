@@ -24,7 +24,7 @@ import { getNodeById } from '../data/dag/dagNodes';
 import { getNextRecommendedNode } from '../data/dag/dagEdges';
 import { indexCurriculum } from '../data/curriculumIndexer';
 import { analytics, logEvent } from '../lib/firebase';
-import { devWarn } from '../lib/devLog';
+import { devWarn, devLog } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // SCAFFOLDING PROVIDER

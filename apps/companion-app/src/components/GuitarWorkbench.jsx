@@ -108,6 +108,7 @@ function ToolModal({ tool, onClose }) {
 
 // ── Suggested Practice Card ──
 function SuggestedPractice({ suggestion, onOpenTool, lang }) {
+  const { t } = useLocale();
   if (!suggestion?.tool) return null;
   const tool = suggestion.tool;
   const isCScale = suggestion.type === 'c-scale';
