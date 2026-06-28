@@ -4,7 +4,7 @@ description: Voix Vive Living Roadmap — dual-market alignment, core loop compl
 
 # Voix Vive — Living Roadmap
 > **This file is the single source of truth for what comes next.**
-> Updated: 2026-06-25
+> Updated: 2026-06-28
 >
 > **Rule:** No feature proceeds to the next phase until all items in the current phase are checked.
 
@@ -49,6 +49,10 @@ We have executed a major restructuring to support the **Dual-Market Strategy**. 
 - [x] Refactor C-Scale screen — collapsible sections, minimal chrome, practice-first layout (practice mode in `CScaleHub.jsx`)
 - [x] Voice commands: next, previous, play, stop, record, ask, menu, back, practice (EN + FR triggers)
 - [x] TTS reads chapter titles, instructions, AI responses aloud (via `speak()` in `useVoiceNav.js`)
+- [x] **AI-driven hands-free** — unhandled transcripts piped to Truebadour AI with context (chapter, pitch state, practice mode). AI interprets intent freely and can emit `[TOOL:XXX]` tags to drive the UI (`useHandsFreeCoach.js` → `CScaleHub.jsx`)
+- [x] **Student Google OAuth → Gemini** — logged-in students use their own Google AI quota for the Truebadour AI (zero API cost for platform). `geminiOAuth.js` + `useTruebadourAI.js` backend detection
+- [x] Auto-speak chapter intro on navigation when hands-free is active
+- [x] 16 voice commands with EN/FR triggers (next, previous, read, repeat, play, stop, practice, close, ask, help, where, menu, home, slower, faster, resonance, complete)
 
 ### Bilingual & Marketing (Joshua)
 - [x] i18n the StudioPage — add useLocale, translate all hardcoded English strings (40+ keys in en.json/fr.json)
@@ -97,10 +101,10 @@ We have executed a major restructuring to support the **Dual-Market Strategy**. 
 **Goal:** The site is live, performant, and stable for external beta testers.
 
 ### Deployment & Polish
-- [ ] Implement Vercel deployment configurations.
-- [ ] Ensure PWA installability.
-- [ ] Lighthouse audit (target 90+ across all metrics).
-- [ ] End-to-end testing of the Pitch Detection across Chrome/Safari.
+- [x] Implement Cloudflare Pages deployment (`wrangler.toml`, `_redirects` for SPA)
+- [x] Ensure PWA installability (manifest, service worker, caching)
+- [ ] Lighthouse audit (target 90+ across all metrics)
+- [ ] End-to-end testing of the Pitch Detection across Chrome/Safari
 
 ### Gate to Final Release
 > **App is live at voix-vive.com, installs as PWA, and Pitch Detection works flawlessly in production.**

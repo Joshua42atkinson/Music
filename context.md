@@ -10,10 +10,10 @@
 |---|---|
 | **Companion app** | 224/224 tests passing, build clean, 0 lint errors |
 | **Git remote** | `origin → github.com:joshua42atkinson/music.git` |
-| **Unpushed commits** | 2 (`e3352c9` + `dab20bd`) — need `git push` |
+| **Unpushed commits** | 0 (all pushed) |
 | **Hosting** | Cloudflare Pages (wrangler.toml exists, `_redirects` configured for SPA) |
 | **PWA** | Configured (manifest, service worker, caching) |
-| **i18n** | EN/FR infrastructure complete, StudioPage done, some components still hardcoded |
+| **i18n** | EN/FR 700/700 key parity (audited 2026-06-28), no gaps |
 
 ---
 
@@ -32,6 +32,14 @@
 - ChapterContentPanel with collapsible sections
 - Practice mode (collapses chrome, minimal UI)
 - Back button navigation
+
+### Google Login / Student Gemini ✅
+- `geminiOAuth.js` — REST SSE streaming from Gemini using student's OAuth Bearer token
+- `useAuth.js` — `generative-language` scope added to OAuth (web + Tauri)
+- `useTruebadourAI.js` — Backend detection: `google-oauth` → Nano → WebGPU → Firebase
+- `useTruebadourChat.js` — `'google-oauth'` backend streams from student's Gemini
+- `TruebadourProvider.jsx` — Passes `accessToken` from `useAuth()` → `useTruebadourAI()`
+- Zero API cost for platform — student's own Google AI quota pays for every request
 
 ### Tech Debt ✅
 - P1-P4: 100% complete (20/20 audit, 4/4 P1, 4/4 P2, 6/6 P3, 6/6 P4)
