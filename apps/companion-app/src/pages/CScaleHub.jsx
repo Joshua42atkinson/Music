@@ -1,15 +1,18 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { Maximize2, Minimize2, ArrowLeft } from 'lucide-react';
 import usePitchDetector from '../hooks/usePitchDetector';
 import { C_SCALE_CHAPTERS } from '../data/cScaleCurriculum';
 import { useCScaleProgress } from '../features/c-scale/useCScaleProgress';
+import { useTruebadour } from '../hooks/TruebadourProvider';
 import PitchDetectorHUD from '../features/c-scale/PitchDetectorHUD';
 import ChapterSidebar from '../features/c-scale/ChapterSidebar';
 import StageHeader from '../features/c-scale/StageHeader';
 import FretboardPanel from '../features/c-scale/FretboardPanel';
+import ChapterContentPanel from '../features/c-scale/ChapterContentPanel';
 import HandsFreeCoachBar from '../components/handsfree/HandsFreeCoachBar';
 import { droneEngine } from '../lib/audio/GenerativeDroneEngine';
+import { devLog } from '../lib/devLog';
 
 // ═══════════════════════════════════════════════════════════
 // MAIN HUB
@@ -20,8 +23,8 @@ export default function CScaleHub() {
   const [practiceMode, setPracticeMode] = useState(false);
   const { progress, markComplete } = useCScaleProgress();
   const navigate = useNavigate();
-
-  const completedCount = useMemo(() => Object.keys(progress).length, [progress]);
+  const { speak: ttsSpeak } = useTruebadour();
+  const handsFreeActiveRef = useRef(false);
 
   const { isListening, noteInfo, volume, error, startListening, stopListening } = usePitchDetector();
 
@@ -35,20 +38,78 @@ export default function CScaleHub() {
     }
   }, [currentStageIndex]);
 
+  // ── Read chapter content aloud (audio snippet or TTS) ──────
+  const readChapterAloud = useCallback((chapter) => {
+    if (!chapter?.bePhase) return;
+    if (chapter.bePhase.audioSnippet) {
+      const audio = new Audio(chapter.bePhase.audioSnippet);
+      audio.play().catch(() => {
+        // Audio failed, fall back to TTS
+        const text = `${chapter.bePhase.title}. ${chapter.bePhase.content} ${chapter.bePhase.action || ''}`;
+        ttsSpeak(text);
+      });
+    } else {
+      const text = `${chapter.bePhase.title}. ${chapter.bePhase.content} ${chapter.bePhase.action || ''}`;
+      ttsSpeak(text);
+    }
+  }, [ttsSpeak]);
+
+  // ── Speak chapter info ("where am I?") ─────────────────────
+  const speakChapterInfo = useCallback((chapter, index) => {
+    const text = `Chapter ${index + 1} of ${C_SCALE_CHAPTERS.length}. ${chapter.title}. ${chapter.subtitle || ''}`;
+    ttsSpeak(text);
+  }, [ttsSpeak]);
+
+  // ── Auto-speak on chapter change (only if hands-free active) ──
+  useEffect(() => {
+    if (handsFreeActiveRef.current && currentChapter) {
+      devLog('[CScaleHub] Auto-speaking chapter intro for:', currentChapter.title);
+      const intro = `Chapter ${currentStageIndex + 1}. ${currentChapter.title}.`;
+      ttsSpeak(intro);
+    }
+  }, [activeStage, currentChapter, currentStageIndex, ttsSpeak]);
+
+  // ── Listen for AI-driven UI commands (Truebadour → UI) ──────
+  useEffect(() => {
+    const handleAICommand = (e) => {
+      const { action } = e.detail;
+      devLog('[CScaleHub] AI command received:', action);
+      switch (action) {
+        case 'next': goToChapter(1); break;
+        case 'previous': goToChapter(-1); break;
+        case 'practice': setPracticeMode(true); break;
+        case 'close': setPracticeMode(false); break;
+        case 'play': startListening(); break;
+        case 'stop': stopListening(); droneEngine.stopAll(); setResonanceMode(false); break;
+        case 'read': readChapterAloud(currentChapter); break;
+        case 'complete': markComplete(currentChapter.id); break;
+        default: break;
+      }
+    };
+    window.addEventListener('voixvive:ai_command', handleAICommand);
+    return () => window.removeEventListener('voixvive:ai_command', handleAICommand);
+  }, [goToChapter, startListening, stopListening, readChapterAloud, markComplete, currentChapter]);
+
   const voiceHandlers = useMemo(() => ({
     next: () => goToChapter(1),
     previous: () => goToChapter(-1),
-    repeat: () => window.dispatchEvent(new CustomEvent('voixvive:repeat_chapter')),
-    menu: () => navigate('/'),
+    repeat: () => readChapterAloud(currentChapter),
+    read: () => readChapterAloud(currentChapter),
+    menu: () => navigate('/dashboard'),
+    home: () => navigate('/dashboard'),
     ask: () => window.dispatchEvent(new CustomEvent('voixvive:open_truebadour')),
     practice: () => setPracticeMode(true),
     close: () => setPracticeMode(false),
     play: () => { if (!isListening) startListening(); },
     stop: () => { if (isListening) stopListening(); droneEngine.stopAll(); setResonanceMode(false); },
     record: () => { if (isListening) stopListening(); else startListening(); },
+    where: () => speakChapterInfo(currentChapter, currentStageIndex),
+    resonance: () => setResonanceMode(prev => !prev),
+    complete: () => { markComplete(currentChapter.id); ttsSpeak('Chapter marked complete.'); },
     slower: () => window.dispatchEvent(new CustomEvent('voixvive:slower')),
     faster: () => window.dispatchEvent(new CustomEvent('voixvive:faster')),
-  }), [goToChapter, navigate, isListening, startListening, stopListening]);
+    help: () => window.dispatchEvent(new CustomEvent('voixvive:open_truebadour')),
+  }), [goToChapter, navigate, isListening, startListening, stopListening, currentChapter, currentStageIndex, readChapterAloud, speakChapterInfo, markComplete, ttsSpeak]);
 
   const toggleMic = useCallback(() => {
     if (isListening) stopListening();
@@ -69,12 +130,20 @@ export default function CScaleHub() {
     <div className={`mesh-bg min-h-[100svh] text-[var(--vv-text)] font-body pt-16 md:pt-20 pb-24 md:pb-10 flex flex-col transition-colors duration-1000 ${resonanceMode ? 'bg-[#030201] shadow-[inset_0_0_150px_rgba(204,153,51,0.05)]' : 'bg-transparent'} ${practiceMode ? 'pb-20' : ''}`}>
       {/* ── Header: responsive (hidden in practice mode) ── */}
       {!practiceMode && (
-      <div className="px-4 md:px-10 mb-4 md:mb-6 flex justify-between items-center flex-wrap gap-3">
-        <div className="min-w-0 flex-1">
-          <h1 className="m-0 font-heading text-[1.5rem] md:text-[2.5rem] font-normal text-[var(--vv-cream)] truncate">The C Scale Journey</h1>
-          <p className="mt-1 md:mt-2 font-mono text-[0.65rem] md:text-[0.8rem] tracking-[0.1em] uppercase text-[var(--vv-gold)]/60">The Matrix of the Fretboard (12 Chapters)</p>
+      <div className="px-4 md:px-10 mb-3 md:mb-[18px] flex justify-between items-center flex-wrap gap-3">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/[0.03] text-white/50 hover:text-white/80 hover:border-white/20 cursor-pointer transition-all"
+            aria-label="Back to dashboard"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="min-w-0 flex-1">
+            <h1 className="m-0 font-heading text-[1.5rem] md:text-[2.5rem] font-normal text-[var(--vv-cream)] truncate">The C Scale Journey</h1>
+            <p className="mt-1 md:mt-2 font-mono text-[0.65rem] md:text-[0.8rem] tracking-[0.1em] uppercase text-[var(--vv-gold)]/60">The Matrix of the Fretboard (12 Chapters)</p>
+          </div>
         </div>
-
       </div>
       )}
 
@@ -100,7 +169,7 @@ export default function CScaleHub() {
       )}
 
       {/* ── Chapter strip (mobile) / sidebar (desktop) + content ── */}
-      <div className={`flex flex-col md:flex-row gap-4 md:gap-8 px-4 md:px-10 flex-1 min-h-0 ${practiceMode ? '!p-0' : ''}`}>
+      <div className={`flex flex-col md:flex-row gap-3 md:gap-[27px] px-4 md:px-10 flex-1 min-h-0 ${practiceMode ? '!p-0' : ''}`}>
         {!practiceMode && (
         <ChapterSidebar
           activeStage={activeStage}
@@ -113,21 +182,7 @@ export default function CScaleHub() {
         <div className={`glass-card flex-1 flex flex-col rounded-2xl overflow-hidden min-h-0 ${practiceMode ? '!rounded-none !border-0' : ''}`}>
           {!practiceMode && <StageHeader chapter={currentChapter} />}
 
-          {/* Minimalist Chapter Focus Area */}
-          <div className="px-4 md:px-8 py-10 md:py-20 border-b border-white/5 flex-1 flex flex-col items-center justify-center text-center">
-            <h2 className="m-0 mb-4 font-heading text-3xl md:text-5xl text-[var(--vv-cream)] drop-shadow-md">
-              {currentChapter.title}
-            </h2>
-            <p className="max-w-xl mx-auto m-0 mb-8 text-base md:text-lg text-white/60 leading-relaxed font-light">
-              Speak to Bertrand to begin this session. He will guide your fretboard exploration.
-            </p>
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('voixvive:open_truebadour'))}
-              className="px-8 py-4 rounded-full bg-[rgba(204,51,51,0.15)] border border-[rgba(204,51,51,0.4)] text-[#ff6666] font-mono text-[0.9rem] uppercase tracking-[0.15em] hover:bg-[rgba(204,51,51,0.25)] transition-all cursor-pointer shadow-[0_0_20px_rgba(204,51,51,0.2)]"
-            >
-              Summon Mentor
-            </button>
-          </div>
+          <ChapterContentPanel chapter={currentChapter} />
 
           {!practiceMode && (
           <div className="hidden md:block">
@@ -171,7 +226,10 @@ export default function CScaleHub() {
       )}
 
       {/* ── Hands-free coach bar (continuous listening) ── */}
-      <HandsFreeCoachBar handlers={voiceHandlers} />
+      <HandsFreeCoachBar
+        handlers={voiceHandlers}
+        onActiveChange={(active) => { handsFreeActiveRef.current = active; }}
+      />
     </div>
   );
 }

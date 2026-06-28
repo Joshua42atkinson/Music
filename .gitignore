@@ -17,5 +17,8 @@ src-tauri/target/
 *.gguf
 *.onnx
 *.wav
-*.mp3
 *.mp4
+
+# Keep companion app audio assets in repo
+!apps/companion-app/public/assets/audio/*.mp3
+!apps/companion-app/public/assets/bertrand_*.wav

@@ -11,32 +11,52 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { getAudioContext, initMicrophone, closeMicrophone } from '../audio/audioEngine';
-import { devError } from '../lib/devLog';
+import { devError, devLog } from '../lib/devLog';
 
 const SPEECH_THRESHOLD = 0.03;
 const SILENCE_THRESHOLD = 0.015;
 const SILENCE_TIMEOUT_MS = 1500;
+const RECOGNITION_TIMEOUT_MS = 8000;
 
 const COMMANDS = {
   next: ['next', 'suivant', 'avancer', 'forward'],
   previous: ['previous', 'back', 'précédent', 'reculer'],
   repeat: ['repeat', 'again', 'répète', 'recommence', 'replay'],
+  read: ['read', 'listen to', 'lire', 'écouter le'],
+  ask: ['ask', 'question', 'demander', 'mentor', 'truebadour', 'help me'],
+  practice: ['practice', 'pratiquer', 'mode pratique'],
+  close: ['close', 'exit practice', 'fermer', 'quitter pratique'],
+  play: ['play', 'start', 'jouer', 'démarrer'],
+  stop: ['stop', 'pause', 'arrête', 'quit', 'exit', 'quitter'],
+  record: ['record', 'enregistrer'],
+  menu: ['menu', 'home', 'dashboard', 'accueil', 'tableau de bord'],
+  where: ['where', 'what chapter', 'status', 'où', 'quel chapitre', 'statut'],
+  resonance: ['resonance', 'drone', 'résonance', 'bourdon'],
+  complete: ['complete', 'done', 'finished', 'terminé', 'fini'],
   slower: ['slower', 'slow', 'lentement', 'ralenti', 'ralentir'],
   faster: ['faster', 'fast', 'speed', 'vite', 'accélère'],
-  play: ['play', 'start', 'jouer', 'démarrer', 'listen'],
   help: ['help', 'aide', 'commands', 'commandes'],
-  stop: ['stop', 'pause', 'arrête', 'quit', 'exit', 'quitter'],
 };
 
 const RESPONSES = {
   next: { en: 'Next.', fr: 'Suivant.' },
   previous: { en: 'Previous.', fr: 'Précédent.' },
   repeat: { en: 'Repeating.', fr: 'Je répète.' },
+  read: { en: 'Reading.', fr: 'Lecture.' },
+  ask: { en: 'Summoning the Truebadour.', fr: 'J\'invoque le Truebadour.' },
+  practice: { en: 'Entering practice mode.', fr: 'Mode pratique.' },
+  close: { en: 'Exiting practice mode.', fr: 'Sortie du mode pratique.' },
+  play: { en: 'Listening for your guitar.', fr: 'J\'écoute votre guitare.' },
+  stop: { en: 'Stopped.', fr: 'Arrêté.' },
+  record: { en: 'Recording.', fr: 'Enregistrement.' },
+  menu: { en: 'Going to dashboard.', fr: 'Retour au tableau de bord.' },
+  where: { en: 'You are on', fr: 'Vous êtes sur' },
+  resonance: { en: 'Toggling resonance.', fr: 'Bourdon activé.' },
+  complete: { en: 'Chapter complete.', fr: 'Chapitre terminé.' },
   slower: { en: 'Slower.', fr: 'Plus lentement.' },
   faster: { en: 'Faster.', fr: 'Plus vite.' },
-  play: { en: 'Listening for your guitar.', fr: 'J\'écoute votre guitare.' },
-  help: { en: 'Say next, repeat, slower, faster, play, or stop.', fr: 'Dites suivant, répète, lentement, vite, jouer, ou arrête.' },
-  stop: { en: 'Hands-free mode stopped.', fr: 'Mode mains libres arrêté.' },
+  help: { en: 'Say next, previous, read, practice, play, ask, where, or stop.', fr: 'Dites suivant, précédent, lire, pratiquer, jouer, demander, où, ou arrête.' },
+  stop_coach: { en: 'Hands-free mode stopped.', fr: 'Mode mains libres arrêté.' },
   unknown: { en: 'I did not understand. Say help for commands.', fr: 'Je n\'ai pas compris. Dites aide pour les commandes.' },
 };
 
@@ -102,11 +122,13 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
       if (triggers.some((t) => lower.includes(t))) {
         const handler = handlersRef.current[action];
         if (handler) handler();
-        if (action === 'stop') {
-          // Stop the hands-free loop itself after responding
+        if (action === 'stop' && (lower.includes('quit') || lower.includes('exit') || lower.includes('quitter'))) {
+          // "quit" / "exit" stops the hands-free loop itself
+          speak('stop_coach');
           setTimeout(() => stopRef.current(), 1200);
+        } else {
+          speak(action);
         }
-        speak(action);
         matched = true;
         break;
       }
@@ -135,15 +157,29 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
     recognition.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
     recognition.maxAlternatives = 1;
 
-    recognition.onstart = () => updateState('listening');
+    let timeoutId = null;
+
+    recognition.onstart = () => {
+      devLog('[useHandsFreeCoach] Recognition started');
+      updateState('listening');
+      // Safety timeout: if no result in 8s, abort and return to idle
+      timeoutId = setTimeout(() => {
+        devLog('[useHandsFreeCoach] Recognition timeout — no speech detected');
+        try { recognition.stop(); } catch { /* ignore */ }
+      }, RECOGNITION_TIMEOUT_MS);
+    };
 
     recognition.onresult = (event) => {
+      if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
       const transcript = event.results[0][0].transcript;
+      devLog('[useHandsFreeCoach] Heard:', transcript);
       processCommand(transcript);
     };
 
     recognition.onerror = (event) => {
-      if (event.error === 'no-speech') {
+      if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
+      devError('[useHandsFreeCoach] Recognition error:', event.error);
+      if (event.error === 'no-speech' || event.error === 'aborted') {
         updateState('idle');
       } else {
         setError(event.error);
@@ -152,7 +188,9 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
     };
 
     recognition.onend = () => {
+      if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
       recognitionRef.current = null;
+      devLog('[useHandsFreeCoach] Recognition ended, state:', stateRef.current);
       if (stateRef.current === 'listening') {
         updateState('idle');
       }
@@ -160,6 +198,7 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
 
     recognitionRef.current = recognition;
     try {
+      devLog('[useHandsFreeCoach] Starting recognition...');
       recognition.start();
     } catch (err) {
       devError('[useHandsFreeCoach] Recognition start failed:', err);
@@ -180,12 +219,18 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
 
   const stopRef = useRef(() => {});
 
+  // Use refs for callbacks so vadTick never goes stale
+  const startRecognitionRef = useRef(startRecognition);
+  const stopRecognitionRef = useRef(stopRecognition);
+  useEffect(() => { startRecognitionRef.current = startRecognition; }, [startRecognition]);
+  useEffect(() => { stopRecognitionRef.current = stopRecognition; }, [stopRecognition]);
+
   const vadTick = useCallback(() => {
     const analyser = analyserRef.current;
     if (!analyser || !stateRef.current) return;
 
-    // Halt VAD while speaking to prevent AI from hearing itself
-    if (stateRef.current === 'speaking') {
+    // Halt VAD while speaking or processing to prevent AI from hearing itself
+    if (stateRef.current === 'speaking' || stateRef.current === 'processing') {
       rafIdRef.current = requestAnimationFrame(vadTick);
       return;
     }
@@ -201,22 +246,24 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
       silenceStartRef.current = null;
       if (!isSpeechDetectedRef.current && stateRef.current === 'idle') {
         isSpeechDetectedRef.current = true;
-        startRecognition();
+        devLog('[useHandsFreeCoach] Speech detected (RMS:', rms.toFixed(3), ') — starting recognition');
+        startRecognitionRef.current();
       }
     } else if (rms < SILENCE_THRESHOLD) {
       if (!silenceStartRef.current) silenceStartRef.current = performance.now();
       const silenceDuration = performance.now() - silenceStartRef.current;
       if (isSpeechDetectedRef.current && silenceDuration > SILENCE_TIMEOUT_MS) {
         isSpeechDetectedRef.current = false;
-        stopRecognition();
+        stopRecognitionRef.current();
       }
     }
 
     rafIdRef.current = requestAnimationFrame(vadTick);
-  }, [startRecognition, stopRecognition]);
+  }, []);
 
   const start = useCallback(async () => {
     try {
+      devLog('[useHandsFreeCoach] Starting hands-free mode...');
       const ctx = getAudioContext();
       if (ctx && ctx.state === 'suspended') {
         await ctx.resume();
@@ -233,6 +280,7 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
       updateState('idle');
       isSpeechDetectedRef.current = false;
       silenceStartRef.current = null;
+      devLog('[useHandsFreeCoach] Mic initialized, VAD loop starting');
       rafIdRef.current = requestAnimationFrame(vadTick);
     } catch (err) {
       devError('[useHandsFreeCoach] Start failed:', err);

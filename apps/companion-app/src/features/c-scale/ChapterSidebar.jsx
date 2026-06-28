@@ -7,9 +7,9 @@ export default function ChapterSidebar({ activeStage, onSelectStage, progress, o
   return (
     <>
       {/* ── Desktop: vertical sidebar ── */}
-      <div className="hidden md:flex w-80 flex-col gap-5 shrink-0 max-h-[calc(100vh-180px)] overflow-y-auto pr-3">
+      <div className="hidden md:flex w-80 flex-col gap-[18px] shrink-0 max-h-[calc(100vh-180px)] overflow-y-auto pr-3">
         <h2 className="m-0 text-[0.9rem] font-mono text-white/40 uppercase tracking-[0.05em]">The 12-Chapter Curriculum</h2>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-[12px]">
           {C_SCALE_CHAPTERS.map((stage, index) => {
             const Icon = stage.icon;
             const isActive = activeStage === stage.id;
@@ -17,7 +17,7 @@ export default function ChapterSidebar({ activeStage, onSelectStage, progress, o
             return (
               <button
                 key={stage.id}
-                className="glass-card flex items-center justify-between p-4 rounded-xl border border-solid cursor-pointer transition-all duration-200 ease-out bg-transparent"
+                className="glass-card flex items-center justify-between p-[18px] rounded-xl border border-solid cursor-pointer transition-all duration-200 ease-out bg-transparent"
                 onClick={() => onSelectStage(stage.id)}
                 style={{
                   borderColor: isActive ? stage.color : undefined,
@@ -38,6 +38,9 @@ export default function ChapterSidebar({ activeStage, onSelectStage, progress, o
                       {isDone ? '✓ Complete' : `Ch. ${index + 1}`}
                     </div>
                     <div className="text-[0.95rem] font-semibold text-vv-text">{stage.title}</div>
+                    {stage.ratio && (
+                      <div className="text-[0.6rem] font-mono text-white/30 mt-0.5">{stage.ratio}</div>
+                    )}
                   </div>
                 </div>
                 {isActive && <ChevronRight size={18} color={stage.color} />}
@@ -91,6 +94,9 @@ export default function ChapterSidebar({ activeStage, onSelectStage, progress, o
                   {isDone ? '✓' : `Ch.${index + 1}`}
                 </div>
                 <div className="text-[0.8rem] font-semibold text-vv-text">{stage.title}</div>
+                {stage.ratio && (
+                  <div className="text-[0.55rem] font-mono text-white/25">{stage.ratio}</div>
+                )}
               </div>
             </button>
           );

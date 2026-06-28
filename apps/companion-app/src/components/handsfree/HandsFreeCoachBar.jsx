@@ -6,7 +6,7 @@
 // ║ WHO     : C Scale hub and future practice screens               ║
 // ║ NEEDS   : useHandsFreeCoach hook, useLocale for i18n           ║
 // ╚═══════════════════════════════════════════════════════════════╝
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Mic, MicOff, Ear, Loader2, Volume2, AlertCircle } from 'lucide-react';
 import { useHandsFreeCoach } from '../../hooks/useHandsFreeCoach';
 import { useLocale } from '../../hooks/useLocale';
@@ -20,7 +20,7 @@ const STATE_LABELS = {
   error: { en: 'Error', fr: 'Erreur' },
 };
 
-export default function HandsFreeCoachBar({ handlers }) {
+export default function HandsFreeCoachBar({ handlers, onActiveChange }) {
   const { locale } = useLocale();
   const { speak: ttsSpeak } = useTruebadour();
   const { isActive, state, lastCommand, error, start, stop } = useHandsFreeCoach({
@@ -28,6 +28,11 @@ export default function HandsFreeCoachBar({ handlers }) {
     locale,
     ttsSpeak,
   });
+
+  // Notify parent when active state changes
+  useEffect(() => {
+    onActiveChange?.(isActive);
+  }, [isActive, onActiveChange]);
 
   const label = STATE_LABELS[state]?.[locale] || STATE_LABELS.idle[locale];
 
