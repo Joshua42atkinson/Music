@@ -135,7 +135,7 @@ export function useAuth() {
       devError('[useAuth] Google login error:', error);
       setLoading(false);
     },
-    scope: 'openid email profile',
+    scope: 'openid email profile https://www.googleapis.com/auth/generative-language',
   });
 
   const signInWithGoogle = useCallback(() => {
@@ -149,7 +149,7 @@ export function useAuth() {
         `client_id=${GOOGLE_CLIENT_ID}&` +
         `redirect_uri=com.voixvive.app:/oauth2redirect&` +
         `response_type=token&` +
-        `scope=openid%20email%20profile`;
+        `scope=openid%20email%20profile%20https://www.googleapis.com/auth/generative-language`;
       open(authUrl);
       return;
     }

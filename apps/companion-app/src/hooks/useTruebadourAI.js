@@ -1,4 +1,4 @@
-import { devWarn } from '../lib/devLog';
+import { devWarn, devLog } from '../lib/devLog';
 // ╔══ VOIX VIVE ════════════════════════════════════════════════════╗
 // ║ FILE    : useTruebadourAI.js                                   ║
 // ║ WHAT    : React hook managing AI chat state, TTS, voice input, ║
@@ -30,11 +30,11 @@ import { isWebLLMReady, getWebLLMEngine, subscribeToWebLLMProgress } from '../li
 // The voice IS the product. "Voix Vive" = "Living Voice."
 // ═══════════════════════════════════════════════════════════════════
 
-export function useTruebadourAI() {
+export function useTruebadourAI({ accessToken = null } = {}) {
   const [isReady, setIsReady]   = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]       = useState(null);
-  const [backend, setBackend]   = useState(null); // 'google' | 'offline' | 'webgpu' | 'nano'
+  const [backend, setBackend]   = useState(null); // 'google-oauth' | 'google' | 'offline' | 'webgpu' | 'nano'
   const [webLLMProgress, setWebLLMProgress] = useState(null);
   const abortRef    = useRef(null);
   const kokoroRef   = useRef(null);
@@ -130,10 +130,28 @@ export function useTruebadourAI() {
       }
     } catch { /* proceed */ }
 
+    // ── 0. Student Google OAuth Gemini — best path for logged-in students ──
+    // When a student logs in with Google, their OAuth token can call the Gemini API
+    // directly. The student's own Google AI quota pays for the request — zero API
+    // cost for us. This is the "MCP for Gemini" pattern.
+    if (accessToken) {
+      try {
+        const { canUseGeminiOAuth } = await import('../lib/geminiOAuth');
+        const canUse = await canUseGeminiOAuth(accessToken);
+        if (canUse) {
+          setIsReady(true);
+          setBackend('google-oauth');
+          devLog('[VoixVive] Using student Google OAuth for Gemini — zero API cost');
+          return { connected: true, backend: 'google-oauth', model: { id: 'gemini-2.5-flash-student-oauth' } };
+        }
+      } catch (err) {
+        devWarn('[VoixVive] Student OAuth Gemini check failed, trying other backends', err);
+      }
+    }
+
     // ── 1. Try Google Gemini Nano (Local Edge via window.ai) ─────
     try {
       if (typeof window !== 'undefined' && window.ai) {
-        // Quick readiness check for Nano
         const canCreate = await window.ai.canCreateTextSession();
         if (canCreate === 'readily' || canCreate === 'after-download') {
           setIsReady(true);
@@ -148,9 +166,6 @@ export function useTruebadourAI() {
     // ── 1.5 Try WebGPU (WebLLM - Llama 3.2 3B) ───────────────────
     try {
       if (typeof navigator !== 'undefined' && navigator.gpu) {
-        // Only set backend if we already initialized or user consents
-        // We will do a lazy initialization here to allow the WebGPU hook
-        // Since we want this to be the primary tier 2, we will set it if WebGPU is available
         setIsReady(true);
         setBackend('webgpu');
         return { connected: true, backend: 'webgpu', model: { id: 'Llama-3.2-3B-Instruct' } };
@@ -171,10 +186,10 @@ export function useTruebadourAI() {
 
     setIsReady(false); setBackend('loading');
     return { connected: false, backend: 'loading', model: null };
-  }, []);
+  }, [accessToken]);
 
   const { chatStream } = useTruebadourChat({
-    backend, speakText, setIsLoading,
+    backend, speakText, setIsLoading, accessToken,
   });
 
   const cancel = useCallback(() => {
@@ -199,5 +214,6 @@ export function useTruebadourAI() {
     voiceRef,
     bertrandRef,
     webLLMProgress,
+    accessToken,
   };
 }

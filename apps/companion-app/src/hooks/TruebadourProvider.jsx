@@ -13,10 +13,10 @@ import { devError } from '../lib/devLog';
 const TruebadourContext = createContext(null);
 
 export function TruebadourProvider({ children }) {
-  const ai          = useTruebadourAI();
+  const { user, accessToken } = useAuth();
+  const ai          = useTruebadourAI({ accessToken });
   const kokoro      = useKokoroWebTTS();
   const voiceInput  = useVoiceInput();
-  const { user }    = useAuth();
   const player      = usePlayerState();
 
   // ── Voice preferences (persisted + Supabase-synced) ──────────
@@ -32,11 +32,11 @@ export function TruebadourProvider({ children }) {
   const openBinder = useCallback(() => setActiveWidget('binder'), []);
   const closeAll   = useCallback(() => setActiveWidget(null),     []);
 
-  // ── Auto-detect backend on mount ─────────────────────────────
+  // ── Auto-detect backend on mount + when accessToken changes ──
   useEffect(() => {
     ai.detectBackend();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // run once on mount
+  }, [accessToken]); // re-detect when student logs in/out
 
   // Wire refs so useTruebadourAI can call back into the engines
   useEffect(() => { ai.bertrandRef.current = kokoro;     }, [kokoro,     ai.bertrandRef]);

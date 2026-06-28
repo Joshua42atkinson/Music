@@ -14,7 +14,7 @@ import { useCallback } from 'react';
 import { buildCompressedPrompt, buildChatPrompt, enforceOver } from '../data/truebadourPrompt';
 import { getWebLLMEngine } from '../lib/webllmEngine';
 
-export function useTruebadourChat({ backend, speakText, setIsLoading }) {
+export function useTruebadourChat({ backend, speakText, setIsLoading, accessToken }) {
   const chatStream = useCallback(async (messages, onChunk, options = {}) => {
     const autoPlay = options.autoPlay === true;
 
@@ -36,7 +36,45 @@ export function useTruebadourChat({ backend, speakText, setIsLoading }) {
           playerModifier: options.playerModifier,
         });
 
-    // ── 0. Google Gemini Nano (Local Edge via window.ai) ─────────
+    // ── 0. Student Google OAuth Gemini (student's own quota) ─────
+    if (backend === 'google-oauth' && accessToken) {
+      try {
+        setIsLoading(true);
+        const { streamGeminiWithOAuth } = await import('../lib/geminiOAuth');
+
+        const contents = messages.filter(m => m.role !== 'system').map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }],
+        }));
+
+        const fullText = await streamGeminiWithOAuth(
+          accessToken,
+          'gemini-2.5-flash',
+          systemMsg,
+          contents,
+          { temperature: 0.7, topP: 0.95, topK: 64, maxOutputTokens: 8192 },
+          (full, delta) => onChunk?.(full, delta),
+        );
+
+        if (autoPlay) {
+          speakText(fullText, options.locale || 'en');
+        }
+
+        const toolMatches = fullText.match(/\[TOOL:([A-Z_]+)\]/g) || [];
+        if (toolMatches.length > 0 && options.onToolCall) {
+          toolMatches.forEach(m => options.onToolCall(m.replace(/\[TOOL:|\]/g, '')));
+        }
+
+        setIsLoading(false);
+        return { choices: [{ message: { role: 'assistant', content: fullText } }] };
+      } catch (err) {
+        devWarn('[VoixVive] Student OAuth Gemini failed, falling back.', err);
+        setIsLoading(false);
+        // Fall through to other backends below
+      }
+    }
+
+    // ── 0.5 Google Gemini Nano (Local Edge via window.ai) ─────────
     if (backend === 'nano') {
       try {
         setIsLoading(true);
@@ -179,7 +217,7 @@ export function useTruebadourChat({ backend, speakText, setIsLoading }) {
     speakText(waitMsg, options.locale || 'en');
     onChunk?.(waitMsg, waitMsg);
     return { choices: [{ message: { role: 'assistant', content: waitMsg } }] };
-  }, [backend, speakText]);
+  }, [backend, speakText, accessToken]);
 
   return { chatStream };
 }
