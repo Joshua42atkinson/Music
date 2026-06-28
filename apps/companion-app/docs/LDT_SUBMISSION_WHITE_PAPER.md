@@ -31,35 +31,39 @@ The User Interface employs "Vertiscale"—orienting the digital fretboard vertic
 
 ## 3. Technical Deep Dive: The Truebadour AI Agent System
 
-To execute this pedagogy without breaking immersion, the student cannot be required to tap the screen, read long paragraphs, or manually log progress. The interaction must be continuous and conversational.
+To execute this pedagogy without breaking immersion, the student cannot be required to tap the screen, read long paragraphs, or manually log progress. The interaction must be continuous, hands-free, and conversational.
+
+### The Two-Tier Hands-Free Architecture
+Voix Vive utilizes a dual-tier voice system to balance absolute responsiveness with deep conversational flexibility:
+
+1. **Tier 1: Fast Keyword Commands:** Critical navigation commands (e.g., "next", "practice", "stop", "slower") are caught locally via the Web Speech API and executed instantly with zero latency.
+2. **Tier 2: AI Intent Interpretation:** If a student's speech doesn't match a hardcoded keyword (e.g., "my wrist hurts," or "can we skip this?"), the transcript is passed to the generative AI mentor. The AI receives the full pedagogical context (current chapter, phase, and pitch detector state) and interprets the natural language intent.
+
+### Agentic UI Control
+The Truebadour AI operates as an agentic system capable of driving the application on the student's behalf. When interpreting natural language intents, the AI can emit specific tags like `[TOOL:NEXT]` or `[TOOL:PLAY_DEMO]` within its response. These tags are parsed by the application and dispatched as events that control the UI—meaning the AI can literally "turn the page" or trigger audio examples for the student without them needing to touch the screen.
 
 ### The Zero-Overhead Mentor Monetization (ZOMM) Architecture
-Voix Vive utilizes a cutting-edge, multi-tiered AI architecture designed to push compute to the Edge, ensuring zero-latency conversational loops and zero cloud-compute costs for standard interactions.
+Providing continuous AI conversation typically presents a scaling cost barrier. Voix Vive solves this through a decentralized, Bring-Your-Own-Compute approach:
 
 ```mermaid
 graph TD
     Student((Student with Guitar)) <-->|Voice/Audio| Mic[Browser Web Speech API]
-    Mic --> Bridge{Backend Bridge}
+    Mic --> Intent{Intent Router}
     
-    Bridge -->|Option A: Local Edge| Nano[Google Gemini Nano]
-    Nano -->|Zero Latency, $0 Cost| TTS[Kokoro TTS / Web Speech]
+    Intent -->|Keyword Match| UI[Local UI Action]
+    Intent -->|Conversational| OAuth[Student Google OAuth]
     
-    Bridge -->|Option B: Cloud Fallback| Firebase[Firebase Vertex AI]
-    Firebase -->|Fast, Low Cost| TTS
+    OAuth -->|Student's Free Quota| Gemini[Gemini API]
+    Gemini -->|Tag Emission [TOOL:XXX]| UI
+    Gemini -->|Spoken Response| TTS[TTS Engine]
     
     TTS --> Student
 ```
 
-1. **Tier 1: On-Device Edge AI (Gemini Nano):** Using the experimental `window.ai` bridge, the app defaults to running the Large Language Model entirely locally on the user's device. This ensures absolute privacy and immediate response times critical for musical feedback.
-2. **Tier 2: Firebase Edge-Cloud Fallback:** If local hardware is insufficient, the system seamlessly falls back to Firebase Vertex AI (Gemini Flash), maintaining the conversation without interruption.
+Rather than funneling all traffic through a centralized developer API key, the system authenticates the student directly via Google OAuth with the `generative-language` scope. The app then calls the Gemini API (e.g., Gemini Nano or Vertex AI fallback) directly from the client using the student's own free AI quota. This results in **zero cloud API costs for the platform**, regardless of how many students are learning simultaneously.
 
 ### Prompt Engineering for Pedagogy
-The AI is strictly constrained by a pedagogical prompt matrix. It is instructed to act as a "Socratic sonic midwife," limiting responses to three sentences or less and ending with "Over." It never lectures; it only asks questions to prompt student reflection.
-
-The AI context window is dynamically injected with the student's immediate state:
-- **Traction/Phase:** Is the student in BE, DO, or PLAY?
-- **Current Fret:** What interval is the student physically looking at?
-- **Guitar Economy:** A hidden engine tracking *Tone*, *Resonance*, and *Distortion* to alter the AI's conversational polarity based on the student's struggle or success.
+The AI is strictly constrained by a pedagogical prompt matrix. It is instructed to act as a "Socratic sonic midwife," limiting responses to three sentences or less. It never lectures; it only asks questions to prompt student reflection. The AI context window is dynamically injected with the student's immediate state (Traction phase, Current Fret, and Guitar Economy) to ground its responses in the physical reality of the student's practice session.
 
 ---
 

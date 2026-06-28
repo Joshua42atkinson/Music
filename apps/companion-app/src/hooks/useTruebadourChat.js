@@ -68,9 +68,12 @@ export function useTruebadourChat({ backend, speakText, setIsLoading, accessToke
         setIsLoading(false);
         return { choices: [{ message: { role: 'assistant', content: fullText } }] };
       } catch (err) {
-        devWarn('[VoixVive] Student OAuth Gemini failed, falling back.', err);
+        devWarn('[VoixVive] Student OAuth Gemini failed.', err);
         setIsLoading(false);
-        // Fall through to other backends below
+        const errMsg = "My mind is clouded. The AI encountered an error.";
+        speakText(errMsg, options.locale || 'en');
+        onChunk?.(errMsg, errMsg);
+        return { choices: [{ message: { role: 'assistant', content: errMsg } }] };
       }
     }
 
@@ -208,6 +211,16 @@ export function useTruebadourChat({ backend, speakText, setIsLoading, accessToke
         onChunk?.(errMsg, errMsg);
         return { choices: [{ message: { role: 'assistant', content: errMsg } }] };
       }
+    }
+
+    if (backend === 'offline' || !backend) {
+      const offlineMsg = options.locale === 'fr'
+        ? "Je suis hors ligne. Veuillez vous connecter avec Google pour réveiller mon esprit."
+        : "I am currently offline. Please sign in with Google to awaken my mind.";
+
+      speakText(offlineMsg, options.locale || 'en');
+      onChunk?.(offlineMsg, offlineMsg);
+      return { choices: [{ message: { role: 'assistant', content: offlineMsg } }] };
     }
 
     const waitMsg = options.locale === 'fr'

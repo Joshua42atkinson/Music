@@ -193,9 +193,10 @@ let micRefCount = 0;
 
 /**
  * Initializes the microphone and returns an AnalyserNode.
- * Disables processing (echoCancellation, etc.) to get clean raw audio.
+ * Disables processing (echoCancellation, etc.) by default to get clean raw audio,
+ * but allows overrides (e.g. for conversational AI needing echoCancellation).
  */
-export async function initMicrophone() {
+export async function initMicrophone(options = {}) {
   const ctx = getAudioContext();
   if (ctx.state === 'suspended') {
     await ctx.resume();
@@ -205,9 +206,9 @@ export async function initMicrophone() {
     try {
       micStream = await navigator.mediaDevices.getUserMedia({
         audio: {
-          echoCancellation: false,
-          autoGainControl: false,
-          noiseSuppression: false
+          echoCancellation: options.echoCancellation ?? false,
+          autoGainControl: options.autoGainControl ?? false,
+          noiseSuppression: options.noiseSuppression ?? false
         }
       });
       micSource = ctx.createMediaStreamSource(micStream);

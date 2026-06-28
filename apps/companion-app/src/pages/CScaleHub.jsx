@@ -11,6 +11,7 @@ import StageHeader from '../features/c-scale/StageHeader';
 import FretboardPanel from '../features/c-scale/FretboardPanel';
 import ChapterContentPanel from '../features/c-scale/ChapterContentPanel';
 import HandsFreeCoachBar from '../components/handsfree/HandsFreeCoachBar';
+import { askTruebadour } from '../services/TruebadourAI';
 import { droneEngine } from '../lib/audio/GenerativeDroneEngine';
 import { devLog } from '../lib/devLog';
 

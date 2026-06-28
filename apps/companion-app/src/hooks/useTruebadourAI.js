@@ -184,8 +184,9 @@ export function useTruebadourAI({ accessToken = null } = {}) {
       }
     } catch { /* Firebase AI not available */ }
 
-    setIsReady(false); setBackend('loading');
-    return { connected: false, backend: 'loading', model: null };
+    setIsReady(false);
+    setBackend('offline');
+    return { connected: false, backend: 'offline', model: null };
   }, [accessToken]);
 
   const { chatStream } = useTruebadourChat({

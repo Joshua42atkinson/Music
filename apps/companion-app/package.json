@@ -22,6 +22,7 @@
     "build:android:ci": "source ~/.config/build-system/env.sh && tauri android build --apk --target aarch64 --ci"
   },
   "dependencies": {
+    "@google/genai": "^2.10.0",
     "@google/generative-ai": "^0.24.1",
     "@huggingface/transformers": "^4.2.0",
     "@mlc-ai/web-llm": "^0.2.84",
@@ -67,6 +68,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "happy-dom": "^20.9.0",
+    "jscodeshift": "^17.3.0",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.15",
     "tailwindcss": "^3.4.18",

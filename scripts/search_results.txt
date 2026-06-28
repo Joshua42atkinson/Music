@@ -1,0 +1,272 @@
+
+--- Searching docs/references/transcript_may21.json ---
+
+Keyword: \bpothole\b
+
+Keyword: \broot\b
+
+Keyword: instrument playing
+  Match at 480.32s - 485.32s:
+    [478.48 -> 480.32]  one phrase of yours.
+    [480.32 -> 485.32]  You are an instrument playing an instrument for someone reading this who just wants to
+    [485.32 -> 486.60]  learn chords.
+----------------------------------------
+  Match at 551.0400000000001s - 554.12s:
+    [547.52 -> 551.04]  So can I stay in the body?
+    [551.04 -> 554.12]  You are an instrument playing an instrument.
+    [554.12 -> 562.20]  I'm going to ask you, how do you intend to learn with your body those muscular movements,
+----------------------------------------
+
+Keyword: \bcaged\b
+
+Keyword: major third
+
+Keyword: perfect fourth
+
+Keyword: \bnumbers\b
+
+Keyword: diatonic
+
+Keyword: sprinkle
+
+Keyword: supporting beams
+  Match at 226.51999999999998s - 230.04s:
+    [216.16 -> 226.52]  So one of the code is for example the basic triads that is the supporting, that represent
+    [226.52 -> 230.04]  the supporting beams of Western harmonies is in red.
+    [230.04 -> 233.44]  The pentatonic scale is in orange.
+----------------------------------------
+
+Keyword: map
+  Match at 177.32s - 187.84s:
+    [174.28 -> 177.32]  of course, bringing YouTube and so forth.
+    [177.32 -> 187.84]  But also I have an app which is beautiful mapping tool of the guitar neck with color
+    [187.84 -> 192.24]  coded notes and shapes.
+----------------------------------------
+  Match at 210.48000000000002s - 212.92000000000002s:
+    [202.32 -> 210.48]  And basically I create a series of scenes, visual scenes that I also call a coded that
+    [210.48 -> 212.92]  may be mapping out a song.
+    [212.92 -> 216.16]  So it's very visual.
+----------------------------------------
+
+Keyword: fifth fret
+
+--- Searching docs/references/transcript_may27.json ---
+
+Keyword: \bpothole\b
+
+Keyword: \broot\b
+  Match at 2047.58s - 2051.14s:
+    [2046.18 -> 2047.58]  It's the order of the rainbow.
+    [2047.58 -> 2051.14]  So red or the square always the root.
+    [2051.14 -> 2052.14]  So red.
+----------------------------------------
+  Match at 3453.02s - 3456.02s:
+    [3451.02 -> 3453.02]  That's why I put that bridle with the music.
+    [3453.02 -> 3456.02]  The right root scale.
+    [3456.02 -> 3458.02]  What if I put two inside?
+----------------------------------------
+
+Keyword: instrument playing
+  Match at 6.0s - 10.0s:
+    [2.00 -> 6.00]  Mind your recording and transcribing too.
+    [6.00 -> 10.00]  Okay, so, so why have you joined instrument playing an instrument?
+    [10.00 -> 14.00]  So right there, it's a hook.
+----------------------------------------
+
+Keyword: \bcaged\b
+  Match at 1777.5800000000002s - 1781.7s:
+    [1768.74 -> 1777.58]  The whole course is set up as an active e-module with stuff where here's the next one.
+    [1777.58 -> 1781.70]  That's so cool caged.
+    [1781.70 -> 1784.66]  It's interactive so you can play in front of the guitar.
+----------------------------------------
+
+Keyword: major third
+  Match at 1673.18s - 1678.22s:
+    [1668.26 -> 1673.18]  So that's why I think it's important to have all this because the intellectual stuff,
+    [1673.18 -> 1678.22]  like knowing about the major third, all of that allows your imagination to frame it out
+    [1678.22 -> 1679.22]  better.
+----------------------------------------
+
+Keyword: perfect fourth
+
+Keyword: \bnumbers\b
+  Match at 604.0s - 606.0s:
+    [602.00 -> 604.00]  bar, it just has all these different tools.
+    [604.00 -> 606.00]  Uh, those numbers?
+    [606.00 -> 607.00]  Yep.
+----------------------------------------
+  Match at 2460.78s - 2461.78s:
+    [2459.78 -> 2460.78]  That's right.
+    [2460.78 -> 2461.78]  Numbers.
+    [2461.78 -> 2462.78]  Numbers.
+----------------------------------------
+  Match at 2461.78s - 2462.78s:
+    [2460.78 -> 2461.78]  Numbers.
+    [2461.78 -> 2462.78]  Numbers.
+    [2462.78 -> 2464.50]  And then one, three, four.
+----------------------------------------
+  Match at 2466.1400000000003s - 2468.6200000000003s:
+    [2464.50 -> 2466.14]  So I saw them.
+    [2466.14 -> 2468.62]  So I give them a string of numbers.
+    [2468.62 -> 2470.50]  So, so anyway.
+----------------------------------------
+  Match at 2542.62s - 2546.7s:
+    [2538.54 -> 2542.62]  Okay, if E is one, what is A?
+    [2542.62 -> 2546.70]  Count numbers, count letters.
+    [2546.70 -> 2547.70]  Which way are we going backwards?
+----------------------------------------
+  Match at 3063.1s - 3065.1s:
+    [3060.10 -> 3061.10]  Yeah.
+    [3063.10 -> 3065.10]  And then they give it in the swing numbers.
+    [3065.10 -> 3066.10]  And we jam.
+----------------------------------------
+  Match at 3070.1s - 3072.1s:
+    [3068.10 -> 3070.10]  We actually play a version that we jam.
+    [3070.10 -> 3072.10]  I give them numbers, music by numbers.
+    [3072.10 -> 3077.10]  See the difference between music by numbers and drawing by numbers, like in the funnies
+----------------------------------------
+  Match at 3072.1s - 3077.1s:
+    [3070.10 -> 3072.10]  I give them numbers, music by numbers.
+    [3072.10 -> 3077.10]  See the difference between music by numbers and drawing by numbers, like in the funnies
+    [3077.10 -> 3081.10]  and Sunday, is that music by numbers actually teaches you music.
+----------------------------------------
+  Match at 3077.1s - 3081.1s:
+    [3072.10 -> 3077.10]  See the difference between music by numbers and drawing by numbers, like in the funnies
+    [3077.10 -> 3081.10]  and Sunday, is that music by numbers actually teaches you music.
+    [3081.10 -> 3084.10]  Drawing by numbers doesn't teach you drawing.
+----------------------------------------
+  Match at 3081.1s - 3084.1s:
+    [3077.10 -> 3081.10]  and Sunday, is that music by numbers actually teaches you music.
+    [3081.10 -> 3084.10]  Drawing by numbers doesn't teach you drawing.
+    [3084.10 -> 3085.10]  Correct.
+----------------------------------------
+  Match at 3085.1s - 3087.1s:
+    [3084.10 -> 3085.10]  Correct.
+    [3085.10 -> 3087.10]  But music by numbers really teaches you music.
+    [3087.10 -> 3090.10]  And this California guy is a millionaire number.
+----------------------------------------
+  Match at 3090.1s - 3093.1s:
+    [3087.10 -> 3090.10]  And this California guy is a millionaire number.
+    [3090.10 -> 3093.10]  He's teaching week numbers and games.
+    [3093.10 -> 3094.10]  Well, you can do...
+----------------------------------------
+  Match at 3097.1s - 3100.1s:
+    [3095.10 -> 3096.10]  You can do artists.
+    [3097.10 -> 3100.10]  You can do artists numbers if you use ratios of fantasy.
+    [3100.10 -> 3101.10]  That's right.
+----------------------------------------
+  Match at 3231.34s - 3236.2599999999998s:
+    [3221.78 -> 3231.34]  So that's the beginning of the tree, right? That's actually very good. C scale, string to string
+    [3231.34 -> 3236.26]  matching C pattern, so you see parrot interval, then numbers, then you know, you have that's one
+    [3236.26 -> 3247.86]  scale, then you build chords with nothing but letters from that scale. So we have CD, E,
+----------------------------------------
+  Match at 3367.02s - 3370.02s:
+    [3365.02 -> 3367.02]  You know.
+    [3367.02 -> 3370.02]  We can look at numbers too. Anyway.
+    [3370.02 -> 3376.50]  Then you understand the formula, the very scale.
+----------------------------------------
+  Match at 3392.74s - 3398.86s:
+    [3388.58 -> 3392.74]  One, five, four, three, five.
+    [3392.74 -> 3398.86]  One of those numbers. Because once you have those numbers, okay. So if you know your three,
+    [3398.86 -> 3399.86]  at the fourth...
+----------------------------------------
+  Match at 3678.02s - 3684.02s:
+    [3676.02 -> 3678.02]  So you have that key system.
+    [3678.02 -> 3684.02]  So numbers, chord tones.
+    [3684.02 -> 3686.02]  So just read this.
+----------------------------------------
+
+Keyword: diatonic
+  Match at 3288.26s - 3299.1000000000004s:
+    [3286.26 -> 3288.26]  And then...
+    [3288.26 -> 3299.10]  And then you have thousands of songs, right there, and you understand. So those are called diatonic
+    [3299.10 -> 3301.10]  chords. It took me...
+----------------------------------------
+  Match at 3301.1000000000004s - 3306.6600000000003s:
+    [3299.10 -> 3301.10]  chords. It took me...
+    [3301.10 -> 3306.66]  No, my teacher, it's diatonic chords. So these are chords that belong to that scale.
+    [3306.66 -> 3310.42]  They know outside thing. They belong to that scale.
+----------------------------------------
+  Match at 3317.06s - 3322.7s:
+    [3315.06 -> 3317.06]  It's a different universe.
+    [3317.06 -> 3322.70]  But diatonic chords mean dia is confirmed Greek. Dia means across, tannic means from tenorium
+    [3322.70 -> 3329.78]  extension. So all Pythagoras across that particular tension exists a series of notes that speak
+----------------------------------------
+  Match at 3339.62s - 3344.9s:
+    [3332.78 -> 3339.62]  And so across that very station. So the chord I just played are made up of the same scale.
+    [3339.62 -> 3344.90]  They all belong together. It's a perfect system of chord. They are diatonic.
+    [3344.90 -> 3350.62]  So every guitar player should know that. And this is one of...
+----------------------------------------
+  Match at 4143.02s - 4147.02s:
+    [4140.02 -> 4143.02]  I mean, it's genius.
+    [4143.02 -> 4147.02]  There's the scaffolding of the diatonic, the major scale.
+    [4147.02 -> 4151.02]  But then there's this off notes.
+----------------------------------------
+  Match at 4158.02s - 4165.02s:
+    [4151.02 -> 4158.02]  Fumming.
+    [4158.02 -> 4165.02]  He adds non-scale note, non-diatonic notes that add a really deep, deep, rich, nested.
+    [4165.02 -> 4169.02]  You turn your major chord into a minor.
+----------------------------------------
+
+Keyword: sprinkle
+
+Keyword: supporting beams
+  Match at 2402.46s - 2409.34s:
+    [2401.46 -> 2402.46]  And one is seven.
+    [2402.46 -> 2409.34]  So the one, three, five are the supporting beams of Western harmony.
+    [2409.34 -> 2412.26]  It's like when you want to use a computer, you got to know how to type.
+----------------------------------------
+  Match at 2413.26s - 2415.42s:
+    [2412.26 -> 2413.26]  Don't scale.
+    [2413.26 -> 2415.42]  Learn the supporting beams.
+    [2415.42 -> 2416.42]  Learn the Western harmony.
+----------------------------------------
+
+Keyword: map
+  Match at 1693.1s - 1695.54s:
+    [1691.02 -> 1693.10]  How the guitar works.
+    [1693.10 -> 1695.54]  In, in, in basically I'm mapping out.
+    [1695.54 -> 1696.54]  Yeah.
+----------------------------------------
+  Match at 2292.6600000000003s - 2297.2200000000003s:
+    [2290.02 -> 2292.66]  We start from, we start making music right away.
+    [2292.66 -> 2297.22]  Because I say, we're going to map out the five first strings, five first frets.
+    [2297.22 -> 2298.22]  That's a nice start.
+----------------------------------------
+  Match at 2298.2200000000003s - 2299.7000000000003s:
+    [2297.22 -> 2298.22]  That's a nice start.
+    [2298.22 -> 2299.70]  We're going to map that out.
+    [2299.70 -> 2301.22]  So it's a little bit tedious.
+----------------------------------------
+  Match at 2470.5s - 2473.1400000000003s:
+    [2468.62 -> 2470.50]  So, so anyway.
+    [2470.50 -> 2473.14]  So I'm mapping out those five first frets.
+    [2473.14 -> 2478.02]  This is usually the go to, you know, we mapping out, you know.
+----------------------------------------
+  Match at 2473.14s - 2478.02s:
+    [2470.50 -> 2473.14]  So I'm mapping out those five first frets.
+    [2473.14 -> 2478.02]  This is usually the go to, you know, we mapping out, you know.
+    [2478.02 -> 2481.78]  And from that, you go to C scale after you have the amount of...
+----------------------------------------
+  Match at 2967.1s - 2973.1s:
+    [2963.10 -> 2967.10]  No, actually the classical did change the tuning.
+    [2967.10 -> 2973.10]  So once you map out the C scale, you start to listen.
+    [2973.10 -> 2975.10]  One, two, three, four, oh.
+----------------------------------------
+  Match at 3040.1s - 3042.1s:
+    [3037.10 -> 3039.10]  It's very, very difficult.
+    [3040.10 -> 3042.10]  So we map out the C scale.
+    [3042.10 -> 3044.10]  We understand the swing to swing relationship.
+----------------------------------------
+  Match at 3624.02s - 3631.02s:
+    [3618.02 -> 3624.02]  So is that so anyway, so, so we got, we got a series of chords.
+    [3624.02 -> 3631.02]  We mapped out the guitar. We saw, we discovered how the major scale sound and we discovered how to build chords from that major scale.
+    [3631.02 -> 3636.02]  We discovered that major scale, major scales can anyway, so pick your random notes.
+----------------------------------------
+  Match at 3862.02s - 3868.02s:
+    [3859.02 -> 3862.02]  That's my D shape, C.
+    [3862.02 -> 3868.02]  So all of a sudden, I'm playing a map.
+    [3873.02 -> 3879.02]  A shape, C, A shape, C, G shape, C.
+----------------------------------------
+
+Keyword: fifth fret

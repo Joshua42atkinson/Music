@@ -17,6 +17,9 @@ const SPEECH_THRESHOLD = 0.03;
 const SILENCE_THRESHOLD = 0.015;
 const SILENCE_TIMEOUT_MS = 1500;
 const RECOGNITION_TIMEOUT_MS = 8000;
+const AWAKE_TIMEOUT_MS = 15000; // Stay awake for 15s after last interaction
+
+const WAKE_WORDS = ['coach', 'truebadour', 'ok truebadour', 'hey coach', 'ok google', 'siri'];
 
 const COMMANDS = {
   next: ['next', 'suivant', 'avancer', 'forward'],
@@ -63,6 +66,7 @@ const RESPONSES = {
 export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = null, onUnhandledTranscript = null } = {}) {
   const [isActive, setIsActive] = useState(false);
   const [state, setState] = useState('idle'); // idle | listening | processing | speaking | error
+  const [isAwake, setIsAwake] = useState(false);
   const [lastCommand, setLastCommand] = useState(null);
   const [error, setError] = useState(null);
 
@@ -72,6 +76,8 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
   const silenceStartRef = useRef(null);
   const isSpeechDetectedRef = useRef(false);
   const stateRef = useRef('idle');
+  const isAwakeRef = useRef(false);
+  const awakeTimeoutRef = useRef(null);
   const handlersRef = useRef(handlers);
   const onUnhandledRef = useRef(onUnhandledTranscript);
 
@@ -82,6 +88,23 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
   useEffect(() => {
     onUnhandledRef.current = onUnhandledTranscript;
   }, [onUnhandledTranscript]);
+
+  const updateAwakeState = useCallback((awakeStatus) => {
+    isAwakeRef.current = awakeStatus;
+    setIsAwake(awakeStatus);
+    if (awakeTimeoutRef.current) {
+      clearTimeout(awakeTimeoutRef.current);
+      awakeTimeoutRef.current = null;
+    }
+    if (awakeStatus) {
+      // automatically go back to sleep after AWAKE_TIMEOUT_MS of inactivity
+      awakeTimeoutRef.current = setTimeout(() => {
+        isAwakeRef.current = false;
+        setIsAwake(false);
+        devLog('[useHandsFreeCoach] Went back to sleep');
+      }, AWAKE_TIMEOUT_MS);
+    }
+  }, []);
 
   const updateState = useCallback((newState) => {
     stateRef.current = newState;
@@ -117,10 +140,62 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
     }
   }, [locale, updateState, ttsSpeak]);
 
+  const speakCustom = useCallback(async (text) => {
+    if (!text) return;
+    if (ttsSpeak) {
+      updateState('speaking');
+      try {
+        await ttsSpeak(text);
+      } catch (err) {
+        devError('[useHandsFreeCoach] ttsSpeak error:', err);
+      } finally {
+        if (stateRef.current === 'speaking') {
+          updateState('idle');
+        }
+      }
+    } else {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
+      utterance.rate = 0.95;
+      utterance.pitch = 0.95;
+      utterance.onstart = () => updateState('speaking');
+      utterance.onend = () => updateState('idle');
+      utterance.onerror = () => updateState('idle');
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [locale, updateState, ttsSpeak]);
+
   const processCommand = useCallback((transcript) => {
     updateState('processing');
     const lower = transcript.toLowerCase().trim();
     setLastCommand(lower);
+    
+    // Check for Wake Word
+    const containsWakeWord = WAKE_WORDS.some(w => lower.includes(w));
+    if (containsWakeWord) {
+      updateAwakeState(true);
+      // Remove wake word from transcript to process the rest
+      let cleanTranscript = lower;
+      WAKE_WORDS.forEach(w => {
+        cleanTranscript = cleanTranscript.replace(w, '').trim();
+      });
+      if (!cleanTranscript) {
+        // Just the wake word, say Yes?
+        speak('play'); // Using 'play' response ("Listening...") as acknowledgment
+        return;
+      }
+    }
+
+    if (!isAwakeRef.current && !containsWakeWord) {
+      devLog('[useHandsFreeCoach] Asleep, ignoring:', transcript);
+      updateState('idle');
+      return;
+    }
+
+    // Refresh awake timeout
+    updateAwakeState(true);
 
     let matched = false;
     for (const [action, triggers] of Object.entries(COMMANDS)) {
@@ -143,12 +218,33 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
       const aiHandler = onUnhandledRef.current;
       if (aiHandler) {
         devLog('[useHandsFreeCoach] No keyword match — piping to AI:', transcript);
-        aiHandler(transcript);
+        // Clean transcript from wake words before passing to AI
+        let cleanTranscript = transcript.toLowerCase();
+        WAKE_WORDS.forEach(w => {
+          cleanTranscript = cleanTranscript.replace(w, '').trim();
+        });
+        
+        // Wrap in async IIFE so we don't block the synchronous processCommand
+        (async () => {
+          try {
+            const aiResponse = await aiHandler(cleanTranscript || transcript);
+            if (aiResponse) {
+              speakCustom(aiResponse);
+            } else {
+              updateState('idle');
+            }
+          } catch (e) {
+            devError('[useHandsFreeCoach] AI Handler error:', e);
+            speak('error');
+            updateState('idle');
+          }
+        })();
       } else {
         speak('unknown');
+        updateState('idle');
       }
     }
-  }, [locale, speak, updateState]);
+  }, [locale, speak, speakCustom, updateState, updateAwakeState]);
 
   const startRecognition = useCallback(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -240,8 +336,8 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
     const analyser = analyserRef.current;
     if (!analyser || !stateRef.current) return;
 
-    // Halt VAD while speaking or processing to prevent AI from hearing itself
-    if (stateRef.current === 'speaking' || stateRef.current === 'processing') {
+    // Do NOT halt VAD during speaking anymore (Interruptible Architecture)
+    if (stateRef.current === 'processing') {
       rafIdRef.current = requestAnimationFrame(vadTick);
       return;
     }
@@ -255,6 +351,16 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
 
     if (rms > SPEECH_THRESHOLD) {
       silenceStartRef.current = null;
+      
+      // Interrupt TTS if speaking
+      if (stateRef.current === 'speaking') {
+        devLog('[useHandsFreeCoach] Interrupted AI speech!');
+        window.speechSynthesis?.cancel();
+        // Also dispatch event in case native audio is playing
+        window.dispatchEvent(new CustomEvent('voixvive:ai_interrupt'));
+        updateState('idle');
+      }
+
       if (!isSpeechDetectedRef.current && stateRef.current === 'idle') {
         isSpeechDetectedRef.current = true;
         devLog('[useHandsFreeCoach] Speech detected (RMS:', rms.toFixed(3), ') — starting recognition');
@@ -280,7 +386,12 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
         await ctx.resume();
       }
 
-      const micData = await initMicrophone();
+      // Initialize with echo cancellation for conversational loop
+      const micData = await initMicrophone({
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      });
       if (!micData) {
         throw new Error('Microphone access was denied or failed.');
       }
@@ -322,6 +433,7 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = nul
   return {
     isActive,
     state,
+    isAwake,
     lastCommand,
     error,
     start,
