@@ -1,0 +1,916 @@
+[
+  {
+    "id": "am_pent_low",
+    "label": "A Minor Pentatonic (Open)",
+    "description": "The universal entry point. Two strings, five notes.",
+    "tonalName": "minor pentatonic",
+    "rootIndex": 9,
+    "minFret": 0,
+    "maxFret": 5,
+    "stringsActive": [
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "awakening",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 1,
+        "noteName": "C",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 3
+      }
+    ]
+  },
+  {
+    "id": "am_pent_full",
+    "label": "A Minor Pentatonic (Full)",
+    "description": "All six strings. The complete vertical shape.",
+    "tonalName": "minor pentatonic",
+    "rootIndex": 9,
+    "minFret": 0,
+    "maxFret": 7,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "awakening",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 1,
+        "noteName": "C",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 3
+      }
+    ]
+  },
+  {
+    "id": "em_pent",
+    "label": "E Minor Pentatonic (Open)",
+    "description": "Open position. The blues mother-shape.",
+    "tonalName": "minor pentatonic",
+    "rootIndex": 4,
+    "minFret": 0,
+    "maxFret": 5,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "awakening",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": true,
+        "intervalIndex": 0
+      }
+    ]
+  },
+  {
+    "id": "c_major",
+    "label": "C Major (Open Position)",
+    "description": "The foundational major scale. Bright and spatial.",
+    "tonalName": "major",
+    "rootIndex": 0,
+    "minFret": 0,
+    "maxFret": 5,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "g_major",
+    "label": "G Major (Open Position)",
+    "description": "Wide open voicing. The neck reveals its breadth.",
+    "tonalName": "major",
+    "rootIndex": 7,
+    "minFret": 0,
+    "maxFret": 5,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 5
+      }
+    ]
+  },
+  {
+    "id": "a_natural_minor",
+    "label": "A Natural Minor",
+    "description": "Melancholy as teacher. Darkness with structure.",
+    "tonalName": "minor",
+    "rootIndex": 9,
+    "minFret": 0,
+    "maxFret": 7,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      }
+    ]
+  },
+  {
+    "id": "d_major",
+    "label": "D Major",
+    "description": "Same pattern, new root. Adjacent key navigation.",
+    "tonalName": "major",
+    "rootIndex": 2,
+    "minFret": 0,
+    "maxFret": 5,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 1
+      }
+    ]
+  },
+  {
+    "id": "am_major_pent",
+    "label": "A Major Pentatonic",
+    "description": "The bright mirror of the minor. Country and gospel lives here.",
+    "tonalName": "major pentatonic",
+    "rootIndex": 9,
+    "minFret": 0,
+    "maxFret": 7,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 2,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 2,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 3
+      }
+    ]
+  },
+  {
+    "id": "a_dorian",
+    "label": "A Dorian",
+    "description": "Minor with a raised 6th. Jazz-adjacent, deeply expressive.",
+    "tonalName": "dorian",
+    "rootIndex": 9,
+    "minFret": 0,
+    "maxFret": 9,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "flow",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      }
+    ]
+  },
+  {
+    "id": "g_mixolydian",
+    "label": "G Mixolydian",
+    "description": "Major with a flat 7th. Blues and rock live here.",
+    "tonalName": "mixolydian",
+    "rootIndex": 7,
+    "minFret": 0,
+    "maxFret": 9,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "flow",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 5
+      }
+    ]
+  },
+  {
+    "id": "am_blues",
+    "label": "A Blues Scale",
+    "description": "Minor pentatonic + the blue note. Maximum emotional bandwidth.",
+    "tonalName": "minor blues",
+    "rootIndex": 9,
+    "minFret": 0,
+    "maxFret": 9,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "flow",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 1,
+        "noteName": "C",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 0,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      }
+    ]
+  },
+  {
+    "id": "c_shape_a",
+    "label": "CAGED: C Shape (A Root)",
+    "description": "The C chord shape at the A position. Open voicing meets barre territory.",
+    "tonalName": "major",
+    "rootIndex": 9,
+    "minFret": 0,
+    "maxFret": 4,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "category": "caged",
+    "positions": [
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 0,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 1,
+        "noteName": "G♯",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 0,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 3
+      },
+      {
+        "fret": 0,
+        "noteName": "A",
+        "isRoot": true,
+        "intervalIndex": 0
+      },
+      {
+        "fret": 0,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      }
+    ]
+  },
+  {
+    "id": "a_shape_c",
+    "label": "CAGED: A Shape (C Root)",
+    "description": "The A chord shape at the C position. Root on the 5th string.",
+    "tonalName": "major",
+    "rootIndex": 0,
+    "minFret": 2,
+    "maxFret": 6,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "category": "caged",
+    "positions": [
+      {
+        "fret": 3,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 3,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 2,
+        "noteName": "A",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 2,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 2,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 3,
+        "noteName": "G",
+        "isRoot": false,
+        "intervalIndex": 4
+      }
+    ]
+  },
+  {
+    "id": "g_shape_a",
+    "label": "CAGED: G Shape (A Root)",
+    "description": "The G chord shape at the A position. Wide stretch, rewarding reach.",
+    "tonalName": "major",
+    "rootIndex": 9,
+    "minFret": 4,
+    "maxFret": 9,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "flow",
+    "category": "caged",
+    "positions": [
+      {
+        "fret": 4,
+        "noteName": "G♯",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 5,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 4,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 4,
+        "noteName": "F♯",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 4,
+        "noteName": "C♯",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 4,
+        "noteName": "G♯",
+        "isRoot": false,
+        "intervalIndex": 6
+      }
+    ]
+  },
+  {
+    "id": "e_shape_g",
+    "label": "CAGED: E Shape (G Root)",
+    "description": "The E chord shape at the G position. Barre chord territory.",
+    "tonalName": "major",
+    "rootIndex": 7,
+    "minFret": 2,
+    "maxFret": 6,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "practice",
+    "category": "caged",
+    "positions": [
+      {
+        "fret": 2,
+        "noteName": "F♯",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 3,
+        "noteName": "D",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 2,
+        "noteName": "A",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 2,
+        "noteName": "E",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 2,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 2,
+        "noteName": "F♯",
+        "isRoot": false,
+        "intervalIndex": 6
+      }
+    ]
+  },
+  {
+    "id": "d_shape_e",
+    "label": "CAGED: D Shape (E Root)",
+    "description": "The D chord shape at the E position. Upper register, bright tone.",
+    "tonalName": "major",
+    "rootIndex": 4,
+    "minFret": 4,
+    "maxFret": 9,
+    "stringsActive": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "phase1Eligible": true,
+    "level": "flow",
+    "category": "caged",
+    "positions": [
+      {
+        "fret": 4,
+        "noteName": "G♯",
+        "isRoot": false,
+        "intervalIndex": 2
+      },
+      {
+        "fret": 4,
+        "noteName": "D♯",
+        "isRoot": false,
+        "intervalIndex": 6
+      },
+      {
+        "fret": 4,
+        "noteName": "B",
+        "isRoot": false,
+        "intervalIndex": 4
+      },
+      {
+        "fret": 4,
+        "noteName": "F♯",
+        "isRoot": false,
+        "intervalIndex": 1
+      },
+      {
+        "fret": 4,
+        "noteName": "C♯",
+        "isRoot": false,
+        "intervalIndex": 5
+      },
+      {
+        "fret": 4,
+        "noteName": "G♯",
+        "isRoot": false,
+        "intervalIndex": 2
+      }
+    ]
+  }
+]

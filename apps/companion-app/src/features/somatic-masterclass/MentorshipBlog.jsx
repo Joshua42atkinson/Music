@@ -135,8 +135,7 @@ The guitar is not just an instrument. It is a teacher of patience.
 
 export default function MentorshipBlog() {
   const navigate = useNavigate();
-  const { locale } = useLocale();
-  const lang = locale;
+  const { locale, t } = useLocale();
 
   const [posts, setPosts] = useState(SEED_POSTS);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -170,7 +169,7 @@ export default function MentorshipBlog() {
 
   const formatDate = (iso) => {
     const d = new Date(iso);
-    return d.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', {
+    return d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
       month: 'long', day: 'numeric', year: 'numeric',
     });
   };
@@ -188,7 +187,7 @@ export default function MentorshipBlog() {
           <div className="py-4 px-5" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
             <button onClick={() => setSelectedPost(null)} className="flex items-center gap-1 bg-transparent border-none text-cf-gold cursor-pointer text-[0.85rem] font-sans">
               <ChevronLeft size={18} />
-              <span>{lang === 'fr' ? 'Retour' : 'Back'}</span>
+              <span>{t('back')}</span>
             </button>
           </div>
 
@@ -208,10 +207,7 @@ export default function MentorshipBlog() {
             <div className="mt-10 text-center">
               <div className="w-[60px] h-px bg-gradient-to-r from-transparent via-cf-gold/30 to-transparent mx-auto mb-4" />
               <p className="text-[0.7rem] text-cf-gold/30 font-mono tracking-[0.05em]">
-                {lang === 'fr'
-                  ? 'Ce contenu est exclusif aux membres du Cercle Intérieur.'
-                  : 'This content is exclusive to Inner Circle members.'
-                }
+                {t('innerCircleExclusive') || 'This content is exclusive to Inner Circle members.'}
               </p>
             </div>
           </article>
@@ -232,7 +228,7 @@ export default function MentorshipBlog() {
           <div className="flex-1 text-center">
             <h1 className="font-heading text-[1.6rem] font-semibold text-cf-gold m-0">The Inner Circle</h1>
             <p className="text-[0.75rem] text-white/40 mt-1">
-              {lang === 'fr' ? 'Réflexions quotidiennes de Bertrand' : "Bertrand's daily reflections"}
+              {t('bertrandReflections') || "Bertrand's daily reflections"}
             </p>
           </div>
           <button onClick={() => navigate('/')} className="w-9 h-9 rounded-[10px] bg-white/[0.05] border border-white/[0.08] text-cf-gold cursor-pointer flex items-center justify-center shrink-0" aria-label="Home">

@@ -88,6 +88,9 @@ export function useVoiceInput() {
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
+      recognitionRef.current.onresult = null;
+      recognitionRef.current.onerror = null;
+      recognitionRef.current.onend = null;
       try { recognitionRef.current.stop(); } catch { /* ignore */ }
       recognitionRef.current = null;
     }

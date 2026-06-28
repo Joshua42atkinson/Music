@@ -56,11 +56,11 @@ export default function MaturationMap() {
 
   const currentMode = useMemo(() => {
     const aiEnabled = traction?.settings?.aiEnabled !== false;
-    if (!sandboxMode && aiEnabled) return { label: 'Apprenticeship', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderColor: 'rgba(167,139,250,0.25)' };
-    if (!sandboxMode && !aiEnabled) return { label: 'Self-Study', color: '#34d399', background: 'rgba(52,211,153,0.1)', borderColor: 'rgba(52,211,153,0.25)' };
-    if (sandboxMode && aiEnabled) return { label: 'Exploration', color: '#fbbf24', background: 'rgba(251,191,38,0.1)', borderColor: 'rgba(251,191,38,0.25)' };
-    return { label: 'Library', color: '#9ca3af', background: 'rgba(156,163,175,0.1)', borderColor: 'rgba(156,163,175,0.25)' };
-  }, [traction, sandboxMode]);
+    if (!sandboxMode && aiEnabled) return { label: t('modeApprenticeshipLabel'), color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderColor: 'rgba(167,139,250,0.25)' };
+    if (!sandboxMode && !aiEnabled) return { label: t('modeSelfStudyLabel'), color: '#34d399', background: 'rgba(52,211,153,0.1)', borderColor: 'rgba(52,211,153,0.25)' };
+    if (sandboxMode && aiEnabled) return { label: t('modeExplorationLabel'), color: '#fbbf24', background: 'rgba(251,191,38,0.1)', borderColor: 'rgba(251,191,38,0.25)' };
+    return { label: t('modeLibraryReferenceLabel'), color: '#9ca3af', background: 'rgba(156,163,175,0.1)', borderColor: 'rgba(156,163,175,0.25)' };
+  }, [traction, sandboxMode, t]);
 
   const fretData = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => {

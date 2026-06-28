@@ -170,9 +170,7 @@ export default function VideoLibrary() {
           {t('bertrandsArchives')}
         </h2>
         <p className="font-mono text-[0.6rem] text-[rgba(var(--cf-gold-rgb),0.5)] tracking-[0.1em] uppercase m-0">
-          {lang === 'fr'
-            ? `Sagesse pour la Frette ${currentFret} — ${fretMeta.interval || 'Root'}`
-            : `Wisdom for Fret ${currentFret} — ${fretMeta.interval || 'Root'}`}
+          {t('wisdomForFret', { fret: currentFret, interval: fretMeta.interval || 'Root' }) || `Wisdom for Fret ${currentFret} — ${fretMeta.interval || 'Root'}`}
         </p>
       </div>
 

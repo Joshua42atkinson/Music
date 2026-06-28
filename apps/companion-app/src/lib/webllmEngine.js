@@ -5,6 +5,7 @@
 // ║           Provides a globally accessible inference engine.     ║
 // ╚════════════════════════════════════════════════════════════════╝
 import { CreateMLCEngine } from '@mlc-ai/web-llm';
+import { devLog, devError } from './devLog';
 
 let engineInstance = null;
 let isInitializing = false;
@@ -38,7 +39,7 @@ export async function getWebLLMEngine() {
   
   initPromise = new Promise(async (resolve, reject) => {
     try {
-      console.log(`[WebLLM] Initializing engine with ${MODEL_ID}...`);
+      devLog(`[WebLLM] Initializing engine with ${MODEL_ID}...`);
       const engine = await CreateMLCEngine(
         MODEL_ID,
         {
@@ -51,7 +52,7 @@ export async function getWebLLMEngine() {
       isInitializing = false;
       resolve(engine);
     } catch (err) {
-      console.error('[WebLLM] Failed to initialize engine:', err);
+      devError('[WebLLM] Failed to initialize engine:', err);
       isInitializing = false;
       reject(err);
     }

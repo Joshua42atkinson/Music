@@ -17,7 +17,7 @@ import {
 } from '../data/tractionStore';
 import { saveProgress, getProgress } from '../data/localDatabase';
 import { getTractionState, saveTractionState, migrateLocalToCloud } from './firebase';
-import { devLog, devWarn } from './devLog';
+import { devLog, devWarn, devError, devInfo } from './devLog';
 import { vvGet } from './storage';
 import { STORAGE_KEYS } from './storageKeys';
 
@@ -104,7 +104,7 @@ export async function syncWithCloud(userId: string): Promise<TractionState | nul
     await migrateLocalToCloud(userId, currentLocal);
     return currentLocal;
   } catch (err) {
-    console.error('[VoixVive] Supabase sync failed:', err);
+    devError('[VoixVive] Supabase sync failed:', err);
     return null;
   }
 }

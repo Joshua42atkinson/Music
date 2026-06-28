@@ -34,10 +34,10 @@ export default function LandingScreen() {
   }, [aiEnabled, t]);
 
   return (
-    <div className="landing-hub">
+    <div className="min-h-[100svh] w-full bg-[#050508] flex flex-col items-center px-5 pb-12 relative overflow-hidden font-sans before:content-[''] before:fixed before:top-[40%] before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-[100vw] before:h-[100vw] before:max-w-[700px] before:max-h-[700px] before:bg-[radial-gradient(circle,rgba(var(--cf-gold-rgb),0.06)_0%,rgba(100,80,160,0.04)_40%,transparent_70%)] before:pointer-events-none before:z-0">
       {/* ── Voix Vive Wordmark ── */}
       <motion.div
-        className="wordmark-wrap"
+        className="w-full max-w-[540px] pt-[max(32px,env(safe-area-inset-top))] relative z-10 mb-2 md:max-w-[600px] landscape:max-w-[260px] landscape:pt-[max(6px,env(safe-area-inset-top))] landscape:mb-1"
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -45,7 +45,7 @@ export default function LandingScreen() {
         <img
           src="/assets/wordmark.png"
           alt="Voix Vive"
-          className="wordmark-img"
+          className="w-full rounded-[20px] block"
           draggable={false}
         />
       </motion.div>
@@ -73,14 +73,14 @@ export default function LandingScreen() {
           }}
           className="premium-button flex items-center justify-center gap-2.5 px-8 py-3 rounded-[14px]"
         >
-          <span style={{ fontSize: 16 }}>🎸</span>
+          <span className="text-base">🎸</span>
           {t('beginJourney') || 'Begin Your Journey'}
         </button>
       </motion.div>
 
       {/* ── Trinity label ── */}
       <motion.p
-        className="trinity-label"
+        className="font-mono text-[0.8rem] tracking-[0.3em] uppercase text-cf-gold/45 text-center mb-6 relative z-10 max-sm:text-[0.9rem] max-sm:tracking-[0.2em] landscape:mb-2 landscape:text-[0.5rem]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.6 }}
@@ -96,32 +96,39 @@ export default function LandingScreen() {
         transition={{ delay: 0.5, duration: 0.6 }}
       >
         {/* Dynamic Mode Pill */}
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, padding: '6px 12px',
-          borderRadius: '12px', background: currentMode.background, border: `1px solid ${currentMode.borderColor}`,
-          backdropFilter: 'blur(10px)', boxShadow: `0 0 12px ${currentMode.background}`
-        }} title={currentMode.desc}>
-          <div style={{
-            fontFamily: "'JetBrains Mono', monospace", fontSize: '0.6rem', fontWeight: 700,
-            color: currentMode.color, letterSpacing: '0.08em', textTransform: 'uppercase'
-          }}>
+        <div 
+          className="flex flex-col items-start gap-0.5 px-3 py-1.5 rounded-xl backdrop-blur-md"
+          style={{
+            background: currentMode.background,
+            borderColor: currentMode.borderColor,
+            borderWidth: '1px',
+            boxShadow: `0 0 12px ${currentMode.background}`
+          }} 
+          title={currentMode.desc}
+        >
+          <div 
+            className="font-mono text-[0.6rem] font-bold tracking-[0.08em] uppercase"
+            style={{ color: currentMode.color }}
+          >
             ● {currentMode.label}
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div className="flex gap-2.5 items-center">
           {/* AI On/Off Toggle */}
           <button
             onClick={() => voixReady ? unloadVoix() : loadVoix('standard')}
             onKeyDown={(e) => e.key === 'Enter' && (voixReady ? unloadVoix() : loadVoix('standard'))}
             disabled={voixLoading}
-            style={{
-              background: voixReady ? 'rgba(16,185,129,0.12)' : voixLoading ? 'rgba(var(--cf-gold-rgb),0.08)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${voixReady ? 'rgba(16,185,129,0.3)' : voixLoading ? 'rgba(var(--cf-gold-rgb),0.2)' : 'rgba(255,255,255,0.1)'}`,
-              borderRadius: '8px', padding: '8px 14px', color: voixReady ? '#a7f3d0' : voixLoading ? 'var(--cf-gold)' : 'rgba(255,255,255,0.4)',
-              fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', fontWeight: 'bold',
-              cursor: voixLoading ? 'wait' : 'pointer', transition: 'all 0.3s', display: 'flex', alignItems: 'center', gap: 6, minWidth: 80,
-            }}
+            className={`
+              rounded-lg px-3.5 py-2 font-mono text-[0.65rem] font-bold flex items-center gap-1.5 min-w-[80px] transition-all duration-300
+              ${voixReady 
+                ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 cursor-pointer' 
+                : voixLoading 
+                  ? 'bg-[rgba(var(--cf-gold-rgb),0.08)] border border-[rgba(var(--cf-gold-rgb),0.2)] text-cf-gold cursor-wait' 
+                  : 'bg-white/5 border border-white/10 text-white/40 cursor-pointer hover:bg-white/10'
+              }
+            `}
           >
             {voixReady ? '🧠 AI On' : voixLoading ? `⏳ ${Math.round(loadProgress)}%` : '🧠 AI Off'}
           </button>
@@ -129,13 +136,7 @@ export default function LandingScreen() {
           <button
             onClick={toggleLocale}
             onKeyDown={(e) => e.key === 'Enter' && toggleLocale()}
-            style={{
-              background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(201, 169, 110, 0.2)',
-              borderRadius: '8px', padding: '8px 16px', color: 'var(--cf-gold)', fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.7rem', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.3s'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(var(--cf-gold-rgb),0.1)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+            className="rounded-lg px-4 py-2 font-mono text-[0.7rem] font-bold cursor-pointer transition-all duration-300 bg-white/5 border border-cf-gold/20 text-cf-gold hover:bg-cf-gold/10"
           >
             🌐 {locale === 'fr' ? 'EN' : 'FR'}
           </button>
@@ -158,11 +159,11 @@ export default function LandingScreen() {
 
       {/* ── Breathing Thumb Anchor ── */}
       <motion.div
-        className="thumb-anchor"
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-cf-gold/30 cursor-pointer transition-all duration-300 hover:text-cf-gold/60 landscape:mt-2.5"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
       >
         <Circle size={28} strokeWidth={1} />
-        <span className="thumb-label">Voix Vive</span>
+        <span className="font-mono text-[0.65rem] tracking-[0.1em] uppercase">Voix Vive</span>
       </motion.div>
 
       {/* ── Studio Doorway ── */}

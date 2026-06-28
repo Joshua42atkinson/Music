@@ -177,12 +177,7 @@ export default function FeedbackButton() {
                 <button
                   key={c.id}
                   onClick={() => setCategory(c.id)}
-                  className="py-1 px-2.5 rounded-xl cursor-pointer font-mono text-[10px] tracking-[0.05em] uppercase transition-all duration-150 min-h-[44px]"
-                  style={{
-                    border:`1px solid ${category === c.id ? 'rgba(var(--cf-gold-rgb),0.6)' : 'rgba(255,255,255,0.1)'}`,
-                    background: category === c.id ? 'rgba(var(--cf-gold-rgb),0.12)' : 'transparent',
-                    color: category === c.id ? 'var(--cf-gold)' : 'rgba(255,255,255,0.4)',
-                  }}
+                  className={`py-1 px-2.5 rounded-xl cursor-pointer font-mono text-[10px] tracking-[0.05em] uppercase transition-all duration-150 min-h-[44px] border ${category === c.id ? 'border-cf-gold/60 bg-cf-gold/10 text-cf-gold' : 'border-white/10 bg-transparent text-white/40'}`}
                 >
                   {c.emoji} {c.label}
                 </button>
@@ -207,13 +202,7 @@ export default function FeedbackButton() {
                   <button
                     onClick={submit}
                     disabled={!text.trim()}
-                    className="py-[7px] px-4 rounded-lg font-mono text-[10px] tracking-[0.1em] uppercase flex items-center gap-[5px] min-h-[44px] transition-all duration-150"
-                    style={{
-                      cursor: text.trim() ? 'pointer' : 'not-allowed',
-                      background: text.trim() ? 'rgba(var(--cf-gold-rgb),0.2)' : 'rgba(255,255,255,0.04)',
-                      border:`1px solid ${text.trim() ? 'rgba(var(--cf-gold-rgb),0.4)' : 'rgba(255,255,255,0.08)'}`,
-                      color: text.trim() ? 'var(--cf-gold)' : 'rgba(255,255,255,0.2)',
-                    }}
+                    className={`py-[7px] px-4 rounded-lg font-mono text-[10px] tracking-[0.1em] uppercase flex items-center gap-[5px] min-h-[44px] transition-all duration-150 border ${text.trim() ? 'cursor-pointer bg-cf-gold/20 border-cf-gold/40 text-cf-gold' : 'cursor-not-allowed bg-white/[0.04] border-white/[0.08] text-white/20'}`}
                   >
                     <Send size={11} /> {t('send')}
                   </button>

@@ -5,7 +5,7 @@ import { generateDailySession } from '../../data/practiceEngine';
 import { getBardicTitle } from '../../data/bardicTitles';
 import { syncJournalToDrive } from '../../lib/driveService';
 import { getAvailableSlots, bookReviewSlot } from '../../lib/calendarService';
-import { useKokoroTTS } from '../../hooks/useKokoroTTS';
+import { useKokoroWebTTS } from '../../hooks/useKokoroWebTTS';
 import { useAuth } from '../../hooks/useAuth';
 import { vvGet, vvSetJSON } from '../../lib/storage';
 import { STORAGE_KEYS } from '../../lib/storageKeys';
@@ -32,7 +32,7 @@ export default function PracticeJournal({ traction, nextRecommended: _nextRecomm
   const session = generateDailySession(traction, completedNodes);
   const { blocks, focusNode, title } = session;
 
-  const { initAndSpeak, isLoading, loadProgress } = useKokoroTTS();
+  const { speak, isLoading, progress: loadProgress } = useKokoroWebTTS();
 
   // ── Calendar Booking State ──
   const [showBooking, setShowBooking] = useState(false);
@@ -82,7 +82,7 @@ export default function PracticeJournal({ traction, nextRecommended: _nextRecomm
       script += `For ${b.duration} minutes, we will focus on ${b.label}. ${b.description}. `;
     });
     script += "Let's begin.";
-    await initAndSpeak(script, 'en', 'am_adam');
+    await speak(script, { voice: 'am_adam' });
   };
 
   // ── Calendar Booking Handlers ──

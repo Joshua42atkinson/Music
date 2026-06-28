@@ -10,6 +10,7 @@ import React from 'react';
 import { Mic, MicOff, Ear, Loader2, Volume2, AlertCircle } from 'lucide-react';
 import { useHandsFreeCoach } from '../../hooks/useHandsFreeCoach';
 import { useLocale } from '../../hooks/useLocale';
+import { useTruebadour } from '../../hooks/TruebadourProvider';
 
 const STATE_LABELS = {
   idle: { en: 'Tap to start hands-free', fr: 'Appuyez pour le mode mains libres' },
@@ -21,9 +22,11 @@ const STATE_LABELS = {
 
 export default function HandsFreeCoachBar({ handlers }) {
   const { locale } = useLocale();
+  const { speak: ttsSpeak } = useTruebadour();
   const { isActive, state, lastCommand, error, start, stop } = useHandsFreeCoach({
     handlers,
     locale,
+    ttsSpeak,
   });
 
   const label = STATE_LABELS[state]?.[locale] || STATE_LABELS.idle[locale];

@@ -40,7 +40,7 @@ const RESPONSES = {
   unknown: { en: 'I did not understand. Say help for commands.', fr: 'Je n\'ai pas compris. Dites aide pour les commandes.' },
 };
 
-export function useHandsFreeCoach({ handlers = {}, locale = 'en' } = {}) {
+export function useHandsFreeCoach({ handlers = {}, locale = 'en', ttsSpeak = null } = {}) {
   const [isActive, setIsActive] = useState(false);
   const [state, setState] = useState('idle'); // idle | listening | processing | speaking | error
   const [lastCommand, setLastCommand] = useState(null);
@@ -63,21 +63,34 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en' } = {}) {
     setState(newState);
   }, []);
 
-  const speak = useCallback((action) => {
-    if (!window.speechSynthesis) return;
+  const speak = useCallback(async (action) => {
     const text = RESPONSES[action]?.[locale] || RESPONSES[action]?.en;
     if (!text) return;
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
-    utterance.rate = 0.95;
-    utterance.pitch = 0.95;
-    utterance.onstart = () => updateState('speaking');
-    utterance.onend = () => updateState('idle');
-    utterance.onerror = () => updateState('idle');
-    window.speechSynthesis.speak(utterance);
-  }, [locale, updateState]);
+    if (ttsSpeak) {
+      updateState('speaking');
+      try {
+        await ttsSpeak(text);
+      } catch (err) {
+        devError('[useHandsFreeCoach] ttsSpeak error:', err);
+      } finally {
+        if (stateRef.current === 'speaking') {
+          updateState('idle');
+        }
+      }
+    } else {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
+      utterance.rate = 0.95;
+      utterance.pitch = 0.95;
+      utterance.onstart = () => updateState('speaking');
+      utterance.onend = () => updateState('idle');
+      utterance.onerror = () => updateState('idle');
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [locale, updateState, ttsSpeak]);
 
   const processCommand = useCallback((transcript) => {
     updateState('processing');
@@ -150,12 +163,16 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en' } = {}) {
       recognition.start();
     } catch (err) {
       devError('[useHandsFreeCoach] Recognition start failed:', err);
+      recognitionRef.current = null;
       updateState('idle');
     }
   }, [locale, processCommand, updateState]);
 
   const stopRecognition = useCallback(() => {
     if (recognitionRef.current) {
+      recognitionRef.current.onresult = null;
+      recognitionRef.current.onerror = null;
+      recognitionRef.current.onend = null;
       try { recognitionRef.current.stop(); } catch { /* ignore */ }
       recognitionRef.current = null;
     }
@@ -166,6 +183,12 @@ export function useHandsFreeCoach({ handlers = {}, locale = 'en' } = {}) {
   const vadTick = useCallback(() => {
     const analyser = analyserRef.current;
     if (!analyser || !stateRef.current) return;
+
+    // Halt VAD while speaking to prevent AI from hearing itself
+    if (stateRef.current === 'speaking') {
+      rafIdRef.current = requestAnimationFrame(vadTick);
+      return;
+    }
 
     const buffer = new Float32Array(analyser.fftSize);
     analyser.getFloatTimeDomainData(buffer);

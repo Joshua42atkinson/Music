@@ -1,0 +1,11 @@
+fc8a56933c4b1c8d796fdb8f7a9f9475
+::res://::1782597161
+export_presets.cfg::TextFile::-1::1782597070::0::1::::<><>::
+FallingNote.gd::GDScript::-1::1782597122::0::1::::FallingNote<>Node3D<>::
+Fretboard.gd::GDScript::-1::1782596626::0::1::::Fretboard<>Node3D<>::
+GameManager.gd::GDScript::-1::1782597110::0::1::::GameManager<>Node<>::
+icon.svg::CompressedTexture2D::1101221180942493232::1782597175::1782597182::1::::<><>::
+main.tscn::PackedScene::6451726239944630789::1782596694::0::1::::<><>::res://GameManager.gd<>res://Fretboard.gd
+vertiscale_patterns.json::JSON::-1::1782596602::0::1::::<><>::
+::res://android/::1782597092
+::res://build/::1782597075

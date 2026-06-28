@@ -1,0 +1,56 @@
+[gd_scene load_steps=5 format=3 uid="uid://cx6i8u1qf7l1v"]
+
+[ext_resource type="Script" path="res://GameManager.gd" id="1_gm"]
+[ext_resource type="Script" path="res://Fretboard.gd" id="2_fb"]
+[ext_resource type="Script" path="res://HandFingertipMapper.gd" id="3_hand"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hand"]
+radius = 0.05
+
+[sub_resource type="Environment" id="Environment_xr"]
+background_mode = 1
+background_color = Color(0, 0, 0, 0)
+ambient_light_source = 2
+ambient_light_color = Color(0.6, 0.6, 0.65, 1)
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_xr")
+
+[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("fretboard")]
+script = ExtResource("1_gm")
+fretboard = NodePath("../Fretboard")
+
+[node name="Fretboard" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -0.5)
+script = ExtResource("2_fb")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+
+[node name="LeftHand" type="XRController3D" parent="XROrigin3D"]
+tracker = &"left_hand"
+script = ExtResource("3_hand")
+hand = 0
+
+[node name="HandBody" type="StaticBody3D" parent="XROrigin3D/LeftHand"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="XROrigin3D/LeftHand/HandBody"]
+shape = SubResource("SphereShape3D_hand")
+
+[node name="RightHand" type="XRController3D" parent="XROrigin3D"]
+tracker = &"right_hand"
+script = ExtResource("3_hand")
+hand = 1
+
+[node name="HandBody" type="StaticBody3D" parent="XROrigin3D/RightHand"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="XROrigin3D/RightHand/HandBody"]
+shape = SubResource("SphereShape3D_hand")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 5, 0)
+shadow_enabled = true

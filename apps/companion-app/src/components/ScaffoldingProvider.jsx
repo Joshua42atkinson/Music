@@ -86,6 +86,54 @@ export function ScaffoldingProvider({ children }) {
     return subscribeToStorageSync(setTraction);
   }, []);
 
+  // ── Godot XR Telemetry Polling (Phase 4 Bridge) ──
+  useEffect(() => {
+    if (import.meta.env.PROD) return; // Only poll in dev mode where Vite plugin runs
+    
+    let isPolling = true;
+    
+    const pollGodot = async () => {
+      if (!isPolling) return;
+      try {
+        const resp = await fetch('/api/vertiscale/latest');
+        if (resp.ok) {
+          const telemetry = await resp.json();
+          if (telemetry && Object.keys(telemetry).length > 0) {
+            devLog('[VoixVive] Received Godot XR Telemetry:', telemetry);
+            
+            // Calculate XP (10 XP for success, 2 for attempt, scaled by score)
+            const baseXP = telemetry.successful ? 10 : 2;
+            const scoreMultiplier = Math.max(1, (telemetry.score || 0) / 100);
+            const xpGained = Math.round(baseXP * scoreMultiplier);
+            
+            setTraction(prev => {
+              const updated = {
+                ...prev,
+                bardLevel: (prev.bardLevel || 1) + (xpGained / 100), // Fractional level increase
+                practiceMinutes: (prev.practiceMinutes || 0) + 1, // Assume each play takes ~1 minute
+                resonanceCycles: (prev.resonanceCycles || 0) + (telemetry.successful ? 1 : 0),
+              };
+              
+              // Persist the changes
+              persistTraction(updated, userId);
+              return updated;
+            });
+          }
+        }
+      } catch (err) {
+        // Ignore network errors when server restarts or is unreachable
+      }
+      
+      if (isPolling) {
+        setTimeout(pollGodot, 1000); // Poll every second
+      }
+    };
+    
+    pollGodot();
+    
+    return () => { isPolling = false; };
+  }, [userId]);
+
   const refreshTraction = useCallback(() => {
     setTraction(loadTraction());
   }, []);

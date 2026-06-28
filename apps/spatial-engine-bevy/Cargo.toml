@@ -1,0 +1,19 @@
+[package]
+name = "voix-vive-xr"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = []
+xr = ["bevy_mod_openxr"]
+
+[dependencies]
+bevy = "0.14"
+bevy_mod_openxr = { version = "0.5.0", optional = true }
+tokio = { version = "1.37", features = ["full"] }
+warp = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+crossbeam-channel = "0.5"
+futures-util = "0.3"
+bevy_kira_audio = "0.20"

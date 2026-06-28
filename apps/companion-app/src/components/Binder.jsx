@@ -87,7 +87,7 @@ export default function Workbook() {
             {t('somaticWorkbook')}
           </h1>
           <p className="font-mono text-[0.55rem] text-[rgba(var(--cf-gold-rgb),0.45)] tracking-[0.15em] uppercase m-0">
-            Voix Vive Sovereign OS
+            {t('voixViveSovereignOS', 'Voix Vive Sovereign OS')}
           </p>
         </div>
         <div className="flex items-center gap-3">

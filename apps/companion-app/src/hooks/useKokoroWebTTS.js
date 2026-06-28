@@ -15,7 +15,6 @@
 // ║ STAGE   : IMPLEMENT                                            ║
 // ╚════════════════════════════════════════════════════════════════╝
 import { useState, useCallback, useRef } from 'react';
-import { KokoroTTS } from 'kokoro-js';
 import { getAudioContext, resumeAudio } from '../audio/audioEngine';
 import { devError } from '../lib/devLog';
 
@@ -36,6 +35,10 @@ export function useKokoroWebTTS() {
     isLoadingRef.current = true;
     setIsLoading(true);
     try {
+      const { KokoroTTS } = await import('kokoro-js');
+      const { env } = await import('@huggingface/transformers');
+      env.allowLocalModels = false;
+      env.allowRemoteModels = true;
       ttsRef.current = await KokoroTTS.from_pretrained(
         'onnx-community/Kokoro-82M-v1.0-ONNX',
         { dtype: 'q8', device: 'wasm' }
@@ -51,7 +54,7 @@ export function useKokoroWebTTS() {
   }, []);
 
   // ── Ensure shared AudioContext + gain node ─────────────────
-  const ensureContext = useCallback(() => {
+  const ensureContext = useCallback(async () => {
     const ctx = resumeAudio();
     if (!ctx) return null;
     if (!gainNodeRef.current) {
@@ -59,7 +62,7 @@ export function useKokoroWebTTS() {
       gainNodeRef.current.connect(ctx.destination);
     }
     if (ctx.state === 'suspended') {
-      ctx.resume().catch(() => {});
+      try { await ctx.resume(); } catch (e) { devError('[Kokoro] Resume failed:', e); }
     }
     return ctx;
   }, []);
@@ -87,10 +90,13 @@ export function useKokoroWebTTS() {
     if (!ttsRef.current) return false;
 
     cancel(); // stop any previous
-    const ctx = ensureContext();
-    if (!ctx) return false;
-
     setIsSpeaking(true);
+    const ctx = await ensureContext();
+    if (!ctx) {
+      setIsSpeaking(false);
+      return false;
+    }
+
     try {
       const audioData = await ttsRef.current.generate(text, { voice, speed });
 

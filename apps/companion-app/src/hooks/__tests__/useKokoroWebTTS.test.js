@@ -21,10 +21,10 @@ const mockAudioContext = {
       detune: { value: 0 },
       connect: vi.fn(),
       start: vi.fn(function() {
-        // Simulate playback completion by triggering onended
-        setTimeout(() => {
+        // Simulate playback completion by triggering onended in a microtask
+        Promise.resolve().then(() => {
           if (source.onended) source.onended();
-        }, 10);
+        });
       }),
       stop: vi.fn(function() {
         // Cancel the scheduled onended if stopped early

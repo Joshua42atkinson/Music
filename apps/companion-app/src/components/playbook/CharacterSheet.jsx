@@ -356,198 +356,148 @@ export default function CharacterSheet() {
   return (
     <div className="p-5 max-w-[500px] mx-auto text-[#e8edf2]">
       {/* Academy Degrees & Certifications Section */}
-      <div className="p-6 rounded-2xl mb-6 text-center text-[#f3e5c8]" style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(167,139,250,0.15))', border: '2px double #d4af37', boxShadow: '0 0 30px rgba(212,175,55,0.25)' }}>
-        <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🎓 🏆 📜</div>
+      <div className="p-6 rounded-2xl mb-6 text-center text-[#f3e5c8] bg-[linear-gradient(135deg,rgba(212,175,55,0.15),rgba(167,139,250,0.15))] border-[2px_double_#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.25)]">
+        <div className="text-[2.5rem] mb-2">🎓 🏆 📜</div>
         <h3 className="font-heading text-[1.4rem] text-[#d4af37] m-0 mb-2.5 font-bold uppercase tracking-[0.05em]">
           {t('academyDegreesCertifications')}
         </h3>
         <p className="font-sans text-[0.8rem] text-[rgba(243,229,200,0.85)] leading-[1.5] m-0 mb-5">
-          {lang === 'fr' 
-            ? `Consultez et téléchargez vos diplômes officiels signés par Maître Bertrand Laurence au fur et à mesure de votre progression somatique.`
-            : `View and download your official printed scrolls certified and signed by Master Truebadour Bertrand Laurence as you mature your somatic guitar skills.`}
+          {t('downloadOfficialScrolls') || `View and download your official printed scrolls certified and signed by Master Truebadour Bertrand Laurence as you mature your somatic guitar skills.`}
         </p>
         
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          width: '100%',
-          maxWidth: '800px',
-          margin: '16px auto 0',
-          textAlign: 'left'
-        }}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 w-full max-w-[800px] mt-4 mx-auto text-left">
           {/* Tier 1: Apprentice Bard */}
-          <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: isApprenticeUnlocked ? '1px solid rgba(var(--cf-gold-rgb),0.3)' : '1px solid rgba(255,255,255,0.05)',
-            borderRadius: '12px',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '12px'
-          }}>
+          <div className={`bg-white/2 rounded-xl p-4 flex flex-col justify-between gap-3 ${isApprenticeUnlocked ? 'border border-cf-gold/30' : 'border border-white/5'}`}>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: isApprenticeUnlocked ? '#e0d0aa' : 'rgba(255,255,255,0.4)' }}>
+              <div className="flex justify-between items-center mb-1">
+                <span className={`text-[0.9rem] font-bold ${isApprenticeUnlocked ? 'text-[#e0d0aa]' : 'text-white/40'}`}>
                   Apprentice Bard
                 </span>
                 <span>{isApprenticeUnlocked ? '⭐' : '🔒'}</span>
               </div>
-              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
+              <p className="text-[0.65rem] text-white/50 leading-[1.4]">
                 {t('unlockedAtFret14')}
               </p>
             </div>
             {isApprenticeUnlocked ? (
               <button 
                 onClick={() => { setSelectedCert('apprentice'); setShowCertModal(true); }}
-                className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, #d4af37, #aa7c11)', color: '#1a120b', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
+                className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer bg-[linear-gradient(135deg,var(--cf-gold),#8a6f3e)] text-[#1a120b] shadow-[0_4px_12px_rgba(212,175,55,0.3)] transition-all duration-200 hover:brightness-110"
               >
                 📜 {t('viewScroll')}
               </button>
             ) : (
-              <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', padding: '8px 0' }}>
-                {completedFrets}/4 Frets Complete
+              <div className="flex flex-col gap-1.5">
+                <div className="text-[0.7rem] text-white/30 font-mono text-center">
+                  {completedFrets} / 4 {t('fretsMastered')}
+                </div>
+                <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                  <div className="h-full bg-cf-gold/30 rounded-full" style={{ width: `${(Math.min(completedFrets, 4) / 4) * 100}%` }} />
+                </div>
               </div>
             )}
           </div>
 
           {/* Tier 2: Journeyman Bard */}
-          <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: isJourneymanUnlocked ? '1px solid rgba(var(--cf-gold-rgb),0.5)' : '1px solid rgba(255,255,255,0.05)',
-            borderRadius: '12px',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '12px'
-          }}>
+          <div className={`bg-white/2 rounded-xl p-4 flex flex-col justify-between gap-3 ${isJourneymanUnlocked ? 'border border-cf-gold/30' : 'border border-white/5'}`}>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: isJourneymanUnlocked ? '#e0d0aa' : 'rgba(255,255,255,0.4)' }}>
+              <div className="flex justify-between items-center mb-1">
+                <span className={`text-[0.9rem] font-bold ${isJourneymanUnlocked ? '#d4af37' : 'text-white/40'}`}>
                   Journeyman Bard
                 </span>
                 <span>{isJourneymanUnlocked ? '🌟' : '🔒'}</span>
               </div>
-              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
-                {t('requiresFret18Complete_')}
+              <p className="text-[0.65rem] text-white/50 leading-[1.4]">
+                {t('unlockedAtFret18')}
               </p>
             </div>
             {isJourneymanUnlocked ? (
               <button 
                 onClick={() => { setSelectedCert('journeyman'); setShowCertModal(true); }}
-                className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, var(--cf-gold), #8a6f3e)', color: '#1a120b', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
+                className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer bg-[linear-gradient(135deg,#d4af37,#aa7c11)] text-[#1a120b] shadow-[0_4px_12px_rgba(212,175,55,0.3)] transition-all duration-200 hover:brightness-110"
               >
                 📜 {t('viewScroll')}
               </button>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center' }}>
-                  {completedFrets}/8 Frets Complete
+              <div className="flex flex-col gap-1.5">
+                <div className="text-[0.7rem] text-white/30 font-mono text-center">
+                  {completedFrets} / 8 {t('fretsMastered')}
                 </div>
-                <a
-                  href="https://bertrandguitarstudio.duetpartner.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-1.5 px-2 rounded-lg font-mono text-[0.65rem] font-bold tracking-[0.05em] uppercase cursor-pointer text-center no-underline" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
-                >
-                  🎸 {t('bookAudition45')}
-                </a>
+                <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                  <div className="h-full bg-cf-gold/30 rounded-full" style={{ width: `${(Math.min(completedFrets, 8) / 8) * 100}%` }} />
+                </div>
+                {(coachingTier === 'free' || coachingTier === 'apprentice') && (
+                  <a href="https://buy.stripe.com/4gw2ad9jK5C95P2cMO" target="_blank" rel="noopener noreferrer"
+                    className="w-full py-1.5 px-2 rounded-lg font-mono text-[0.65rem] font-bold tracking-[0.05em] uppercase cursor-pointer text-center no-underline bg-white/5 border border-white/10 text-white/80 shadow-[0_4px_12px_rgba(212,175,55,0.3)] transition-all duration-200 hover:brightness-110"
+                  >
+                    🎸 {t('bookAudition45')}
+                  </a>
+                )}
               </div>
             )}
           </div>
 
-          {/* Tier 3: Bertrand Approved Truebadour */}
-          <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: isMasterUnlocked ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.05)',
-            borderRadius: '12px',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '12px'
-          }}>
+          {/* Tier 3: Master Bard */}
+          <div className={`bg-white/2 rounded-xl p-4 flex flex-col justify-between gap-3 ${isMasterUnlocked ? 'border border-cf-gold/30' : 'border border-white/5'}`}>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: isMasterUnlocked ? '#d4af37' : 'rgba(255,255,255,0.4)' }}>
-                  Truebadour Master
+              <div className="flex justify-between items-center mb-1">
+                <span className={`text-[0.9rem] font-bold ${isMasterUnlocked ? 'text-[#d4af37]' : 'text-white/40'}`}>
+                  Master Bard
                 </span>
                 <span>{isMasterUnlocked ? '👑' : '🔒'}</span>
               </div>
-              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.4' }}>
-                {t('requiresAll12Modules_')}
+              <p className="text-[0.65rem] text-white/50 leading-[1.4]">
+                {t('unlockedAtFret112')}
               </p>
             </div>
             {isMasterUnlocked ? (
               <button 
                 onClick={() => { setSelectedCert('master'); setShowCertModal(true); }}
-                className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, #d4af37, #aa7c11)', color: '#1a120b', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
+                className="w-full py-2 px-3 rounded-lg font-mono text-[0.75rem] font-bold tracking-[0.05em] uppercase cursor-pointer bg-[linear-gradient(135deg,#d4af37,#aa7c11)] text-[#1a120b] shadow-[0_4px_12px_rgba(212,175,55,0.3)] transition-all duration-200 hover:brightness-110"
               >
                 📜 {t('viewScroll')}
               </button>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center' }}>
-                  {completedFrets}/12 Frets Complete
+              <div className="flex flex-col gap-1.5">
+                <div className="text-[0.7rem] text-white/30 font-mono text-center">
+                  {completedFrets} / 12 {t('fretsMastered')}
                 </div>
-                <a
-                  href="https://bertrandguitarstudio.duetpartner.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-1.5 px-2 rounded-lg font-mono text-[0.65rem] font-bold tracking-[0.05em] uppercase cursor-pointer text-center no-underline" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
-                >
-                  🎸 {t('bookMasterReview')}
-                </a>
+                <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                  <div className="h-full bg-cf-gold/30 rounded-full" style={{ width: `${(Math.min(completedFrets, 12) / 12) * 100}%` }} />
+                </div>
+                {coachingTier !== 'master' && (
+                  <a href="https://buy.stripe.com/4gw2ad9jK5C95P2cMO" target="_blank" rel="noopener noreferrer"
+                    className="w-full py-1.5 px-2 rounded-lg font-mono text-[0.65rem] font-bold tracking-[0.05em] uppercase cursor-pointer text-center no-underline bg-white/5 border border-white/10 text-white/80 shadow-[0_4px_12px_rgba(212,175,55,0.3)] transition-all duration-200 hover:brightness-110"
+                  >
+                    🎸 {t('bookMasterReview')}
+                  </a>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Header — Name & Level */}
-      <div className="flex items-center gap-4 mb-6 p-5 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(var(--cf-gold-rgb),0.08) 0%, rgba(var(--cf-gold-rgb),0.02) 100%)', border: '1px solid rgba(var(--cf-gold-rgb),0.2)' }}>
-        <div style={{ position: 'relative' }}>
-          <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(var(--cf-gold-rgb),0.1)', border: '2px solid rgba(var(--cf-gold-rgb),0.3)' }}>
-            {capturedPhoto ? (
-              <img
-                src={capturedPhoto}
-                alt={studentName}
-                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-              />
-            ) : googleAvatar ? (
-              <img
-                src={googleAvatar}
-                alt={studentName}
-                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+      {/* Main Stats Header */}
+      <div className="flex items-center gap-4 mb-6 p-5 rounded-2xl bg-[linear-gradient(135deg,rgba(var(--cf-gold-rgb),0.08)_0%,rgba(var(--cf-gold-rgb),0.02)_100%)] border border-cf-gold/20">
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 bg-cf-gold/10 border-2 border-cf-gold/30">
+            {googleAvatar || capturedPhoto ? (
+              <img 
+                src={capturedPhoto || googleAvatar} 
+                alt="Portrait" 
+                className="w-full h-full rounded-full object-cover"
               />
             ) : (
-              <span className="text-[1.8rem]">🎸</span>
+              <span className="text-[2rem] font-serif">🎸</span>
             )}
           </div>
-          <button
+          <button 
             onClick={startCamera}
             title={t('takePhoto')}
-            style={{
-              position: 'absolute',
-              bottom: -4,
-              right: -4,
-              width: 28,
-              height: 28,
-              borderRadius: '50%',
-              background: 'rgba(201, 169, 110, 0.9)',
-              border: '2px solid #0a0a0f',
-              color: '#0a0a0f',
-              fontSize: '0.75rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-            }}
+            className="absolute bottom-[-4px] right-[-4px] w-7 h-7 rounded-full bg-[#c9a96e]/90 border-2 border-[#0a0a0f] text-[#0a0a0f] text-xs flex items-center justify-center cursor-pointer p-0"
           >
-            📷
+            📸
           </button>
         </div>
         <div className="flex-1">
@@ -561,38 +511,10 @@ export default function CharacterSheet() {
         </div>
         <button
           onClick={handleShareCard}
-          style={{
-            marginLeft: 'auto',
-            padding: '8px 18px',
-            borderRadius: 10,
-            background: 'linear-gradient(135deg, rgba(var(--cf-gold-rgb),0.2), rgba(var(--cf-gold-rgb),0.05))',
-            border: '1px solid rgba(var(--cf-gold-rgb),0.4)',
-            color: 'var(--cf-gold)',
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.7rem',
-            fontWeight: 600,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            cursor: 'pointer',
-            transition: 'all 0.3s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
+          className="ml-auto py-2 px-[18px] rounded-lg bg-[linear-gradient(135deg,rgba(var(--cf-gold-rgb),0.2),rgba(var(--cf-gold-rgb),0.05))] border border-cf-gold/40 text-cf-gold font-mono text-[0.7rem] font-semibold tracking-[0.1em] uppercase cursor-pointer transition-all duration-300 flex items-center gap-1.5 hover:brightness-110"
         >
           📤 {t('share')}
         </button>
-      </div>
-
-      {/* XP Bar */}
-      <div className="mb-5">
-        <div className="flex justify-between mb-1.5">
-          <span className="font-mono text-[0.65rem] text-[rgba(var(--cf-gold-rgb),0.6)] tracking-[0.15em] uppercase">XP</span>
-          <span className="font-mono text-[0.65rem] text-white/40">{xpCurrent} / {xpNext}</span>
-        </div>
-        <div className="h-1.5 rounded-md bg-white/[0.06] overflow-hidden">
-          <div className="h-full rounded-md" style={{ width: `${xpProgress * 100}%`, background: 'linear-gradient(90deg, var(--cf-gold), #e0d0aa)', boxShadow: '0 0 8px rgba(var(--cf-gold-rgb),0.4)', transition: 'width 0.5s ease' }} />
-        </div>
       </div>
 
       {/* Quick Stats Row */}
@@ -625,31 +547,25 @@ export default function CharacterSheet() {
           {t('yourPath')}
         </h3>
         <p className="text-center mb-4 opacity-60 text-[0.75rem] font-mono">
-          {lang === 'fr' 
-            ? `Temps de pratique cible: ${timeline.tier.dailyMinutes} min/jour. Graduation: ${timeline.graduationFormatted}`
-            : `Target practice: ${timeline.tier.dailyMinutes} min/day. Graduation ETA: ${timeline.graduationFormatted}`}
+          {t('targetPracticeGraduation', { min: timeline.tier.dailyMinutes, date: timeline.graduationFormatted }) || `Target practice: ${timeline.tier.dailyMinutes} min/day. Graduation ETA: ${timeline.graduationFormatted}`}
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px' }}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2">
           {Object.values(COMMITMENT_TIERS).map(tier => (
             <button
               key={tier.id}
               onClick={() => updateTraction({ commitmentTier: tier.id })}
+              className="rounded-lg p-3 text-center cursor-pointer transition-all duration-200"
               style={{
                 background: currentTierId === tier.id ? `${tier.color}20` : 'rgba(255,255,255,0.02)',
                 border: currentTierId === tier.id ? `1px solid ${tier.color}` : '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                padding: '12px 8px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
                 opacity: currentTierId === tier.id ? 1 : 0.6
               }}
             >
-              <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{tier.icon}</div>
-              <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: currentTierId === tier.id ? tier.color : '#e8edf2' }}>
+              <div className="text-[1.5rem] mb-1">{tier.icon}</div>
+              <div className="text-[0.8rem] font-bold" style={{ color: currentTierId === tier.id ? tier.color : '#e8edf2' }}>
                 {tier.name[lang]}
               </div>
-              <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>
+              <div className="text-[0.6rem] text-white/50 mt-1">
                 {tier.subtitle[lang]}
               </div>
             </button>
@@ -727,7 +643,7 @@ export default function CharacterSheet() {
         <h3 className="font-mono text-[0.65rem] text-[rgba(var(--cf-gold-rgb),0.5)] tracking-[0.25em] uppercase text-center mb-4">
           Student Archetype
         </h3>
-        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+        <div className="text-center mb-4">
           <select 
             value={traction?.truebadourTypeOverride || ''}
             onChange={(e) => updateTraction({ truebadourTypeOverride: e.target.value || null })}
@@ -753,7 +669,7 @@ export default function CharacterSheet() {
             return (
               <div key={type.id} className="flex items-center gap-2.5">
                 <span className="text-[1rem] w-6 text-center">{type.icon}</span>
-                <div style={{ flex: 1 }}>
+                <div className="flex-1">
                   <div className="flex justify-between mb-1">
                     <span className="font-mono text-[0.6rem] tracking-[0.08em] uppercase" style={{ color: type.color }}>
                       {type.name[lang]}
@@ -784,17 +700,17 @@ export default function CharacterSheet() {
         <p className="text-center mb-4 opacity-60 text-[0.65rem] normal-case tracking-normal font-sans">
           {t('youAreTheSole')}
         </p>
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div className="flex gap-3 justify-center flex-wrap">
           <button 
             onClick={handleExport}
-            className="py-2.5 px-4 rounded-lg font-mono text-[0.75rem] cursor-pointer transition-all duration-200" style={{ background: 'rgba(var(--cf-gold-rgb),0.1)', border: '1px solid rgba(var(--cf-gold-rgb),0.3)', color: '#e0d0aa' }}
+            className="py-2.5 px-4 rounded-lg font-mono text-[0.75rem] cursor-pointer transition-all duration-200 bg-cf-gold/10 border border-cf-gold/30 text-[#e0d0aa] hover:bg-cf-gold/20"
           >
             💾 {t('sealTheJournal')}
           </button>
           
           <button 
             onClick={() => fileInputRef.current?.click()}
-            className="py-2.5 px-4 rounded-lg font-mono text-[0.75rem] cursor-pointer transition-all duration-200" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
+            className="py-2.5 px-4 rounded-lg font-mono text-[0.75rem] cursor-pointer transition-all duration-200 bg-white/5 border border-white/10 text-white/80 hover:bg-white/10"
           >
             📜 {t('presentYourJournal')}
           </button>
@@ -803,70 +719,32 @@ export default function CharacterSheet() {
             accept=".voixvive,.json"
             ref={fileInputRef}
             onChange={handleImport}
-            style={{ display: 'none' }}
+            className="hidden"
           />
         </div>
       </div>
 
       {/* Camera overlay */}
       {showCamera && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 2000,
-          background: 'rgba(0,0,0,0.92)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 16,
-          padding: 20,
-        }}>
+        <div className="fixed inset-0 z-[2000] bg-black/90 flex flex-col items-center justify-center gap-4 p-5">
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            style={{
-              width: 'min(320px, 80vw)',
-              height: 'min(320px, 80vw)',
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '2px solid rgba(201, 169, 110, 0.4)',
-            }}
+            className="w-[min(320px,80vw)] h-[min(320px,80vw)] rounded-full object-cover border-2 border-cf-gold/40"
           />
-          <canvas ref={photoCanvasRef} style={{ display: 'none' }} />
-          <div style={{ display: 'flex', gap: 12 }}>
+          <canvas ref={photoCanvasRef} className="hidden" />
+          <div className="flex gap-3">
             <button
               onClick={takePhoto}
-              style={{
-                padding: '10px 28px',
-                borderRadius: 50,
-                background: 'var(--cf-gold)',
-                color: '#0a0a0f',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className="py-2.5 px-7 rounded-full bg-cf-gold text-[#0a0a0f] font-mono text-xs font-bold tracking-[0.1em] uppercase border-none cursor-pointer"
             >
               📸 {t('capture')}
             </button>
             <button
               onClick={cancelCamera}
-              style={{
-                padding: '10px 24px',
-                borderRadius: 50,
-                background: 'rgba(255,255,255,0.1)',
-                color: '#fff',
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.75rem',
-                border: '1px solid rgba(255,255,255,0.2)',
-                cursor: 'pointer',
-              }}
+              className="py-2.5 px-6 rounded-full bg-white/10 text-white font-mono text-xs border border-white/20 cursor-pointer"
             >
               {t('cancel')}
             </button>
@@ -875,17 +753,7 @@ export default function CharacterSheet() {
       )}
 
       {showCertModal && selectedCert && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'rgba(0,0,0,0.85)',
-          zIndex: 1000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px',
-          backdropFilter: 'blur(5px)'
-        }} className="no-print">
+        <div className="fixed inset-0 bg-black/85 z-[1000] flex items-center justify-center p-5 backdrop-blur-[5px] no-print">
           <style>{`
             @media print {
               body * {
@@ -915,58 +783,23 @@ export default function CharacterSheet() {
             }
           `}</style>
           
-          <div style={{
-            background: '#1c1510',
-            border: selectedCert === 'master' ? '3px double #d4af37' : selectedCert === 'journeyman' ? '3px double var(--cf-gold)' : '3px double #8a8a8a',
-            padding: '30px',
-            maxWidth: '650px',
-            width: '100%',
-            borderRadius: '8px',
-            textAlign: 'center',
-            boxShadow: '0 0 40px rgba(0,0,0,0.6)',
-            position: 'relative',
-            color: '#f3e5c8',
-          }}>
+          <div className={`p-[30px] max-w-[650px] w-full rounded-lg text-center shadow-[0_0_40px_rgba(0,0,0,0.6)] relative text-[#f3e5c8] bg-[#1c1510] border-[3px] border-double ${selectedCert === 'master' ? 'border-[#d4af37]' : selectedCert === 'journeyman' ? 'border-[var(--cf-gold)]' : 'border-[#8a8a8a]'}`}>
             <button 
               onClick={() => { setShowCertModal(false); setSelectedCert(null); }}
-              style={{
-                position: 'absolute',
-                top: 15, right: 15,
-                background: 'none',
-                border: 'none',
-                color: '#d4af37',
-                fontSize: '1.2rem',
-                cursor: 'pointer'
-              }}
+              className="absolute top-[15px] right-[15px] bg-transparent border-none text-[#d4af37] text-[1.2rem] cursor-pointer"
             >
               ✕
             </button>
             
             {/* Printable Certificate Frame */}
-            <div id="printable-certificate" style={{
-              border: selectedCert === 'master' ? '2px solid rgba(212,175,55,0.6)' : selectedCert === 'journeyman' ? '2px solid rgba(var(--cf-gold-rgb),0.4)' : '2px solid rgba(255,255,255,0.2)',
-              padding: '32px 24px',
-              borderRadius: '4px',
-              backgroundColor: '#1f1812',
-              backgroundImage: selectedCert === 'master' 
-                ? 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 80%)'
-                : 'radial-gradient(circle, rgba(var(--cf-gold-rgb),0.05) 0%, transparent 80%)',
-              boxShadow: selectedCert === 'master' ? '0 0 20px rgba(212,175,55,0.15) inset' : 'none'
-            }}>
+            <div id="printable-certificate" className={`border-2 py-8 px-6 rounded bg-[#1f1812] ${selectedCert === 'master' ? 'border-[#d4af37]/60 shadow-[inset_0_0_20px_rgba(212,175,55,0.15)] bg-[radial-gradient(circle,rgba(212,175,55,0.08)_0%,transparent_80%)]' : selectedCert === 'journeyman' ? 'border-[rgba(var(--cf-gold-rgb),0.4)] bg-[radial-gradient(circle,rgba(var(--cf-gold-rgb),0.05)_0%,transparent_80%)]' : 'border-white/20'}`}>
               {/* Emblem */}
-              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>
+              <div className="text-[2.5rem] mb-3">
                 {selectedCert === 'master' ? '👑' : selectedCert === 'journeyman' ? '🌟' : '⭐'}
               </div>
               
               {/* Header Title */}
-              <h2 style={{ 
-                fontFamily: "'Cormorant Garamond', serif", 
-                fontSize: selectedCert === 'master' ? '2.2rem' : '1.8rem', 
-                color: selectedCert === 'master' ? '#d4af37' : '#e0d0aa', 
-                letterSpacing: '0.06em', 
-                margin: '0 0 8px', 
-                textTransform: 'uppercase' 
-              }}>
+              <h2 className={`font-serif text-[1.8rem] md:text-[2.2rem] tracking-[0.06em] m-0 mb-2 uppercase ${selectedCert === 'master' ? 'text-[#d4af37]' : 'text-[#e0d0aa]'}`}>
                 {selectedCert === 'master' 
                   ? (t('bertrandApprovedTruebadourMaster'))
                   : selectedCert === 'journeyman'
@@ -975,44 +808,21 @@ export default function CharacterSheet() {
                 }
               </h2>
               
-              <div style={{ 
-                fontSize: '0.75rem', 
-                fontFamily: "'JetBrains Mono', monospace", 
-                color: selectedCert === 'master' ? '#d4af37' : 'rgba(255,255,255,0.4)', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.15em', 
-                marginBottom: 24 
-              }}>
+              <div className={`text-xs font-mono uppercase tracking-[0.15em] mb-6 ${selectedCert === 'master' ? 'text-[#d4af37]' : 'text-white/40'}`}>
                 {t('voixViveMusicAcademy')}
               </div>
               
-              <p style={{ fontStyle: 'italic', fontSize: '0.9rem', margin: '0 0 15px', color: 'rgba(255,255,255,0.7)' }}>
+              <p className="italic text-[0.9rem] m-0 mb-[15px] text-white/70">
                 {t('thisIsToCertify')}
               </p>
               
               {/* Student Name */}
-              <h3 style={{ 
-                fontFamily: "'Cormorant Garamond', serif", 
-                fontSize: '2.4rem', 
-                color: '#ffffff', 
-                margin: '10px 0 20px', 
-                textShadow: '0 2px 4px rgba(0,0,0,0.5)', 
-                borderBottom: '1px solid rgba(212,175,55,0.3)', 
-                paddingBottom: '10px', 
-                display: 'inline-block', 
-                minWidth: '320px' 
-              }}>
+              <h3 className="font-serif text-[2.4rem] text-white m-[10px_0_20px] shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-b border-[#d4af37]/30 pb-2.5 inline-block min-w-[320px]">
                 {studentName}
               </h3>
               
               {/* Detailed Somatic Text */}
-              <p style={{ 
-                fontSize: '0.85rem', 
-                lineHeight: 1.6, 
-                maxWidth: '520px', 
-                margin: '0 auto 24px',
-                color: 'rgba(255,255,255,0.85)'
-              }}>
+              <p className="text-[0.85rem] leading-[1.6] max-w-[520px] mx-auto mb-6 text-white/85">
                 {selectedCert === 'master' ? (
                   t('hasSuccessfullyDemonstratedAbsolute')
                 ) : selectedCert === 'journeyman' ? (
@@ -1023,60 +833,51 @@ export default function CharacterSheet() {
               </p>
               
               {/* Seals and signatures */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 35, padding: '0 20px' }}>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.8rem', fontFamily: "'Cormorant Garamond', serif", borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: 4, width: '140px', fontStyle: 'italic' }}>
+              <div className="flex justify-between items-center mt-[35px] px-5">
+                <div className="text-left">
+                  <div className="text-[0.8rem] font-serif border-b border-white/20 pb-1 w-[140px] italic">
                     {new Date().toLocaleDateString(t('enus'))}
                   </div>
-                  <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
+                  <div className="text-[0.6rem] text-white/40 font-mono uppercase mt-1">
                     {t('dateOfAward')}
                   </div>
                 </div>
                 
                 {/* Wax Seal Graphic for Premium Feel */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <svg width="50" height="50" viewBox="0 0 100 100" style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))' }}>
+                <div className="flex flex-col items-center">
+                  <svg width="50" height="50" viewBox="0 0 100 100" className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                     <circle cx="50" cy="50" r="42" fill={selectedCert === 'master' ? '#b22222' : selectedCert === 'journeyman' ? '#a0522d' : '#4682b4'} opacity="0.9" />
                     <circle cx="50" cy="50" r="38" fill="none" stroke="#d4af37" strokeWidth="2" strokeDasharray="3,3" />
                     <text x="50" y="55" textAnchor="middle" fill="#d4af37" fontSize="12" fontWeight="bold" fontFamily="'Cormorant Garamond', serif">
                       {selectedCert === 'master' ? 'MASTER' : selectedCert === 'journeyman' ? 'BARD' : 'APPR'}
                     </text>
                   </svg>
-                  <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
+                  <span className="text-[0.5rem] text-white/40 font-mono uppercase mt-1">
                     {t('officialSeal')}
                   </span>
                 </div>
                 
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ 
-                    fontSize: '1rem', 
-                    fontFamily: "'Cormorant Garamond', serif", 
-                    color: '#d4af37', 
-                    borderBottom: '1px solid rgba(255,255,255,0.2)', 
-                    paddingBottom: 4, 
-                    width: '140px', 
-                    fontStyle: 'italic', 
-                    fontWeight: 600 
-                  }}>
+                <div className="text-right">
+                  <div className="text-[1rem] font-serif text-[#d4af37] border-b border-white/20 pb-1 w-[140px] italic font-semibold">
                     Bertrand Laurence
                   </div>
-                  <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', marginTop: 4 }}>
+                  <div className="text-[0.6rem] text-white/40 font-mono uppercase mt-1">
                     {t('mentorshipSeal')}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 15, justifyContent: 'center', marginTop: 25 }}>
+            <div className="flex gap-[15px] justify-center mt-[25px]">
               <button 
                 onClick={() => window.print()}
-                className="py-2.5 px-5 rounded-lg font-mono text-[0.7rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: '#ffffff', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
+                className="py-2.5 px-5 rounded-lg font-mono text-[0.7rem] font-bold tracking-[0.05em] uppercase cursor-pointer bg-[linear-gradient(135deg,#10b981,#059669)] text-white shadow-[0_4px_12px_rgba(212,175,55,0.3)] transition-all duration-200"
               >
                 🖨️ {t('printSavePdf')}
               </button>
               <button 
                 onClick={() => { setShowCertModal(false); setSelectedCert(null); }}
-                className="py-2.5 px-5 rounded-lg font-mono text-[0.7rem] font-bold tracking-[0.05em] uppercase cursor-pointer" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff', boxShadow: '0 4px 12px rgba(212,175,55,0.3)', transition: 'all 0.2s' }}
+                className="py-2.5 px-5 rounded-lg font-mono text-[0.7rem] font-bold tracking-[0.05em] uppercase cursor-pointer bg-white/10 border border-white/20 text-white shadow-[0_4px_12px_rgba(212,175,55,0.3)] transition-all duration-200"
               >
                 {t('close')}
               </button>

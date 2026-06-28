@@ -1,11 +1,79 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 // https://vite.dev/config/
+const godotBridgePlugin = () => {
+  let latestTelemetry = null;
+  
+  return {
+    name: 'godot-telemetry-bridge',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        // Godot sends telemetry here
+        if (req.url === '/api/vertiscale/sync' && req.method === 'POST') {
+          let body = '';
+          req.on('data', chunk => {
+            body += chunk.toString();
+          });
+          req.on('end', () => {
+            try {
+              latestTelemetry = JSON.parse(body);
+              console.log('Received Godot telemetry:', latestTelemetry);
+              res.statusCode = 200;
+              res.end(JSON.stringify({ success: true }));
+            } catch (e) {
+              res.statusCode = 400;
+              res.end(JSON.stringify({ error: 'Invalid JSON' }));
+            }
+          });
+          return;
+        }
+        
+        // React polls this endpoint to get the latest telemetry
+        if (req.url === '/api/vertiscale/latest' && req.method === 'GET') {
+          res.setHeader('Content-Type', 'application/json');
+          res.statusCode = 200;
+          res.end(JSON.stringify(latestTelemetry || {}));
+          // Clear it after reading so we don't process it twice
+          latestTelemetry = null;
+          return;
+        }
+        
+        next();
+      });
+    }
+  };
+};
+
+const stripLargeWasm = () => ({
+  name: 'strip-large-wasm',
+  closeBundle() {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const distAssets = path.resolve(__dirname, 'dist/assets');
+    if (fs.existsSync(distAssets)) {
+      for (const file of fs.readdirSync(distAssets)) {
+        if (file.endsWith('.wasm')) {
+          const filePath = path.join(distAssets, file);
+          const size = fs.statSync(filePath).size;
+          if (size > 25 * 1024 * 1024) {
+            fs.unlinkSync(filePath);
+            console.log(`[strip-large-wasm] Removed ${file} (${(size / 1024 / 1024).toFixed(1)}MB) — loading from CDN instead`);
+          }
+        }
+      }
+    }
+  },
+});
+
 export default defineConfig({
   plugins: [
     react(),
+    godotBridgePlugin(),
+    stripLargeWasm(),
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
@@ -94,6 +162,7 @@ export default defineConfig({
     },
   },
   server: {
+    port: 1420,
     headers: {
       // Required for SharedArrayBuffer (ONNX runtime threaded WASM)
       'Cross-Origin-Opener-Policy': 'same-origin',
