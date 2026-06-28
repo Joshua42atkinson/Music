@@ -52,7 +52,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'Le 1-3-5 sont les piliers de l\'harmonie occidentale. La plupart des gens connaissent le 1-3-5 car ils jouent des accords. Nous vous rejoignons là où vous êtes. C\'est votre protéine, vos légumes et vos féculents — il n\'y a pas encore de saveur, mais c\'est le cœur de tout ce que nous faisons. À partir de cette triade de base, nous augmentons la complexité au rythme de l\'étudiant.',
       action: 'Visualize placing the 1, 3, and 5 together. Hear the fundamental triad in your inner ear.',
       actionFr: 'Visualisez le placement des 1, 3 et 5 ensemble. Entendez la triade fondamentale dans votre oreille interne.',
-      audioSnippet: '/assets/audio/bertrand_supporting_beams.mp3',
     },
     deepDive: 'A triad is three notes stacked in thirds. The Root (1) gives the chord its name. The Major 3rd (3) gives it its emotional color — bright, happy, resolved. The Perfect 5th (5) gives it stability and power. Together, these three notes form the skeleton of every major chord you will ever play. Bertrand calls this your "protein, greens, and starch" — the nutritional base of all harmony. The Pythagorean ratio 1:1 represents the root as the fundamental frequency — everything else is measured against it.',
     practiceTips: [
@@ -91,7 +90,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'Il n\'y a pas de mythologie ici. Il n\'y a pas de dogme académique pompeux. Si nous attribuons des nombres à la gamme, vous pouvez faire de la musique tout de suite. Si Do est 1, Ré est 2, Mi est 3... vous connaissez déjà des millions de chansons.',
       action: 'Close your eyes. Hear the relationship between the 1st note and the 5th note.',
       actionFr: 'Fermez les yeux. Entendez la relation entre la 1ère note et la 5ème note.',
-      audioSnippet: '/assets/audio/bertrand_music_by_numbers.mp3',
     },
     deepDive: 'The Nashville Number System is used by professional studio musicians worldwide. Instead of reading chord names (C, F, G), they read numbers (1, 4, 5). This lets a musician transpose to any key instantly — if the singer needs a lower key, you just think in numbers and play in the new key. The Pythagorean ratio 9:8 represents a whole step (Major 2nd), the distance between C and D.',
     practiceTips: [
@@ -129,7 +127,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'Vous devez comprendre la structure de votre instrument. Entre les cordes de Sol et de Si, l\'intervalle se réduit à une tierce majeure. C\'est un nid-de-poule. Nous devons compenser ce trou. Si vous l\'oubliez, vos motifs se brisent.',
       action: 'Visualize the 4th fret on the G string matching the open B string. This is the glitch.',
       actionFr: 'Visualisez la 4ème frette sur la corde de Sol correspondant à la corde de Si à vide. C\'est le bug.',
-      audioSnippet: '/assets/audio/bertrand_the_pothole.mp3',
     },
     deepDive: 'Standard guitar tuning is E-A-D-G-B-E. Five of the six string pairs are tuned in Perfect 4ths (5 semitones). But the G-to-B pair is a Major 3rd (4 semitones). This was done so that full six-string chords are easier to finger. The trade-off: any scale pattern that crosses the G-B boundary must shift up one fret. This is the single most important structural fact about the guitar fretboard. The Pythagorean ratio 81:64 is the Major 3rd — the same interval that creates this pothole.',
     practiceTips: [
@@ -165,7 +162,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'Vous avez vos protéines, vos légumes et vos féculents (1-3-5). Mais que se passe-t-il si nous saupoudrons la 7ème ? Vous devez la goûter. Laissez le son faire impression sur vous. La 7ème demande à se résoudre sur la fondamentale.',
       action: 'Play the 7th in your mind. Feel the tension. Now let it resolve.',
       actionFr: 'Jouez la 7ème dans votre esprit. Ressentez la tension. Maintenant, laissez-la se résoudre.',
-      audioSnippet: '/assets/audio/bertrand_the_7th.mp3',
     },
     deepDive: 'The Major 7th is the most expressive note in the scale. It creates tension because it is only a half-step below the root — it wants to resolve. In jazz, the Major 7th chord (Cmaj7) is the sound of sophistication and longing. In pop, it adds color to an otherwise plain major chord. Bertrand recommends using the Ear Master interval song chart to connect this interval to songs you already know. The Pythagorean ratio 243:128 is the Major 7th — the most complex ratio in the scale, which is why it sounds the most tense and yearning.',
     practiceTips: [
@@ -203,7 +199,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'Avant de pouvoir accorder les cordes, vous devez vous accorder vous-même. Remarquez toute tension dans vos épaules, votre mâchoire, votre respiration. Les cordes à vide représentent le vide non fretté. Comprenez l\'accordage standard : Mi, La, Ré, Sol, Si, Mi.',
       action: 'Close your eyes. Take a deep breath. Picture the 6 strings vibrating freely.',
       actionFr: 'Fermez les yeux. Prenez une grande respiration. Imaginez les 6 cordes vibrant librement.',
-      audioSnippet: '/assets/audio/bertrand_body_first_instrument.mp3',
     },
     deepDive: 'Standard tuning from low to high is E2-A2-D3-G3-B3-E4. Each string is named after its open note. The Pythagorean ratio 2:1 is the octave — the most fundamental relationship in music. When you play an open string and then fret the 12th fret, you hear the same note doubled in frequency. This is the foundation of all fretboard geometry. Bertrand teaches that the guitar and voice should be integrated — the guitar becomes your voice coach, and your voice becomes your guitar instructor. Sing each open string as you play it to build this connection.',
     practiceTips: [
@@ -239,7 +234,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'L\'accordage standard est principalement en quartes parfaites. Cela signifie que presser la 5ème frette de la corde de Mi grave crée exactement la même hauteur que la corde de La à vide en dessous. Visualisez cette relation géométrique.',
       action: 'Imagine pressing the 5th fret on the thickest string. Hear the pitch in your head. Now imagine the next string ringing openly. They are the same.',
       actionFr: 'Imaginez presser la 5ème frette sur la corde la plus épaisse. Entendez la hauteur dans votre tête. Maintenant, imaginez la corde suivante résonnant à vide. Elles sont identiques.',
-      audioSnippet: '/assets/audio/bertrand_the_5th_fret_unison.mp3',
     },
     deepDive: 'The 5th fret unison is how guitarists tune by ear. Because five of the six string pairs are Perfect 4ths apart, the 5th fret of each string matches the next open string. The exception is G-to-B, where the 4th fret (not 5th) matches. The Pythagorean ratio 4:3 is the Perfect 4th — the interval that defines the guitar\'s tuning geometry. Bertrand uses his "Vertiscales" worksheets to visualize these vertical relationships on the fretboard.',
     practiceTips: [
@@ -275,7 +269,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'La Fondamentale est la "maison". Chaque autre note pousse ou tire vers la fondamentale. Sur la guitare, Do est situé sur la 3ème frette de la corde de La. C\'est notre ancre pour tout ce qui suit.',
       action: 'Sing a strong, grounded note. Call it "C". Now visualize your finger landing on the 3rd fret of the A string.',
       actionFr: 'Chantez une note forte et enracinée. Appelez-la "Do". Visualisez maintenant votre doigt atterrissant sur la 3ème frette de la corde de La.',
-      audioSnippet: '/assets/audio/bertrand_the_root_note_c.mp3',
     },
     deepDive: 'The root note is the gravitational center of the scale. Every other note in the C major scale (D, E, F, G, A, B) has a relationship to C — some stable (G the 5th, E the 3rd), some tense (B the 7th, F the 4th). Finding C on the A string 3rd fret is your home base. From here, you can map the entire fretboard. The Pythagorean ratio 1:1 — the root is the reference frequency from which all other ratios are derived.',
     practiceTips: [
@@ -315,7 +308,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'Un "Ton Entier" correspond simplement à deux frettes sur la guitare. Pour aller de Do (1) à Ré (2), nous montons exactement d\'un ton entier.',
       action: 'Visualize the space of two frets on the A string. Hear the Root, then hear the note a whole step higher in your mind.',
       actionFr: 'Visualisez l\'espace de deux frettes sur la corde de La. Entendez la Fondamentale, puis entendez la note un ton plus haut dans votre esprit.',
-      audioSnippet: '/assets/audio/bertrand_whole_step.mp3',
     },
     deepDive: 'The C Major scale has a specific pattern of whole steps (W) and half steps (H): W-W-H-W-W-W-H. This pattern is what makes it "major." Every major scale in every key follows this same pattern. On the guitar, a whole step = 2 frets, a half step = 1 fret. The Pythagorean ratio 9:8 is the whole step — the distance between C and D, or any two adjacent scale tones separated by a whole step.',
     practiceTips: [
@@ -351,7 +343,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'Parce que les cordes sont accordées en quartes, la note située directement "au-dessus" de la fondamentale (sur la même frette, corde plus aiguë) est la Quarte Parfaite. Do est sur la corde de La. Directement au-dessus sur la corde de Ré se trouve Fa.',
       action: 'Imagine placing your finger flat across two strings at the 3rd fret. You are pressing C and F simultaneously.',
       actionFr: 'Imaginez placer votre doigt à plat en travers de deux cordes à la 3ème frette. Vous pressez Do et Fa simultanément.',
-      audioSnippet: '/assets/audio/bertrand_vertical_geometry.mp3',
     },
     deepDive: 'The Perfect 4th is the most geometrically powerful interval on the guitar because the instrument is tuned in 4ths. This means that any note played on a given fret has its Perfect 4th directly above it on the next string (same fret). The exception: crossing from G to B, where you must shift up one fret. Bertrand calls these vertical relationships "Vertiscales" — his original term for seeing scales as vertical columns rather than horizontal lines. The Pythagorean ratio 4:3 is the Perfect 4th — the inversion of the Perfect 5th (3:2). Together, 4:3 and 3:2 define the geometry of the fretboard.',
     practiceTips: [
@@ -387,7 +378,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'La tierce majeure dicte si un accord sonne joyeux (majeur) ou triste (mineur). Depuis Do, un ton entier au-dessus de Ré nous amène à Mi. Vous pouvez trouver Mi sur la corde de Ré, 2ème frette. Remarquez la relation diagonale avec la fondamentale.',
       action: 'Audiate the brightness of a major third. Hum "Root... Third".',
       actionFr: 'Audiationnez la brillance d\'une tierce majeure. Fredonnez "Fondamentale... Tierce".',
-      audioSnippet: '/assets/audio/bertrand_the_major_3rd_e.mp3',
     },
     deepDive: 'The Major 3rd is the defining interval of major tonality. Lower it by one fret (a half step) and it becomes a minor 3rd — the sound of sadness, blues, and introspection. This single semitone change is the most emotionally significant move in all of Western music. Bertrand combines ear training with interval recognition games — using songs you already know to identify intervals instantly. The Pythagorean ratio 81:64 is the Major 3rd — a complex ratio that produces the bright, open sound we associate with happiness and resolution.',
     practiceTips: [
@@ -426,7 +416,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'La gamme de Do majeur est complètement disposée sur les cinq premières frettes de votre guitare. Il n\'y a pas de dièses et pas de bémols. Juste un pur mouvement diatonique.',
       action: 'Visualize the full grid from low E to high E. Your fingers know where to go.',
       actionFr: 'Visualisez la grille complète du Mi grave au Mi aigu. Vos doigts savent où aller.',
-      audioSnippet: '/assets/audio/bertrand_the_full_octave_map.mp3',
     },
     deepDive: 'The C Major scale is the only major scale with no sharps or flats: C-D-E-F-G-A-B-C. Across frets 0-5, every note is available on every string. This makes C Major the perfect key for learning the fretboard. Once you can see the map in C, you can transpose it to any key by shifting the pattern. The Pythagorean ratio 2:1 is the octave — the scale spans exactly one octave from C to the next C.',
     practiceTips: [
@@ -463,7 +452,6 @@ export const C_SCALE_CHAPTERS = [
       contentFr: 'La forme que vous venez de jouer pour Do Majeur peut être glissée sur le manche. Pour ce faire, votre index doit agir comme le "sillet" de la guitare (un barré). C\'est le secret du système CAGED.',
       action: 'Visualize taking the open C shape, shifting it two frets up, and barring the 2nd fret. You just played a D Major chord.',
       actionFr: 'Visualisez prendre la forme ouverte de Do, la décaler de deux frettes vers le haut, et barrer la 2ème frette. Vous venez de jouer un accord de Ré Majeur.',
-      audioSnippet: '/assets/audio/bertrand_caged_seed.mp3',
     },
     deepDive: 'CAGED is an acronym for five open chord shapes: C, A, G, E, D. Each shape can be barred and moved up the neck to create the same chord type in a different key. The C shape barred at fret 2 gives you D major. Barred at fret 4 gives you E major. This is the fractal nature of the fretboard — the same geometry repeats at every fret. Bertrand teaches CAGED as the gateway to transposition — once you see the shapes, you can play in any key. The Pythagorean ratio 3:2 is the Perfect 5th — the interval that connects the C and G shapes in the CAGED system.',
     practiceTips: [
