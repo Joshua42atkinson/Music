@@ -3,5 +3,26 @@
 Voix Vive: Somatic Music Education in the Age of Generative AI.
 
 [![Deploy to Cloudflare Pages](https://img.shields.io/badge/Deploy-Cloudflare%20Pages-blue?style=for-the-badge)](https://voix-vive.pages.dev)
+[![XR Prototype](https://img.shields.io/badge/XR%20Prototype-WebXR%20Live-brightgreen?style=for-the-badge)](./apps/xr-prototype)
 
 Live URL: [https://voix-vive.pages.dev](https://voix-vive.pages.dev)
+
+## Voix Vive XR — Spatial Guitar Academy (Android XR Prototype)
+
+A WebXR prototype demonstrating the spatial computing vision for Android XR. Projects a holographic guitar fretboard over the user's physical instrument using AR passthrough, with real-time pitch detection and spatial audio feedback.
+
+**Quick start (no build required):**
+```bash
+cd apps/xr-prototype
+python3 -m http.server 8080
+# Open http://localhost:8080 in Chrome
+```
+
+Includes:
+- WebXR AR passthrough with 3D fretboard overlay
+- YIN pitch detection (real-time, from microphone)
+- Spatial audio feedback (3D positioned tones)
+- BE/DO/PLAY curriculum mode system
+- Android XR native scaffold (Kotlin/Jetpack XR + Oboe + ML Kit)
+
+See [`apps/xr-prototype/README.md`](./apps/xr-prototype/README.md) for full documentation.

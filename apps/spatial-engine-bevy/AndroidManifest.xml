@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ════════════════════════════════════════════════════════════
+     AndroidManifest.xml — Voix Vive XR for XREAL Aura
+     
+     Target: XREAL Aura (Android XR, optical see-through glasses)
+     - Hand tracking via world-facing cameras (XR_EXT_hand_tracking)
+     - 6DoF spatial anchoring for fretboard alignment
+     - Microphone for real-time pitch detection
+     - Optical see-through (user sees real guitar through glass)
+     ════════════════════════════════════════════════════════════ -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.voixvive.xr"
+    android:versionCode="1"
+    android:versionName="0.1.0">
+
+    <uses-sdk android:minSdkVersion="30" android:targetSdkVersion="36" />
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Required for hand tracking on Android XR (XR_EXT_hand_tracking) -->
+    <uses-permission android:name="android.permission.HAND_TRACKING" />
+
+    <!-- Android XR Features — XREAL Aura specific -->
+    <uses-feature
+        android:name="android.software.xr.api.level"
+        android:required="true"
+        android:version="1" />
+    <!-- Hand tracking is required — maps actual fingertips to fret positions -->
+    <uses-feature
+        android:name="android.hardware.xr.handtracking"
+        android:required="true" />
+    <!-- Spatial anchoring for aligning virtual fretboard to real guitar -->
+    <uses-feature
+        android:name="android.hardware.xr.spatial_anchoring"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.xr.eye_tracking"
+        android:required="false" />
+
+    <application
+        android:debuggable="false"
+        android:hasCode="false"
+        android:label="Voix Vive XR">
+
+        <activity
+            android:name="android.app.NativeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true">
+
+            <meta-data android:name="android.app.lib_name" android:value="voix_vive_xr" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Declare XR capability for Android XR (XREAL Aura) -->
+            <intent-filter>
+                <action android:name="android.intent.action.XR_ACTIVITY" />
+                <category android:name="android.intent.category.XR_DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

@@ -21,14 +21,14 @@ pub struct ContextWindow {
 pub struct TruebadourAvatar;
 
 fn predict_bass_response(
-    mut events: EventReader<IpcEvent>,
+    mut events: MessageReader<IpcEvent>,
     mut context: ResMut<ContextWindow>,
     mut avatars: Query<&mut Transform, With<TruebadourAvatar>>,
 ) {
     for event in events.read() {
         if event.0.event == "NOTE_PLAYED" {
             if let Some(data) = &event.0.data {
-                if let Some(note_name) = data.get("name").and_then(|n| n.as_str()) {
+                if let Some(note_name) = data.get("name").and_then(|n: &serde_json::Value| n.as_str()) {
                     // 1. Add to context window
                     context.notes.push(note_name.to_string());
                     if context.notes.len() > 8 {
@@ -39,11 +39,10 @@ fn predict_bass_response(
                     // Scaffold: We package the context window and trigger an asynchronous
                     // request to the local ONNX or Cloud API endpoint.
                     let context_string = context.notes.join(", ");
-                    println!("[AiAudioEngine] Sending context to AI Audio Model: [{}]", context_string);
+                    info!("[AiAudioEngine] Sending context to AI Audio Model: [{}]", context_string);
                     
-                    // Simulate receiving the generated audio buffer
                     let predicted_bass_note = format!("{}2", note_name);
-                    println!("[AiAudioEngine] Received generated audio buffer for base backing track matching: {}", predicted_bass_note);
+                    info!("[AiAudioEngine] Received generated audio buffer for base backing track matching: {}", predicted_bass_note);
 
                     // 3. Somatic/Visual Feedback (Bounce the Truebadour Avatar)
                     for mut transform in avatars.iter_mut() {

@@ -1,0 +1,54 @@
+# Third-Party License Notices
+
+Voix Vive XR incorporates open-source software from the following projects.
+Their licenses are reproduced below or referenced.
+
+## Bevy Engine — MIT OR Apache 2.0
+- https://bevyengine.org
+- Copyright (c) Bevy Contributors
+
+## bevy_mod_openxr — MIT OR Apache 2.0
+- https://github.com/awtterpv/bevy_mod_openxr
+- Copyright (c) bevy_mod_openxr Contributors
+
+## bevy_mod_xr — MIT OR Apache 2.0
+- https://github.com/awtterpv/bevy_mod_xr
+- Copyright (c) bevy_mod_xr Contributors
+
+## cpal (Cross-Platform Audio Library) — MIT OR Apache 2.0
+- https://github.com/RustAudio/cpal
+- Copyright (c) cpal Contributors
+
+## OpenXR Specification — Apache 2.0
+- https://www.khronos.org/openxr/
+- Copyright (c) The Khronos Group Inc.
+
+## React — MIT
+- https://react.dev
+- Copyright (c) Meta Platforms, Inc. and affiliates
+
+## Three.js — MIT
+- https://threejs.org
+- Copyright (c) Three.js Contributors
+
+## Vite — MIT
+- https://vitejs.dev
+- Copyright (c) Vite Contributors
+
+## Tokio — MIT
+- https://tokio.rs
+- Copyright (c) Tokio Contributors
+
+## warp (WebSocket server) — MIT
+- https://github.com/seanmonstar/warp
+- Copyright (c) warp Contributors
+
+## serde — MIT OR Apache 2.0
+- https://serde.rs
+- Copyright (c) serde Contributors
+
+---
+
+All above licenses permit commercial use. The Voix Vive XR source code
+itself is licensed under the Business Source License 1.1 (see LICENSE file).
+Third-party dependencies retain their original licenses.

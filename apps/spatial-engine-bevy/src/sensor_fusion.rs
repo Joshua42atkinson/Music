@@ -8,14 +8,14 @@ pub struct SensorFusionPlugin;
 
 impl Plugin for SensorFusionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<FusionScore>()
+        app.add_message::<FusionScore>()
            .insert_resource(RightHandMotion { velocity: Vec3::ZERO, last_pos: Vec3::ZERO })
            .add_systems(Update, (track_optical_motion, evaluate_sensor_fusion).chain());
     }
 }
 
 /// Emitted when a mechanical action (like picking) is fully evaluated
-#[derive(Event, Debug)]
+#[derive(Message, Debug)]
 pub struct FusionScore {
     pub optical_velocity: f32,
     pub acoustic_latency_ms: f32, // Time between hand strike and mic transient
@@ -42,7 +42,7 @@ fn track_optical_motion(
     if let Some(transform) = bone_query.iter().next() {
         let current_pos = transform.translation;
         let delta = current_pos - motion.last_pos;
-        motion.velocity = delta / time.delta_seconds();
+        motion.velocity = delta / time.delta_secs();
         motion.last_pos = current_pos;
     }
 }
@@ -52,11 +52,10 @@ fn track_optical_motion(
     time: Res<Time>,
     mut motion: ResMut<RightHandMotion>,
 ) {
-    // Desktop simulation: Assume the hand is moving in a sine wave
-    let simulated_y = (time.elapsed_seconds() * 5.0).sin() * 0.1;
+    let simulated_y = (time.elapsed_secs() * 5.0).sin() * 0.1;
     let current_pos = Vec3::new(0.0, simulated_y, 0.0);
     let delta = current_pos - motion.last_pos;
-    motion.velocity = delta / time.delta_seconds();
+    motion.velocity = delta / time.delta_secs();
     motion.last_pos = current_pos;
 }
 
@@ -65,15 +64,15 @@ use serde_json::json;
 
 /// Combines Acoustic (IPC) and Optical (Hand Tracking) to evaluate the Pling
 fn evaluate_sensor_fusion(
-    mut events: EventReader<IpcEvent>,
+    mut events: MessageReader<IpcEvent>,
     motion: Res<RightHandMotion>,
-    mut score_writer: EventWriter<FusionScore>,
-    mut outgoing_ipc: EventWriter<OutgoingIpcEvent>,
+    mut score_writer: MessageWriter<FusionScore>,
+    mut outgoing_ipc: MessageWriter<OutgoingIpcEvent>,
 ) {
     for event in events.read() {
         if event.0.event == "NOTE_PLAYED" {
             if let Some(data) = &event.0.data {
-                if let Some(note_name) = data.get("name").and_then(|n| n.as_str()) {
+                if let Some(note_name) = data.get("name").and_then(|n: &serde_json::Value| n.as_str()) {
                     let speed = motion.velocity.length();
                     
                     let mut evaluation = "Perfect Pling".to_string();
@@ -83,7 +82,7 @@ fn evaluate_sensor_fusion(
                         evaluation = "Aggressive Strike Detected: Hand velocity extreme.".to_string();
                     }
 
-                    score_writer.send(FusionScore {
+                    score_writer.write(FusionScore {
                         optical_velocity: speed,
                         acoustic_latency_ms: 0.0, // Scaffolded for now
                         note_name: note_name.to_string(),
@@ -91,7 +90,7 @@ fn evaluate_sensor_fusion(
                     });
 
                     // Send the evaluated score back to React via IPC
-                    outgoing_ipc.send(OutgoingIpcEvent(IpcPayload {
+                    outgoing_ipc.write(OutgoingIpcEvent(IpcPayload {
                         event: "FUSION_SCORE".to_string(),
                         archetype: Some("SensorFusion".to_string()),
                         friction: Some(0),
@@ -103,7 +102,7 @@ fn evaluate_sensor_fusion(
                         })),
                     }));
 
-                    println!("[Sensor Fusion] Note: {}, Velocity: {:.2}, Eval: {}", note_name, speed, evaluation);
+                    info!("[Sensor Fusion] Note: {}, Velocity: {:.2}, Eval: {}", note_name, speed, evaluation);
                 }
             }
         }

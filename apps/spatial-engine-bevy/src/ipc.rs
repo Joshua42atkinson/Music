@@ -16,10 +16,10 @@ pub struct IpcPayload {
     pub data: Option<serde_json::Value>,
 }
 
-#[derive(Event, Debug, Clone)]
+#[derive(Message, Debug, Clone)]
 pub struct IpcEvent(pub IpcPayload);
 
-#[derive(Event, Debug, Clone)]
+#[derive(Message, Debug, Clone)]
 pub struct OutgoingIpcEvent(pub IpcPayload);
 
 // ── Resource for the Channel ──
@@ -47,8 +47,8 @@ impl Plugin for IpcPlugin {
             });
         });
 
-        app.add_event::<IpcEvent>()
-            .add_event::<OutgoingIpcEvent>()
+        app.add_message::<IpcEvent>()
+            .add_message::<OutgoingIpcEvent>()
             .insert_resource(IpcReceiver(rx))
             .insert_resource(IpcBroadcaster(b_tx))
             .add_systems(Update, process_ipc_messages)
@@ -104,14 +104,14 @@ async fn handle_client(ws: WebSocket, tx: CrossbeamSender<IpcPayload>, b_tx: bro
     }
 }
 
-fn process_ipc_messages(receiver: Res<IpcReceiver>, mut events: EventWriter<IpcEvent>) {
+fn process_ipc_messages(receiver: Res<IpcReceiver>, mut events: MessageWriter<IpcEvent>) {
     for payload in receiver.0.try_iter() {
-        events.send(IpcEvent(payload));
+        events.write(IpcEvent(payload));
     }
 }
 
 fn broadcast_outgoing_ipc(
-    mut events: EventReader<OutgoingIpcEvent>,
+    mut events: MessageReader<OutgoingIpcEvent>,
     broadcaster: Res<IpcBroadcaster>,
 ) {
     for event in events.read() {

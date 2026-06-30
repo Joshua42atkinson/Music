@@ -1,12 +1,15 @@
 use bevy::prelude::*;
-use crate::truebadour_ai::TruebadourAvatar;
+use crate::environment_manager::SceneState;
+
+#[derive(Component)]
+struct TruebadourAvatar;
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub enum PracticeMode {
     #[default]
-    Be,   // Observation & Somatic Check-in
-    Do,   // Mechanics, Picking, & The Pling
-    Play, // Truebadour Backup Band & Flow State
+    Be,
+    Do,
+    Play,
 }
 
 pub struct ModesPlugin;
@@ -24,25 +27,33 @@ fn setup_be_mode(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut scene_state: ResMut<NextState<SceneState>>,
 ) {
-    println!("[Mode] Entering BE Mode: Fretboard visualization only. Somatic focus.");
-    
-    // Spawn Truebadour Avatar
+    info!("[Mode] Entering BE Mode: Fretboard visualization only. Somatic focus.");
+    scene_state.set(SceneState::ZenGarden);
+
     commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Sphere::new(0.5)),
-            material: materials.add(Color::srgb(0.2, 0.4, 0.8)),
-            transform: Transform::from_xyz(2.0, 1.0, -2.0),
+        Mesh3d(meshes.add(Sphere::new(0.5))),
+        MeshMaterial3d(materials.add(StandardMaterial {
+            base_color: Color::srgb(0.2, 0.4, 0.8),
+            emissive: LinearRgba::new(0.05, 0.1, 0.3, 1.0),
             ..default()
-        },
+        })),
+        Transform::from_xyz(2.0, 1.0, -2.0),
         TruebadourAvatar,
     ));
 }
 
-fn setup_do_mode() {
-    println!("[Mode] Entering DO Mode: Zooming in on right hand mechanics (The Pling).");
+fn setup_do_mode(
+    mut scene_state: ResMut<NextState<SceneState>>,
+) {
+    info!("[Mode] Entering DO Mode: Zooming in on right hand mechanics (The Pling).");
+    scene_state.set(SceneState::Studio);
 }
 
-fn setup_play_mode() {
-    println!("[Mode] Entering PLAY Mode: AI Truebadour backing band activated.");
+fn setup_play_mode(
+    mut scene_state: ResMut<NextState<SceneState>>,
+) {
+    info!("[Mode] Entering PLAY Mode: AI Truebadour backing band activated.");
+    scene_state.set(SceneState::Stage);
 }

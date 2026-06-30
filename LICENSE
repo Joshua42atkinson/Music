@@ -1,0 +1,62 @@
+Business Source License 1.1
+
+Parameters
+
+               Licensor:             Joshua Atkinson
+               Licensed Work:        Voix Vive XR — Spatial Guitar Academy
+                                     The Voix Vive spatial guitar education platform,
+                                     including the Bevy OpenXR spatial engine, companion
+                                     app, and XR prototype.
+               Additional Use Grant: Non-commercial use permitted, including personal
+                                     learning, academic research, and evaluation for
+                                     potential commercial licensing.
+               Change Date:          2030-06-30
+               Change License:       Apache License, Version 2.0
+
+Terms
+
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and non-commercially use the Licensed Work as described
+in the Additional Use Grant, subject to the following conditions:
+
+1. Distribution: You must distribute a copy of this license with the Licensed
+   Work. If you distribute the Licensed Work in source code form, you must
+   make this license available in a prominent location in the source code.
+
+2. Modifications: You may modify the Licensed Work and distribute modified
+   copies under this license, provided that you:
+   a. Prominently display a notice that the Licensed Work has been modified.
+   b. Include the original copyright notice and this license.
+
+3. Commercial Use: Commercial use of the Licensed Work is prohibited without
+   prior written permission from the Licensor. Commercial use includes, but
+   is not limited to:
+   a. Selling or licensing the Licensed Work or derivative works.
+   b. Using the Licensed Work in a paid service or product.
+   c. Using the Licensed Work internally for commercial gain.
+   
+   To obtain a commercial license, contact: joshua@voixvive.com
+
+4. Change Date: On or after the Change Date, this license will automatically
+   convert to the Change License (Apache License, Version 2.0), at which point
+   the Licensed Work will be freely available for commercial and non-commercial
+   use under the terms of the Apache License, Version 2.0.
+
+5. Disclaimer: THE LICENSED WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+   KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+   NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   FROM, OUT OF OR IN CONNECTION WITH THE LICENSED WORK OR THE USE OR OTHER
+   DEALINGS IN THE LICENSED WORK.
+
+6. Copyright: Copyright (c) 2026 Joshua Atkinson. All rights reserved.
+
+See the full Business Source License 1.1 text at:
+https://mariadb.com/bsl11/
+
+---
+
+On the Change Date (2030-06-30), this license converts to:
+Apache License, Version 2.0
+https://www.apache.org/licenses/LICENSE-2.0

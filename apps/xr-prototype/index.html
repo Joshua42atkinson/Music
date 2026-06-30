@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Voix Vive XR — Spatial Guitar Academy. An offline-capable, audio-first spatial computing platform that teaches guitar using real-time pitch detection and hand-tracking. Built for Android XR." />
+  <meta name="theme-color" content="#0a0a0f" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Voix Vive XR — Spatial Guitar Academy" />
+  <meta property="og:description" content="Offline-capable, audio-first spatial computing platform for guitar education. Android XR Developer Catalyst prototype." />
+  <meta property="og:type" content="website" />
+
+  <title>Voix Vive XR — Spatial Guitar Academy</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Three.js ES Module Import Map (no build step needed) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- ════════════════════════════════════════════════════════════
+       UI Overlay (visible in both desktop and AR modes)
+       ════════════════════════════════════════════════════════════ -->
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <h1 class="brand-title">Voix Vive <span class="brand-xr">XR</span></h1>
+      <p class="brand-subtitle">Spatial Guitar Academy</p>
+      <div class="loading-spinner"></div>
+      <p class="loading-text" id="loading-text">Initializing engine...</p>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div id="top-bar" class="hidden">
+    <div class="top-left">
+      <div class="logo">
+        <span class="logo-main">Voix Vive</span>
+        <span class="logo-xr">XR</span>
+      </div>
+    </div>
+    <div class="top-center">
+      <div id="note-display" class="note-display">
+        <span class="note-name" id="note-name">—</span>
+        <span class="note-octave" id="note-octave"></span>
+        <span class="note-freq" id="note-freq">Sing or play a note...</span>
+      </div>
+    </div>
+    <div class="top-right">
+      <button id="mic-toggle" class="btn btn-mic" title="Toggle microphone">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+        <span id="mic-label">Start Listening</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mode Selector (BE / DO / PLAY) -->
+  <div id="mode-bar" class="hidden">
+    <button class="mode-btn active" data-mode="be">
+      <span class="mode-icon">◐</span>
+      <span class="mode-label">BE</span>
+      <span class="mode-desc">Observe</span>
+    </button>
+    <button class="mode-btn" data-mode="do">
+      <span class="mode-icon">◑</span>
+      <span class="mode-label">DO</span>
+      <span class="mode-desc">Mechanics</span>
+    </button>
+    <button class="mode-btn" data-mode="play">
+      <span class="mode-icon">●</span>
+      <span class="mode-label">PLAY</span>
+      <span class="mode-desc">Flow State</span>
+    </button>
+  </div>
+
+  <!-- Scale Selector -->
+  <div id="scale-bar" class="hidden">
+    <div class="scale-label">Scale:</div>
+    <button class="scale-btn active" data-root="C" data-scale="major">C Major</button>
+    <button class="scale-btn" data-root="A" data-scale="minor">A Minor</button>
+    <button class="scale-btn" data-root="G" data-scale="major">G Major</button>
+    <button class="scale-btn" data-root="E" data-scale="minor">E Minor</button>
+    <button class="scale-btn" data-root="D" data-scale="major">D Major</button>
+    <button class="scale-btn" data-root="C" data-scale="pentatonic">C Pentatonic</button>
+  </div>
+
+  <!-- Bottom Info Panel -->
+  <div id="info-panel" class="hidden">
+    <div class="info-section">
+      <div class="info-label">Detected Note</div>
+      <div class="info-value" id="info-note">—</div>
+    </div>
+    <div class="info-section">
+      <div class="info-label">Cents Off</div>
+      <div class="info-value" id="info-cents">0¢</div>
+    </div>
+    <div class="info-section">
+      <div class="info-label">Volume</div>
+      <div class="volume-bar"><div class="volume-fill" id="volume-fill"></div></div>
+    </div>
+    <div class="info-section">
+      <div class="info-label">In Scale</div>
+      <div class="info-value" id="info-in-scale">—</div>
+    </div>
+  </div>
+
+  <!-- AR Session Button (injected by Three.js ARButton) -->
+  <div id="ar-button-container"></div>
+
+  <!-- Desktop Help (shown when WebXR not available) -->
+  <div id="desktop-help" class="hidden">
+    <div class="help-card">
+      <h3>Desktop Preview Mode</h3>
+      <p>WebXR AR not available on this device. You're viewing the 3D fretboard in desktop preview mode.</p>
+      <ul>
+        <li><strong>Drag</strong> to rotate the fretboard</li>
+        <li><strong>Scroll</strong> to zoom</li>
+        <li><strong>Click "Start Listening"</strong> then play your guitar or sing — notes will light up in real-time</li>
+      </ul>
+      <p class="help-ar-note">To experience full AR passthrough, open this page on an AR-capable device (Android Chrome with ARCore, Meta Quest browser, or Android XR headset).</p>
+    </div>
+  </div>
+
+  <!-- Canvas container -->
+  <div id="canvas-container"></div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

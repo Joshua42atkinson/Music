@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Voix Vive XR — Android XR app for XREAL Aura
+     Target: Optical see-through glasses with hand tracking
+     Requires: Android XR (API level 1), hand tracking, microphone -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required for ARCore hand tracking (XR_EXT_hand_tracking) -->
+    <uses-permission android:name="android.permission.HAND_TRACKING" />
+
+    <!-- Android XR Features — XREAL Aura specific -->
+    <uses-feature
+        android:name="android.software.xr.api.level"
+        android:required="true"
+        android:version="1" />
+    <!-- Hand tracking is required — maps actual fingertips to fret positions -->
+    <uses-feature
+        android:name="android.hardware.xr.handtracking"
+        android:required="true" />
+    <!-- Spatial anchoring for aligning fretboard overlay to real guitar -->
+    <uses-feature
+        android:name="android.hardware.xr.spatial_anchoring"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.VoixViveXR"
+        tools:targetApi="34">
+
+        <!-- Main XR Activity — launches in spatial mode on XREAL Aura -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="screenSize|screenLayout|orientation|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Declare XR capability for Android XR -->
+            <intent-filter>
+                <action android:name="android.intent.action.XR_ACTIVITY" />
+                <category android:name="android.intent.category.XR_DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
