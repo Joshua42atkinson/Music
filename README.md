@@ -7,6 +7,8 @@ Voix Vive: Somatic Music Education in the Age of Generative AI.
 
 Live URL: [https://voix-vive.pages.dev](https://voix-vive.pages.dev)
 
+[![10-Minute Walkthrough](https://img.shields.io/badge/Watch-10%20Min%20Walkthrough-red?style=for-the-badge&logo=youtube)](https://youtu.be/czyY0ZE2n3U)
+
 ## Voix Vive XR — Spatial Guitar Academy (Android XR Prototype)
 
 A WebXR prototype demonstrating the spatial computing vision for Android XR. Projects a holographic guitar fretboard over the user's physical instrument using AR passthrough, with real-time pitch detection and spatial audio feedback.
