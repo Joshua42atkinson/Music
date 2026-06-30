@@ -26,3 +26,10 @@ Includes:
 - Android XR native scaffold (Kotlin/Jetpack XR + Oboe + ML Kit)
 
 See [`apps/xr-prototype/README.md`](./apps/xr-prototype/README.md) for full documentation.
+
+## Maturation Maps
+
+Strategic planning documents for the XR app's development trajectory, aligned with Bertrand's pedagogy and XREAL Aura hardware capabilities. These are living documents — reference them in future workflows for context on architecture decisions, feature priorities, and the BE/DO/PLAY pedagogical model.
+
+- [`docs/XR_MATURATION_MAP.md`](./docs/XR_MATURATION_MAP.md) — Full 6-phase maturation map: scaffold → first light → guitar alignment → curriculum in space → Truebadour AI coach → somatic layer → performance & connection. Includes chapter-to-XR-feature matrix, API usage map, competitive landscape, and risk assessment.
+- [`docs/XR_AUDIO_MATURATION.md`](./docs/XR_AUDIO_MATURATION.md) — Audio-focused deep dive: XREAL Aura hardware (Bose open-ear speakers, 4-mic array), audit of all 8 existing audio systems, audio architecture pipeline, sound design philosophy, and what "mature" means for the student, Bertrand, and Google.

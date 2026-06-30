@@ -41,7 +41,8 @@ import kotlinx.coroutines.launch
  */
 class HandTrackingManager(
     private val session: Session,
-    private val onFretDetected: (FretPosition) -> Unit
+    private val onFretDetected: (FretPosition) -> Unit,
+    private val onHandJointsUpdated: ((FloatArray) -> Unit)? = null
 ) {
     private val TAG = "HandTracking"
     private val scope = CoroutineScope(Dispatchers.Default)
@@ -75,6 +76,10 @@ class HandTrackingManager(
                     val indexTip = handState.handJoints[HandJointType.INDEX_TIP]
                     val thumbTip = handState.handJoints[HandJointType.THUMB_TIP]
 
+                    // Collect all joint positions for renderer
+                    val jointPositions = collectJointPositions(handState, isLeft = true)
+                    onHandJointsUpdated?.invoke(jointPositions)
+
                     if (indexTip != null) {
                         // Transform fingertip pose from perception space to activity space
                         val transformedPose = session.scene.perceptionSpace.transformPoseTo(
@@ -97,6 +102,10 @@ class HandTrackingManager(
             Hand.right(session).state.collect { handState ->
                 if (handState.trackingState == androidx.xr.arcore.TrackingState.Tracking) {
                     val indexTip = handState.handJoints[HandJointType.INDEX_TIP]
+
+                    // Collect all joint positions for renderer
+                    val jointPositions = collectJointPositions(handState, isLeft = false)
+                    onHandJointsUpdated?.invoke(jointPositions)
 
                     if (indexTip != null) {
                         val transformedPose = session.scene.perceptionSpace.transformPoseTo(
@@ -130,6 +139,27 @@ class HandTrackingManager(
     fun release() {
         stop()
         scope.cancel()
+    }
+
+    /**
+     * Collect all hand joint positions transformed to activity space.
+     * Returns a flat FloatArray [x0, y0, z0, x1, y1, z1, ...] for renderer instancing.
+     */
+    private fun collectJointPositions(
+        handState: androidx.xr.arcore.HandState,
+        isLeft: Boolean
+    ): FloatArray {
+        val positions = mutableListOf<Float>()
+        for ((jointType, pose) in handState.handJoints) {
+            val transformed = session.scene.perceptionSpace.transformPoseTo(
+                pose,
+                session.scene.activitySpace
+            )
+            positions.add(transformed.translation.x)
+            positions.add(transformed.translation.y)
+            positions.add(transformed.translation.z)
+        }
+        return positions.toFloatArray()
     }
 
     /**

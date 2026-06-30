@@ -13,6 +13,7 @@ import androidx.xr.arcore.HandTrackingMode
 import androidx.xr.runtime.Config
 import androidx.xr.runtime.Session
 import androidx.xr.runtime.SessionCreateResult
+import androidx.xr.scenecore.RenderCallback
 
 /**
  * Voix Vive XR — Spatial Guitar Academy for XREAL Aura
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
     private var xrSession: Session? = null
     private var pitchEngine: PitchDetectionEngine? = null
     private var handTracker: HandTrackingManager? = null
+    private var fretboardRenderer: XrFretboardRenderer? = null
 
     // Compose state for UI updates
     private val noteState = mutableStateOf<DetectedNote?>(null)
@@ -89,6 +91,7 @@ class MainActivity : ComponentActivity() {
                     xrSession = sessionResult.session
                     Log.i(TAG, "XR Session created successfully")
 
+                    setupFretboardRenderer()
                     setupHandTracking()
                     setupPitchDetection()
                     setupComposeUi()
@@ -101,6 +104,27 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             Log.e(TAG, "XR Session initialization error: ${e.message}")
             setupFallbackUi()
+        }
+    }
+
+    /**
+     * Initialize the OpenGL ES fretboard renderer and register it
+     * as a render callback with the XR session. The renderer draws
+     * the holographic fretboard overlay into each XR frame.
+     */
+    private fun setupFretboardRenderer() {
+        val session = xrSession ?: return
+        fretboardRenderer = XrFretboardRenderer(session)
+        // Register the renderer to be called for each XR frame
+        // The XR runtime calls onSurfaceCreated once, then onDrawFrame per frame
+        try {
+            val surfaceEntity = androidx.xr.scenecore.SurfaceEntity.create(
+                session,
+                fretboardRenderer!! as RenderCallback
+            )
+            Log.i(TAG, "Fretboard renderer registered as render callback")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to register fretboard renderer: ${e.message}")
         }
     }
 
@@ -125,10 +149,16 @@ class MainActivity : ComponentActivity() {
         when (val result = session.configure(config)) {
             is Config.ConfigResult.Success -> {
                 Log.i(TAG, "Hand tracking configured — both hands enabled")
-                handTracker = HandTrackingManager(session) { fretPos ->
-                    fretState.value = fretPos
-                    Log.d(TAG, "Fret detected: string ${fretPos.stringIndex}, fret ${fretPos.fretIndex}")
-                }
+                handTracker = HandTrackingManager(
+                    session = session,
+                    onFretDetected = { fretPos ->
+                        fretState.value = fretPos
+                        Log.d(TAG, "Fret detected: string ${fretPos.stringIndex}, fret ${fretPos.fretIndex}")
+                    },
+                    onHandJointsUpdated = { jointPositions ->
+                        fretboardRenderer?.updateHandJoints(jointPositions)
+                    }
+                )
                 handTracker?.start()
                 handTrackingReady.value = true
             }
@@ -148,6 +178,8 @@ class MainActivity : ComponentActivity() {
             onNoteDetected = { noteName, frequency, cents ->
                 val note = DetectedNote(noteName, frequency, cents)
                 noteState.value = note
+                // Feed detected note to the fretboard renderer for pothole highlighting
+                fretboardRenderer?.setActiveNote(noteName, frequency)
                 Log.d(TAG, "Note: $noteName (${String.format("%.1f", frequency)}Hz, ${cents}¢)")
             }
         )
@@ -189,6 +221,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         pitchEngine?.release()
         handTracker?.release()
+        fretboardRenderer = null
         xrSession?.close()
     }
 }
