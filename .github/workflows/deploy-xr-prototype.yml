@@ -4,7 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/xr-prototype/**'
+      - 'apps/xr-prototype/index.html'
+      - 'apps/xr-prototype/*.js'
+      - 'apps/xr-prototype/*.css'
+      - 'apps/xr-prototype/assets/**'
   workflow_dispatch:
 
 permissions:
@@ -33,6 +36,11 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: apps/xr-prototype
+          include: |
+            index.html
+            *.js
+            *.css
+            assets/**
 
       - name: Deploy to GitHub Pages
         id: deployment
